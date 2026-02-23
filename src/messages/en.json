@@ -1,0 +1,395 @@
+{
+  "metadata": {
+    "title": "Just-Tag | The Best Restaurants in Switzerland",
+    "description": "Discover the best restaurants in Switzerland. Search by canton, cuisine and budget to find your ideal restaurant."
+  },
+  "nav": {
+    "home": "Home",
+    "restaurants": "Restaurants",
+    "about": "About",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "forRestaurants": "For restaurants",
+    "search": "Search"
+  },
+  "hero": {
+    "title": "Switzerland at the Table",
+    "subtitle": "From the Alps to the lakes, discover the finest restaurants in every Swiss canton",
+    "searchPlaceholder": "Restaurant name, cuisine...",
+    "canton": "Canton",
+    "allCantons": "All cantons",
+    "cuisineType": "Cuisine type",
+    "allCuisines": "All cuisines",
+    "searchButton": "Search",
+    "swissBadge": "100% Swiss",
+    "popularSearches": "Popular searches",
+    "statsCounter": "26 cantons, 500+ restaurants"
+  },
+  "featured": {
+    "title": "Restaurants of the Month",
+    "subtitle": "Our selection of the best tables this month",
+    "badge": "Restaurant of the Month"
+  },
+  "categories": {
+    "title": "Explore by cuisine type",
+    "subtitle": "Find exactly what you are craving",
+    "viewAll": "View all"
+  },
+  "howItWorks": {
+    "title": "How it works?",
+    "subtitle": "Find your ideal restaurant in 3 simple steps",
+    "step1Title": "Search",
+    "step1Desc": "Use our advanced filters to find the perfect restaurant based on your preferences",
+    "step2Title": "Discover",
+    "step2Desc": "Browse detailed profiles: menus, photos, reviews and location",
+    "step3Title": "Enjoy",
+    "step3Desc": "Contact the restaurant and enjoy an unforgettable dining experience"
+  },
+  "testimonials": {
+    "title": "What our users say",
+    "subtitle": "Thousands of food lovers trust us"
+  },
+  "newsletter": {
+    "title": "Stay informed",
+    "subtitle": "Receive our best recommendations and new restaurants every week",
+    "placeholder": "Your email address",
+    "button": "Subscribe",
+    "privacy": "We respect your privacy. Unsubscribe at any time.",
+    "success": "Thank you! You are now subscribed to our newsletter.",
+    "error": "An error occurred. Please try again."
+  },
+  "stats": {
+    "restaurants": "Restaurants",
+    "cantons": "Cantons covered",
+    "reviews": "Verified reviews",
+    "cuisines": "Cuisine types",
+    "swissQuality": "Swiss Quality"
+  },
+  "search": {
+    "title": "Find a restaurant",
+    "filters": "Filters",
+    "results": "{count} restaurants found",
+    "noResults": "No restaurant matches your search",
+    "sortBy": "Sort by",
+    "sortRating": "Best rating",
+    "sortPrice": "Price ascending",
+    "sortPriceDesc": "Price descending",
+    "sortNewest": "Newest",
+    "sortName": "Name A-Z",
+    "priceRange": "Price range",
+    "minRating": "Minimum rating",
+    "features": "Features",
+    "clearAll": "Clear filters",
+    "showMore": "Show more",
+    "map": "View on map"
+  },
+  "restaurant": {
+    "menu": "Menu",
+    "reviews": "Reviews",
+    "photos": "Photos",
+    "location": "Location",
+    "contact": "Contact",
+    "hours": "Opening hours",
+    "features": "Features",
+    "priceRange": "Price range",
+    "cuisine": "Cuisine type",
+    "website": "Visit website",
+    "call": "Call",
+    "email": "Send email",
+    "similar": "Similar restaurants",
+    "writeReview": "Write a review",
+    "closed": "Closed",
+    "open": "Open",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "merchant": {
+    "title": "Join Just-Tag",
+    "subtitle": "Showcase your restaurant to thousands of Swiss food lovers",
+    "monthly": "Monthly",
+    "semiannual": "Semi-annual",
+    "annual": "Annual",
+    "lifetime": "Lifetime",
+    "perMonth": "/month",
+    "perSemester": "/6 months",
+    "perYear": "/year",
+    "oneTime": "one-time payment",
+    "popular": "Most popular",
+    "bestValue": "Best value",
+    "subscribe": "Subscribe",
+    "features": {
+      "listing": "Complete restaurant profile",
+      "photos": "Up to 20 photos",
+      "menu": "Detailed menu",
+      "stats": "Visit statistics",
+      "badge": "Verified badge",
+      "priority": "Priority display",
+      "support": "Dedicated support"
+    },
+    "form": {
+      "name": "Full name",
+      "email": "Business email",
+      "phone": "Phone",
+      "restaurantName": "Restaurant name",
+      "city": "City",
+      "submit": "Continue to payment"
+    },
+    "success": {
+      "title": "Welcome to Just-Tag!",
+      "subtitle": "Your subscription has been successfully activated",
+      "nextSteps": "Next steps",
+      "step1": "Complete your restaurant profile",
+      "step2": "Add your photos and menu",
+      "step3": "Publish and attract new customers"
+    }
+  },
+  "footer": {
+    "description": "The reference platform to discover the best restaurants in Switzerland.",
+    "quickLinks": "Quick links",
+    "legal": "Legal information",
+    "privacy": "Privacy policy",
+    "terms": "Terms & conditions",
+    "imprint": "Legal notice",
+    "followUs": "Follow us",
+    "copyright": "All rights reserved.",
+    "swissMade": "Made in Switzerland",
+    "secureData": "Data secured in Switzerland",
+    "ctaTitle": "Are you a restaurant owner?",
+    "ctaSubtitle": "Register your restaurant and attract new customers"
+  },
+  "b2b": {
+    "hero": {
+      "title": "The first platform 100% dedicated to Swiss restaurants",
+      "subtitle": "Join the leading platform for restaurants in Switzerland and attract new customers every day.",
+      "benefit1": "Visibility among thousands of Swiss food lovers",
+      "benefit2": "Complete restaurant profile with menu, photos and reviews",
+      "benefit3": "Marketing tools to boost your reputation",
+      "socialProof": "Join the 100+ restaurant owners who trust us",
+      "cta": "Request a callback",
+      "ctaSecondary": "View pricing"
+    },
+    "swissAdvantage": {
+      "badge": "Swiss Advantage",
+      "title": "Why a 100% Swiss platform?",
+      "subtitle": "Just-Tag is designed for the Swiss market, by Swiss people",
+      "trilingual": {
+        "title": "Multilingual by default",
+        "desc": "Your restaurant profile is automatically available in French, German, English, Portuguese and Spanish."
+      },
+      "seo": {
+        "title": "SEO by canton",
+        "desc": "Optimized visibility in local search results for every Swiss canton."
+      },
+      "data": {
+        "title": "Data in Switzerland",
+        "desc": "Swiss hosting, GDPR compliant and Swiss data protection law."
+      },
+      "community": {
+        "title": "Local community",
+        "desc": "Verified reviews from the Swiss community for authentic trust."
+      }
+    },
+    "stats": {
+      "restaurants": "Partner restaurants",
+      "cantons": "Cantons covered",
+      "reviews": "Published reviews",
+      "cuisines": "Cuisine types"
+    },
+    "advantages": {
+      "title": "Why join Just-Tag?",
+      "subtitle": "Everything you need to grow your customer base",
+      "visibility": {
+        "title": "Maximum visibility",
+        "desc": "Your restaurant appears in search results of thousands of Swiss food lovers, with an SEO-optimized profile.",
+        "point1": "Detailed and professional restaurant profile",
+        "point2": "SEO-optimized presence on Google",
+        "point3": "Presence on Switzerland's #1 platform"
+      },
+      "reviews": {
+        "title": "Review management",
+        "desc": "Receive verified customer reviews and improve your online reputation. Each review strengthens your credibility.",
+        "point1": "Verified and moderated reviews",
+        "point2": "Average rating displayed on your profile",
+        "point3": "Respond to reviews to build customer loyalty"
+      },
+      "marketing": {
+        "title": "Powerful marketing tools",
+        "desc": "Take advantage of exclusive tools to highlight your establishment and attract new customers.",
+        "point1": "Verified badge to build trust",
+        "point2": "Possibility to be selected as Restaurant of the Month",
+        "point3": "Featured placement in search results"
+      },
+      "simplicity": {
+        "title": "Simple and effective",
+        "desc": "An intuitive interface and personalized support so you can focus on what matters most: your cuisine.",
+        "point1": "Simple and intuitive dashboard",
+        "point2": "Dedicated and responsive support",
+        "point3": "Detailed visit statistics"
+      }
+    },
+    "howItWorks": {
+      "title": "How does it work?",
+      "subtitle": "Join Just-Tag in 4 simple steps",
+      "step1": {
+        "title": "Sign up",
+        "desc": "Fill out the contact form or choose your subscription directly."
+      },
+      "step2": {
+        "title": "Create your profile",
+        "desc": "Add your photos, menu, opening hours and all your restaurant information."
+      },
+      "step3": {
+        "title": "Publish",
+        "desc": "Your restaurant appears on the platform and becomes visible to thousands of food lovers."
+      },
+      "step4": {
+        "title": "Attract customers",
+        "desc": "Receive contacts, reviews and grow your customer base daily."
+      }
+    },
+    "testimonials": {
+      "title": "They trust us",
+      "subtitle": "Swiss restaurant owners share their experience",
+      "t1": {
+        "name": "Marco Bernasconi",
+        "restaurant": "Trattoria da Marco",
+        "city": "Lugano",
+        "quote": "Since we joined Just-Tag, our reservations have increased by 30%. The platform is really effective for reaching new customers."
+      },
+      "t2": {
+        "name": "Sophie Mueller",
+        "restaurant": "Gasthof zum Baeren",
+        "city": "Bern",
+        "quote": "The interface is very easy to use and the support is excellent. I recommend Just-Tag to all Swiss restaurant owners."
+      },
+      "t3": {
+        "name": "Antoine Girard",
+        "restaurant": "Le Comptoir du Lac",
+        "city": "Lausanne",
+        "quote": "The verified reviews have helped us strengthen our reputation. Our customers often mention they found us on Just-Tag."
+      }
+    },
+    "pricing": {
+      "title": "Pricing for every need",
+      "subtitle": "Choose the plan that suits you and start attracting new customers",
+      "earlyBirdTab": "Launch offer",
+      "earlyBirdBadge": "-40%",
+      "earlyBirdNote": "Exclusive rates for the first 100 registered restaurants",
+      "standardTab": "Standard rates",
+      "perMonthLabel": "/month",
+      "totalLabel": "i.e. CHF {price} total",
+      "toteBags": "+ {count} personalized tote bags included",
+      "bestValue": "Best value",
+      "lifetimeTitle": "Lifetime offer",
+      "lifetimeExclusive": "Exclusive",
+      "lifetimeDesc": "A one-time payment for unlimited access to all features, forever.",
+      "oneTimePayment": "one-time payment",
+      "cta": "View details and subscribe",
+      "note": "No commitment on the monthly plan. Cancel anytime.",
+      "guarantee": "30-day money-back guarantee",
+      "spotsLeft": "{count} Early Bird spots remaining",
+      "includedTitle": "Included in all plans",
+      "included": {
+        "presence": "Your establishment listing",
+        "photoHighlight": "Photo showcase",
+        "menuDisplay": "Menu display",
+        "addressContact": "Address, contact & map",
+        "openingHours": "Opening hours",
+        "videoPresentation": "Video presentation"
+      },
+      "features": {
+        "listing": "Complete profile",
+        "photos": "Photos & menu",
+        "stats": "Statistics",
+        "badge": "Verified badge",
+        "priority": "Priority display",
+        "support": "Dedicated support"
+      }
+    },
+    "contact": {
+      "title": "Request a callback",
+      "subtitle": "Leave your contact details and an advisor will get back to you within 24 hours.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Business email",
+      "phone": "Phone",
+      "restaurantName": "Restaurant name",
+      "city": "City",
+      "message": "Message (optional)",
+      "messagePlaceholder": "Tell us more about your restaurant...",
+      "submit": "Send my request",
+      "sending": "Sending...",
+      "success": "Thank you! Your request has been sent successfully. An advisor will contact you within 24 hours.",
+      "error": "An error occurred. Please try again.",
+      "canton": "Canton",
+      "allCantons": "Select a canton",
+      "cuisineType": "Cuisine type",
+      "allCuisines": "Select a type",
+      "trustSecure": "Secure data",
+      "trustNoCommit": "No commitment",
+      "trustMultilingual": "Support in 5 languages",
+      "trustCallback": "Callback within 24h"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "q1": {
+        "question": "How much does it cost to register on Just-Tag?",
+        "answer": "We offer 3 plans (monthly, semi-annual, annual) with a launch rate starting at CHF 24.90/month for the first 100 registered restaurants. Standard rates apply thereafter. A lifetime offer at CHF 1,495 is also available. All semi-annual and annual plans include free personalized tote bags."
+      },
+      "q2": {
+        "question": "Am I tied to a minimum duration?",
+        "answer": "No, the monthly plan has no commitment. You can cancel at any time. The semi-annual and annual plans are billed once for the chosen period."
+      },
+      "q3": {
+        "question": "How is my restaurant featured?",
+        "answer": "Your restaurant appears in search results with a complete profile including photos, menu, opening hours and reviews. Depending on your plan, you benefit from priority display and a verified badge."
+      },
+      "q4": {
+        "question": "Is the website available in multiple languages?",
+        "answer": "Yes, Just-Tag is available in French, German, English, Portuguese and Spanish. Your restaurant profile is translated into all five languages to reach as many customers as possible."
+      },
+      "q5": {
+        "question": "What kind of support do you offer?",
+        "answer": "All plans include email support. Annual and Lifetime plans benefit from dedicated and priority support with a personal advisor."
+      },
+      "q6": {
+        "question": "Can I update my profile at any time?",
+        "answer": "Absolutely. You can update your photos, menu, opening hours and all your information at any time from your dashboard."
+      }
+    }
+  },
+  "cantonMap": {
+    "title": "Explore by canton",
+    "subtitle": "Click on a canton to discover its restaurants"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "viewDetails": "View details",
+    "seeAll": "See all",
+    "chf": "CHF"
+  },
+  "contactPage": {
+    "subtitle": "Have a question? Don't hesitate to contact us.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send message",
+    "phone": "Phone",
+    "address": "Address",
+    "successTitle": "Message sent!",
+    "successMessage": "Thank you for contacting us. Our team will get back to you as soon as possible.",
+    "error": "An error occurred. Please try again."
+  }
+}

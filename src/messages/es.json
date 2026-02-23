@@ -1,0 +1,395 @@
+{
+  "metadata": {
+    "title": "Just-Tag | Los mejores restaurantes de Suiza",
+    "description": "Descubre los mejores restaurantes de Suiza. Busca por canton, cocina y presupuesto para encontrar tu restaurante ideal."
+  },
+  "nav": {
+    "home": "Inicio",
+    "restaurants": "Restaurantes",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "faq": "FAQ",
+    "forRestaurants": "Para restaurantes",
+    "search": "Buscar"
+  },
+  "hero": {
+    "title": "Suiza a la mesa",
+    "subtitle": "De los Alpes a los lagos, descubre los mejores restaurantes en cada canton suizo",
+    "searchPlaceholder": "Nombre del restaurante, cocina...",
+    "canton": "Canton",
+    "allCantons": "Todos los cantones",
+    "cuisineType": "Tipo de cocina",
+    "allCuisines": "Todas las cocinas",
+    "searchButton": "Buscar",
+    "swissBadge": "100% suizo",
+    "popularSearches": "Busquedas populares",
+    "statsCounter": "26 cantones, mas de 500 restaurantes"
+  },
+  "featured": {
+    "title": "Restaurantes del mes",
+    "subtitle": "Nuestra seleccion de las mejores mesas este mes",
+    "badge": "Restaurante del mes"
+  },
+  "categories": {
+    "title": "Explora por tipo de cocina",
+    "subtitle": "Encuentra exactamente lo que te apetece",
+    "viewAll": "Ver todo"
+  },
+  "howItWorks": {
+    "title": "Como funciona?",
+    "subtitle": "Encuentra tu restaurante ideal en 3 sencillos pasos",
+    "step1Title": "Busca",
+    "step1Desc": "Utiliza nuestros filtros avanzados para encontrar el restaurante perfecto segun tus preferencias",
+    "step2Title": "Descubre",
+    "step2Desc": "Explora perfiles detallados: menus, fotos, resenas y ubicacion",
+    "step3Title": "Disfruta",
+    "step3Desc": "Contacta con el restaurante y disfruta de una experiencia gastronomica inolvidable"
+  },
+  "testimonials": {
+    "title": "Lo que dicen nuestros usuarios",
+    "subtitle": "Miles de amantes de la gastronomia confian en nosotros"
+  },
+  "newsletter": {
+    "title": "Mantente informado",
+    "subtitle": "Recibe nuestras mejores recomendaciones y nuevos restaurantes cada semana",
+    "placeholder": "Tu direccion de correo electronico",
+    "button": "Suscribirse",
+    "privacy": "Respetamos tu privacidad. Puedes darte de baja en cualquier momento.",
+    "success": "¡Gracias! Estás suscrito a nuestro boletín.",
+    "error": "Ha ocurrido un error. Por favor, inténtelo de nuevo."
+  },
+  "stats": {
+    "restaurants": "Restaurantes",
+    "cantons": "Cantones cubiertos",
+    "reviews": "Resenas verificadas",
+    "cuisines": "Tipos de cocina",
+    "swissQuality": "Calidad suiza"
+  },
+  "search": {
+    "title": "Encontrar un restaurante",
+    "filters": "Filtros",
+    "results": "{count} restaurantes encontrados",
+    "noResults": "Ningun restaurante coincide con tu busqueda",
+    "sortBy": "Ordenar por",
+    "sortRating": "Mejor valoracion",
+    "sortPrice": "Precio ascendente",
+    "sortPriceDesc": "Precio descendente",
+    "sortNewest": "Mas recientes",
+    "sortName": "Nombre A-Z",
+    "priceRange": "Rango de precios",
+    "minRating": "Valoracion minima",
+    "features": "Caracteristicas",
+    "clearAll": "Borrar filtros",
+    "showMore": "Mostrar mas",
+    "map": "Ver en el mapa"
+  },
+  "restaurant": {
+    "menu": "Carta",
+    "reviews": "Resenas",
+    "photos": "Fotos",
+    "location": "Ubicacion",
+    "contact": "Contacto",
+    "hours": "Horario de apertura",
+    "features": "Caracteristicas",
+    "priceRange": "Rango de precios",
+    "cuisine": "Tipo de cocina",
+    "website": "Visitar sitio web",
+    "call": "Llamar",
+    "email": "Enviar correo electronico",
+    "similar": "Restaurantes similares",
+    "writeReview": "Escribir una resena",
+    "closed": "Cerrado",
+    "open": "Abierto",
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miercoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sabado",
+    "sunday": "Domingo"
+  },
+  "merchant": {
+    "title": "Unete a Just-Tag",
+    "subtitle": "Muestra tu restaurante a miles de amantes de la gastronomia suiza",
+    "monthly": "Mensual",
+    "semiannual": "Semestral",
+    "annual": "Anual",
+    "lifetime": "De por vida",
+    "perMonth": "/mes",
+    "perSemester": "/6 meses",
+    "perYear": "/ano",
+    "oneTime": "pago unico",
+    "popular": "Mas popular",
+    "bestValue": "Mejor relacion calidad-precio",
+    "subscribe": "Suscribirse",
+    "features": {
+      "listing": "Perfil completo del restaurante",
+      "photos": "Hasta 20 fotos",
+      "menu": "Carta detallada",
+      "stats": "Estadisticas de visitas",
+      "badge": "Insignia de verificacion",
+      "priority": "Visualizacion prioritaria",
+      "support": "Soporte dedicado"
+    },
+    "form": {
+      "name": "Nombre completo",
+      "email": "Correo electronico profesional",
+      "phone": "Telefono",
+      "restaurantName": "Nombre del restaurante",
+      "city": "Ciudad",
+      "submit": "Continuar al pago"
+    },
+    "success": {
+      "title": "Bienvenido a Just-Tag!",
+      "subtitle": "Tu suscripcion se ha activado correctamente",
+      "nextSteps": "Proximos pasos",
+      "step1": "Completa el perfil de tu restaurante",
+      "step2": "Anade tus fotos y tu carta",
+      "step3": "Publica y atrae nuevos clientes"
+    }
+  },
+  "footer": {
+    "description": "La plataforma de referencia para descubrir los mejores restaurantes de Suiza.",
+    "quickLinks": "Enlaces rapidos",
+    "legal": "Informacion legal",
+    "privacy": "Politica de privacidad",
+    "terms": "Terminos y condiciones",
+    "imprint": "Aviso legal",
+    "followUs": "Siguenos",
+    "copyright": "Todos los derechos reservados.",
+    "swissMade": "Fabricado en Suiza",
+    "secureData": "Datos protegidos en Suiza",
+    "ctaTitle": "Eres propietario de un restaurante?",
+    "ctaSubtitle": "Registra tu restaurante y atrae nuevos clientes"
+  },
+  "b2b": {
+    "hero": {
+      "title": "La primera plataforma 100% dedicada a los restaurantes suizos",
+      "subtitle": "Unete a la plataforma lider para restaurantes en Suiza y atrae nuevos clientes cada dia.",
+      "benefit1": "Visibilidad ante miles de amantes de la gastronomia suiza",
+      "benefit2": "Perfil completo del restaurante con carta, fotos y resenas",
+      "benefit3": "Herramientas de marketing para potenciar tu reputacion",
+      "socialProof": "Unete a los mas de 100 propietarios de restaurantes que confian en nosotros",
+      "cta": "Solicitar una llamada",
+      "ctaSecondary": "Ver precios"
+    },
+    "swissAdvantage": {
+      "badge": "Ventaja suiza",
+      "title": "Por que una plataforma 100% suiza?",
+      "subtitle": "Just-Tag esta disenado para el mercado suizo, por suizos",
+      "trilingual": {
+        "title": "Multilingue por defecto",
+        "desc": "El perfil de tu restaurante esta disponible automaticamente en frances, aleman, ingles, portugues y espanol."
+      },
+      "seo": {
+        "title": "SEO por canton",
+        "desc": "Visibilidad optimizada en los resultados de busqueda locales de cada canton suizo."
+      },
+      "data": {
+        "title": "Datos en Suiza",
+        "desc": "Alojamiento suizo, conforme al RGPD y a la ley suiza de proteccion de datos."
+      },
+      "community": {
+        "title": "Comunidad local",
+        "desc": "Resenas verificadas de la comunidad suiza para una confianza autentica."
+      }
+    },
+    "stats": {
+      "restaurants": "Restaurantes asociados",
+      "cantons": "Cantones cubiertos",
+      "reviews": "Resenas publicadas",
+      "cuisines": "Tipos de cocina"
+    },
+    "advantages": {
+      "title": "Por que unirse a Just-Tag?",
+      "subtitle": "Todo lo que necesitas para hacer crecer tu base de clientes",
+      "visibility": {
+        "title": "Visibilidad maxima",
+        "desc": "Tu restaurante aparece en los resultados de busqueda de miles de amantes de la gastronomia suiza, con un perfil optimizado para SEO.",
+        "point1": "Perfil del restaurante detallado y profesional",
+        "point2": "Presencia optimizada para SEO en Google",
+        "point3": "Presencia en la plataforma numero 1 de Suiza"
+      },
+      "reviews": {
+        "title": "Gestion de resenas",
+        "desc": "Recibe resenas verificadas de clientes y mejora tu reputacion en linea. Cada resena refuerza tu credibilidad.",
+        "point1": "Resenas verificadas y moderadas",
+        "point2": "Valoracion media mostrada en tu perfil",
+        "point3": "Responde a las resenas para fidelizar a tus clientes"
+      },
+      "marketing": {
+        "title": "Potentes herramientas de marketing",
+        "desc": "Aprovecha herramientas exclusivas para destacar tu establecimiento y atraer nuevos clientes.",
+        "point1": "Insignia de verificacion para generar confianza",
+        "point2": "Posibilidad de ser seleccionado como Restaurante del mes",
+        "point3": "Posicionamiento destacado en los resultados de busqueda"
+      },
+      "simplicity": {
+        "title": "Simple y eficaz",
+        "desc": "Una interfaz intuitiva y un soporte personalizado para que puedas centrarte en lo mas importante: tu cocina.",
+        "point1": "Panel de control sencillo e intuitivo",
+        "point2": "Soporte dedicado y reactivo",
+        "point3": "Estadisticas detalladas de visitas"
+      }
+    },
+    "howItWorks": {
+      "title": "Como funciona?",
+      "subtitle": "Unete a Just-Tag en 4 sencillos pasos",
+      "step1": {
+        "title": "Registrate",
+        "desc": "Rellena el formulario de contacto o elige tu suscripcion directamente."
+      },
+      "step2": {
+        "title": "Crea tu perfil",
+        "desc": "Anade tus fotos, carta, horarios de apertura y toda la informacion de tu restaurante."
+      },
+      "step3": {
+        "title": "Publica",
+        "desc": "Tu restaurante aparece en la plataforma y se hace visible para miles de amantes de la gastronomia."
+      },
+      "step4": {
+        "title": "Atrae clientes",
+        "desc": "Recibe contactos, resenas y haz crecer tu base de clientes cada dia."
+      }
+    },
+    "testimonials": {
+      "title": "Confian en nosotros",
+      "subtitle": "Propietarios de restaurantes suizos comparten su experiencia",
+      "t1": {
+        "name": "Marco Bernasconi",
+        "restaurant": "Trattoria da Marco",
+        "city": "Lugano",
+        "quote": "Desde que nos unimos a Just-Tag, nuestras reservas han aumentado un 30%. La plataforma es realmente eficaz para llegar a nuevos clientes."
+      },
+      "t2": {
+        "name": "Sophie Mueller",
+        "restaurant": "Gasthof zum Baeren",
+        "city": "Bern",
+        "quote": "La interfaz es muy facil de usar y el soporte es excelente. Recomiendo Just-Tag a todos los propietarios de restaurantes suizos."
+      },
+      "t3": {
+        "name": "Antoine Girard",
+        "restaurant": "Le Comptoir du Lac",
+        "city": "Lausanne",
+        "quote": "Las resenas verificadas nos han ayudado a reforzar nuestra reputacion. Nuestros clientes mencionan a menudo que nos encontraron en Just-Tag."
+      }
+    },
+    "pricing": {
+      "title": "Precios para cada necesidad",
+      "subtitle": "Elige el plan que mas te convenga y empieza a atraer nuevos clientes",
+      "earlyBirdTab": "Oferta de lanzamiento",
+      "earlyBirdBadge": "-40%",
+      "earlyBirdNote": "Tarifas exclusivas para los primeros 100 restaurantes registrados",
+      "standardTab": "Tarifas estandar",
+      "perMonthLabel": "/mes",
+      "totalLabel": "es decir, CHF {price} en total",
+      "toteBags": "+ {count} bolsas de tela personalizadas incluidas",
+      "bestValue": "Mejor relacion calidad-precio",
+      "lifetimeTitle": "Oferta de por vida",
+      "lifetimeExclusive": "Exclusivo",
+      "lifetimeDesc": "Un pago unico para acceder a todas las funciones de forma ilimitada, para siempre.",
+      "oneTimePayment": "pago unico",
+      "cta": "Ver detalles y suscribirse",
+      "note": "Sin compromiso en el plan mensual. Cancela en cualquier momento.",
+      "guarantee": "Garantia de devolucion de 30 dias",
+      "spotsLeft": "{count} plazas Early Bird restantes",
+      "includedTitle": "Incluido en todos los planes",
+      "included": {
+        "presence": "Ficha de tu establecimiento",
+        "photoHighlight": "Galeria de fotos",
+        "menuDisplay": "Presentacion de la carta",
+        "addressContact": "Direccion, contacto y mapa",
+        "openingHours": "Horarios de apertura",
+        "videoPresentation": "Presentacion en video"
+      },
+      "features": {
+        "listing": "Perfil completo",
+        "photos": "Fotos y carta",
+        "stats": "Estadisticas",
+        "badge": "Insignia de verificacion",
+        "priority": "Visualizacion prioritaria",
+        "support": "Soporte dedicado"
+      }
+    },
+    "contact": {
+      "title": "Solicitar una llamada",
+      "subtitle": "Deja tus datos de contacto y un asesor se pondra en contacto contigo en un plazo de 24 horas.",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electronico profesional",
+      "phone": "Telefono",
+      "restaurantName": "Nombre del restaurante",
+      "city": "Ciudad",
+      "message": "Mensaje (opcional)",
+      "messagePlaceholder": "Cuentanos mas sobre tu restaurante...",
+      "submit": "Enviar mi solicitud",
+      "sending": "Enviando...",
+      "success": "Gracias! Tu solicitud se ha enviado correctamente. Un asesor se pondra en contacto contigo en un plazo de 24 horas.",
+      "error": "Se ha producido un error. Por favor, intentalo de nuevo.",
+      "canton": "Canton",
+      "allCantons": "Seleccionar un canton",
+      "cuisineType": "Tipo de cocina",
+      "allCuisines": "Seleccionar un tipo",
+      "trustSecure": "Datos protegidos",
+      "trustNoCommit": "Sin compromiso",
+      "trustMultilingual": "Soporte en 5 idiomas",
+      "trustCallback": "Llamada en 24 h"
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "q1": {
+        "question": "Cuanto cuesta registrarse en Just-Tag?",
+        "answer": "Ofrecemos 3 planes (mensual, semestral, anual) con una tarifa de lanzamiento a partir de CHF 24,90/mes para los primeros 100 restaurantes registrados. Despues se aplican las tarifas estandar. Tambien esta disponible una oferta de por vida a CHF 1.495. Todos los planes semestrales y anuales incluyen bolsas de tela personalizadas de regalo."
+      },
+      "q2": {
+        "question": "Estoy sujeto a una duracion minima?",
+        "answer": "No, el plan mensual no tiene compromiso. Puedes cancelar en cualquier momento. Los planes semestrales y anuales se facturan de una sola vez por el periodo elegido."
+      },
+      "q3": {
+        "question": "Como se destaca mi restaurante?",
+        "answer": "Tu restaurante aparece en los resultados de busqueda con un perfil completo que incluye fotos, carta, horarios de apertura y resenas. Segun tu plan, te beneficias de una visualizacion prioritaria y una insignia de verificacion."
+      },
+      "q4": {
+        "question": "El sitio web esta disponible en varios idiomas?",
+        "answer": "Si, Just-Tag esta disponible en frances, aleman, ingles, portugues y espanol. El perfil de tu restaurante se traduce a los cinco idiomas para llegar al mayor numero posible de clientes."
+      },
+      "q5": {
+        "question": "Que tipo de soporte ofrecen?",
+        "answer": "Todos los planes incluyen soporte por correo electronico. Los planes anuales y de por vida se benefician de un soporte dedicado y prioritario con un asesor personal."
+      },
+      "q6": {
+        "question": "Puedo actualizar mi perfil en cualquier momento?",
+        "answer": "Por supuesto. Puedes actualizar tus fotos, carta, horarios de apertura y toda tu informacion en cualquier momento desde tu panel de control."
+      }
+    }
+  },
+  "cantonMap": {
+    "title": "Explora por canton",
+    "subtitle": "Haz clic en un canton para descubrir sus restaurantes"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Se ha producido un error",
+    "retry": "Reintentar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "viewDetails": "Ver detalles",
+    "seeAll": "Ver todo",
+    "chf": "CHF"
+  },
+  "contactPage": {
+    "subtitle": "¿Tiene alguna pregunta? No dude en contactarnos.",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "subject": "Asunto",
+    "message": "Mensaje",
+    "send": "Enviar mensaje",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "successTitle": "¡Mensaje enviado!",
+    "successMessage": "Gracias por contactarnos. Nuestro equipo le responderá lo antes posible.",
+    "error": "Ha ocurrido un error. Por favor, inténtelo de nuevo."
+  }
+}
