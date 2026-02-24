@@ -5,6 +5,7 @@ import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers"
 import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { createAdminClient } from "@/lib/supabase/server";
+import type { DbMenuItem, DbReview, RestaurantImage } from "@/lib/supabase/types";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch";
 
@@ -57,7 +58,7 @@ function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaur
   };
 }
 
-function mapDbToReview(row: { id: string; restaurant_id: string; author_name: string; rating: number; comment: string | null; created_at: string }): Review {
+function mapDbToReview(row: DbReview): Review {
   return {
     id: row.id,
     restaurantId: row.restaurant_id,
@@ -90,7 +91,7 @@ async function getReviews(restaurantId: string): Promise<Review[]> {
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
-  return data.map((row) => mapDbToReview(row));
+  return (data as unknown as DbReview[]).map((row) => mapDbToReview(row));
 }
 
 async function getMenuItems(restaurantId: string) {
@@ -103,7 +104,7 @@ async function getMenuItems(restaurantId: string) {
     .order("position", { ascending: true });
 
   if (error || !data) return [];
-  return data.map((row) => ({
+  return (data as unknown as DbMenuItem[]).map((row) => ({
     nameFr: row.name_fr || "",
     nameDe: row.name_de || "",
     nameEn: row.name_en || "",
@@ -124,7 +125,7 @@ async function getRestaurantImages(restaurantId: string): Promise<string[]> {
     .order("position", { ascending: true });
 
   if (error || !data) return [];
-  return data.map((row) => row.url);
+  return (data as unknown as RestaurantImage[]).map((row) => row.url);
 }
 
 export async function generateMetadata({
