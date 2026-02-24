@@ -57,14 +57,14 @@ function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaur
   };
 }
 
-function mapDbToReview(row: Record<string, unknown>): Review {
+function mapDbToReview(row: { id: string; restaurant_id: string; author_name: string; rating: number; comment: string | null; created_at: string }): Review {
   return {
-    id: row.id as string,
-    restaurantId: row.restaurant_id as string,
-    authorName: row.author_name as string,
-    rating: row.rating as number,
-    comment: (row.comment as string) || "",
-    createdAt: row.created_at as string,
+    id: row.id,
+    restaurantId: row.restaurant_id,
+    authorName: row.author_name,
+    rating: row.rating,
+    comment: row.comment || "",
+    createdAt: row.created_at,
   };
 }
 
@@ -90,7 +90,7 @@ async function getReviews(restaurantId: string): Promise<Review[]> {
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
-  return data.map((row) => mapDbToReview(row as Record<string, unknown>));
+  return data.map((row) => mapDbToReview(row));
 }
 
 async function getMenuItems(restaurantId: string) {
@@ -104,14 +104,14 @@ async function getMenuItems(restaurantId: string) {
 
   if (error || !data) return [];
   return data.map((row) => ({
-    nameFr: (row.name_fr as string) || "",
-    nameDe: (row.name_de as string) || "",
-    nameEn: (row.name_en as string) || "",
-    descriptionFr: (row.description_fr as string) || "",
-    descriptionDe: (row.description_de as string) || "",
-    descriptionEn: (row.description_en as string) || "",
-    price: parseFloat(row.price as string) || 0,
-    category: (row.category as string) || "",
+    nameFr: row.name_fr || "",
+    nameDe: row.name_de || "",
+    nameEn: row.name_en || "",
+    descriptionFr: row.description_fr || "",
+    descriptionDe: row.description_de || "",
+    descriptionEn: row.description_en || "",
+    price: typeof row.price === "number" ? row.price : parseFloat(String(row.price)) || 0,
+    category: row.category || "",
   }));
 }
 
@@ -124,7 +124,7 @@ async function getRestaurantImages(restaurantId: string): Promise<string[]> {
     .order("position", { ascending: true });
 
   if (error || !data) return [];
-  return data.map((row) => row.url as string);
+  return data.map((row) => row.url);
 }
 
 export async function generateMetadata({
