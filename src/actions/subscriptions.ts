@@ -290,6 +290,7 @@ export async function createFreeTrial(params: {
   name: string;
   email: string;
   phone: string;
+  password: string;
   restaurantName: string;
   city: string;
 }): Promise<{ success: boolean; error: string | null }> {

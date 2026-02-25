@@ -123,6 +123,7 @@ function FreeTrialForm() {
         name: formData.get("name") as string,
         email: formData.get("email") as string,
         phone: formData.get("phone") as string,
+        password: formData.get("password") as string,
         restaurantName: formData.get("restaurantName") as string,
         city: formData.get("city") as string,
       });
@@ -187,6 +188,10 @@ function FreeTrialForm() {
           <div>
             <Label htmlFor="city">Ville *</Label>
             <Input id="city" name="city" required className="mt-1.5" placeholder="Genève" />
+          </div>
+          <div>
+            <Label htmlFor="password">Mot de passe *</Label>
+            <Input id="password" name="password" type="password" required minLength={6} className="mt-1.5" placeholder="Minimum 6 caractères" />
           </div>
 
           {error && (
