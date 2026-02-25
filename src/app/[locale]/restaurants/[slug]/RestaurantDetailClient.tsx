@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Star,
   MapPin,
@@ -18,6 +18,8 @@ import {
   X,
   Camera,
   Navigation,
+  Loader2,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +29,7 @@ import { SwissCrossIcon } from "@/components/ui/swiss-cross";
 import { SimilarRestaurants } from "@/components/restaurants/SimilarRestaurants";
 import type { Restaurant, Review } from "@/data/mock-restaurants";
 import { getLocalizedName, getLocalizedDescription, getLocalizedLabelAlt } from "@/lib/locale-helpers";
+import { submitReview } from "@/actions/reviews";
 
 interface FeatureOption {
   value: string;
@@ -191,6 +194,78 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  // Review form state
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHoverRating, setReviewHoverRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [localReviews, setLocalReviews] = useState<Review[]>(reviews);
+  const [localAvgRating, setLocalAvgRating] = useState(restaurant.avgRating);
+  const [localReviewCount, setLocalReviewCount] = useState(restaurant.reviewCount);
+
+  const handleSubmitReview = useCallback(async () => {
+    setReviewError(null);
+
+    if (!reviewName.trim() || reviewName.trim().length < 2) {
+      setReviewError(t("reviewForm.errorName"));
+      return;
+    }
+    if (reviewRating < 1) {
+      setReviewError(t("reviewForm.errorRating"));
+      return;
+    }
+
+    setReviewSubmitting(true);
+    try {
+      const result = await submitReview({
+        restaurant_id: restaurant.id,
+        author_name: reviewName.trim(),
+        rating: reviewRating,
+        comment: reviewComment.trim() || undefined,
+      });
+
+      if (result.success && result.review) {
+        // Optimistic update: add the new review to the list
+        const newReview: Review = {
+          id: result.review.id,
+          restaurantId: result.review.restaurantId,
+          authorName: result.review.authorName,
+          rating: result.review.rating,
+          comment: result.review.comment,
+          createdAt: result.review.createdAt,
+        };
+        const updatedReviews = [newReview, ...localReviews];
+        setLocalReviews(updatedReviews);
+
+        // Update local avg rating and count
+        const newCount = localReviewCount + 1;
+        const newAvg = ((localAvgRating * localReviewCount) + newReview.rating) / newCount;
+        setLocalAvgRating(Math.round(newAvg * 10) / 10);
+        setLocalReviewCount(newCount);
+
+        // Reset form
+        setReviewName("");
+        setReviewRating(0);
+        setReviewComment("");
+        setReviewSuccess(true);
+        setTimeout(() => {
+          setReviewSuccess(false);
+          setShowReviewForm(false);
+        }, 3000);
+      } else {
+        setReviewError(result.error || t("reviewForm.errorGeneric"));
+      }
+    } catch {
+      setReviewError(t("reviewForm.errorGeneric"));
+    } finally {
+      setReviewSubmitting(false);
+    }
+  }, [reviewName, reviewRating, reviewComment, restaurant.id, localReviews, localAvgRating, localReviewCount, t]);
+
   const name = getLocalizedName(restaurant, locale);
   const description = getLocalizedDescription(restaurant, locale);
   const open = isOpenNow(restaurant.openingHours);
@@ -331,7 +406,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               {/* Rating circle */}
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-just-tag)] text-white font-bold text-sm">
-                  {restaurant.avgRating}
+                  {localAvgRating}
                 </div>
                 <div>
                   <div className="flex items-center gap-0.5">
@@ -339,14 +414,14 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                       <Star
                         key={i}
                         className={`h-3.5 w-3.5 ${
-                          i < Math.round(restaurant.avgRating)
+                          i < Math.round(localAvgRating)
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-gray-200"
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-gray-500">({restaurant.reviewCount} {t("reviews")})</span>
+                  <span className="text-xs text-gray-500">({localReviewCount} {t("reviews")})</span>
                 </div>
               </div>
               <span className="text-gray-300">|</span>
@@ -388,7 +463,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
           <Tabs defaultValue="menu" className="w-full">
             <TabsList className="w-full justify-start">
               <TabsTrigger value="menu">{t("menu")}</TabsTrigger>
-              <TabsTrigger value="reviews">{t("reviews")} ({reviews.length})</TabsTrigger>
+              <TabsTrigger value="reviews">{t("reviews")} ({localReviews.length})</TabsTrigger>
               <TabsTrigger value="hours">{t("hours")}</TabsTrigger>
             </TabsList>
 
@@ -439,28 +514,28 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               {/* Aggregate rating */}
               <div className="mb-8 flex flex-col items-center gap-6 rounded-xl border bg-gray-50 p-6 sm:flex-row">
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-900">{restaurant.avgRating}</div>
+                  <div className="text-5xl font-bold text-gray-900">{localAvgRating}</div>
                   <div className="mt-1 flex items-center gap-0.5">
                     {Array.from({ length: 5 }, (_, i) => (
                       <Star
                         key={i}
                         className={`h-4 w-4 ${
-                          i < Math.round(restaurant.avgRating)
+                          i < Math.round(localAvgRating)
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-gray-200"
                         }`}
                       />
                     ))}
                   </div>
-                  <p className="mt-1 text-sm text-gray-500">{restaurant.reviewCount} {t("reviews")}</p>
+                  <p className="mt-1 text-sm text-gray-500">{localReviewCount} {t("reviews")}</p>
                 </div>
                 <div className="w-full max-w-xs">
-                  <RatingDistribution reviews={reviews} />
+                  <RatingDistribution reviews={localReviews} />
                 </div>
               </div>
 
               <div className="space-y-4">
-                {reviews.map((review) => (
+                {localReviews.map((review) => (
                   <div key={review.id} className="rounded-lg border p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -486,16 +561,149 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                       </div>
                     </div>
                     <p className="mt-3 text-sm text-gray-600 leading-relaxed">{review.comment}</p>
+                    {review.replyComment && (
+                      <div className="mt-3 ml-4 rounded-lg bg-gray-50 border-l-2 border-[var(--color-just-tag)] p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs font-semibold text-[var(--color-just-tag)]">
+                            {t("restaurantReply")}
+                          </span>
+                          {review.replyDate && (
+                            <span className="text-xs text-gray-400">
+                              {relativeDate(review.replyDate, locale)}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed">{review.replyComment}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
 
-              {/* Write review CTA */}
-              <div className="mt-6 text-center">
-                <Button variant="outline" className="border-[var(--color-just-tag)]/30 text-[var(--color-just-tag)]">
-                  <Star className="mr-2 h-4 w-4" />
-                  {t("writeReview")}
-                </Button>
+              {/* Write review CTA & Form */}
+              <div className="mt-6">
+                {!showReviewForm && !reviewSuccess && (
+                  <div className="text-center">
+                    <Button
+                      variant="outline"
+                      className="border-[var(--color-just-tag)]/30 text-[var(--color-just-tag)]"
+                      onClick={() => setShowReviewForm(true)}
+                    >
+                      <Star className="mr-2 h-4 w-4" />
+                      {t("writeReview")}
+                    </Button>
+                  </div>
+                )}
+
+                {reviewSuccess && (
+                  <div className="flex items-center justify-center gap-2 rounded-lg bg-green-50 p-4 text-green-700">
+                    <CheckCircle className="h-5 w-5" />
+                    <span className="font-medium">{t("reviewForm.success")}</span>
+                  </div>
+                )}
+
+                {showReviewForm && !reviewSuccess && (
+                  <div className="rounded-xl border bg-white p-6 shadow-sm">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("reviewForm.title")}</h3>
+
+                    {reviewError && (
+                      <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                        {reviewError}
+                      </div>
+                    )}
+
+                    {/* Author name */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("reviewForm.name")}
+                      </label>
+                      <input
+                        type="text"
+                        value={reviewName}
+                        onChange={(e) => setReviewName(e.target.value)}
+                        placeholder={t("reviewForm.namePlaceholder")}
+                        maxLength={50}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-just-tag)] focus:outline-none focus:ring-1 focus:ring-[var(--color-just-tag)]"
+                      />
+                    </div>
+
+                    {/* Star rating selector */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t("reviewForm.rating")}
+                      </label>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }, (_, i) => {
+                          const starValue = i + 1;
+                          const isFilled = starValue <= (reviewHoverRating || reviewRating);
+                          return (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => setReviewRating(starValue)}
+                              onMouseEnter={() => setReviewHoverRating(starValue)}
+                              onMouseLeave={() => setReviewHoverRating(0)}
+                              className="p-0.5 transition-transform hover:scale-110"
+                            >
+                              <Star
+                                className={`h-7 w-7 transition-colors ${
+                                  isFilled
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-gray-300 hover:text-yellow-300"
+                                }`}
+                              />
+                            </button>
+                          );
+                        })}
+                        {reviewRating > 0 && (
+                          <span className="ml-2 text-sm text-gray-500">{reviewRating}/5</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Comment */}
+                    <div className="mb-5">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t("reviewForm.comment")}
+                      </label>
+                      <textarea
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder={t("reviewForm.commentPlaceholder")}
+                        maxLength={1000}
+                        rows={3}
+                        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[var(--color-just-tag)] focus:outline-none focus:ring-1 focus:ring-[var(--color-just-tag)]"
+                      />
+                      <p className="mt-1 text-xs text-gray-400 text-right">{reviewComment.length}/1000</p>
+                    </div>
+
+                    {/* Buttons */}
+                    <div className="flex items-center gap-3">
+                      <Button
+                        onClick={handleSubmitReview}
+                        disabled={reviewSubmitting}
+                        className="bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag)]/90"
+                      >
+                        {reviewSubmitting ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Star className="mr-2 h-4 w-4" />
+                        )}
+                        {t("reviewForm.submit")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => {
+                          setShowReviewForm(false);
+                          setReviewError(null);
+                        }}
+                        disabled={reviewSubmitting}
+                      >
+                        {t("reviewForm.cancel")}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </TabsContent>
 
@@ -566,6 +774,48 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                       className="flex items-center gap-1 text-[var(--color-just-tag)] hover:underline"
                     >
                       {t("website")}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+                {restaurant.instagram && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <svg className="h-4 w-4 shrink-0 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    <a
+                      href={restaurant.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[var(--color-just-tag)] hover:underline"
+                    >
+                      {t("followInstagram")}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+                {restaurant.facebook && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <svg className="h-4 w-4 shrink-0 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <a
+                      href={restaurant.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[var(--color-just-tag)] hover:underline"
+                    >
+                      {t("followFacebook")}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+                {restaurant.tiktok && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <svg className="h-4 w-4 shrink-0 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46V13a8.28 8.28 0 005.58 2.17v-3.44a4.85 4.85 0 01-3.58-1.46V6.69h3.58z"/></svg>
+                    <a
+                      href={restaurant.tiktok}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[var(--color-just-tag)] hover:underline"
+                    >
+                      {t("followTiktok")}
                       <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>

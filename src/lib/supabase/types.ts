@@ -20,6 +20,7 @@ export interface CuisineType {
 
 export interface Merchant {
   id: string;
+  auth_user_id: string | null;
   email: string;
   name: string;
   phone: string | null;
@@ -62,6 +63,9 @@ export interface DbRestaurant {
   phone: string | null;
   email: string | null;
   website: string | null;
+  instagram: string | null;
+  facebook: string | null;
+  tiktok: string | null;
   price_range: PriceRange;
   avg_rating: number;
   review_count: number;
@@ -92,6 +96,8 @@ export interface DbReview {
   comment: string | null;
   is_verified: boolean;
   created_at: string;
+  reply_comment: string | null;
+  reply_date: string | null;
 }
 
 export interface DbMenuItem {
@@ -174,7 +180,7 @@ export interface Database {
       };
       merchants: {
         Row: Merchant;
-        Insert: Omit<Merchant, "id" | "created_at" | "updated_at"> & { id?: string };
+        Insert: Omit<Merchant, "id" | "created_at" | "updated_at" | "auth_user_id"> & { id?: string; auth_user_id?: string | null };
         Update: Partial<Omit<Merchant, "id">>;
         Relationships: [];
       };

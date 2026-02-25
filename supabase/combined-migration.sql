@@ -534,5 +534,15 @@ FROM restaurants WHERE slug = 'el-gaucho-basel'
 ON CONFLICT (restaurant_id, month, year) DO NOTHING;
 
 -- ============================================
+-- MIGRATION: Add reply columns to reviews table
+-- ============================================
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS reply_comment TEXT;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS reply_date TIMESTAMPTZ;
+
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS instagram TEXT;
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS facebook TEXT;
+ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS tiktok TEXT;
+
+-- ============================================
 -- DONE!
 -- ============================================

@@ -21,6 +21,9 @@ export interface Restaurant {
   phone: string;
   email: string;
   website: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
   priceRange: 1 | 2 | 3 | 4;
   avgRating: number;
   reviewCount: number;
@@ -55,6 +58,8 @@ export interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+  replyComment?: string;
+  replyDate?: string;
 }
 
 export const featuresOptions = [

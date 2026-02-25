@@ -46,3 +46,5 @@ supabase/.branches/
 
 # Temporary scripts
 scripts/apply-migrations.mjs
+.env.local.save
+scripts/

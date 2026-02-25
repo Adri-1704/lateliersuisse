@@ -43,6 +43,9 @@ function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaur
     phone: (row.phone as string) || "",
     email: (row.email as string) || "",
     website: (row.website as string) || "",
+    instagram: (row.instagram as string) || undefined,
+    facebook: (row.facebook as string) || undefined,
+    tiktok: (row.tiktok as string) || undefined,
     priceRange: parseInt(row.price_range as string || "2") as 1 | 2 | 3 | 4,
     avgRating: parseFloat(row.avg_rating as string) || 0,
     reviewCount: (row.review_count as number) || 0,
@@ -66,6 +69,8 @@ function mapDbToReview(row: DbReview): Review {
     rating: row.rating,
     comment: row.comment || "",
     createdAt: row.created_at,
+    replyComment: row.reply_comment || undefined,
+    replyDate: row.reply_date || undefined,
   };
 }
 

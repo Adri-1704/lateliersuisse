@@ -401,7 +401,76 @@ export function paymentConfirmation(
 }
 
 // ---------------------------------------------------------------------------
-// 5. Contact Admin Notification (always in French)
+// 5. Merchant Welcome (localized) — sent after Stripe checkout
+// ---------------------------------------------------------------------------
+const merchantWelcomeT = {
+  fr: {
+    subject: "Bienvenue sur Just-Tag ! Configurez votre compte",
+    title: "Bienvenue partenaire !",
+    body: "Votre abonnement est actif. Cliquez sur le bouton ci-dessous pour configurer votre mot de passe et accéder à votre espace client.",
+    cta: "Configurer mon mot de passe",
+    footer: "Ce lien est valable 24 heures. Si vous n'avez pas initié cette inscription, ignorez cet email.",
+  },
+  de: {
+    subject: "Willkommen bei Just-Tag! Richten Sie Ihr Konto ein",
+    title: "Willkommen Partner!",
+    body: "Ihr Abonnement ist aktiv. Klicken Sie auf die Schaltfläche unten, um Ihr Passwort festzulegen und auf Ihren Kundenbereich zuzugreifen.",
+    cta: "Mein Passwort einrichten",
+    footer: "Dieser Link ist 24 Stunden gültig. Wenn Sie diese Registrierung nicht veranlasst haben, ignorieren Sie diese E-Mail.",
+  },
+  en: {
+    subject: "Welcome to Just-Tag! Set up your account",
+    title: "Welcome partner!",
+    body: "Your subscription is active. Click the button below to set your password and access your client dashboard.",
+    cta: "Set my password",
+    footer: "This link is valid for 24 hours. If you did not initiate this registration, please ignore this email.",
+  },
+  pt: {
+    subject: "Bem-vindo ao Just-Tag! Configure a sua conta",
+    title: "Bem-vindo parceiro!",
+    body: "A sua assinatura está ativa. Clique no botão abaixo para definir a sua palavra-passe e aceder ao seu espaço de cliente.",
+    cta: "Definir a minha palavra-passe",
+    footer: "Este link é válido por 24 horas. Se não iniciou este registo, ignore este email.",
+  },
+  es: {
+    subject: "¡Bienvenido a Just-Tag! Configure su cuenta",
+    title: "¡Bienvenido socio!",
+    body: "Su suscripción está activa. Haga clic en el botón de abajo para configurar su contraseña y acceder a su espacio de cliente.",
+    cta: "Configurar mi contraseña",
+    footer: "Este enlace es válido durante 24 horas. Si no ha iniciado este registro, ignore este correo electrónico.",
+  },
+};
+
+export interface MerchantWelcomeData {
+  merchantName: string;
+  merchantEmail: string;
+  restaurantName: string;
+  passwordResetUrl: string;
+}
+
+export function merchantWelcome(
+  data: MerchantWelcomeData,
+  locale: string
+): { subject: string; html: string } {
+  const l = getLocale(locale);
+  const tr = merchantWelcomeT[l];
+
+  const content = [
+    heading(tr.title),
+    paragraph(tr.body),
+    divider(),
+    label(l === "de" ? "Name" : l === "en" ? "Name" : "Nom", data.merchantName),
+    label("Restaurant", data.restaurantName),
+    label("Email", data.merchantEmail),
+    button(data.passwordResetUrl, tr.cta),
+    `<p style="margin:16px 0 0;font-size:12px;color:${COLORS.lightText};line-height:1.5;">${tr.footer}</p>`,
+  ].join("");
+
+  return { subject: tr.subject, html: emailLayout(content) };
+}
+
+// ---------------------------------------------------------------------------
+// 6. Contact Admin Notification (always in French)
 // ---------------------------------------------------------------------------
 export interface ContactEmailData {
   firstName: string;
