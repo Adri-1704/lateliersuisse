@@ -3,7 +3,8 @@
 import { getStripe, PLAN_PRICES } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
-import { paymentConfirmation } from "@/lib/email-templates";
+import { paymentConfirmation, merchantWelcome } from "@/lib/email-templates";
+import { createServerClient } from "@supabase/ssr";
 
 interface CreateCheckoutParams {
   planType: "monthly" | "semiannual" | "annual" | "lifetime";
@@ -132,6 +133,68 @@ export async function handleSubscriptionWebhook(
             status: "active",
             current_period_start: new Date().toISOString(),
           });
+
+          // Create Supabase Auth user for merchant portal access
+          try {
+            const adminAuth = createServerClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.SUPABASE_SERVICE_ROLE_KEY!,
+              { cookies: { getAll() { return []; }, setAll() {} } }
+            );
+
+            // Create auth user with confirmed email
+            const { data: authUser, error: authError } = await adminAuth.auth.admin.createUser({
+              email: data.customer_email,
+              email_confirm: true,
+            });
+
+            if (authError && authError.message?.includes("already been registered")) {
+              // User already exists — link to merchant
+              const { data: existingUsers } = await adminAuth.auth.admin.listUsers();
+              const existingUser = existingUsers?.users?.find((u: { email?: string }) => u.email === data.customer_email);
+              if (existingUser) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                await (supabase.from("merchants") as any)
+                  .update({ auth_user_id: existingUser.id })
+                  .eq("id", merchant.id);
+              }
+            } else if (authUser?.user) {
+              // Link auth user to merchant
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              await (supabase.from("merchants") as any)
+                .update({ auth_user_id: authUser.user.id })
+                .eq("id", merchant.id);
+
+              // Generate password reset link
+              const { data: linkData } = await adminAuth.auth.admin.generateLink({
+                type: "recovery",
+                email: data.customer_email,
+              });
+
+              const recoveryUrl = linkData?.properties?.action_link || "";
+
+              // Send welcome email with password setup link
+              if (recoveryUrl && data.customer_email) {
+                const locale = metadata.locale || "fr";
+                const template = merchantWelcome(
+                  {
+                    merchantName: metadata.merchant_name || "",
+                    merchantEmail: data.customer_email,
+                    restaurantName: metadata.restaurant_name || "",
+                    passwordResetUrl: recoveryUrl,
+                  },
+                  locale
+                );
+                await sendEmail({
+                  to: data.customer_email,
+                  subject: template.subject,
+                  html: template.html,
+                });
+              }
+            }
+          } catch (authErr) {
+            console.error("Auth user creation error:", authErr);
+          }
         }
       } catch (err) {
         console.error(
@@ -217,5 +280,41 @@ export async function handleSubscriptionWebhook(
 
     default:
       console.log("Unhandled webhook event:", eventType);
+  }
+}
+
+/**
+ * Create a free trial merchant account (no Stripe payment).
+ */
+export async function createFreeTrial(params: {
+  name: string;
+  email: string;
+  phone: string;
+  restaurantName: string;
+  city: string;
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = createAdminClient();
+    const { data: merchant, error: merchantError } = await supabase
+      .from("merchants")
+      .upsert({ email: params.email, name: params.name, phone: params.phone }, { onConflict: "email" })
+      .select()
+      .single();
+    if (merchantError) throw merchantError;
+    const now = new Date();
+    const trialEnd = new Date(now);
+    trialEnd.setDate(trialEnd.getDate() + 30);
+    const { error: subError } = await supabase.from("subscriptions").insert({
+      merchant_id: merchant.id,
+      plan_type: "monthly",
+      status: "trialing",
+      current_period_start: now.toISOString(),
+      current_period_end: trialEnd.toISOString(),
+    });
+    if (subError) throw subError;
+    return { success: true, error: null };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Impossible de créer le compte";
+    return { success: false, error: msg };
   }
 }
