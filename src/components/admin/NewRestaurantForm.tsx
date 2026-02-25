@@ -18,7 +18,12 @@ const cantons = [
   "Neuchatel", "Geneve", "Jura",
 ];
 
-export function NewRestaurantForm() {
+interface NewRestaurantFormProps {
+  merchantId?: string;
+  redirectTo?: string;
+}
+
+export function NewRestaurantForm({ merchantId, redirectTo }: NewRestaurantFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [canton, setCanton] = useState("");
@@ -41,11 +46,12 @@ export function NewRestaurantForm() {
         website: formData.get("website") as string,
         price_range: priceRange,
         description_fr: formData.get("description_fr") as string,
+        merchant_id: merchantId,
       });
 
       if (res.success) {
         toast.success("Restaurant cree avec succes");
-        router.push("/admin/restaurants");
+        router.push(redirectTo || "/admin/restaurants");
         router.refresh();
       } else {
         toast.error(res.error || "Erreur lors de la creation");

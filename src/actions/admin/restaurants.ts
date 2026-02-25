@@ -131,6 +131,7 @@ export async function createRestaurant(params: {
   website?: string;
   price_range?: string;
   description_fr?: string;
+  merchant_id?: string;
 }): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
@@ -155,10 +156,12 @@ export async function createRestaurant(params: {
       website: params.website || null,
       price_range: params.price_range || "2",
       description_fr: params.description_fr || null,
+      merchant_id: params.merchant_id || null,
       is_published: false,
     });
     if (error) throw error;
     revalidatePath("/admin/restaurants");
+    revalidatePath("/admin/merchants");
     return { success: true, error: null };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Impossible de creer le restaurant";

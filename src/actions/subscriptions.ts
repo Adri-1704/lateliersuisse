@@ -219,3 +219,66 @@ export async function handleSubscriptionWebhook(
       console.log("Unhandled webhook event:", eventType);
   }
 }
+
+/**
+ * Create a free trial merchant account (no Stripe payment).
+ */
+export async function createFreeTrial(params: {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  restaurantName: string;
+  city: string;
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = createAdminClient();
+
+    // Create Supabase Auth user
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email: params.email,
+      password: params.password,
+      email_confirm: true,
+    });
+
+    if (authError) throw authError;
+
+    // Create merchant linked to auth user
+    const { data: merchant, error: merchantError } = await supabase
+      .from("merchants")
+      .upsert(
+        {
+          email: params.email,
+          name: params.name,
+          phone: params.phone,
+          auth_user_id: authData.user.id,
+        },
+        { onConflict: "email" }
+      )
+      .select()
+      .single();
+
+    if (merchantError) throw merchantError;
+
+    // Create trial subscription (30 days)
+    const now = new Date();
+    const trialEnd = new Date(now);
+    trialEnd.setDate(trialEnd.getDate() + 30);
+
+    const { error: subError } = await supabase.from("subscriptions").insert({
+      merchant_id: merchant.id,
+      plan_type: "monthly",
+      status: "trialing",
+      current_period_start: now.toISOString(),
+      current_period_end: trialEnd.toISOString(),
+    });
+
+    if (subError) throw subError;
+
+    return { success: true, error: null };
+  } catch (e) {
+    console.error("Free trial creation error:", e);
+    const msg = e instanceof Error ? e.message : "Impossible de créer le compte";
+    return { success: false, error: msg };
+  }
+}

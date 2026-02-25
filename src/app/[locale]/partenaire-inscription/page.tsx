@@ -1,13 +1,16 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { Check, Star, Zap, Crown, Infinity, Gift, ShieldCheck } from "lucide-react";
+import { useState, useTransition } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { Check, Star, Zap, Crown, Infinity, Gift, ShieldCheck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { createFreeTrial, createCheckoutSession } from "@/actions/subscriptions";
+import { toast } from "sonner";
 
 const earlyBirdPlans = [
   {
@@ -103,10 +106,115 @@ const standardPlans = [
   },
 ];
 
+function FreeTrialForm() {
+  const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string;
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    const formData = new FormData(e.currentTarget);
+
+    startTransition(async () => {
+      const res = await createFreeTrial({
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        phone: formData.get("phone") as string,
+        password: formData.get("password") as string,
+        restaurantName: formData.get("restaurantName") as string,
+        city: formData.get("city") as string,
+      });
+
+      if (res.success) {
+        toast.success("Compte créé avec succès !");
+        router.push(`/${locale}/partenaire-inscription/succes`);
+      } else {
+        setError(res.error);
+        toast.error(res.error || "Erreur lors de la création du compte");
+      }
+    });
+  }
+
+  return (
+    <div className="mx-auto max-w-lg px-4 py-12 sm:px-6">
+      <div className="text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+          <Gift className="h-8 w-8 text-green-600" />
+        </div>
+        <h1 className="mt-4 text-2xl font-bold text-gray-900 sm:text-3xl">
+          Essai gratuit 30 jours
+        </h1>
+        <p className="mt-2 text-gray-600">
+          Testez Just-Tag gratuitement pendant 30 jours, sans engagement.
+        </p>
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <Badge variant="outline" className="gap-1.5 px-3 py-1">
+          <Clock className="h-3.5 w-3.5" />
+          30 jours gratuits
+        </Badge>
+        <Badge variant="outline" className="gap-1.5 px-3 py-1">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Sans carte bancaire
+        </Badge>
+        <Badge variant="outline" className="gap-1.5 px-3 py-1">
+          <Star className="h-3.5 w-3.5" />
+          Toutes les fonctionnalités
+        </Badge>
+      </div>
+
+      <div className="mt-8 rounded-2xl border bg-white p-8 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nom complet *</Label>
+            <Input id="name" name="name" required className="mt-1.5" placeholder="Jean Dupont" />
+          </div>
+          <div>
+            <Label htmlFor="email">Email *</Label>
+            <Input id="email" name="email" type="email" required className="mt-1.5" placeholder="jean@monrestaurant.ch" />
+          </div>
+          <div>
+            <Label htmlFor="phone">Téléphone *</Label>
+            <Input id="phone" name="phone" type="tel" required className="mt-1.5" placeholder="+41 22 123 45 67" />
+          </div>
+          <div>
+            <Label htmlFor="restaurantName">Nom du restaurant *</Label>
+            <Input id="restaurantName" name="restaurantName" required className="mt-1.5" placeholder="Le Petit Prince" />
+          </div>
+          <div>
+            <Label htmlFor="city">Ville *</Label>
+            <Input id="city" name="city" required className="mt-1.5" placeholder="Genève" />
+          </div>
+          <div>
+            <Label htmlFor="password">Mot de passe *</Label>
+            <Input id="password" name="password" type="password" required minLength={6} className="mt-1.5" placeholder="Minimum 6 caractères" />
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-600">{error}</p>
+          )}
+
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="mt-2 w-full bg-[var(--color-just-tag)] py-3 text-base hover:bg-[var(--color-just-tag-dark)]"
+          >
+            {isPending ? "Création en cours..." : "Créer mon compte gratuit"}
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function MerchantSignupPage() {
   const t = useTranslations("merchant");
   const [selectedPlan, setSelectedPlan] = useState("annual");
-  const [step, setStep] = useState<"plans" | "form">("plans");
+  const [step, setStep] = useState<"plans" | "form" | "free-trial">("plans");
   const [activeTab, setActiveTab] = useState<"earlyBird" | "standard">("earlyBird");
 
   const plans = activeTab === "earlyBird" ? earlyBirdPlans : standardPlans;
@@ -131,6 +239,16 @@ export default function MerchantSignupPage() {
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ShieldCheck className="h-4 w-4" />
             Satisfait ou remboursé pendant 30 jours
+          </div>
+          <div className="mt-6">
+            <Button
+              onClick={() => setStep("free-trial")}
+              variant="outline"
+              className="gap-2 border-[var(--color-just-tag)] text-[var(--color-just-tag)] hover:bg-[var(--color-just-tag)]/5 px-6 py-2"
+            >
+              <Gift className="h-4 w-4" />
+              Essayer gratuitement pendant 30 jours
+            </Button>
           </div>
         </div>
 
@@ -274,6 +392,8 @@ export default function MerchantSignupPage() {
           </>
         )}
 
+        {step === "free-trial" && <FreeTrialForm />}
+
         {step === "form" && (
           <div className="mx-auto mt-12 max-w-lg">
             <div className="rounded-2xl border bg-white p-8 shadow-sm">
@@ -326,6 +446,14 @@ export default function MerchantSignupPage() {
                 onClick={() => setStep("plans")}
               >
                 ← Changer de plan
+              </Button>
+              <Button
+                variant="link"
+                className="mt-1 w-full text-[var(--color-just-tag)]"
+                onClick={() => setStep("free-trial")}
+              >
+                <Gift className="mr-2 h-4 w-4" />
+                Ou essayer gratuitement pendant 30 jours
               </Button>
             </div>
           </div>

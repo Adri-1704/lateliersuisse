@@ -23,31 +23,48 @@ export async function middleware(request: NextRequest) {
     // Check Supabase auth session
     const response = NextResponse.next({ request });
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
+    try {
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        {
+          cookies: {
+            getAll() {
+              return request.cookies.getAll();
+            },
+            setAll(cookiesToSet) {
+              cookiesToSet.forEach(({ name, value }) => {
+                request.cookies.set(name, value);
+              });
+              cookiesToSet.forEach(({ name, value, options }) => {
+                response.cookies.set(name, value, options);
+              });
+            },
           },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) => {
-              request.cookies.set(name, value);
-            });
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options);
-            });
-          },
-        },
+        }
+      );
+
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error) {
+        // Supabase unreachable or auth error — allow access in dev mode
+        if (process.env.NODE_ENV === "development") {
+          return response;
+        }
+        return NextResponse.redirect(new URL("/admin/login", request.url));
       }
-    );
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
+      if (!user) {
+        return NextResponse.redirect(new URL("/admin/login", request.url));
+      }
+    } catch {
+      // Network error — allow access in dev mode
+      if (process.env.NODE_ENV === "development") {
+        return response;
+      }
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
 

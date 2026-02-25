@@ -11,11 +11,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const user = await getAdminUser();
     if (user) {
       email = user.email || email;
-    } else if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      // Supabase is configured but no user session — redirect to login
+    } else if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NODE_ENV !== "development") {
+      // Supabase is configured but no user session — redirect to login (production only)
       redirect("/admin/login");
     }
-    // If Supabase is NOT configured, allow access with default email (demo mode)
+    // In development or if Supabase is NOT configured, allow access with default email (demo mode)
   } catch {
     // Supabase error — continue in demo mode
   }

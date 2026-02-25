@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
-import type { Merchant, Subscription } from "@/lib/supabase/types";
+import type { Merchant, Subscription, DbRestaurant } from "@/lib/supabase/types";
 
 interface MerchantWithSubscription extends Merchant {
   subscription?: Subscription | null;
@@ -50,5 +50,45 @@ export async function listMerchants(params: {
     const start = (page - 1) * limit;
     const paged = filtered.slice(start, start + limit);
     return { success: true, error: null, data: { merchants: paged, total } };
+  }
+}
+
+interface MerchantDetail extends Merchant {
+  subscription?: Subscription | null;
+  restaurant?: DbRestaurant | null;
+}
+
+export async function getMerchant(id: string): Promise<{ success: boolean; error: string | null; data?: MerchantDetail }> {
+  try {
+    const supabase = createAdminClient();
+
+    const { data: merchant, error: merchantError } = await supabase
+      .from("merchants")
+      .select("*, subscriptions(*)")
+      .eq("id", id)
+      .single();
+
+    if (merchantError) throw merchantError;
+
+    // Fetch linked restaurant
+    const { data: restaurants } = await supabase
+      .from("restaurants")
+      .select("*")
+      .eq("merchant_id", id)
+      .limit(1);
+
+    const m = merchant as Record<string, unknown>;
+    const result: MerchantDetail = {
+      ...(m as unknown as Merchant),
+      subscription: Array.isArray(m.subscriptions) ? (m.subscriptions as Subscription[])[0] || null : null,
+      restaurant: (restaurants as DbRestaurant[] | null)?.[0] || null,
+    };
+
+    return { success: true, error: null, data: result };
+  } catch {
+    // Mock fallback
+    const mock = mockMerchants.find((m) => m.id === id);
+    if (!mock) return { success: false, error: "Commercant non trouve" };
+    return { success: true, error: null, data: { ...mock, restaurant: null } };
   }
 }
