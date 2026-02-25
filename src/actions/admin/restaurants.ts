@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { mockRestaurants } from "@/data/mock-restaurants";
 import type { DbRestaurant } from "@/lib/supabase/types";
+import { revalidatePath } from "next/cache";
 
 interface ListResult {
   success: boolean;
@@ -116,11 +117,61 @@ export async function getRestaurant(id: string): Promise<{ success: boolean; err
   }
 }
 
+export async function createRestaurant(params: {
+  name_fr: string;
+  name_de?: string;
+  name_en?: string;
+  cuisine_type?: string;
+  canton: string;
+  city: string;
+  address?: string;
+  postal_code?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  price_range?: string;
+  description_fr?: string;
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = createAdminClient();
+    const slug = params.name_fr
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+    const { error } = await supabase.from("restaurants").insert({
+      name_fr: params.name_fr,
+      name_de: params.name_de || params.name_fr,
+      name_en: params.name_en || params.name_fr,
+      slug,
+      cuisine_type: params.cuisine_type || null,
+      canton: params.canton,
+      city: params.city,
+      address: params.address || null,
+      postal_code: params.postal_code || null,
+      phone: params.phone || null,
+      email: params.email || null,
+      website: params.website || null,
+      price_range: params.price_range || "2",
+      description_fr: params.description_fr || null,
+      is_published: false,
+    });
+    if (error) throw error;
+    revalidatePath("/admin/restaurants");
+    return { success: true, error: null };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Impossible de creer le restaurant";
+    return { success: false, error: msg };
+  }
+}
+
 export async function deleteRestaurant(id: string): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
     const { error } = await supabase.from("restaurants").delete().eq("id", id);
     if (error) throw error;
+    revalidatePath("/admin/restaurants");
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Impossible de supprimer le restaurant (mode demo)" };

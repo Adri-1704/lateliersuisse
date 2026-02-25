@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Pencil, Star } from "lucide-react";
+import { RestaurantDeleteButton } from "@/components/admin/RestaurantDeleteButton";
 
 export default async function RestaurantsPage({
   searchParams,
@@ -89,11 +90,14 @@ export default async function RestaurantsPage({
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/admin/restaurants/${r.id}`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                      </Button>
+                      <div className="flex items-center">
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/admin/restaurants/${r.id}`}>
+                            <Pencil className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <RestaurantDeleteButton id={r.id} name={r.name_fr} />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

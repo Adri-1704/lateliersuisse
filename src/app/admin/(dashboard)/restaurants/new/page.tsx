@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
+import { NewRestaurantForm } from "@/components/admin/NewRestaurantForm";
 
 export default function NewRestaurantPage() {
   return (
@@ -17,13 +18,10 @@ export default function NewRestaurantPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Formulaire de creation</CardTitle>
+          <CardTitle>Informations du restaurant</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            Le formulaire de creation de restaurant sera disponible une fois Supabase connecte.
-            En attendant, les restaurants sont geres via les donnees mock.
-          </p>
+          <NewRestaurantForm />
         </CardContent>
       </Card>
     </div>
