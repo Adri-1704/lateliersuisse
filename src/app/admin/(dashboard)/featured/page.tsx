@@ -1,9 +1,5 @@
 import { listFeatured } from "@/actions/admin/featured";
-import { EmptyState } from "@/components/admin/EmptyState";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
+import { FeaturedManager } from "@/components/admin/FeaturedManager";
 import { Star } from "lucide-react";
 
 const monthNames = ["", "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"];
@@ -32,34 +28,7 @@ export default async function FeaturedPage({
         </p>
       </div>
 
-      {featured.length === 0 ? (
-        <EmptyState title="Aucun restaurant selectionne" description="Aucun restaurant du mois pour cette periode." />
-      ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Position</TableHead>
-                <TableHead>Restaurant</TableHead>
-                <TableHead>Ajoute le</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {featured.map((f) => (
-                <TableRow key={f.id}>
-                  <TableCell>
-                    <Badge variant="outline">#{f.position}</Badge>
-                  </TableCell>
-                  <TableCell className="font-medium">{f.restaurant_name || f.restaurant_id}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {new Date(f.created_at).toLocaleDateString("fr-CH")}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <FeaturedManager featured={featured} month={month} year={year} />
     </div>
   );
 }

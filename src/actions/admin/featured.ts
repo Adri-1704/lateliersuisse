@@ -2,8 +2,9 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import type { FeaturedRestaurant } from "@/lib/supabase/types";
+import { revalidatePath } from "next/cache";
 
-interface FeaturedWithRestaurant extends FeaturedRestaurant {
+export interface FeaturedWithRestaurant extends FeaturedRestaurant {
   restaurant_name?: string;
 }
 
@@ -43,13 +44,74 @@ export async function listFeatured(params: {
   }
 }
 
+export async function addFeatured(params: {
+  restaurant_id: string;
+  month: number;
+  year: number;
+  position: number;
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = createAdminClient();
+    const { error } = await supabase.from("featured_restaurants").insert({
+      restaurant_id: params.restaurant_id,
+      month: params.month,
+      year: params.year,
+      position: params.position,
+    });
+    if (error) throw error;
+    revalidatePath("/admin/featured");
+    return { success: true, error: null };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Impossible d'ajouter le restaurant";
+    if (msg.includes("duplicate") || msg.includes("unique")) {
+      return { success: false, error: "Ce restaurant est deja selectionne pour ce mois" };
+    }
+    return { success: false, error: msg };
+  }
+}
+
 export async function removeFeatured(id: string): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
     const { error } = await supabase.from("featured_restaurants").delete().eq("id", id);
     if (error) throw error;
+    revalidatePath("/admin/featured");
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Impossible de retirer le restaurant (mode demo)" };
+  }
+}
+
+export async function searchRestaurants(query: string): Promise<{
+  success: boolean;
+  error: string | null;
+  data?: { id: string; name: string }[];
+}> {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("restaurants")
+      .select("id, name_fr")
+      .ilike("name_fr", `%${query}%`)
+      .order("name_fr")
+      .limit(10);
+    if (error) throw error;
+    return {
+      success: true,
+      error: null,
+      data: (data || []).map((r: { id: string; name_fr: string }) => ({ id: r.id, name: r.name_fr })),
+    };
+  } catch {
+    return {
+      success: true,
+      error: null,
+      data: [
+        { id: "1", name: "Le Petit Prince" },
+        { id: "2", name: "Chez Marcel" },
+        { id: "3", name: "Alpenstube" },
+        { id: "4", name: "La Brasserie" },
+        { id: "5", name: "Sakura" },
+      ].filter((r) => r.name.toLowerCase().includes(query.toLowerCase())),
+    };
   }
 }
