@@ -24,6 +24,7 @@ export interface Merchant {
   name: string;
   phone: string | null;
   stripe_customer_id: string | null;
+  auth_user_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -174,7 +175,7 @@ export interface Database {
       };
       merchants: {
         Row: Merchant;
-        Insert: Omit<Merchant, "id" | "created_at" | "updated_at"> & { id?: string };
+        Insert: Omit<Merchant, "id" | "created_at" | "updated_at" | "auth_user_id"> & { id?: string; auth_user_id?: string | null };
         Update: Partial<Omit<Merchant, "id">>;
         Relationships: [];
       };
