@@ -133,13 +133,20 @@ export async function updateMenuItem(
   item: Partial<MenuItemData>
 ): Promise<{ success: boolean; error: string | null }> {
   try {
-    // If restaurant_id is provided, verify ownership
-    if (item.restaurant_id) {
-      const isOwner = await verifyRestaurantOwnership(item.restaurant_id);
-      if (!isOwner) return { success: false, error: "Accès non autorisé" };
-    }
-
     const admin = createAdminClient();
+
+    // Always verify ownership by looking up the menu item's restaurant
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: menuItem } = await (admin.from("menu_items") as any)
+      .select("restaurant_id")
+      .eq("id", id)
+      .single();
+
+    if (!menuItem) return { success: false, error: "Élément introuvable" };
+
+    const isOwner = await verifyRestaurantOwnership(menuItem.restaurant_id);
+    if (!isOwner) return { success: false, error: "Accès non autorisé" };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin.from("menu_items") as any)
       .update(item)
@@ -157,6 +164,19 @@ export async function deleteMenuItem(
 ): Promise<{ success: boolean; error: string | null }> {
   try {
     const admin = createAdminClient();
+
+    // Get the menu item to verify restaurant ownership
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: menuItem } = await (admin.from("menu_items") as any)
+      .select("restaurant_id")
+      .eq("id", id)
+      .single();
+
+    if (!menuItem) return { success: false, error: "Élément introuvable" };
+
+    const isOwner = await verifyRestaurantOwnership(menuItem.restaurant_id);
+    if (!isOwner) return { success: false, error: "Accès non autorisé" };
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin.from("menu_items") as any)
       .delete()

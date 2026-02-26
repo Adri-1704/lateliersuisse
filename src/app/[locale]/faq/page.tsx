@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -69,6 +70,16 @@ const faqs = [
 
 export default function FAQPage() {
   const t = useTranslations("nav");
+  const params = useParams();
+  const locale = (params.locale as string) || "fr";
+
+  const subtitles: Record<string, string> = {
+    fr: "Questions fréquemment posées",
+    de: "Häufig gestellte Fragen",
+    en: "Frequently asked questions",
+    pt: "Perguntas frequentes",
+    es: "Preguntas frecuentes",
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -77,7 +88,7 @@ export default function FAQPage() {
           {t("faq")}
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-          Questions frequemment posees
+          {subtitles[locale] || subtitles.fr}
         </p>
       </div>
 
@@ -96,8 +107,8 @@ function FAQItem({
   faq: (typeof faqs)[number];
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  // Simple locale detection from URL
-  const locale = typeof window !== "undefined" ? window.location.pathname.split("/")[1] : "fr";
+  const params = useParams();
+  const locale = (params.locale as string) || "fr";
 
   const questionMap: Record<string, string> = { de: faq.questionDe, en: faq.questionEn, pt: faq.questionPt, es: faq.questionEs };
   const answerMap: Record<string, string> = { de: faq.answerDe, en: faq.answerEn, pt: faq.answerPt, es: faq.answerEs };

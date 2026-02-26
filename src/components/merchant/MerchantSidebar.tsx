@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useParams } from "next/navigation";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -14,6 +15,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -29,8 +31,16 @@ export function MerchantSidebar() {
   const params = useParams();
   const locale = params.locale as string;
   const t = useTranslations("merchantPortal");
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const basePath = `/${locale}/espace-client`;
+
+  // Auto-close mobile sidebar on navigation
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [pathname, isMobile, setOpenMobile]);
 
   const navItems = [
     { title: t("sidebar.dashboard"), href: basePath, icon: LayoutDashboard },
@@ -66,7 +76,7 @@ export function MerchantSidebar() {
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
+                      <Link href={item.href} prefetch>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>

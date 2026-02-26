@@ -73,6 +73,9 @@ export async function listRestaurants(params: {
       phone: r.phone,
       email: r.email,
       website: r.website,
+      instagram: null,
+      facebook: null,
+      tiktok: null,
       price_range: String(r.priceRange) as DbRestaurant["price_range"],
       avg_rating: r.avgRating,
       review_count: r.reviewCount,
@@ -107,6 +110,7 @@ export async function getRestaurant(id: string): Promise<{ success: boolean; err
       canton: mock.canton, city: mock.city, address: mock.address, postal_code: mock.postalCode,
       latitude: mock.latitude, longitude: mock.longitude,
       phone: mock.phone, email: mock.email, website: mock.website,
+      instagram: null, facebook: null, tiktok: null,
       price_range: String(mock.priceRange) as DbRestaurant["price_range"],
       avg_rating: mock.avgRating, review_count: mock.reviewCount,
       opening_hours: mock.openingHours as DbRestaurant["opening_hours"],
@@ -141,7 +145,8 @@ export async function createRestaurant(params: {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
-    const { error } = await supabase.from("restaurants").insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from("restaurants") as any).insert({
       name_fr: params.name_fr,
       name_de: params.name_de || params.name_fr,
       name_en: params.name_en || params.name_fr,
@@ -187,6 +192,7 @@ export async function togglePublishRestaurant(id: string, isPublished: boolean):
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("restaurants").update({ is_published: isPublished }).eq("id", id);
     if (error) throw error;
+    revalidatePath("/admin/restaurants");
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Impossible de modifier la publication (mode demo)" };

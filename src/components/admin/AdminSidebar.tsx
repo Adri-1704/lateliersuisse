@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import Link from "next/link";
 import {
   Sidebar,
@@ -13,6 +14,7 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -38,6 +40,14 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  // Auto-close mobile sidebar on navigation
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [pathname, isMobile, setOpenMobile]);
 
   return (
     <Sidebar>
@@ -64,7 +74,7 @@ export function AdminSidebar() {
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
+                      <Link href={item.href} prefetch>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>

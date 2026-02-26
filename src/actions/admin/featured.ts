@@ -52,7 +52,8 @@ export async function addFeatured(params: {
 }): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
-    const { error } = await supabase.from("featured_restaurants").insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from("featured_restaurants") as any).insert({
       restaurant_id: params.restaurant_id,
       month: params.month,
       year: params.year,
@@ -102,9 +103,10 @@ export async function searchRestaurants(query: string): Promise<{
       data: (data || []).map((r: { id: string; name_fr: string }) => ({ id: r.id, name: r.name_fr })),
     };
   } catch {
+    // Mock data fallback for demo mode
     return {
       success: true,
-      error: null,
+      error: "Mode demo",
       data: [
         { id: "1", name: "Le Petit Prince" },
         { id: "2", name: "Chez Marcel" },

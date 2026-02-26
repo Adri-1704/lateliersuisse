@@ -23,7 +23,11 @@ export default async function MerchantDashboardLayout({
     } else if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
       redirect(`/${locale}/espace-client/connexion`);
     }
-  } catch {
+  } catch (e) {
+    // Re-throw redirect errors (Next.js uses exceptions for redirects)
+    if (e && typeof e === "object" && "digest" in e) {
+      throw e;
+    }
     // Supabase error — continue in demo mode
   }
 

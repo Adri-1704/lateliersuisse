@@ -16,7 +16,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
       redirect("/admin/login");
     }
     // In development or if Supabase is NOT configured, allow access with default email (demo mode)
-  } catch {
+  } catch (e) {
+    // Re-throw redirect errors (Next.js uses exceptions for redirects)
+    if (e && typeof e === "object" && "digest" in e) {
+      throw e;
+    }
     // Supabase error — continue in demo mode
   }
 

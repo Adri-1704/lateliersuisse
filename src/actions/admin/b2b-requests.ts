@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import type { B2BContactRequest, B2BContactStatus } from "@/lib/supabase/types";
 
 const mockB2BRequests: B2BContactRequest[] = [
@@ -65,6 +66,7 @@ export async function updateB2BRequestStatus(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("b2b_contact_requests").update({ status: newStatus }).eq("id", id);
     if (error) throw error;
+    revalidatePath("/admin/b2b-requests");
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Impossible de mettre a jour le statut (mode demo)" };

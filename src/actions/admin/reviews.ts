@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import type { DbReview } from "@/lib/supabase/types";
 
 interface ReviewWithRestaurant extends DbReview {
@@ -8,11 +9,11 @@ interface ReviewWithRestaurant extends DbReview {
 }
 
 const mockReviews: ReviewWithRestaurant[] = [
-  { id: "r1", restaurant_id: "1", author_name: "Jean Dupont", rating: 5, comment: "Excellent restaurant, service impeccable et cuisine raffinee.", is_verified: true, created_at: "2026-02-20T12:00:00Z", restaurant_name: "Le Petit Prince" },
-  { id: "r2", restaurant_id: "2", author_name: "Marie Curie", rating: 4, comment: "Tres bonne experience, je recommande le menu du jour.", is_verified: true, created_at: "2026-02-19T18:30:00Z", restaurant_name: "Chez Marcel" },
-  { id: "r3", restaurant_id: "1", author_name: "Pierre Martin", rating: 3, comment: "Correct mais un peu cher pour ce que c'est.", is_verified: false, created_at: "2026-02-18T20:15:00Z", restaurant_name: "Le Petit Prince" },
-  { id: "r4", restaurant_id: "3", author_name: "Anna Schmidt", rating: 5, comment: "Das beste Schweizer Restaurant! Wunderbar.", is_verified: true, created_at: "2026-02-17T13:00:00Z", restaurant_name: "Alpenstube" },
-  { id: "r5", restaurant_id: "2", author_name: "Luc Bernard", rating: 2, comment: "Decu par la qualite, pas a la hauteur des attentes.", is_verified: false, created_at: "2026-02-16T19:45:00Z", restaurant_name: "Chez Marcel" },
+  { id: "r1", restaurant_id: "1", author_name: "Jean Dupont", rating: 5, comment: "Excellent restaurant, service impeccable et cuisine raffinee.", is_verified: true, reply_comment: null, reply_date: null, created_at: "2026-02-20T12:00:00Z", restaurant_name: "Le Petit Prince" },
+  { id: "r2", restaurant_id: "2", author_name: "Marie Curie", rating: 4, comment: "Tres bonne experience, je recommande le menu du jour.", is_verified: true, reply_comment: null, reply_date: null, created_at: "2026-02-19T18:30:00Z", restaurant_name: "Chez Marcel" },
+  { id: "r3", restaurant_id: "1", author_name: "Pierre Martin", rating: 3, comment: "Correct mais un peu cher pour ce que c'est.", is_verified: false, reply_comment: null, reply_date: null, created_at: "2026-02-18T20:15:00Z", restaurant_name: "Le Petit Prince" },
+  { id: "r4", restaurant_id: "3", author_name: "Anna Schmidt", rating: 5, comment: "Das beste Schweizer Restaurant! Wunderbar.", is_verified: true, reply_comment: null, reply_date: null, created_at: "2026-02-17T13:00:00Z", restaurant_name: "Alpenstube" },
+  { id: "r5", restaurant_id: "2", author_name: "Luc Bernard", rating: 2, comment: "Decu par la qualite, pas a la hauteur des attentes.", is_verified: false, reply_comment: null, reply_date: null, created_at: "2026-02-16T19:45:00Z", restaurant_name: "Chez Marcel" },
 ];
 
 export async function listReviews(params: {
@@ -62,6 +63,7 @@ export async function deleteReview(id: string): Promise<{ success: boolean; erro
     const supabase = createAdminClient();
     const { error } = await supabase.from("reviews").delete().eq("id", id);
     if (error) throw error;
+    revalidatePath("/admin/reviews");
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Impossible de supprimer l'avis (mode demo)" };

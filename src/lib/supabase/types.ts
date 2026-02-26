@@ -63,6 +63,9 @@ export interface DbRestaurant {
   phone: string | null;
   email: string | null;
   website: string | null;
+  instagram: string | null;
+  facebook: string | null;
+  tiktok: string | null;
   price_range: PriceRange;
   avg_rating: number;
   review_count: number;
@@ -92,6 +95,8 @@ export interface DbReview {
   rating: number;
   comment: string | null;
   is_verified: boolean;
+  reply_comment: string | null;
+  reply_date: string | null;
   created_at: string;
 }
 
@@ -203,7 +208,7 @@ export interface Database {
       };
       reviews: {
         Row: DbReview;
-        Insert: Omit<DbReview, "id" | "created_at" | "is_verified"> & { id?: string; is_verified?: boolean };
+        Insert: Omit<DbReview, "id" | "created_at" | "is_verified" | "reply_comment" | "reply_date"> & { id?: string; is_verified?: boolean; reply_comment?: string | null; reply_date?: string | null };
         Update: Partial<Omit<DbReview, "id">>;
         Relationships: [];
       };

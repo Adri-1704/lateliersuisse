@@ -30,14 +30,14 @@ export async function createCheckoutSession(
   const { planType, merchantEmail, locale } = params;
 
   try {
-    // If Stripe is not configured, return placeholder
+    // If Stripe is not configured, return error
     if (!process.env.STRIPE_SECRET_KEY) {
       console.log(
-        `[Stripe] Not configured. Placeholder checkout for ${merchantEmail} — Plan: ${planType}`
+        `[Stripe] Not configured. Cannot create checkout for ${merchantEmail} — Plan: ${planType}`
       );
       return {
-        url: `/${locale}/partenaire-inscription/succes`,
-        error: null,
+        url: null,
+        error: "Le paiement en ligne n'est pas encore disponible. Veuillez utiliser l'essai gratuit.",
       };
     }
 
@@ -244,8 +244,8 @@ export async function createFreeTrial(params: {
     if (authError) throw authError;
 
     // Create merchant linked to auth user
-    const { data: merchant, error: merchantError } = await supabase
-      .from("merchants")
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: merchant, error: merchantError } = await (supabase.from("merchants") as any)
       .upsert(
         {
           email: params.email,
@@ -265,7 +265,8 @@ export async function createFreeTrial(params: {
     const trialEnd = new Date(now);
     trialEnd.setDate(trialEnd.getDate() + 30);
 
-    const { error: subError } = await supabase.from("subscriptions").insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: subError } = await (supabase.from("subscriptions") as any).insert({
       merchant_id: merchant.id,
       plan_type: "monthly",
       status: "trialing",

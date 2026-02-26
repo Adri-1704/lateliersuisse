@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import type { ContactSubmission } from "@/lib/supabase/types";
 
 const mockContacts: ContactSubmission[] = [
@@ -50,6 +51,7 @@ export async function markContactAsRead(id: string): Promise<{ success: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("contact_submissions").update({ is_read: true }).eq("id", id);
     if (error) throw error;
+    revalidatePath("/admin/contacts");
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Impossible de marquer comme lu (mode demo)" };

@@ -177,12 +177,17 @@ export async function deleteImage(imageId: string): Promise<{
   try {
     const admin = createAdminClient();
 
-    // Get image URL to delete from storage
+    // Get image to verify ownership
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: image } = await (admin.from("restaurant_images") as any)
-      .select("url")
+      .select("url, restaurant_id")
       .eq("id", imageId)
       .single();
+
+    if (!image) return { success: false, error: "Image introuvable" };
+
+    const isOwner = await verifyRestaurantOwnership(image.restaurant_id);
+    if (!isOwner) return { success: false, error: "Accès non autorisé" };
 
     // Delete from DB
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -235,7 +240,21 @@ export async function reorderImages(
   imageIds: string[]
 ): Promise<{ success: boolean; error: string | null }> {
   try {
+    if (!imageIds.length) return { success: true, error: null };
+
     const admin = createAdminClient();
+
+    // Verify ownership via the first image's restaurant
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: firstImage } = await (admin.from("restaurant_images") as any)
+      .select("restaurant_id")
+      .eq("id", imageIds[0])
+      .single();
+
+    if (!firstImage) return { success: false, error: "Image introuvable" };
+
+    const isOwner = await verifyRestaurantOwnership(firstImage.restaurant_id);
+    if (!isOwner) return { success: false, error: "Accès non autorisé" };
 
     // Update each image position in parallel
     const updates = imageIds.map((id, index) =>
