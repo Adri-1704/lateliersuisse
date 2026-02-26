@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname, useParams } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname, useParams, useRouter } from "next/navigation";
+import { useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -17,6 +17,7 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   UtensilsCrossed,
@@ -24,14 +25,17 @@ import {
   ImageIcon,
   MessageSquare,
   CreditCard,
+  Loader2,
 } from "lucide-react";
 
 export function MerchantSidebar() {
   const pathname = usePathname();
   const params = useParams();
+  const router = useRouter();
   const locale = params.locale as string;
   const t = useTranslations("merchantPortal");
   const { setOpenMobile, isMobile } = useSidebar();
+  const [isPending, startTransition] = useTransition();
 
   const basePath = `/${locale}/espace-client`;
 
@@ -75,11 +79,20 @@ export function MerchantSidebar() {
                     : pathname.startsWith(item.href);
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href} prefetch>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => {
+                        startTransition(() => {
+                          router.push(item.href);
+                        });
+                      }}
+                      className={cn(isPending && !isActive && "cursor-wait")}
+                    >
+                      <item.icon className={cn("h-4 w-4", isPending && isActive && "animate-pulse")} />
+                      <span>{item.title}</span>
+                      {isPending && isActive && (
+                        <Loader2 className="ml-auto h-3 w-3 animate-spin text-muted-foreground" />
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );

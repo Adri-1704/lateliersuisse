@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useTransition } from "react";
 import Link from "next/link";
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   UtensilsCrossed,
@@ -25,6 +26,7 @@ import {
   Mail,
   Newspaper,
   Star,
+  Loader2,
 } from "lucide-react";
 
 const navItems = [
@@ -40,7 +42,9 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { setOpenMobile, isMobile } = useSidebar();
+  const [isPending, startTransition] = useTransition();
 
   // Auto-close mobile sidebar on navigation
   useEffect(() => {
@@ -73,11 +77,20 @@ export function AdminSidebar() {
                     : pathname.startsWith(item.href);
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href} prefetch>
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
-                      </Link>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      onClick={() => {
+                        startTransition(() => {
+                          router.push(item.href);
+                        });
+                      }}
+                      className={cn(isPending && !isActive && "cursor-wait")}
+                    >
+                      <item.icon className={cn("h-4 w-4", isPending && isActive && "animate-pulse")} />
+                      <span>{item.title}</span>
+                      {isPending && isActive && (
+                        <Loader2 className="ml-auto h-3 w-3 animate-spin text-muted-foreground" />
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
