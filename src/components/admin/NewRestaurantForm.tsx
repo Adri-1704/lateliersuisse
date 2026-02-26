@@ -18,6 +18,34 @@ const cantons = [
   "Neuchatel", "Geneve", "Jura",
 ];
 
+const cuisineTypes = [
+  { slug: "italien", label: "🇮🇹 Italien" },
+  { slug: "francais", label: "🇫🇷 Francais" },
+  { slug: "japonais", label: "🇯🇵 Japonais" },
+  { slug: "suisse", label: "🇨🇭 Suisse" },
+  { slug: "indien", label: "🇮🇳 Indien" },
+  { slug: "chinois", label: "🇨🇳 Chinois" },
+  { slug: "mexicain", label: "🇲🇽 Mexicain" },
+  { slug: "thai", label: "🇹🇭 Thailandais" },
+  { slug: "mediterraneen", label: "🌊 Mediterraneen" },
+  { slug: "americain", label: "🇺🇸 Americain" },
+  { slug: "espagnol", label: "🇪🇸 Espagnol" },
+  { slug: "grec", label: "🇬🇷 Grec" },
+  { slug: "coreen", label: "🇰🇷 Coreen" },
+  { slug: "vietnamien", label: "🇻🇳 Vietnamien" },
+  { slug: "libanais", label: "🇱🇧 Libanais" },
+  { slug: "turc", label: "🇹🇷 Turc" },
+  { slug: "argentin", label: "🇦🇷 Argentin" },
+  { slug: "peruvien", label: "🇵🇪 Peruvien" },
+  { slug: "ethiopien", label: "🇪🇹 Ethiopien" },
+  { slug: "fusion", label: "🔥 Fusion" },
+  { slug: "fruits-de-mer", label: "🦞 Fruits de mer" },
+  { slug: "vegetarien", label: "🥬 Vegetarien" },
+  { slug: "vegan", label: "🌱 Vegan" },
+  { slug: "gastronomique", label: "⭐ Gastronomique" },
+  { slug: "steakhouse", label: "🥩 Steakhouse" },
+];
+
 interface NewRestaurantFormProps {
   merchantId?: string;
   redirectTo?: string;
@@ -27,6 +55,7 @@ export function NewRestaurantForm({ merchantId, redirectTo }: NewRestaurantFormP
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [canton, setCanton] = useState("");
+  const [cuisineType, setCuisineType] = useState("");
   const [priceRange, setPriceRange] = useState("2");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -36,7 +65,7 @@ export function NewRestaurantForm({ merchantId, redirectTo }: NewRestaurantFormP
     startTransition(async () => {
       const res = await createRestaurant({
         name_fr: formData.get("name_fr") as string,
-        cuisine_type: formData.get("cuisine_type") as string,
+        cuisine_type: cuisineType,
         canton,
         city: formData.get("city") as string,
         address: formData.get("address") as string,
@@ -68,8 +97,17 @@ export function NewRestaurantForm({ merchantId, redirectTo }: NewRestaurantFormP
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="cuisine_type">Type de cuisine</Label>
-          <Input id="cuisine_type" name="cuisine_type" placeholder="Ex: Francaise, Italienne..." />
+          <Label>Type de cuisine</Label>
+          <Select value={cuisineType} onValueChange={setCuisineType}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selectionner un type" />
+            </SelectTrigger>
+            <SelectContent>
+              {cuisineTypes.map((c) => (
+                <SelectItem key={c.slug} value={c.slug}>{c.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-2">
