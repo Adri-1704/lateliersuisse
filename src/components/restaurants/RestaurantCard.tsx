@@ -14,7 +14,7 @@ function isOpenNow(openingHours: Restaurant["openingHours"]): boolean {
   const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
   const today = days[now.getDay()];
   const hours = openingHours[today];
-  if (!hours) return false;
+  if (!hours || !("open" in hours) || !("close" in hours)) return false;
   const currentTime = now.getHours() * 100 + now.getMinutes();
   const [openH, openM] = hours.open.split(":").map(Number);
   const [closeH, closeM] = hours.close.split(":").map(Number);

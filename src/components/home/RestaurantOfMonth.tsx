@@ -30,7 +30,7 @@ function isOpenNow(openingHours: Record<string, { open: string; close: string } 
   const now = new Date();
   const dayName = days[now.getDay()];
   const hours = openingHours[dayName];
-  if (!hours) return false;
+  if (!hours || !("open" in hours) || !("close" in hours)) return false;
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const [openH, openM] = hours.open.split(":").map(Number);
   const [closeH, closeM] = hours.close.split(":").map(Number);
