@@ -144,7 +144,7 @@ export async function createRestaurant(params: {
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
-    const { error } = await supabase.from("restaurants").insert({
+    const { error } = await (supabase.from("restaurants") as any).insert({
       name_fr: params.name_fr,
       name_de: params.name_de || params.name_fr,
       name_en: params.name_en || params.name_fr,

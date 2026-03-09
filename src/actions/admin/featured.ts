@@ -52,7 +52,7 @@ export async function addFeatured(params: {
 }): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
-    const { error } = await supabase.from("featured_restaurants").insert({
+    const { error } = await (supabase.from("featured_restaurants") as any).insert({
       restaurant_id: params.restaurant_id,
       month: params.month,
       year: params.year,

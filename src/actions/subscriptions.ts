@@ -296,8 +296,8 @@ export async function createFreeTrial(params: {
 }): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
-    const { data: merchant, error: merchantError } = await supabase
-      .from("merchants")
+    const { data: merchant, error: merchantError } = await (supabase
+      .from("merchants") as any)
       .upsert({ email: params.email, name: params.name, phone: params.phone }, { onConflict: "email" })
       .select()
       .single();
@@ -305,7 +305,7 @@ export async function createFreeTrial(params: {
     const now = new Date();
     const trialEnd = new Date(now);
     trialEnd.setDate(trialEnd.getDate() + 30);
-    const { error: subError } = await supabase.from("subscriptions").insert({
+    const { error: subError } = await (supabase.from("subscriptions") as any).insert({
       merchant_id: merchant.id,
       plan_type: "monthly",
       status: "trialing",
