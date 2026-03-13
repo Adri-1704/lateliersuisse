@@ -34,6 +34,8 @@ export interface Restaurant {
   isFeatured: boolean;
   isPublished: boolean;
   menuItems: MenuItem[];
+  badges?: RestaurantBadge[];
+  promotions?: RestaurantPromotion[];
 }
 
 export interface MenuItem {
@@ -56,10 +58,33 @@ export interface Review {
   restaurantId: string;
   authorName: string;
   rating: number;
+  ratingCuisine?: number;
+  ratingService?: number;
+  ratingAmbiance?: number;
+  ratingValue?: number;
   comment: string;
   createdAt: string;
   replyComment?: string;
   replyDate?: string;
+}
+
+export type BadgeType = "michelin_star" | "michelin_bib" | "gaultmillau" | "atelier_suisse_selection";
+
+export interface RestaurantBadge {
+  type: BadgeType;
+  label: string;
+  score?: string;
+  year?: number;
+}
+
+export type PromotionType = "percentage" | "daily_menu" | "happy_hour" | "special_event";
+
+export interface RestaurantPromotion {
+  type: PromotionType;
+  title: string;
+  description?: string;
+  discountPercentage?: number;
+  endDate?: string;
 }
 
 export const featuresOptions = [
@@ -75,6 +100,17 @@ export const featuresOptions = [
   { value: "takeaway", labelFr: "A emporter", labelDe: "Zum Mitnehmen", labelEn: "Takeaway", labelPt: "Para levar", labelEs: "Para llevar" },
   { value: "delivery", labelFr: "Livraison", labelDe: "Lieferung", labelEn: "Delivery", labelPt: "Entrega", labelEs: "Entrega a domicilio" },
   { value: "kids-friendly", labelFr: "Adapte aux enfants", labelDe: "Kinderfreundlich", labelEn: "Kids friendly", labelPt: "Para crianças", labelEs: "Para niños" },
+  { value: "halal", labelFr: "Halal", labelDe: "Halal", labelEn: "Halal", labelPt: "Halal", labelEs: "Halal" },
+  { value: "kosher", labelFr: "Casher", labelDe: "Koscher", labelEn: "Kosher", labelPt: "Kosher", labelEs: "Kosher" },
+  { value: "organic", labelFr: "Bio", labelDe: "Bio", labelEn: "Organic", labelPt: "Orgânico", labelEs: "Orgánico" },
+  { value: "dog-friendly", labelFr: "Chiens acceptes", labelDe: "Hundefreundlich", labelEn: "Dog friendly", labelPt: "Aceita cães", labelEs: "Admite perros" },
+  { value: "air-conditioning", labelFr: "Climatisation", labelDe: "Klimaanlage", labelEn: "Air conditioning", labelPt: "Ar condicionado", labelEs: "Aire acondicionado" },
+  { value: "outdoor-seating", labelFr: "Places en exterieur", labelDe: "Aussenplaetze", labelEn: "Outdoor seating", labelPt: "Lugares ao ar livre", labelEs: "Asientos al aire libre" },
+  { value: "group-friendly", labelFr: "Adapte aux groupes", labelDe: "Gruppenfreundlich", labelEn: "Group friendly", labelPt: "Para grupos", labelEs: "Para grupos" },
+  { value: "romantic", labelFr: "Romantique", labelDe: "Romantisch", labelEn: "Romantic", labelPt: "Romântico", labelEs: "Romántico" },
+  { value: "business", labelFr: "Business lunch", labelDe: "Business Lunch", labelEn: "Business lunch", labelPt: "Almoço de negócios", labelEs: "Almuerzo de negocios" },
+  { value: "brunch", labelFr: "Brunch", labelDe: "Brunch", labelEn: "Brunch", labelPt: "Brunch", labelEs: "Brunch" },
+  { value: "lake-view", labelFr: "Vue sur le lac", labelDe: "Seeblick", labelEn: "Lake view", labelPt: "Vista para o lago", labelEs: "Vista al lago" },
 ];
 
 export const mockRestaurants: Restaurant[] = [

@@ -167,30 +167,90 @@ export function SearchFilters() {
         </div>
       </div>
 
-      {/* Features */}
+      {/* Dietary Restrictions */}
       <div>
         <label className="mb-2 block text-sm font-medium text-gray-700">
-          {t("features")}
+          {t("dietaryRestrictions")}
         </label>
         <div className="flex flex-wrap gap-2">
-          {featuresOptions.map((feature) => {
-            const label = getLocalizedLabelAlt(feature, locale);
-            const isActive = currentFeatures.includes(feature.value);
-            return (
-              <Badge
-                key={feature.value}
-                variant={isActive ? "default" : "outline"}
-                className={`cursor-pointer transition-colors ${
-                  isActive
-                    ? "bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)] text-white border-0"
-                    : "hover:border-[var(--color-just-tag)] hover:text-[var(--color-just-tag)]"
-                }`}
-                onClick={() => toggleFeature(feature.value)}
-              >
-                {label}
-              </Badge>
-            );
-          })}
+          {featuresOptions
+            .filter((f) => ["vegetarian", "vegan", "gluten-free", "halal", "kosher", "organic"].includes(f.value))
+            .map((feature) => {
+              const label = getLocalizedLabelAlt(feature, locale);
+              const isActive = currentFeatures.includes(feature.value);
+              return (
+                <Badge
+                  key={feature.value}
+                  variant={isActive ? "default" : "outline"}
+                  className={`cursor-pointer transition-colors ${
+                    isActive
+                      ? "bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)] text-white border-0"
+                      : "hover:border-[var(--color-just-tag)] hover:text-[var(--color-just-tag)]"
+                  }`}
+                  onClick={() => toggleFeature(feature.value)}
+                >
+                  {label}
+                </Badge>
+              );
+            })}
+        </div>
+      </div>
+
+      {/* Ambiance */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          {t("ambiance")}
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {featuresOptions
+            .filter((f) => ["romantic", "business", "brunch", "lake-view", "kids-friendly", "group-friendly"].includes(f.value))
+            .map((feature) => {
+              const label = getLocalizedLabelAlt(feature, locale);
+              const isActive = currentFeatures.includes(feature.value);
+              return (
+                <Badge
+                  key={feature.value}
+                  variant={isActive ? "default" : "outline"}
+                  className={`cursor-pointer transition-colors ${
+                    isActive
+                      ? "bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)] text-white border-0"
+                      : "hover:border-[var(--color-just-tag)] hover:text-[var(--color-just-tag)]"
+                  }`}
+                  onClick={() => toggleFeature(feature.value)}
+                >
+                  {label}
+                </Badge>
+              );
+            })}
+        </div>
+      </div>
+
+      {/* Services & Equipments */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          {t("services")}
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {featuresOptions
+            .filter((f) => ["terrace", "parking", "wifi", "accessible", "private-room", "live-music", "takeaway", "delivery", "dog-friendly", "air-conditioning", "outdoor-seating"].includes(f.value))
+            .map((feature) => {
+              const label = getLocalizedLabelAlt(feature, locale);
+              const isActive = currentFeatures.includes(feature.value);
+              return (
+                <Badge
+                  key={feature.value}
+                  variant={isActive ? "default" : "outline"}
+                  className={`cursor-pointer transition-colors ${
+                    isActive
+                      ? "bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)] text-white border-0"
+                      : "hover:border-[var(--color-just-tag)] hover:text-[var(--color-just-tag)]"
+                  }`}
+                  onClick={() => toggleFeature(feature.value)}
+                >
+                  {label}
+                </Badge>
+              );
+            })}
         </div>
       </div>
     </div>

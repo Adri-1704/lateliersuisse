@@ -79,9 +79,14 @@
     "priceRange": "Price range",
     "minRating": "Minimum rating",
     "features": "Features",
+    "dietaryRestrictions": "Dietary restrictions",
+    "ambiance": "Ambiance",
+    "services": "Services & amenities",
     "clearAll": "Clear filters",
     "showMore": "Show more",
-    "map": "View on map"
+    "map": "View on map",
+    "mapView": "Map view",
+    "listView": "List view"
   },
   "restaurant": {
     "menu": "Menu",

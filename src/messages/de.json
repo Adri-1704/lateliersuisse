@@ -79,9 +79,14 @@
     "priceRange": "Preisspanne",
     "minRating": "Mindestbewertung",
     "features": "Merkmale",
+    "dietaryRestrictions": "Ernaehrungseinschraenkungen",
+    "ambiance": "Ambiente",
+    "services": "Services und Ausstattung",
     "clearAll": "Filter löschen",
     "showMore": "Mehr anzeigen",
-    "map": "Auf Karte anzeigen"
+    "map": "Auf Karte anzeigen",
+    "mapView": "Kartenansicht",
+    "listView": "Listenansicht"
   },
   "restaurant": {
     "menu": "Speisekarte",

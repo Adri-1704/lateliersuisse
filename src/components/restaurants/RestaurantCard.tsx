@@ -4,9 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Star, MapPin, Heart, Clock } from "lucide-react";
+import { Star, MapPin, Clock } from "lucide-react";
+import { FavoriteButton } from "@/components/restaurants/FavoriteButton";
 import { Badge } from "@/components/ui/badge";
 import type { Restaurant } from "@/data/mock-restaurants";
+import { DistinctionBadges } from "@/components/restaurants/DistinctionBadges";
+import { PromotionBadge } from "@/components/restaurants/PromotionBadge";
 import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
 
 function isOpenNow(openingHours: Restaurant["openingHours"]): boolean {
@@ -49,24 +52,26 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
           {/* Top left: Featured badge or cuisine */}
-          {restaurant.isFeatured ? (
-            <Badge className="absolute left-3 top-3 bg-[var(--color-just-tag)] text-white border-0 animate-pulse-gentle">
-              {t("badge")}
-            </Badge>
-          ) : (
-            <Badge className="absolute left-3 top-3 bg-black/50 text-white border-0 backdrop-blur-sm text-xs">
-              {restaurant.cuisineType}
-            </Badge>
-          )}
+          <div className="absolute left-3 top-3 flex flex-col gap-1.5">
+            {restaurant.isFeatured ? (
+              <Badge className="bg-[var(--color-just-tag)] text-white border-0 animate-pulse-gentle">
+                {t("badge")}
+              </Badge>
+            ) : (
+              <Badge className="bg-black/50 text-white border-0 backdrop-blur-sm text-xs">
+                {restaurant.cuisineType}
+              </Badge>
+            )}
+            {restaurant.promotions && restaurant.promotions.length > 0 && (
+              <PromotionBadge promotion={restaurant.promotions[0]} size="sm" />
+            )}
+          </div>
 
           {/* Top right: Heart icon */}
-          <button
-            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 opacity-0 transition-all group-hover:opacity-100 hover:bg-white"
-            onClick={(e) => { e.preventDefault(); }}
-            aria-label="Save"
-          >
-            <Heart className="h-4 w-4 text-gray-600" />
-          </button>
+          <FavoriteButton
+            restaurantId={restaurant.id}
+            className="absolute right-3 top-3 h-8 w-8 bg-white/80 opacity-0 group-hover:opacity-100 hover:bg-white"
+          />
 
           {/* Bottom left: Canton badge */}
           <div className="absolute bottom-3 left-3 flex items-center gap-2">
@@ -124,7 +129,12 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
           <p className="mt-2 text-sm text-gray-500 line-clamp-2">
             {description}
           </p>
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          {restaurant.badges && restaurant.badges.length > 0 && (
+            <div className="mt-2">
+              <DistinctionBadges badges={restaurant.badges} size="sm" />
+            </div>
+          )}
+          <div className="mt-2 flex flex-wrap gap-1.5">
             {restaurant.features.slice(0, 3).map((feature) => (
               <Badge
                 key={feature}

@@ -27,6 +27,10 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwissCrossIcon } from "@/components/ui/swiss-cross";
 import { SimilarRestaurants } from "@/components/restaurants/SimilarRestaurants";
+import { ShareButtons } from "@/components/restaurants/ShareButtons";
+import { DistinctionBadges } from "@/components/restaurants/DistinctionBadges";
+import { PromotionBanner } from "@/components/restaurants/PromotionBadge";
+import { SubRatingBar } from "@/components/restaurants/SubRatingBar";
 import type { Restaurant, Review } from "@/data/mock-restaurants";
 import { getLocalizedName, getLocalizedDescription, getLocalizedLabelAlt } from "@/lib/locale-helpers";
 import { submitReview } from "@/actions/reviews";
@@ -203,6 +207,10 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewHoverRating, setReviewHoverRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
+  const [reviewCuisine, setReviewCuisine] = useState(0);
+  const [reviewService, setReviewService] = useState(0);
+  const [reviewAmbiance, setReviewAmbiance] = useState(0);
+  const [reviewValue, setReviewValue] = useState(0);
   const [localReviews, setLocalReviews] = useState<Review[]>(reviews);
   const [localAvgRating, setLocalAvgRating] = useState(restaurant.avgRating);
   const [localReviewCount, setLocalReviewCount] = useState(restaurant.reviewCount);
@@ -225,6 +233,10 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
         restaurant_id: restaurant.id,
         author_name: reviewName.trim(),
         rating: reviewRating,
+        rating_cuisine: reviewCuisine || undefined,
+        rating_service: reviewService || undefined,
+        rating_ambiance: reviewAmbiance || undefined,
+        rating_value: reviewValue || undefined,
         comment: reviewComment.trim() || undefined,
       });
 
@@ -235,6 +247,10 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
           restaurantId: result.review.restaurantId,
           authorName: result.review.authorName,
           rating: result.review.rating,
+          ratingCuisine: reviewCuisine || undefined,
+          ratingService: reviewService || undefined,
+          ratingAmbiance: reviewAmbiance || undefined,
+          ratingValue: reviewValue || undefined,
           comment: result.review.comment,
           createdAt: result.review.createdAt,
         };
@@ -390,6 +406,10 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
                 {name}
               </h1>
+              <ShareButtons
+                url={typeof window !== "undefined" ? window.location.href : `/${locale}/restaurants/${restaurant.slug}`}
+                title={name}
+              />
               {restaurant.isFeatured && (
                 <Badge className="bg-[var(--color-just-tag)] text-white border-0 animate-pulse-gentle">
                   ⭐ {locale === "de" ? "Restaurant des Monats" : locale === "en" ? "Restaurant of the month" : locale === "pt" ? "Restaurante do mês" : locale === "es" ? "Restaurante del mes" : "Restaurant du mois"}
@@ -402,6 +422,16 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 </Badge>
               )}
             </div>
+            {restaurant.badges && restaurant.badges.length > 0 && (
+              <div className="mt-2">
+                <DistinctionBadges badges={restaurant.badges} />
+              </div>
+            )}
+            {restaurant.promotions && restaurant.promotions.length > 0 && (
+              <div className="mt-3">
+                <PromotionBanner promotions={restaurant.promotions} />
+              </div>
+            )}
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
               {/* Rating circle */}
               <div className="flex items-center gap-2">
@@ -534,6 +564,32 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 </div>
               </div>
 
+              {/* Sub-ratings */}
+              {localReviews.length > 0 && (() => {
+                const withCuisine = localReviews.filter((r) => r.ratingCuisine);
+                const withService = localReviews.filter((r) => r.ratingService);
+                const withAmbiance = localReviews.filter((r) => r.ratingAmbiance);
+                const withValue = localReviews.filter((r) => r.ratingValue);
+                const hasSub = withCuisine.length > 0 || withService.length > 0;
+                if (!hasSub) return null;
+                return (
+                  <div className="mt-4 space-y-2">
+                    {withCuisine.length > 0 && (
+                      <SubRatingBar label={locale === "de" ? "Kueche" : locale === "en" ? "Cuisine" : locale === "pt" ? "Cozinha" : locale === "es" ? "Cocina" : "Cuisine"} value={withCuisine.reduce((s, r) => s + (r.ratingCuisine || 0), 0) / withCuisine.length} />
+                    )}
+                    {withService.length > 0 && (
+                      <SubRatingBar label="Service" value={withService.reduce((s, r) => s + (r.ratingService || 0), 0) / withService.length} />
+                    )}
+                    {withAmbiance.length > 0 && (
+                      <SubRatingBar label={locale === "de" ? "Ambiente" : locale === "en" ? "Ambiance" : locale === "pt" ? "Ambiente" : locale === "es" ? "Ambiente" : "Ambiance"} value={withAmbiance.reduce((s, r) => s + (r.ratingAmbiance || 0), 0) / withAmbiance.length} />
+                    )}
+                    {withValue.length > 0 && (
+                      <SubRatingBar label={locale === "de" ? "Preis/Leistung" : locale === "en" ? "Value" : locale === "pt" ? "Custo-benefício" : locale === "es" ? "Relacion calidad-precio" : "Rapport qualite-prix"} value={withValue.reduce((s, r) => s + (r.ratingValue || 0), 0) / withValue.length} />
+                    )}
+                  </div>
+                );
+              })()}
+
               <div className="space-y-4">
                 {localReviews.map((review) => (
                   <div key={review.id} className="rounded-lg border p-4">
@@ -658,6 +714,37 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                         {reviewRating > 0 && (
                           <span className="ml-2 text-sm text-gray-500">{reviewRating}/5</span>
                         )}
+                      </div>
+                    </div>
+
+                    {/* Sub-ratings (optional) */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {locale === "de" ? "Detailbewertung (optional)" : locale === "en" ? "Detailed rating (optional)" : locale === "pt" ? "Avaliação detalhada (opcional)" : locale === "es" ? "Valoración detallada (opcional)" : "Notes detaillees (optionnel)"}
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { label: locale === "de" ? "Kueche" : locale === "en" ? "Cuisine" : "Cuisine", value: reviewCuisine, setter: setReviewCuisine },
+                          { label: "Service", value: reviewService, setter: setReviewService },
+                          { label: locale === "de" ? "Ambiente" : locale === "en" ? "Ambiance" : "Ambiance", value: reviewAmbiance, setter: setReviewAmbiance },
+                          { label: locale === "de" ? "Preis/Leistung" : locale === "en" ? "Value" : locale === "pt" ? "Custo-benefício" : locale === "es" ? "Calidad-precio" : "Qualite-prix", value: reviewValue, setter: setReviewValue },
+                        ].map((sub) => (
+                          <div key={sub.label} className="flex items-center gap-2">
+                            <span className="text-xs text-gray-600 w-20 shrink-0">{sub.label}</span>
+                            <div className="flex gap-0.5">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <button
+                                  key={i}
+                                  type="button"
+                                  onClick={() => sub.setter(sub.value === i + 1 ? 0 : i + 1)}
+                                  className="p-0"
+                                >
+                                  <Star className={`h-4 w-4 ${i < sub.value ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
 

@@ -6,6 +6,7 @@ import { StatsSection } from "@/components/home/StatsSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { Testimonials } from "@/components/home/Testimonials";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
+import { CollectionsSection } from "@/components/home/CollectionsSection";
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <RestaurantOfMonth />
       <SwissCantonMap />
       <CategoryGrid />
+      <CollectionsSection />
       <StatsSection />
       <HowItWorks />
       <Testimonials />

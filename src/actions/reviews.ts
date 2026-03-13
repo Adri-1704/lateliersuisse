@@ -7,6 +7,10 @@ export interface SubmitReviewData {
   restaurant_id: string;
   author_name: string;
   rating: number;
+  rating_cuisine?: number;
+  rating_service?: number;
+  rating_ambiance?: number;
+  rating_value?: number;
   comment?: string;
 }
 
@@ -65,6 +69,10 @@ export async function submitReview(data: SubmitReviewData): Promise<SubmitReview
         restaurant_id: data.restaurant_id,
         author_name: authorName,
         rating: data.rating,
+        ...(data.rating_cuisine ? { rating_cuisine: data.rating_cuisine } : {}),
+        ...(data.rating_service ? { rating_service: data.rating_service } : {}),
+        ...(data.rating_ambiance ? { rating_ambiance: data.rating_ambiance } : {}),
+        ...(data.rating_value ? { rating_value: data.rating_value } : {}),
         comment: comment || null,
       })
       .select()

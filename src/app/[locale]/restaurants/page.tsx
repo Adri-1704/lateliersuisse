@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useSearchParams, useParams, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect, Suspense } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import dynamic from "next/dynamic";
+import { SlidersHorizontal, Map, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
@@ -11,6 +12,11 @@ import { SearchFilters } from "@/components/restaurants/SearchFilters";
 import { RestaurantCardSkeletonGrid } from "@/components/restaurants/RestaurantCardSkeleton";
 import { createClient } from "@/lib/supabase/client";
 import type { Restaurant } from "@/data/mock-restaurants";
+
+const RestaurantMap = dynamic(
+  () => import("@/components/map/RestaurantMap").then((mod) => mod.RestaurantMap),
+  { ssr: false, loading: () => <div className="h-[600px] rounded-xl bg-gray-100 animate-pulse" /> }
+);
 
 // Placeholder images for restaurants without cover images
 const placeholderImages = [
@@ -66,6 +72,7 @@ function RestaurantsContent() {
   const locale = params.locale as string;
   const router = useRouter();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -192,6 +199,24 @@ function RestaurantsContent() {
             <option value="name">{t("sortName")}</option>
           </select>
 
+          {/* View toggle */}
+          <div className="hidden sm:flex rounded-lg border border-gray-200 overflow-hidden">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm ${viewMode === "list" ? "bg-[var(--color-just-tag)] text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+            >
+              <List className="h-4 w-4" />
+              {t("listView")}
+            </button>
+            <button
+              onClick={() => setViewMode("map")}
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm ${viewMode === "map" ? "bg-[var(--color-just-tag)] text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}
+            >
+              <Map className="h-4 w-4" />
+              {t("mapView")}
+            </button>
+          </div>
+
           {/* Mobile filters button */}
           <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
             <SheetTrigger asChild>
@@ -217,10 +242,14 @@ function RestaurantsContent() {
           </div>
         </aside>
 
-        {/* Results Grid */}
+        {/* Results */}
         <div className="flex-1">
           {loading ? (
             <RestaurantCardSkeletonGrid />
+          ) : viewMode === "map" ? (
+            <div className="h-[600px] rounded-xl overflow-hidden border">
+              <RestaurantMap restaurants={filteredRestaurants} locale={locale} />
+            </div>
           ) : filteredRestaurants.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {filteredRestaurants.map((restaurant) => (
