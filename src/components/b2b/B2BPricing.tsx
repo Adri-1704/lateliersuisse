@@ -277,20 +277,6 @@ export function B2BPricing() {
           </div>
         </div>
 
-        {/* CTA */}
-        <div className="mt-10 text-center">
-          <Button
-            asChild
-            size="lg"
-            className="bg-[var(--color-just-tag)] px-8 text-base font-semibold hover:bg-[var(--color-just-tag-dark)]"
-          >
-            <a href="#b2b-contact">
-              {t("cta")}
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </a>
-          </Button>
-          <p className="mt-3 text-sm text-gray-500">{t("note")}</p>
-        </div>
       </div>
     </section>
   );
