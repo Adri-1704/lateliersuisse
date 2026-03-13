@@ -2,13 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
-import { Check, Gift, Star, Zap, ShieldCheck, Store, Camera, UtensilsCrossed, MapPin, Clock, Video, Crown, Infinity, Loader2, ArrowLeft } from "lucide-react";
+import { useParams } from "next/navigation";
+import { Check, Gift, Star, Zap, ShieldCheck, Store, Camera, UtensilsCrossed, MapPin, Clock, Video, Crown, Infinity, Loader2, ArrowLeft, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createFreeTrial } from "@/actions/subscriptions";
+import { createCheckoutSession } from "@/actions/subscriptions";
 import { toast } from "sonner";
 
 const includedFeatures = [
@@ -104,7 +104,6 @@ export function B2BPricing() {
   const tMerchant = useTranslations("merchant");
   const params = useParams();
   const locale = params.locale as string;
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"earlyBird" | "standard">("earlyBird");
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -131,22 +130,21 @@ export function B2BPricing() {
     const formData = new FormData(e.currentTarget);
 
     startTransition(async () => {
-      const res = await createFreeTrial({
-        name: formData.get("name") as string,
-        email: formData.get("email") as string,
-        phone: formData.get("phone") as string,
-        password: formData.get("password") as string,
+      const res = await createCheckoutSession({
+        planType: (selectedPlan || "annual") as "monthly" | "semiannual" | "annual" | "lifetime",
+        merchantName: formData.get("name") as string,
+        merchantEmail: formData.get("email") as string,
+        merchantPhone: formData.get("phone") as string,
         restaurantName: formData.get("restaurantName") as string,
-        city: formData.get("city") as string,
+        restaurantCity: formData.get("city") as string,
         locale,
       });
 
-      if (res.success) {
-        toast.success("Compte créé avec succès !");
-        router.push(`/${locale}/partenaire-inscription/succes`);
+      if (res.url) {
+        window.location.href = res.url;
       } else {
-        setFormError(res.error);
-        toast.error(res.error || "Erreur lors de la création du compte");
+        setFormError(res.error || "Erreur lors de la création du paiement");
+        toast.error(res.error || "Erreur lors de la création du paiement");
       }
     });
   }
@@ -377,7 +375,7 @@ export function B2BPricing() {
           <div id="b2b-signup-form" className="mx-auto mt-12 max-w-lg">
             <div className="rounded-2xl border-2 border-[var(--color-just-tag)] bg-white p-8 shadow-lg">
               <div className="mb-6 text-center">
-                <h3 className="text-xl font-bold text-gray-900">Créer votre compte</h3>
+                <h3 className="text-xl font-bold text-gray-900">Finaliser votre inscription</h3>
                 <Badge className="mt-2 bg-[var(--color-just-tag)] text-white border-0 text-sm px-4 py-1">
                   {tMerchant(selectedPlanData.id)} — {selectedPlanData.pricePerMonth ? `CHF ${selectedPlanData.pricePerMonth}/mois` : `CHF ${selectedPlanData.totalPrice}`}
                 </Badge>
@@ -404,10 +402,6 @@ export function B2BPricing() {
                   <Label htmlFor="pricing-city">Ville *</Label>
                   <Input id="pricing-city" name="city" required className="mt-1.5" placeholder="Genève" />
                 </div>
-                <div>
-                  <Label htmlFor="pricing-password">Mot de passe *</Label>
-                  <Input id="pricing-password" name="password" type="password" required minLength={6} className="mt-1.5" placeholder="Minimum 6 caractères" />
-                </div>
 
                 {formError && (
                   <p className="text-sm text-red-600">{formError}</p>
@@ -421,10 +415,13 @@ export function B2BPricing() {
                   {isPending ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Création en cours...
+                      Redirection vers le paiement...
                     </>
                   ) : (
-                    "Créer mon compte"
+                    <>
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Payer et s&apos;inscrire
+                    </>
                   )}
                 </Button>
               </form>
