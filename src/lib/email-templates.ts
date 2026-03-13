@@ -266,7 +266,7 @@ function getLocale(locale: string): Locale {
   return "fr";
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lateliersuisse.vercel.app";
 
 // ---------------------------------------------------------------------------
 // 1. B2B Admin Notification (always in French)
@@ -522,4 +522,103 @@ export function contactConfirmation(
   ].join("");
 
   return { subject: tr.subject, html: emailLayout(content) };
+}
+
+// ---------------------------------------------------------------------------
+// 8. Free Trial Welcome (localized) — sent after free trial signup
+// ---------------------------------------------------------------------------
+export interface FreeTrialData {
+  merchantName: string;
+  merchantEmail: string;
+  restaurantName: string;
+  city: string;
+  trialEndDate: string;
+}
+
+const freeTrialT = {
+  fr: {
+    subject: "Bienvenue sur L'Atelier Suisse ! Votre essai gratuit est actif",
+    title: "Bienvenue partenaire ! 🎉",
+    body: "Votre essai gratuit de 30 jours est maintenant actif. Profitez de toutes les fonctionnalités pour faire rayonner votre restaurant.",
+    trialEnd: "Fin de l'essai",
+    cta: "Accéder à mon espace",
+  },
+  de: {
+    subject: "Willkommen bei L'Atelier Suisse! Ihre kostenlose Testphase ist aktiv",
+    title: "Willkommen Partner! 🎉",
+    body: "Ihre 30-tägige kostenlose Testphase ist jetzt aktiv. Nutzen Sie alle Funktionen, um Ihr Restaurant bekannt zu machen.",
+    trialEnd: "Ende der Testphase",
+    cta: "Zu meinem Bereich",
+  },
+  en: {
+    subject: "Welcome to L'Atelier Suisse! Your free trial is active",
+    title: "Welcome partner! 🎉",
+    body: "Your 30-day free trial is now active. Enjoy all features to boost your restaurant's visibility.",
+    trialEnd: "Trial ends",
+    cta: "Access my dashboard",
+  },
+  pt: {
+    subject: "Bem-vindo ao L'Atelier Suisse! O seu período de teste gratuito está ativo",
+    title: "Bem-vindo parceiro! 🎉",
+    body: "O seu período de teste gratuito de 30 dias está agora ativo. Aproveite todas as funcionalidades para destacar o seu restaurante.",
+    trialEnd: "Fim do teste",
+    cta: "Aceder ao meu espaço",
+  },
+  es: {
+    subject: "¡Bienvenido a L'Atelier Suisse! Su prueba gratuita está activa",
+    title: "¡Bienvenido socio! 🎉",
+    body: "Su prueba gratuita de 30 días ya está activa. Disfrute de todas las funciones para dar visibilidad a su restaurante.",
+    trialEnd: "Fin de la prueba",
+    cta: "Acceder a mi espacio",
+  },
+};
+
+export function freeTrialWelcome(
+  data: FreeTrialData,
+  locale: string
+): { subject: string; html: string } {
+  const l = getLocale(locale);
+  const tr = freeTrialT[l];
+
+  const content = [
+    heading(tr.title),
+    paragraph(tr.body),
+    divider(),
+    label(l === "de" ? "Name" : l === "en" ? "Name" : "Nom", data.merchantName),
+    label("Restaurant", data.restaurantName),
+    label(l === "de" ? "Stadt" : l === "en" ? "City" : "Ville", data.city),
+    label("Email", data.merchantEmail),
+    label(tr.trialEnd, data.trialEndDate),
+    button(`${siteUrl}/${l}`, tr.cta),
+  ].join("");
+
+  return { subject: tr.subject, html: emailLayout(content) };
+}
+
+// ---------------------------------------------------------------------------
+// 9. Free Trial Admin Notification (always in French)
+// ---------------------------------------------------------------------------
+export function freeTrialAdminNotification(data: FreeTrialData): {
+  subject: string;
+  html: string;
+} {
+  const content = [
+    heading("🆕 Nouvel essai gratuit"),
+    paragraph("Un nouveau restaurateur vient de créer un compte essai gratuit."),
+    divider(),
+    label("Nom", data.merchantName),
+    label("Email", data.merchantEmail),
+    label("Restaurant", data.restaurantName),
+    label("Ville", data.city),
+    label("Fin de l'essai", data.trialEndDate),
+    divider(),
+    paragraph(
+      `<a href="mailto:${data.merchantEmail}" style="color:${COLORS.red};font-weight:600;">Contacter par email</a>`
+    ),
+  ].join("");
+
+  return {
+    subject: `Nouvel essai gratuit — ${data.restaurantName} (${data.city})`,
+    html: emailLayout(content),
+  };
 }

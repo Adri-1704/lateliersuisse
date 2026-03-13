@@ -138,6 +138,7 @@ export function B2BPricing() {
         password: formData.get("password") as string,
         restaurantName: formData.get("restaurantName") as string,
         city: formData.get("city") as string,
+        locale,
       });
 
       if (res.success) {

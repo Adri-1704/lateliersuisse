@@ -3,7 +3,7 @@
 import { getStripe, PLAN_PRICES } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
-import { paymentConfirmation, merchantWelcome } from "@/lib/email-templates";
+import { paymentConfirmation, merchantWelcome, freeTrialWelcome, freeTrialAdminNotification } from "@/lib/email-templates";
 import { createServerClient } from "@supabase/ssr";
 
 interface CreateCheckoutParams {
@@ -293,6 +293,7 @@ export async function createFreeTrial(params: {
   password: string;
   restaurantName: string;
   city: string;
+  locale?: string;
 }): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
@@ -313,6 +314,36 @@ export async function createFreeTrial(params: {
       current_period_end: trialEnd.toISOString(),
     });
     if (subError) throw subError;
+
+    // Send emails (non-blocking — don't fail the signup if emails fail)
+    const locale = params.locale || "fr";
+    const emailData = {
+      merchantName: params.name,
+      merchantEmail: params.email,
+      restaurantName: params.restaurantName,
+      city: params.city,
+      trialEndDate: trialEnd.toLocaleDateString(locale === "de" ? "de-CH" : locale === "en" ? "en-GB" : "fr-CH"),
+    };
+
+    // Welcome email to merchant
+    const welcomeEmail = freeTrialWelcome(emailData, locale);
+    await sendEmail({
+      to: params.email,
+      subject: welcomeEmail.subject,
+      html: welcomeEmail.html,
+    });
+
+    // Admin notification
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (adminEmail) {
+      const adminNotif = freeTrialAdminNotification(emailData);
+      await sendEmail({
+        to: adminEmail,
+        subject: adminNotif.subject,
+        html: adminNotif.html,
+      });
+    }
+
     return { success: true, error: null };
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Impossible de créer le compte";
