@@ -11,6 +11,19 @@ const mockB2BRequests: B2BContactRequest[] = [
   { id: "5", first_name: "Claire", last_name: "Dupont", email: "claire@labrasserie.ch", phone: null, restaurant_name: "La Brasserie", city: "Geneve", message: null, status: "converted", locale: "fr", notes: null, created_at: "2026-02-10T11:20:00Z" },
 ];
 
+export async function getB2BRequest(id: string): Promise<{ success: boolean; error: string | null; data?: B2BContactRequest }> {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.from("b2b_contact_requests").select("*").eq("id", id).single();
+    if (error) throw error;
+    return { success: true, error: null, data };
+  } catch {
+    const mock = mockB2BRequests.find((r) => r.id === id);
+    if (!mock) return { success: false, error: "Demande non trouvée" };
+    return { success: true, error: null, data: mock };
+  }
+}
+
 export async function listB2BRequests(params: {
   page?: number;
   limit?: number;

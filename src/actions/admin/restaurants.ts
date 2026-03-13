@@ -170,6 +170,30 @@ export async function createRestaurant(params: {
   }
 }
 
+export async function updateRestaurant(
+  id: string,
+  params: {
+    name_fr?: string; name_de?: string; name_en?: string;
+    description_fr?: string; description_de?: string; description_en?: string;
+    cuisine_type?: string; canton?: string; city?: string; address?: string;
+    postal_code?: string; phone?: string; email?: string; website?: string;
+    instagram?: string; facebook?: string; tiktok?: string;
+    price_range?: string; features?: string[]; is_published?: boolean; is_featured?: boolean;
+  }
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any).from("restaurants").update(params).eq("id", id);
+    if (error) throw error;
+    revalidatePath("/admin/restaurants");
+    revalidatePath(`/admin/restaurants/${id}`);
+    return { success: true, error: null };
+  } catch {
+    return { success: false, error: "Impossible de mettre à jour le restaurant (mode demo)" };
+  }
+}
+
 export async function deleteRestaurant(id: string): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();

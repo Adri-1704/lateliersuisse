@@ -13,6 +13,24 @@ const mockMerchants: MerchantWithSubscription[] = [
   { id: "m3", auth_user_id: null, email: "antoine@lecomptoir.ch", name: "Antoine Girard", phone: "+41 21 345 67 89", stripe_customer_id: null, created_at: "2025-12-01T09:00:00Z", updated_at: "2025-12-01T09:00:00Z", subscription: { id: "s3", merchant_id: "m3", stripe_subscription_id: null, plan_type: "semiannual", status: "past_due", current_period_start: "2025-12-01T00:00:00Z", current_period_end: "2026-06-01T00:00:00Z", cancel_at_period_end: false, created_at: "2025-12-01T09:00:00Z", updated_at: "2025-12-01T09:00:00Z" } },
 ];
 
+export async function getMerchant(id: string): Promise<{ success: boolean; error: string | null; data?: MerchantWithSubscription }> {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase.from("merchants").select("*, subscriptions(*)").eq("id", id).single();
+    if (error) throw error;
+    const record = data as Record<string, unknown>;
+    const merchant = {
+      ...record,
+      subscription: Array.isArray(record.subscriptions) ? (record.subscriptions as Subscription[])[0] || null : null,
+    } as MerchantWithSubscription;
+    return { success: true, error: null, data: merchant };
+  } catch {
+    const mock = mockMerchants.find((m) => m.id === id);
+    if (!mock) return { success: false, error: "Commerçant non trouvé" };
+    return { success: true, error: null, data: mock };
+  }
+}
+
 export async function listMerchants(params: {
   page?: number;
   limit?: number;

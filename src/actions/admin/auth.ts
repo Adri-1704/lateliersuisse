@@ -24,6 +24,13 @@ export async function logoutAdmin() {
   redirect("/admin/login");
 }
 
+export async function updateAdminPassword(newPassword: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) return { success: false, error: error.message };
+  return { success: true, error: null };
+}
+
 export async function getAdminUser() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return null;

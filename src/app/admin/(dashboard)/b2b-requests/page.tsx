@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listB2BRequests } from "@/actions/admin/b2b-requests";
 import { SearchInput } from "@/components/admin/SearchInput";
 import { Pagination } from "@/components/admin/Pagination";
@@ -52,15 +53,29 @@ export default async function B2BRequestsPage({
               </TableHeader>
               <TableBody>
                 {requests.map((r) => (
-                  <TableRow key={r.id}>
+                  <TableRow key={r.id} className="cursor-pointer hover:bg-muted/50">
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(r.created_at).toLocaleDateString("fr-CH")}
+                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">
+                        {new Date(r.created_at).toLocaleDateString("fr-CH")}
+                      </Link>
                     </TableCell>
-                    <TableCell className="font-medium">{r.first_name} {r.last_name}</TableCell>
-                    <TableCell>{r.restaurant_name}</TableCell>
-                    <TableCell>{r.city}</TableCell>
-                    <TableCell className="text-sm">{r.email}</TableCell>
-                    <TableCell className="text-sm">{r.phone || "\u2014"}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">
+                        {r.first_name} {r.last_name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.restaurant_name}</Link>
+                    </TableCell>
+                    <TableCell>
+                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.city}</Link>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.email}</Link>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.phone || "\u2014"}</Link>
+                    </TableCell>
                     <TableCell><StatusBadge status={r.status} /></TableCell>
                   </TableRow>
                 ))}

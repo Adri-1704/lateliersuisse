@@ -23,6 +23,7 @@ import {
   Mail,
   Newspaper,
   Star,
+  Settings,
 } from "lucide-react";
 
 const navItems = [
@@ -34,6 +35,7 @@ const navItems = [
   { title: "Contacts", href: "/admin/contacts", icon: Mail },
   { title: "Newsletter", href: "/admin/newsletter", icon: Newspaper },
   { title: "Restaurants du mois", href: "/admin/featured", icon: Star },
+  { title: "Parametres", href: "/admin/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {
@@ -47,7 +49,7 @@ export function AdminSidebar() {
             <UtensilsCrossed className="h-4 w-4" />
           </div>
           <span className="text-lg font-bold">
-            Just<span className="text-[var(--color-just-tag)]">-Tag</span>
+            L&apos;Atelier <span className="text-[var(--color-just-tag)]">Suisse</span>
           </span>
         </Link>
       </SidebarHeader>
@@ -77,7 +79,7 @@ export function AdminSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t px-6 py-3">
-        <p className="text-xs text-muted-foreground">Just-Tag.ch Admin</p>
+        <p className="text-xs text-muted-foreground">L&apos;Atelier Suisse Admin</p>
       </SidebarFooter>
     </Sidebar>
   );
