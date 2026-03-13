@@ -107,13 +107,13 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
             </span>
           </div>
         </div>
-        <div className="p-4">
+        <div className="p-4 overflow-hidden">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[var(--color-just-tag)] transition-colors line-clamp-1">
+            <h3 className="min-w-0 text-lg font-semibold text-gray-900 group-hover:text-[var(--color-just-tag)] transition-colors line-clamp-1">
               {name}
             </h3>
             {/* Rating badge */}
-            <div className="flex shrink-0 items-center gap-1 rounded-lg bg-[var(--color-just-tag)]/10 px-2 py-1">
+            <div className="flex shrink-0 items-center gap-1 rounded-lg bg-orange-50 px-2 py-1">
               <Star className="h-3.5 w-3.5 fill-[var(--color-just-tag)] text-[var(--color-just-tag)]" />
               <span className="text-sm font-bold text-[var(--color-just-tag)]">{restaurant.avgRating}</span>
             </div>
