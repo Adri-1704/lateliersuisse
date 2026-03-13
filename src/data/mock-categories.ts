@@ -28,6 +28,7 @@ export const cuisineCategories: CuisineCategory[] = [
   { slug: "africain", nameFr: "Africain", nameDe: "Afrikanisch", nameEn: "African", namePt: "Africano", nameEs: "Africano", icon: "🥘", count: 12 },
   { slug: "portugais", nameFr: "Portugais", nameDe: "Portugiesisch", nameEn: "Portuguese", namePt: "Português", nameEs: "Portugués", icon: "🐟", count: 16 },
   { slug: "vegetarien", nameFr: "Vegetarien", nameDe: "Vegetarisch", nameEn: "Vegetarian", namePt: "Vegetariano", nameEs: "Vegetariano", icon: "🥗", count: 34 },
+  { slug: "vegan", nameFr: "Vegan", nameDe: "Vegan", nameEn: "Vegan", namePt: "Vegano", nameEs: "Vegano", icon: "🌱", count: 19 },
   { slug: "fruits-de-mer", nameFr: "Fruits de mer", nameDe: "Meeresfruechte", nameEn: "Seafood", namePt: "Frutos do mar", nameEs: "Mariscos", icon: "🦞", count: 27 },
   { slug: "steakhouse", nameFr: "Steakhouse", nameDe: "Steakhouse", nameEn: "Steakhouse", namePt: "Steakhouse", nameEs: "Steakhouse", icon: "🥩", count: 31 },
 ];
