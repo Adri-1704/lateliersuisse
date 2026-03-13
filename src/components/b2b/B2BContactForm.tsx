@@ -2,9 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import { useState } from "react";
-import { Send, CheckCircle2, Loader2, ShieldCheck, Clock, Globe, Lock, ArrowRight, Phone } from "lucide-react";
+import { Send, CheckCircle2, Loader2, ShieldCheck, Clock, Globe, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +18,6 @@ export function B2BContactForm() {
   const params = useParams();
   const locale = params.locale as string;
 
-  const [mode, setMode] = useState<"choice" | "contact">("choice");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -107,59 +105,8 @@ export function B2BContactForm() {
             </span>
           </div>
 
-          {/* Two options */}
-          {mode === "choice" && (
-            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Link
-                href={`/${locale}/partenaire-inscription`}
-                className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-[var(--color-just-tag)] bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:border-[var(--color-just-tag-dark)]"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-just-tag)]/10">
-                  <ArrowRight className="h-7 w-7 text-[var(--color-just-tag)]" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-bold text-gray-900">S&apos;inscrire directement</h3>
-                  <p className="mt-1 text-sm text-gray-600">Choisissez votre plan et creez votre compte en quelques minutes</p>
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-[var(--color-just-tag)] px-5 py-2.5 text-sm font-semibold text-white transition-colors group-hover:bg-[var(--color-just-tag-dark)]">
-                  Commencer maintenant
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              </Link>
-
-              <button
-                onClick={() => setMode("contact")}
-                className="group flex flex-col items-center gap-4 rounded-2xl border-2 border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-lg hover:border-gray-300"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
-                  <Phone className="h-7 w-7 text-gray-600" />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-lg font-bold text-gray-900">Etre contacte</h3>
-                  <p className="mt-1 text-sm text-gray-600">Laissez-nous vos coordonnees et nous vous rappelons rapidement</p>
-                </div>
-                <span className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors group-hover:bg-gray-50">
-                  Demander un rappel
-                  <Phone className="h-4 w-4" />
-                </span>
-              </button>
-            </div>
-          )}
-
           {/* Contact form */}
-          {mode === "contact" && (
-            <div className="mt-8 rounded-2xl border bg-white p-8 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Demande de rappel</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setMode("choice")}
-                  className="text-sm text-gray-500"
-                >
-                  ← Retour
-                </Button>
-              </div>
+          <div className="mt-8 rounded-2xl border bg-white p-8 shadow-sm">
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
@@ -293,7 +240,6 @@ export function B2BContactForm() {
                 </Button>
               </form>
             </div>
-          )}
         </div>
       </div>
     </section>
