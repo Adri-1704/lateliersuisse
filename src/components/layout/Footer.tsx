@@ -9,7 +9,7 @@ export function Footer({ locale }: { locale: string }) {
   const nav = useTranslations("nav");
 
   return (
-    <footer className="border-t bg-gray-900 text-gray-300">
+    <footer className="border-t bg-[#2d4a3e] text-gray-300">
       {/* CTA Banner for restaurateurs */}
       <div className="bg-[var(--color-just-tag)]">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6 lg:px-8">
