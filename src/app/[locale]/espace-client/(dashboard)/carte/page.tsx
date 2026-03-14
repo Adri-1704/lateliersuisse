@@ -135,17 +135,22 @@ export default function MenuPage() {
     if (!restaurantId) return;
     setUploadingImageFor(itemId);
     setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const result = await uploadMenuItemImage(itemId, formData);
-    if (result.success && result.url) {
-      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
-    } else {
-      setError(result.error || "Erreur lors de l'upload");
+      const result = await uploadMenuItemImage(itemId, formData);
+      if (result.success && result.url) {
+        setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
+      } else {
+        setError(result.error || "Erreur lors de l'upload");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(err instanceof Error ? err.message : "Erreur lors de l'upload");
+    } finally {
+      setUploadingImageFor(null);
     }
-    setUploadingImageFor(null);
   }
 
   async function handleImageDelete(itemId: string) {
