@@ -48,15 +48,20 @@ export default function MenuPage() {
 
   useEffect(() => {
     async function load() {
-      const restResult = await getMerchantRestaurant();
-      if (restResult.success && restResult.data) {
-        setRestaurantId(restResult.data.id);
-        const menuResult = await getMenuItems(restResult.data.id);
-        if (menuResult.success && menuResult.data) {
-          setItems(menuResult.data);
+      try {
+        const restResult = await getMerchantRestaurant();
+        if (restResult.success && restResult.data) {
+          setRestaurantId(restResult.data.id);
+          const menuResult = await getMenuItems(restResult.data.id);
+          if (menuResult.success && menuResult.data) {
+            setItems(menuResult.data);
+          }
         }
+      } catch (err) {
+        console.error("Erreur chargement menu:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     load();
   }, []);

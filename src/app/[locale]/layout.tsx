@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SwissTrustBanner } from "@/components/layout/SwissTrustBanner";
+import { PublicLayoutWrapper } from "@/components/layout/PublicLayoutWrapper";
 import "../globals.css";
 
 const outfit = Outfit({
@@ -96,12 +97,6 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  // Detect merchant portal pages — they have their own layout (sidebar + header)
-  const { headers } = await import("next/headers");
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname") || "";
-  const isMerchantPortal = pathname.includes("/espace-client") && !pathname.endsWith("/connexion") && !pathname.endsWith("/mot-de-passe-oublie");
-
   // Structured data - Organization
   const organizationJsonLd = {
     "@context": "https://schema.org",
@@ -147,16 +142,9 @@ export default async function LocaleLayout({
       </head>
       <body className="min-h-screen font-sans antialiased">
         <NextIntlClientProvider>
-          {isMerchantPortal ? (
-            children
-          ) : (
-            <>
-              <Header />
-              <main>{children}</main>
-              <SwissTrustBanner />
-              <Footer locale={locale} />
-            </>
-          )}
+          <PublicLayoutWrapper locale={locale}>
+            {children}
+          </PublicLayoutWrapper>
         </NextIntlClientProvider>
       </body>
     </html>
