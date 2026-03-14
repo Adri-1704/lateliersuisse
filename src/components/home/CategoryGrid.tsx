@@ -95,7 +95,7 @@ export function CategoryGrid({ cuisineCounts }: CategoryGridProps = {}) {
                   {name}
                 </span>
                 <span className="mt-1 text-xs text-gray-400">
-                  {cuisineCounts ? (cuisineCounts[category.slug] || 0) : category.count} restaurants
+                  {(() => { const c = cuisineCounts ? (cuisineCounts[category.slug] || 0) : category.count; return `${c} restaurant${c > 1 ? "s" : ""}`; })()}
                 </span>
               </Link>
             );
