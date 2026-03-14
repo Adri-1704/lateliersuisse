@@ -12,7 +12,7 @@ export default async function CollectionsPage({
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-gray-900">
-        {locale === "de" ? "Kollektionen" : locale === "en" ? "Collections" : locale === "pt" ? "Coleções" : locale === "es" ? "Colecciones" : "Collections"}
+        {locale === "de" ? "Ambianzen" : locale === "en" ? "Ambiances" : locale === "pt" ? "Ambientes" : locale === "es" ? "Ambientes" : "Ambiances"}
       </h1>
       <p className="mt-2 text-gray-600">
         {locale === "de" ? "Entdecken Sie unsere kuratierten Restaurantauswahlen" : locale === "en" ? "Discover our curated restaurant selections" : locale === "pt" ? "Descubra as nossas seleções de restaurantes" : locale === "es" ? "Descubra nuestras selecciones de restaurantes" : "Decouvrez nos selections thematiques de restaurants"}

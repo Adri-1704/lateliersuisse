@@ -16,7 +16,7 @@ export function CollectionsSection() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-              {locale === "de" ? "Unsere Kollektionen" : locale === "en" ? "Our collections" : locale === "pt" ? "Nossas coleções" : locale === "es" ? "Nuestras colecciones" : "Nos collections"}
+              {locale === "de" ? "Unsere Ambianzen" : locale === "en" ? "Our ambiances" : locale === "pt" ? "Nossos ambientes" : locale === "es" ? "Nuestros ambientes" : "Nos ambiances"}
             </h2>
             <p className="mt-2 text-gray-600">
               {locale === "de" ? "Entdecken Sie unsere kuratierten Auswahlen" : locale === "en" ? "Discover our curated selections" : locale === "pt" ? "Descubra as nossas seleções" : locale === "es" ? "Descubra nuestras selecciones" : "Decouvrez nos selections thematiques"}
