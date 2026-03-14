@@ -9,38 +9,42 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { createAdminClient } from "@/lib/supabase/server";
 
-async function getCantonCounts(): Promise<Record<string, number>> {
+async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, number>; cuisineCounts: Record<string, number> }> {
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
       .from("restaurants")
-      .select("canton")
+      .select("canton, cuisine_type")
       .eq("is_published", true);
 
-    if (error || !data) return {};
+    if (error || !data) return { cantonCounts: {}, cuisineCounts: {} };
 
-    const counts: Record<string, number> = {};
-    for (const row of data as { canton: string }[]) {
-      const canton = row.canton;
-      if (canton) {
-        counts[canton] = (counts[canton] || 0) + 1;
+    const cantonCounts: Record<string, number> = {};
+    const cuisineCounts: Record<string, number> = {};
+
+    for (const row of data as { canton: string; cuisine_type: string | null }[]) {
+      if (row.canton) {
+        cantonCounts[row.canton] = (cantonCounts[row.canton] || 0) + 1;
+      }
+      if (row.cuisine_type) {
+        cuisineCounts[row.cuisine_type] = (cuisineCounts[row.cuisine_type] || 0) + 1;
       }
     }
-    return counts;
+    return { cantonCounts, cuisineCounts };
   } catch {
-    return {};
+    return { cantonCounts: {}, cuisineCounts: {} };
   }
 }
 
 export default async function HomePage() {
-  const cantonCounts = await getCantonCounts();
+  const { cantonCounts, cuisineCounts } = await getRestaurantCounts();
 
   return (
     <>
       <HeroSection />
       <RestaurantOfMonth />
       <SwissCantonMap restaurantCounts={cantonCounts} />
-      <CategoryGrid />
+      <CategoryGrid cuisineCounts={cuisineCounts} />
       <CollectionsSection />
       <StatsSection />
       <HowItWorks />

@@ -31,7 +31,11 @@ const categoryImages: Record<string, string> = {
   steakhouse: "https://images.unsplash.com/photo-1544025162-d76694265947?w=200&h=200&fit=crop",
 };
 
-export function CategoryGrid() {
+interface CategoryGridProps {
+  cuisineCounts?: Record<string, number>;
+}
+
+export function CategoryGrid({ cuisineCounts }: CategoryGridProps = {}) {
   const t = useTranslations("categories");
   const params = useParams();
   const locale = params.locale as string;
@@ -91,7 +95,7 @@ export function CategoryGrid() {
                   {name}
                 </span>
                 <span className="mt-1 text-xs text-gray-400">
-                  {category.count} restaurants
+                  {cuisineCounts?.[category.slug] ?? category.count} restaurants
                 </span>
               </Link>
             );
