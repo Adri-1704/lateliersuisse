@@ -11,6 +11,7 @@ import { Loader2, Save, CheckCircle, Plus, Copy, CopyCheck, Video } from "lucide
 import { getMerchantRestaurant, updateMerchantRestaurant, createMerchantRestaurant, getCuisineTypes } from "@/actions/merchant/restaurant";
 import type { DbRestaurant, CuisineType } from "@/lib/supabase/types";
 import { featuresOptions } from "@/data/mock-restaurants";
+import { collections } from "@/data/collections";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 const DAY_LABELS: Record<string, string> = {
@@ -390,6 +391,45 @@ export default function MyRestaurantPage() {
                   {feat.labelFr}
                 </button>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Ambiances */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Ambiances</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Selectionnez les ambiances qui correspondent a votre restaurant. Cela vous rendra visible dans les pages Ambiances du site.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {collections.map((col) => {
+                const featureKey = col.filterFeature;
+                if (!featureKey) return null;
+                const isSelected = form.features.includes(featureKey);
+                return (
+                  <button
+                    key={col.slug}
+                    type="button"
+                    onClick={() => toggleFeature(featureKey)}
+                    className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-colors ${
+                      isSelected
+                        ? "border-[var(--color-just-tag)] bg-orange-50 text-gray-900"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                    }`}
+                  >
+                    <span className="text-2xl">{col.icon}</span>
+                    <div>
+                      <span className="text-sm font-medium">{col.titleFr}</span>
+                      {isSelected && (
+                        <p className="text-xs text-[var(--color-just-tag)]">Active</p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
