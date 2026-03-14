@@ -118,6 +118,7 @@ async function getMenuItems(restaurantId: string) {
     descriptionEn: row.description_en || "",
     price: typeof row.price === "number" ? row.price : parseFloat(String(row.price)) || 0,
     category: row.category || "",
+    imageUrl: row.image_url || null,
   }));
 }
 

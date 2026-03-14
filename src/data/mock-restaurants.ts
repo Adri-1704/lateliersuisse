@@ -51,6 +51,7 @@ export interface MenuItem {
   descriptionEs?: string;
   price: number;
   category: string;
+  imageUrl?: string | null;
 }
 
 export interface Review {

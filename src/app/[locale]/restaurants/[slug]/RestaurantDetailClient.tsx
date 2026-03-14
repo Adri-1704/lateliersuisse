@@ -522,13 +522,24 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                           const itemName = getLocalizedName(item, locale);
                           const itemDesc = getLocalizedDescription(item, locale);
                           return (
-                            <div key={idx} className="flex items-start justify-between rounded-lg border p-4">
-                              <div className="flex-1">
+                            <div key={idx} className="flex items-center gap-4 rounded-lg border p-4">
+                              {item.imageUrl && (
+                                <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
+                                  <Image
+                                    src={item.imageUrl}
+                                    alt={itemName}
+                                    fill
+                                    className="object-cover"
+                                    sizes="64px"
+                                  />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
                                 <h4 className="font-medium text-gray-900">{itemName}</h4>
                                 <p className="mt-1 text-sm text-gray-500">{itemDesc}</p>
                               </div>
                               <span className="ml-4 shrink-0 font-semibold text-gray-900">
-                                CHF {item.price}
+                                {item.price.toFixed(2)} CHF
                               </span>
                             </div>
                           );
