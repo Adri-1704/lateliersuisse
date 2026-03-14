@@ -33,7 +33,9 @@ export function PromotionBanner({ promotions }: { promotions: RestaurantPromotio
   if (!promotions || promotions.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="space-y-2">
+      <h4 className="text-sm font-semibold text-red-600">Offres du moment</h4>
+      <div className="flex flex-wrap gap-2">
       {promotions.map((promo, i) => (
         <div key={i} className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
           <PromotionBadge promotion={promo} />
@@ -42,6 +44,7 @@ export function PromotionBanner({ promotions }: { promotions: RestaurantPromotio
           )}
         </div>
       ))}
+      </div>
     </div>
   );
 }
