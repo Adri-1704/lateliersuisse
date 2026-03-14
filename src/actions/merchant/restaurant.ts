@@ -138,6 +138,64 @@ export async function updateMerchantRestaurant(data: UpdateRestaurantData): Prom
   }
 }
 
+export async function createMerchantRestaurant(data: {
+  name_fr: string;
+  name_de?: string;
+  name_en?: string;
+  cuisine_type?: string;
+  canton: string;
+  city: string;
+  address?: string;
+  postal_code?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  price_range?: string;
+  description_fr?: string;
+}): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Non authentifié" };
+
+    const merchantId = await findMerchantId(supabase, user.id, user.email || "");
+    if (!merchantId) return { success: false, error: "Marchand non trouvé" };
+
+    const slug = data.name_fr
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
+
+    const admin = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (admin.from("restaurants") as any).insert({
+      merchant_id: merchantId,
+      name_fr: data.name_fr,
+      name_de: data.name_de || data.name_fr,
+      name_en: data.name_en || data.name_fr,
+      slug,
+      cuisine_type: data.cuisine_type || null,
+      canton: data.canton,
+      city: data.city,
+      address: data.address || null,
+      postal_code: data.postal_code || null,
+      phone: data.phone || null,
+      email: data.email || null,
+      website: data.website || null,
+      price_range: data.price_range || "2",
+      description_fr: data.description_fr || null,
+      is_published: false,
+    });
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, error: null };
+  } catch {
+    return { success: false, error: "Erreur inattendue" };
+  }
+}
+
 export async function getCuisineTypes(): Promise<CuisineType[]> {
   try {
     const supabase = await createClient();

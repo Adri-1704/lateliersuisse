@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, CheckCircle } from "lucide-react";
-import { getMerchantRestaurant, updateMerchantRestaurant, getCuisineTypes } from "@/actions/merchant/restaurant";
+import { Loader2, Save, CheckCircle, Plus } from "lucide-react";
+import { getMerchantRestaurant, updateMerchantRestaurant, createMerchantRestaurant, getCuisineTypes } from "@/actions/merchant/restaurant";
 import type { DbRestaurant, CuisineType } from "@/lib/supabase/types";
 import { featuresOptions } from "@/data/mock-restaurants";
 
@@ -144,9 +144,10 @@ export default function MyRestaurantPage() {
 
   if (!restaurant) {
     return (
-      <div className="py-20 text-center">
-        <p className="text-muted-foreground">{t("restaurant.notFound")}</p>
-      </div>
+      <CreateRestaurantForm
+        cuisineTypes={cuisineTypes}
+        onCreated={() => window.location.reload()}
+      />
     );
   }
 
@@ -385,6 +386,195 @@ export default function MyRestaurantPage() {
               <Save className="mr-2 h-4 w-4" />
             )}
             {t("restaurant.save")}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function CreateRestaurantForm({
+  cuisineTypes,
+  onCreated,
+}: {
+  cuisineTypes: CuisineType[];
+  onCreated: () => void;
+}) {
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [form, setForm] = useState({
+    name_fr: "",
+    name_de: "",
+    name_en: "",
+    description_fr: "",
+    cuisine_type: "",
+    canton: "",
+    city: "",
+    address: "",
+    postal_code: "",
+    phone: "",
+    email: "",
+    website: "",
+    price_range: "2",
+  });
+
+  function updateField(field: string, value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+
+    const result = await createMerchantRestaurant(form);
+
+    if (result.success) {
+      onCreated();
+    } else {
+      setError(result.error);
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-just-tag)]/10">
+          <Plus className="h-8 w-8 text-[var(--color-just-tag)]" />
+        </div>
+        <h1 className="mt-4 text-2xl font-bold">Ajouter votre restaurant</h1>
+        <p className="mt-2 text-muted-foreground">
+          Renseignez les informations de votre restaurant pour le rendre visible sur la plateforme.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+
+        <Card>
+          <CardHeader><CardTitle>Informations principales</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nom du restaurant *</Label>
+              <Input value={form.name_fr} onChange={(e) => updateField("name_fr", e.target.value)} required placeholder="Le Petit Prince" />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Nom (DE)</Label>
+                <Input value={form.name_de} onChange={(e) => updateField("name_de", e.target.value)} placeholder="Optionnel" />
+              </div>
+              <div className="space-y-2">
+                <Label>Nom (EN)</Label>
+                <Input value={form.name_en} onChange={(e) => updateField("name_en", e.target.value)} placeholder="Optionnel" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Textarea value={form.description_fr} onChange={(e) => updateField("description_fr", e.target.value)} rows={3} placeholder="Decrivez votre restaurant..." />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Localisation</CardTitle></CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Adresse</Label>
+              <Input value={form.address} onChange={(e) => updateField("address", e.target.value)} placeholder="Rue de la Gare 12" />
+            </div>
+            <div className="space-y-2">
+              <Label>Code postal</Label>
+              <Input value={form.postal_code} onChange={(e) => updateField("postal_code", e.target.value)} placeholder="1200" />
+            </div>
+            <div className="space-y-2">
+              <Label>Ville *</Label>
+              <Input value={form.city} onChange={(e) => updateField("city", e.target.value)} required placeholder="Geneve" />
+            </div>
+            <div className="space-y-2">
+              <Label>Canton *</Label>
+              <select
+                value={form.canton}
+                onChange={(e) => updateField("canton", e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                required
+              >
+                <option value="">Choisir un canton</option>
+                {CANTONS.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Contact</CardTitle></CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Telephone</Label>
+              <Input value={form.phone} onChange={(e) => updateField("phone", e.target.value)} type="tel" placeholder="+41 22 123 45 67" />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input value={form.email} onChange={(e) => updateField("email", e.target.value)} type="email" placeholder="contact@restaurant.ch" />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Site web</Label>
+              <Input value={form.website} onChange={(e) => updateField("website", e.target.value)} type="url" placeholder="https://www.monrestaurant.ch" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle>Type de cuisine & Prix</CardTitle></CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Type de cuisine</Label>
+              <select
+                value={form.cuisine_type}
+                onChange={(e) => updateField("cuisine_type", e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="">Choisir</option>
+                {cuisineTypes.map((ct) => (
+                  <option key={ct.id} value={ct.slug}>{ct.name_fr}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Gamme de prix</Label>
+              <select
+                value={form.price_range}
+                onChange={(e) => updateField("price_range", e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              >
+                <option value="1">$ — Economique</option>
+                <option value="2">$$ — Moyen</option>
+                <option value="3">$$$ — Haut de gamme</option>
+                <option value="4">$$$$ — Luxe</option>
+              </select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            disabled={saving}
+            className="bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag)]/90"
+          >
+            {saving ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Plus className="mr-2 h-4 w-4" />
+            )}
+            Creer mon restaurant
           </Button>
         </div>
       </form>
