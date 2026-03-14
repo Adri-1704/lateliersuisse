@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Trash2, Pencil, X, CheckCircle } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil, X, CheckCircle, ImagePlus } from "lucide-react";
+import { useRef } from "react";
+import Image from "next/image";
 import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
-import { getMenuItems, createMenuItem, updateMenuItem, deleteMenuItem } from "@/actions/merchant/menu";
+import { getMenuItems, createMenuItem, updateMenuItem, deleteMenuItem, uploadMenuItemImage, deleteMenuItemImage } from "@/actions/merchant/menu";
 import type { DbMenuItem } from "@/lib/supabase/types";
 
 interface MenuItemForm {
@@ -41,6 +43,8 @@ export default function MenuPage() {
   const [form, setForm] = useState<MenuItemForm>(EMPTY_FORM);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [uploadingImageFor, setUploadingImageFor] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function load() {
@@ -119,6 +123,25 @@ export default function MenuPage() {
     const result = await deleteMenuItem(id);
     if (result.success) {
       setItems((prev) => prev.filter((i) => i.id !== id));
+    }
+  }
+
+  async function handleImageUpload(itemId: string, file: File) {
+    if (!restaurantId) return;
+    setUploadingImageFor(itemId);
+    const formData = new FormData();
+    formData.append("file", file);
+    const result = await uploadMenuItemImage(itemId, restaurantId, formData);
+    if (result.success && result.url) {
+      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
+    }
+    setUploadingImageFor(null);
+  }
+
+  async function handleImageDelete(itemId: string) {
+    const result = await deleteMenuItemImage(itemId);
+    if (result.success) {
+      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: null } : i));
     }
   }
 
@@ -278,8 +301,47 @@ export default function MenuPage() {
               {items
                 .filter((i) => i.category === category)
                 .map((item) => (
-                  <div key={item.id} className="flex items-center justify-between py-3">
-                    <div className="flex-1">
+                  <div key={item.id} className="flex items-center gap-4 py-3">
+                    {/* Image thumbnail */}
+                    <div className="relative h-16 w-16 flex-shrink-0 rounded-lg border bg-gray-50 overflow-hidden">
+                      {item.image_url ? (
+                        <>
+                          <Image
+                            src={item.image_url}
+                            alt={item.name_fr}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleImageDelete(item.id)}
+                            className="absolute -right-1 -top-1 rounded-full bg-red-500 p-0.5 text-white shadow-sm hover:bg-red-600"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </>
+                      ) : (
+                        <label className="flex h-full w-full cursor-pointer flex-col items-center justify-center text-gray-400 hover:text-gray-600 transition-colors">
+                          {uploadingImageFor === item.id ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <ImagePlus className="h-5 w-5" />
+                          )}
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleImageUpload(item.id, file);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{item.name_fr}</span>
                         {!item.is_available && (
@@ -287,13 +349,36 @@ export default function MenuPage() {
                         )}
                       </div>
                       {item.description_fr && (
-                        <p className="text-sm text-muted-foreground">{item.description_fr}</p>
+                        <p className="text-sm text-muted-foreground truncate">{item.description_fr}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="font-semibold">
+                      <span className="font-semibold whitespace-nowrap">
                         {typeof item.price === "number" ? item.price.toFixed(2) : item.price} CHF
                       </span>
+                      {!item.image_url && (
+                        <label className="cursor-pointer">
+                          <Button variant="ghost" size="icon" type="button" asChild>
+                            <span>
+                              {uploadingImageFor === item.id ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <ImagePlus className="h-3.5 w-3.5" />
+                              )}
+                            </span>
+                          </Button>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleImageUpload(item.id, file);
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                      )}
                       <Button variant="ghost" size="icon" onClick={() => startEdit(item)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>

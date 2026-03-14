@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DbMenuItem } from "@/lib/supabase/types";
 
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 export interface MenuItemData {
   restaurant_id: string;
   name_fr: string;
@@ -16,6 +19,7 @@ export interface MenuItemData {
   category: string;
   position?: number;
   is_available?: boolean;
+  image_url?: string;
 }
 
 /**
@@ -119,6 +123,7 @@ export async function createMenuItem(item: MenuItemData): Promise<{
       category: item.category,
       position: item.position || 0,
       is_available: item.is_available !== false,
+      image_url: item.image_url || null,
     });
 
     if (error) return { success: false, error: "Erreur lors de l'ajout" };
@@ -161,6 +166,67 @@ export async function deleteMenuItem(
     const { error } = await (admin.from("menu_items") as any)
       .delete()
       .eq("id", id);
+
+    if (error) return { success: false, error: "Erreur lors de la suppression" };
+    return { success: true, error: null };
+  } catch {
+    return { success: false, error: "Erreur inattendue" };
+  }
+}
+
+export async function uploadMenuItemImage(
+  menuItemId: string,
+  restaurantId: string,
+  formData: FormData
+): Promise<{ success: boolean; error: string | null; url?: string }> {
+  try {
+    const isOwner = await verifyRestaurantOwnership(restaurantId);
+    if (!isOwner) return { success: false, error: "Accès non autorisé" };
+
+    const file = formData.get("file") as File;
+    if (!file) return { success: false, error: "Aucun fichier fourni" };
+    if (!ALLOWED_TYPES.includes(file.type)) return { success: false, error: "Format non supporté (JPEG, PNG, WebP)" };
+    if (file.size > MAX_IMAGE_SIZE) return { success: false, error: "Fichier trop volumineux (max 5 Mo)" };
+
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const fileName = `menu/${restaurantId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+    const admin = createAdminClient();
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const { error: uploadError } = await admin.storage
+      .from("restaurant-images")
+      .upload(fileName, buffer, { contentType: file.type, cacheControl: "3600" });
+
+    if (uploadError) return { success: false, error: "Erreur lors de l'upload" };
+
+    const { data: urlData } = admin.storage
+      .from("restaurant-images")
+      .getPublicUrl(fileName);
+
+    const publicUrl = urlData.publicUrl;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: updateError } = await (admin.from("menu_items") as any)
+      .update({ image_url: publicUrl })
+      .eq("id", menuItemId);
+
+    if (updateError) return { success: false, error: "Erreur lors de la mise à jour" };
+    return { success: true, error: null, url: publicUrl };
+  } catch {
+    return { success: false, error: "Erreur inattendue" };
+  }
+}
+
+export async function deleteMenuItemImage(
+  menuItemId: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const admin = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (admin.from("menu_items") as any)
+      .update({ image_url: null })
+      .eq("id", menuItemId);
 
     if (error) return { success: false, error: "Erreur lors de la suppression" };
     return { success: true, error: null };

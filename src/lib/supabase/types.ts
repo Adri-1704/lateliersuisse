@@ -119,6 +119,7 @@ export interface DbMenuItem {
   category: string;
   position: number;
   is_available: boolean;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 }
