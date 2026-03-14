@@ -529,7 +529,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                                     src={item.imageUrl}
                                     alt={itemName}
                                     fill
-                                    className="object-cover"
+                                    className="object-cover transition-transform duration-300 hover:scale-125"
                                     sizes="64px"
                                   />
                                 </div>
