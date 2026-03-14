@@ -217,12 +217,17 @@ export default function MenuPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>{t("menu.category")} *</Label>
-                  <Input
+                  <select
                     value={form.category}
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    placeholder="Entrees, Plats, Desserts..."
                     required
-                  />
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="">-- Choisir --</option>
+                    <option value="Entrées">Entrées</option>
+                    <option value="Plats">Plats</option>
+                    <option value="Desserts">Desserts</option>
+                  </select>
                 </div>
                 <div className="flex items-end">
                   <label className="flex items-center gap-2 text-sm">
