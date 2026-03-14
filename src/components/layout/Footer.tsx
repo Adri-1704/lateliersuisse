@@ -88,13 +88,13 @@ export function Footer({ locale }: { locale: string }) {
             </h3>
             <ul className="mt-4 space-y-3">
               <li>
-                <span className="text-sm text-gray-400">{t("privacy")}</span>
+                <Link href={`/${locale}/politique-de-confidentialite`} className="text-sm text-gray-400 hover:text-white transition-colors">{t("privacy")}</Link>
               </li>
               <li>
-                <span className="text-sm text-gray-400">{t("terms")}</span>
+                <Link href={`/${locale}/conditions-generales`} className="text-sm text-gray-400 hover:text-white transition-colors">{t("terms")}</Link>
               </li>
               <li>
-                <span className="text-sm text-gray-400">{t("imprint")}</span>
+                <Link href={`/${locale}/mentions-legales`} className="text-sm text-gray-400 hover:text-white transition-colors">{t("imprint")}</Link>
               </li>
             </ul>
           </div>
