@@ -59,7 +59,7 @@ export function HeroSection({ totalRestaurants }: HeroSectionProps) {
   };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-gray-700 via-gray-600 to-gray-700">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#2d4a3e] via-[#3a5f50] to-[#2d4a3e]">
       {/* Swiss cross watermark */}
       <div className="absolute -right-20 -top-20 opacity-[0.04]">
         <svg width="500" height="500" viewBox="0 0 32 32" fill="none">
