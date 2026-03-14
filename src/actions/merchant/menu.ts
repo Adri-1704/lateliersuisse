@@ -174,33 +174,36 @@ export async function deleteMenuItem(
   }
 }
 
-export async function uploadMenuItemImage(data: {
-  menuItemId: string;
-  restaurantId: string;
-  fileName: string;
-  fileType: string;
-  fileBase64: string;
-}): Promise<{ success: boolean; error: string | null; url?: string }> {
+export async function uploadMenuItemImage(
+  menuItemId: string,
+  formData: FormData
+): Promise<{ success: boolean; error: string | null; url?: string }> {
   try {
-    const { menuItemId, restaurantId, fileName: origName, fileType, fileBase64 } = data;
+    const file = formData.get("file") as File;
+    if (!file) return { success: false, error: "Aucun fichier fourni" };
+    if (!ALLOWED_TYPES.includes(file.type)) return { success: false, error: "Format non supporté (JPEG, PNG, WebP)" };
+    if (file.size > MAX_IMAGE_SIZE) return { success: false, error: "Fichier trop volumineux (max 5 Mo)" };
 
-    if (!ALLOWED_TYPES.includes(fileType)) return { success: false, error: "Format non supporté (JPEG, PNG, WebP)" };
+    // Get restaurant ID from the menu item
+    const admin = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: menuItem } = await (admin.from("menu_items") as any)
+      .select("restaurant_id")
+      .eq("id", menuItemId)
+      .single();
 
+    if (!menuItem) return { success: false, error: "Plat non trouvé" };
+
+    const restaurantId = menuItem.restaurant_id;
     const isOwner = await verifyRestaurantOwnership(restaurantId);
     if (!isOwner) return { success: false, error: "Accès non autorisé" };
 
-    // Decode base64 to buffer
-    const buffer = Buffer.from(fileBase64, "base64");
-    if (buffer.length > MAX_IMAGE_SIZE) return { success: false, error: "Fichier trop volumineux (max 5 Mo)" };
-
-    const ext = origName.split(".").pop()?.toLowerCase() || "jpg";
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
     const storagePath = `menu/${restaurantId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-
-    const admin = createAdminClient();
 
     const { error: uploadError } = await admin.storage
       .from("restaurant-images")
-      .upload(storagePath, buffer, { contentType: fileType, cacheControl: "3600", upsert: false });
+      .upload(storagePath, file, { cacheControl: "3600", upsert: false });
 
     if (uploadError) {
       console.error("Supabase storage upload error:", uploadError);
@@ -211,18 +214,16 @@ export async function uploadMenuItemImage(data: {
       .from("restaurant-images")
       .getPublicUrl(storagePath);
 
-    const publicUrl = urlData.publicUrl;
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: updateError } = await (admin.from("menu_items") as any)
-      .update({ image_url: publicUrl })
+      .update({ image_url: urlData.publicUrl })
       .eq("id", menuItemId);
 
     if (updateError) {
       console.error("DB update error:", updateError);
       return { success: false, error: `Mise a jour echouee: ${updateError.message}` };
     }
-    return { success: true, error: null, url: publicUrl };
+    return { success: true, error: null, url: urlData.publicUrl };
   } catch (err) {
     console.error("uploadMenuItemImage unexpected error:", err);
     return { success: false, error: "Erreur inattendue" };

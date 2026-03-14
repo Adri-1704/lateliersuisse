@@ -135,34 +135,17 @@ export default function MenuPage() {
     if (!restaurantId) return;
     setUploadingImageFor(itemId);
     setError(null);
-    try {
-      // Convert file to base64 in chunks (spread fails for large arrays)
-      const buffer = await file.arrayBuffer();
-      const bytes = new Uint8Array(buffer);
-      let binary = "";
-      for (let i = 0; i < bytes.length; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const base64 = btoa(binary);
-      const result = await uploadMenuItemImage({
-        menuItemId: itemId,
-        restaurantId,
-        fileName: file.name,
-        fileType: file.type,
-        fileBase64: base64,
-      });
-      if (result.success && result.url) {
-        setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
-      } else {
-        setError(result.error || "Erreur upload image");
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setError(`Erreur upload: ${msg}`);
-      console.error("Upload error:", err);
-    } finally {
-      setUploadingImageFor(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const result = await uploadMenuItemImage(itemId, formData);
+    if (result.success && result.url) {
+      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
+    } else {
+      setError(result.error || "Erreur lors de l'upload");
     }
+    setUploadingImageFor(null);
   }
 
   async function handleImageDelete(itemId: string) {
