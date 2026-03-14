@@ -77,6 +77,8 @@ export async function middleware(request: NextRequest) {
 
     // Check Supabase auth session
     const response = intlMiddleware(request);
+    // Tag merchant dashboard requests so the locale layout can skip Header/Footer
+    response.headers.set("x-pathname", pathname);
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
