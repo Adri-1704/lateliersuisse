@@ -110,7 +110,7 @@ export const collections: Collection[] = [
     descriptionPt: "Mesas excepcionais para uma experiência culinária inesquecível",
     descriptionEs: "Mesas excepcionales para una experiencia culinaria inolvidable",
     icon: "⭐",
-    coverImage: "https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
     filterCuisine: "gastronomique",
   },
 ];
