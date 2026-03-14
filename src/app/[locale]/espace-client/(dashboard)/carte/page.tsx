@@ -134,13 +134,22 @@ export default function MenuPage() {
   async function handleImageUpload(itemId: string, file: File) {
     if (!restaurantId) return;
     setUploadingImageFor(itemId);
-    const formData = new FormData();
-    formData.append("file", file);
-    const result = await uploadMenuItemImage(itemId, restaurantId, formData);
-    if (result.success && result.url) {
-      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
+    setError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const result = await uploadMenuItemImage(itemId, restaurantId, formData);
+      if (result.success && result.url) {
+        setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
+      } else {
+        setError(result.error || "Erreur upload image");
+      }
+    } catch (err) {
+      setError("Erreur lors de l'upload de l'image");
+      console.error("Upload error:", err);
+    } finally {
+      setUploadingImageFor(null);
     }
-    setUploadingImageFor(null);
   }
 
   async function handleImageDelete(itemId: string) {
@@ -186,6 +195,12 @@ export default function MenuPage() {
           )}
         </div>
       </div>
+
+      {error && !showForm && (
+        <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {error}
+        </div>
+      )}
 
       {/* Add/Edit form */}
       {showForm && (

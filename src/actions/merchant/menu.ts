@@ -198,7 +198,10 @@ export async function uploadMenuItemImage(
       .from("restaurant-images")
       .upload(fileName, buffer, { contentType: file.type, cacheControl: "3600" });
 
-    if (uploadError) return { success: false, error: "Erreur lors de l'upload" };
+    if (uploadError) {
+      console.error("Supabase storage upload error:", uploadError);
+      return { success: false, error: `Upload echoue: ${uploadError.message}` };
+    }
 
     const { data: urlData } = admin.storage
       .from("restaurant-images")
@@ -211,9 +214,13 @@ export async function uploadMenuItemImage(
       .update({ image_url: publicUrl })
       .eq("id", menuItemId);
 
-    if (updateError) return { success: false, error: "Erreur lors de la mise à jour" };
+    if (updateError) {
+      console.error("DB update error:", updateError);
+      return { success: false, error: `Mise a jour echouee: ${updateError.message}` };
+    }
     return { success: true, error: null, url: publicUrl };
-  } catch {
+  } catch (err) {
+    console.error("uploadMenuItemImage unexpected error:", err);
     return { success: false, error: "Erreur inattendue" };
   }
 }
