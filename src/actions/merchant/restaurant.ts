@@ -26,6 +26,7 @@ export interface UpdateRestaurantData {
   price_range: string;
   opening_hours: Record<string, { open: string; close: string; closed?: boolean }>;
   features: string[];
+  video_url?: string;
 }
 
 /**
@@ -128,6 +129,7 @@ export async function updateMerchantRestaurant(data: UpdateRestaurantData): Prom
         price_range: data.price_range,
         opening_hours: data.opening_hours,
         features: data.features,
+        video_url: data.video_url || null,
       })
       .eq("merchant_id", merchantId);
 

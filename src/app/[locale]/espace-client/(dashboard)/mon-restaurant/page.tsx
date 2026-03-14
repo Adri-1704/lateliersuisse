@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, CheckCircle, Plus, Copy, CopyCheck } from "lucide-react";
+import { Loader2, Save, CheckCircle, Plus, Copy, CopyCheck, Video } from "lucide-react";
 import { getMerchantRestaurant, updateMerchantRestaurant, createMerchantRestaurant, getCuisineTypes } from "@/actions/merchant/restaurant";
 import type { DbRestaurant, CuisineType } from "@/lib/supabase/types";
 import { featuresOptions } from "@/data/mock-restaurants";
@@ -45,6 +45,7 @@ export default function MyRestaurantPage() {
     price_range: "2",
     features: [] as string[],
     opening_hours: {} as Record<string, { open: string; close: string; closed?: boolean }>,
+    video_url: "",
   });
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function MyRestaurantPage() {
           price_range: String(r.price_range) || "2",
           features: r.features || [],
           opening_hours: r.opening_hours || {},
+          video_url: r.video_url || "",
         });
       }
       setLoading(false);
@@ -303,6 +305,36 @@ export default function MyRestaurantPage() {
               <Label>{t("restaurant.tiktok")}</Label>
               <Input value={form.tiktok} onChange={(e) => updateField("tiktok", e.target.value)} type="url" placeholder="https://tiktok.com/@..." />
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Video */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Video className="h-5 w-5" />
+              Video de presentation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>URL de la video</Label>
+              <Input
+                value={form.video_url}
+                onChange={(e) => updateField("video_url", e.target.value)}
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=... ou https://vimeo.com/..."
+              />
+              <p className="text-xs text-muted-foreground">
+                Collez un lien YouTube ou Vimeo. La video sera affichee sur votre page restaurant.
+              </p>
+            </div>
+            {form.video_url && (
+              <div className="rounded-lg border bg-green-50 p-3">
+                <p className="text-sm text-green-700 font-medium">Video configuree</p>
+                <p className="text-xs text-green-600 truncate mt-1">{form.video_url}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
