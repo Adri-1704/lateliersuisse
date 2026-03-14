@@ -175,11 +175,13 @@ export async function deleteMenuItem(
 }
 
 export async function uploadMenuItemImage(
-  menuItemId: string,
-  restaurantId: string,
   formData: FormData
 ): Promise<{ success: boolean; error: string | null; url?: string }> {
   try {
+    const menuItemId = formData.get("menuItemId") as string;
+    const restaurantId = formData.get("restaurantId") as string;
+    if (!menuItemId || !restaurantId) return { success: false, error: "Donnees manquantes" };
+
     const isOwner = await verifyRestaurantOwnership(restaurantId);
     if (!isOwner) return { success: false, error: "Accès non autorisé" };
 
@@ -192,11 +194,10 @@ export async function uploadMenuItemImage(
     const fileName = `menu/${restaurantId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     const admin = createAdminClient();
-    const buffer = Buffer.from(await file.arrayBuffer());
 
     const { error: uploadError } = await admin.storage
       .from("restaurant-images")
-      .upload(fileName, buffer, { contentType: file.type, cacheControl: "3600" });
+      .upload(fileName, file, { cacheControl: "3600", upsert: false });
 
     if (uploadError) {
       console.error("Supabase storage upload error:", uploadError);

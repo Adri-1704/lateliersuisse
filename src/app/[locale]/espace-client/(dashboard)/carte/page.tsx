@@ -138,7 +138,9 @@ export default function MenuPage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const result = await uploadMenuItemImage(itemId, restaurantId, formData);
+      formData.append("menuItemId", itemId);
+      formData.append("restaurantId", restaurantId);
+      const result = await uploadMenuItemImage(formData);
       if (result.success && result.url) {
         setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
       } else {
