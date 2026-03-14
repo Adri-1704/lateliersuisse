@@ -91,16 +91,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq("is_published", true);
 
     if (restaurants) {
-      for (const restaurant of restaurants) {
+      for (const r of restaurants as { slug: string; updated_at: string | null }[]) {
         for (const locale of locales) {
           entries.push({
-            url: `${baseUrl}/${locale}/restaurants/${restaurant.slug}`,
-            lastModified: restaurant.updated_at
-              ? new Date(restaurant.updated_at)
+            url: `${baseUrl}/${locale}/restaurants/${r.slug}`,
+            lastModified: r.updated_at
+              ? new Date(r.updated_at)
               : now,
             changeFrequency: "weekly",
             priority: 0.8,
-            alternates: alternates(`/restaurants/${restaurant.slug}`),
+            alternates: alternates(`/restaurants/${r.slug}`),
           });
         }
       }
