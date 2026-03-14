@@ -524,27 +524,28 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                           return (
                             <div key={idx} className="flex items-center gap-4 rounded-lg border p-4">
                               {item.imageUrl && (
-                                <div className="group/img relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg cursor-pointer">
-                                  <Image
-                                    src={item.imageUrl}
-                                    alt={itemName}
-                                    fill
-                                    className="object-cover transition-transform duration-300 group-hover/img:scale-110"
-                                    sizes="64px"
-                                  />
+                                <div className="group/img relative h-16 w-16 flex-shrink-0 cursor-pointer">
+                                  <div className="relative h-full w-full overflow-hidden rounded-lg">
+                                    <Image
+                                      src={item.imageUrl}
+                                      alt={itemName}
+                                      fill
+                                      className="object-cover transition-transform duration-300 group-hover/img:scale-110"
+                                      sizes="64px"
+                                    />
+                                  </div>
                                   {/* Pop-up on hover */}
-                                  <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 z-50">
-                                    <div className="relative h-48 w-48 overflow-hidden rounded-xl shadow-xl border-2 border-white bg-white">
-                                      <Image
-                                        src={item.imageUrl}
-                                        alt={itemName}
-                                        fill
-                                        className="object-cover"
-                                        sizes="192px"
-                                      />
-                                    </div>
-                                    <div className="flex justify-center">
-                                      <div className="h-2 w-2 rotate-45 bg-white border-b border-r border-white -mt-1" />
+                                  <div className="pointer-events-none absolute bottom-full left-0 mb-3 opacity-0 group-hover/img:opacity-100 transition-opacity duration-200 z-50">
+                                    <div className="relative h-52 w-52 overflow-hidden rounded-xl shadow-2xl border border-gray-200 bg-white p-1">
+                                      <div className="relative h-full w-full overflow-hidden rounded-lg">
+                                        <Image
+                                          src={item.imageUrl}
+                                          alt={itemName}
+                                          fill
+                                          className="object-cover"
+                                          sizes="208px"
+                                        />
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
