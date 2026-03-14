@@ -136,11 +136,16 @@ export default function MenuPage() {
     setUploadingImageFor(itemId);
     setError(null);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("menuItemId", itemId);
-      formData.append("restaurantId", restaurantId);
-      const result = await uploadMenuItemImage(formData);
+      // Convert file to base64 to avoid FormData serialization issues
+      const buffer = await file.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const result = await uploadMenuItemImage({
+        menuItemId: itemId,
+        restaurantId,
+        fileName: file.name,
+        fileType: file.type,
+        fileBase64: base64,
+      });
       if (result.success && result.url) {
         setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: result.url! } : i));
       } else {

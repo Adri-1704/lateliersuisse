@@ -174,30 +174,33 @@ export async function deleteMenuItem(
   }
 }
 
-export async function uploadMenuItemImage(
-  formData: FormData
-): Promise<{ success: boolean; error: string | null; url?: string }> {
+export async function uploadMenuItemImage(data: {
+  menuItemId: string;
+  restaurantId: string;
+  fileName: string;
+  fileType: string;
+  fileBase64: string;
+}): Promise<{ success: boolean; error: string | null; url?: string }> {
   try {
-    const menuItemId = formData.get("menuItemId") as string;
-    const restaurantId = formData.get("restaurantId") as string;
-    if (!menuItemId || !restaurantId) return { success: false, error: "Donnees manquantes" };
+    const { menuItemId, restaurantId, fileName: origName, fileType, fileBase64 } = data;
+
+    if (!ALLOWED_TYPES.includes(fileType)) return { success: false, error: "Format non supporté (JPEG, PNG, WebP)" };
 
     const isOwner = await verifyRestaurantOwnership(restaurantId);
     if (!isOwner) return { success: false, error: "Accès non autorisé" };
 
-    const file = formData.get("file") as File;
-    if (!file) return { success: false, error: "Aucun fichier fourni" };
-    if (!ALLOWED_TYPES.includes(file.type)) return { success: false, error: "Format non supporté (JPEG, PNG, WebP)" };
-    if (file.size > MAX_IMAGE_SIZE) return { success: false, error: "Fichier trop volumineux (max 5 Mo)" };
+    // Decode base64 to buffer
+    const buffer = Buffer.from(fileBase64, "base64");
+    if (buffer.length > MAX_IMAGE_SIZE) return { success: false, error: "Fichier trop volumineux (max 5 Mo)" };
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const fileName = `menu/${restaurantId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const ext = origName.split(".").pop()?.toLowerCase() || "jpg";
+    const storagePath = `menu/${restaurantId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     const admin = createAdminClient();
 
     const { error: uploadError } = await admin.storage
       .from("restaurant-images")
-      .upload(fileName, file, { cacheControl: "3600", upsert: false });
+      .upload(storagePath, buffer, { contentType: fileType, cacheControl: "3600", upsert: false });
 
     if (uploadError) {
       console.error("Supabase storage upload error:", uploadError);
@@ -206,7 +209,7 @@ export async function uploadMenuItemImage(
 
     const { data: urlData } = admin.storage
       .from("restaurant-images")
-      .getPublicUrl(fileName);
+      .getPublicUrl(storagePath);
 
     const publicUrl = urlData.publicUrl;
 
