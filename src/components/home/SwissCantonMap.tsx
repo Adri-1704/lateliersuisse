@@ -211,13 +211,14 @@ export function SwissCantonMap() {
     e: React.MouseEvent<SVGElement>,
     slug: string
   ) => {
-    const svgRect = (
+    const container = (
       e.currentTarget.closest("svg") as SVGSVGElement
-    )?.getBoundingClientRect();
-    if (svgRect) {
+    )?.parentElement;
+    if (container) {
+      const rect = container.getBoundingClientRect();
       setTooltipPos({
-        x: e.clientX - svgRect.left,
-        y: e.clientY - svgRect.top - 16,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top - 16,
       });
     }
     setHoveredCanton(slug);
@@ -334,55 +335,6 @@ export function SwissCantonMap() {
               );
             })}
 
-            {/* Enhanced Tooltip */}
-            {hoveredCanton && (
-              <g
-                className="pointer-events-none"
-                transform={`translate(${tooltipPos.x}, ${tooltipPos.y})`}
-              >
-                {/* Tooltip background */}
-                <rect
-                  x="-80"
-                  y="-52"
-                  width="160"
-                  height="46"
-                  rx="8"
-                  fill="#1f2937"
-                  opacity="0.96"
-                />
-                {/* Arrow */}
-                <polygon
-                  points="-6,-6 6,-6 0,2"
-                  fill="#1f2937"
-                  opacity="0.96"
-                />
-                {/* Canton name */}
-                <text
-                  x="0"
-                  y="-36"
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontSize="12"
-                  fontWeight="700"
-                  fill="#ffffff"
-                >
-                  {getCantonLabel(hoveredCanton)}
-                </text>
-                {/* Restaurant count with icon */}
-                <text
-                  x="0"
-                  y="-18"
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontSize="10.5"
-                  fontWeight="500"
-                  fill="#ff8a90"
-                >
-                  🍽 {restaurantCounts[hoveredCanton] || 0} {getRestaurantWord(restaurantCounts[hoveredCanton] || 0)}
-                </text>
-              </g>
-            )}
-
             {/* Legend */}
             <g transform="translate(20, 420)">
               <text x="0" y="-8" fontSize="9" fontWeight="700" fill="#6b7280" letterSpacing="0.5">
@@ -398,6 +350,26 @@ export function SwissCantonMap() {
               ))}
             </g>
           </svg>
+
+          {/* HTML Tooltip */}
+          {hoveredCanton && (
+            <div
+              className="pointer-events-none absolute z-50"
+              style={{
+                left: tooltipPos.x,
+                top: tooltipPos.y,
+                transform: "translate(-50%, -100%)",
+              }}
+            >
+              <div className="rounded-lg bg-gray-800/95 px-4 py-2 text-center shadow-lg">
+                <p className="text-sm font-bold text-white">{getCantonLabel(hoveredCanton)}</p>
+                <p className="text-xs font-medium text-red-300">
+                  🍽 {restaurantCounts[hoveredCanton] || 0} {getRestaurantWord(restaurantCounts[hoveredCanton] || 0)}
+                </p>
+              </div>
+              <div className="mx-auto h-0 w-0 border-l-[6px] border-r-[6px] border-t-[6px] border-l-transparent border-r-transparent border-t-gray-800/95" />
+            </div>
+          )}
         </div>
 
         {/* Canton grid for mobile / supplementary navigation */}
