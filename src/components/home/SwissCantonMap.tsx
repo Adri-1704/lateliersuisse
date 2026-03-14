@@ -67,35 +67,8 @@ const cantonCenters: Record<string, { x: number; y: number; abbr: string }> = {
   zurich: { x: 478, y: 90, abbr: "ZH" },
 };
 
-// Simulated restaurant counts per canton (using mock data + realistic filler)
-const cantonRestaurantCounts: Record<string, number> = {
-  zurich: 68,
-  berne: 52,
-  vaud: 47,
-  geneve: 43,
-  lucerne: 35,
-  "saint-gall": 28,
-  argovie: 26,
-  valais: 38,
-  tessin: 32,
-  fribourg: 22,
-  "bale-ville": 24,
-  "bale-campagne": 15,
-  soleure: 12,
-  grisons: 30,
-  thurgovie: 14,
-  neuchatel: 18,
-  schwyz: 10,
-  zoug: 16,
-  schaffhouse: 8,
-  jura: 6,
-  glaris: 5,
-  obwald: 4,
-  nidwald: 5,
-  uri: 3,
-  "appenzell-re": 7,
-  "appenzell-ri": 3,
-};
+// Default empty counts (will be populated from DB via props)
+const defaultCounts: Record<string, number> = {};
 
 // Color scale: alpine green gradient based on density
 function getCantonColor(count: number): string {
@@ -167,7 +140,11 @@ const legendItems = [
   { label: "1-4", color: "#b7e4c7" },
 ];
 
-export function SwissCantonMap() {
+interface SwissCantonMapProps {
+  restaurantCounts?: Record<string, number>;
+}
+
+export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapProps = {}) {
   const t = useTranslations("cantonMap");
   const params = useParams();
   const locale = (params.locale as string) || "fr";
@@ -179,7 +156,7 @@ export function SwissCantonMap() {
     y: 0,
   });
 
-  const restaurantCounts = cantonRestaurantCounts;
+  const restaurantCounts = propCounts || defaultCounts;
 
   const totalRestaurants = Object.values(restaurantCounts).reduce((sum, c) => sum + c, 0);
 
