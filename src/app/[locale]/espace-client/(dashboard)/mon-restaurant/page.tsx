@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, CheckCircle, Plus } from "lucide-react";
+import { Loader2, Save, CheckCircle, Plus, Copy, CopyCheck } from "lucide-react";
 import { getMerchantRestaurant, updateMerchantRestaurant, createMerchantRestaurant, getCuisineTypes } from "@/actions/merchant/restaurant";
 import type { DbRestaurant, CuisineType } from "@/lib/supabase/types";
 import { featuresOptions } from "@/data/mock-restaurants";
@@ -129,6 +129,37 @@ export default function MyRestaurantPage() {
           [day]: current?.closed
             ? { open: "11:30", close: "22:00" }
             : { open: "", close: "", closed: true },
+        },
+      };
+    });
+  }
+
+  function copyHoursToAll(sourceDay: string) {
+    setForm((prev) => {
+      const source = prev.opening_hours[sourceDay];
+      if (!source) return prev;
+      const updated = { ...prev.opening_hours };
+      for (const day of DAYS) {
+        if (day !== sourceDay) {
+          updated[day] = { ...source };
+        }
+      }
+      return { ...prev, opening_hours: updated };
+    });
+  }
+
+  function copyHoursToNext(sourceDay: string) {
+    const idx = DAYS.indexOf(sourceDay);
+    if (idx < 0 || idx >= DAYS.length - 1) return;
+    const nextDay = DAYS[idx + 1];
+    setForm((prev) => {
+      const source = prev.opening_hours[sourceDay];
+      if (!source) return prev;
+      return {
+        ...prev,
+        opening_hours: {
+          ...prev.opening_hours,
+          [nextDay]: { ...source },
         },
       };
     });
@@ -333,11 +364,28 @@ export default function MyRestaurantPage() {
 
         {/* Opening Hours */}
         <Card>
-          <CardHeader><CardTitle>{t("restaurant.openingHours")}</CardTitle></CardHeader>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>{t("restaurant.openingHours")}</CardTitle>
+              {form.opening_hours[DAYS[0]] && !form.opening_hours[DAYS[0]]?.closed && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyHoursToAll(DAYS[0])}
+                  className="text-xs gap-1.5"
+                >
+                  <CopyCheck className="h-3.5 w-3.5" />
+                  Appliquer lundi a tous
+                </Button>
+              )}
+            </div>
+          </CardHeader>
           <CardContent className="space-y-3">
-            {DAYS.map((day) => {
+            {DAYS.map((day, idx) => {
               const hours = form.opening_hours[day];
               const isClosed = hours?.closed;
+              const hasHours = hours && !isClosed && hours.open;
               return (
                 <div key={day} className="flex items-center gap-3">
                   <span className="w-24 text-sm font-medium">{DAY_LABELS[day]}</span>
@@ -366,6 +414,16 @@ export default function MyRestaurantPage() {
                         className="w-28"
                       />
                     </>
+                  )}
+                  {hasHours && idx < DAYS.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={() => copyHoursToNext(day)}
+                      className="flex items-center gap-1 rounded-md border px-2 py-1 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors"
+                      title={`Copier vers ${DAY_LABELS[DAYS[idx + 1]]}`}
+                    >
+                      <Copy className="h-3 w-3" />
+                    </button>
                   )}
                 </div>
               );
