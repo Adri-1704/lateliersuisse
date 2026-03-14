@@ -21,9 +21,11 @@ export function PromotionBadge({ promotion, size = "default" }: { promotion: Res
     ? `-${promotion.discountPercentage}%`
     : promotion.title;
 
+  const showIcon = promotion.type !== "percentage";
+
   return (
     <Badge className={`${config.color} border-0 ${size === "sm" ? "text-[10px] px-1.5 py-0" : "text-xs px-2 py-0.5"}`}>
-      <Icon className={`mr-1 ${size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3"}`} />
+      {showIcon && <Icon className={`mr-1 ${size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3"}`} />}
       {label}
     </Badge>
   );
