@@ -40,10 +40,7 @@ export function PromotionBanner({ promotions }: { promotions: RestaurantPromotio
       <div className="flex flex-wrap gap-2">
       {promotions.map((promo, i) => (
         <div key={i} className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-          <PromotionBadge promotion={promo} />
-          {promo.description && (
-            <span className="text-sm text-red-700">{promo.description}</span>
-          )}
+          <span className="text-sm text-red-700">{promo.description || promo.title}</span>
         </div>
       ))}
       </div>
