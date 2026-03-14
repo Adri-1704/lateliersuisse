@@ -10,6 +10,7 @@
     "contact": "Contacto",
     "faq": "FAQ",
     "forRestaurants": "Para restauradores",
+    "pricing": "Precos",
     "search": "Pesquisar"
   },
   "hero": {
@@ -23,7 +24,7 @@
     "searchButton": "Pesquisar",
     "swissBadge": "100% Suíço",
     "popularSearches": "Pesquisas populares",
-    "statsCounter": "26 cantões, 500+ restaurantes"
+    "statsCounter": "26 cantões, {count} restaurantes"
   },
   "featured": {
     "title": "Restaurantes do mês",

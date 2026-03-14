@@ -10,6 +10,7 @@
     "contact": "Kontakt",
     "faq": "FAQ",
     "forRestaurants": "Für Restaurants",
+    "pricing": "Preise",
     "search": "Suchen"
   },
   "hero": {
@@ -23,7 +24,7 @@
     "searchButton": "Suchen",
     "swissBadge": "100% Schweiz",
     "popularSearches": "Beliebte Suchen",
-    "statsCounter": "26 Kantone, 500+ Restaurants"
+    "statsCounter": "26 Kantone, {count} Restaurants"
   },
   "featured": {
     "title": "Restaurants des Monats",

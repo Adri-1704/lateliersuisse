@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { B2BHero } from "@/components/b2b/B2BHero";
 import { B2BTrustStats } from "@/components/b2b/B2BTrustStats";
 import { B2BSwissAdvantage } from "@/components/b2b/B2BSwissAdvantage";
@@ -60,6 +61,19 @@ export default async function PourRestaurateursPage({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "b2b.faq" });
 
+  // Fetch real restaurant count
+  let totalRestaurants = 0;
+  try {
+    const supabase = createAdminClient();
+    const { count } = await supabase
+      .from("restaurants")
+      .select("id", { count: "exact", head: true })
+      .eq("is_published", true);
+    totalRestaurants = count ?? 0;
+  } catch {
+    // Fallback to 0 if Supabase is unavailable
+  }
+
   // FAQPage structured data (Schema.org)
   const faqKeys = ["q1", "q2", "q3", "q4", "q5", "q6"];
   const faqJsonLd = {
@@ -82,7 +96,7 @@ export default async function PourRestaurateursPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <B2BHero />
-      <B2BTrustStats />
+      <B2BTrustStats totalRestaurants={totalRestaurants} />
       <B2BSwissAdvantage />
       <B2BAdvantages />
       <B2BHowItWorks />

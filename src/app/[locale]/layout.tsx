@@ -101,10 +101,11 @@ export default async function LocaleLayout({
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Just-Tag",
+    name: "Just-Tag.ch",
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
-    description: "Plateforme de decouverte des meilleurs restaurants en Suisse",
+    description:
+      "Just-Tag.ch est l'annuaire de reference pour decouvrir les meilleurs restaurants en Suisse. Trouvez des restaurants par ville, cuisine et avis.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "CH",
@@ -116,13 +117,16 @@ export default async function LocaleLayout({
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Just-Tag",
+    name: "Just-Tag.ch",
     url: baseUrl,
+    description:
+      "Annuaire des meilleurs restaurants de Suisse — recherche par ville, type de cuisine et avis clients.",
+    inLanguage: ["fr", "de", "en", "pt", "es"],
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${baseUrl}/${locale}/restaurants?q={search_term_string}`,
+        urlTemplate: `${baseUrl}/fr/restaurants?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },

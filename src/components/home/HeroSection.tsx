@@ -26,7 +26,11 @@ const popularTags = [
   { key: "lac", label: { fr: "Vue sur le lac", de: "Seeblick", en: "Lake view", pt: "Vista para o lago", es: "Vista al lago" } },
 ];
 
-export function HeroSection() {
+interface HeroSectionProps {
+  totalRestaurants: number;
+}
+
+export function HeroSection({ totalRestaurants }: HeroSectionProps) {
   const t = useTranslations("hero");
   const params = useParams();
   const locale = params.locale as string;
@@ -160,7 +164,7 @@ export function HeroSection() {
             <div className="mt-6 flex items-center gap-4 text-sm text-gray-400 animate-fade-in-up animate-delay-300">
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-4 w-4 text-[var(--color-just-tag)]" />
-                <span>{t("statsCounter")}</span>
+                <span>{t("statsCounter", { count: totalRestaurants })}</span>
               </div>
             </div>
           </div>

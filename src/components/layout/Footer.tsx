@@ -64,6 +64,11 @@ export function Footer({ locale }: { locale: string }) {
                 </Link>
               </li>
               <li>
+                <Link href={`/${locale}/a-propos`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  {nav("about")}
+                </Link>
+              </li>
+              <li>
                 <Link href={`/${locale}/contact`} className="text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("contact")}
                 </Link>

@@ -3,14 +3,17 @@
 import { useTranslations } from "next-intl";
 import { UtensilsCrossed, MapPin, Star, ChefHat } from "lucide-react";
 
-const stats = [
-  { key: "restaurants", value: "500+", icon: UtensilsCrossed },
-  { key: "cantons", value: "26", icon: MapPin },
-  { key: "reviews", value: "15 000+", icon: Star },
-  { key: "cuisines", value: "40+", icon: ChefHat },
-] as const;
+interface B2BTrustStatsProps {
+  totalRestaurants: number;
+}
 
-export function B2BTrustStats() {
+export function B2BTrustStats({ totalRestaurants }: B2BTrustStatsProps) {
+  const stats = [
+    { key: "restaurants", value: `${totalRestaurants}+`, icon: UtensilsCrossed },
+    { key: "cantons", value: "26", icon: MapPin },
+    { key: "reviews", value: "15 000+", icon: Star },
+    { key: "cuisines", value: "40+", icon: ChefHat },
+  ] as const;
   const t = useTranslations("b2b.stats");
 
   return (

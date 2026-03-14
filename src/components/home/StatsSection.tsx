@@ -30,11 +30,15 @@ function AnimatedStat({ target, suffix, label, icon: Icon }: {
   );
 }
 
-export function StatsSection() {
+interface StatsSectionProps {
+  totalRestaurants: number;
+}
+
+export function StatsSection({ totalRestaurants }: StatsSectionProps) {
   const t = useTranslations("stats");
 
   const stats = [
-    { icon: UtensilsCrossed, target: 500, suffix: "+", label: t("restaurants") },
+    { icon: UtensilsCrossed, target: totalRestaurants, suffix: "+", label: t("restaurants") },
     { icon: MapPin, target: 26, suffix: "", label: t("cantons") },
     { icon: Star, target: 15000, suffix: "+", label: t("reviews") },
     { icon: ChefHat, target: 40, suffix: "+", label: t("cuisines") },

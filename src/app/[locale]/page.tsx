@@ -66,15 +66,16 @@ async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, num
 
 export default async function HomePage() {
   const { cantonCounts, cuisineCounts } = await getRestaurantCounts();
+  const totalRestaurants = Object.values(cantonCounts).reduce((sum, n) => sum + n, 0);
 
   return (
     <>
-      <HeroSection />
+      <HeroSection totalRestaurants={totalRestaurants} />
       <RestaurantOfMonth />
       <SwissCantonMap restaurantCounts={cantonCounts} />
       <CategoryGrid cuisineCounts={cuisineCounts} />
       <CollectionsSection />
-      <StatsSection />
+      <StatsSection totalRestaurants={totalRestaurants} />
       <HowItWorks />
       <Testimonials />
       <NewsletterSection />

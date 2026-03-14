@@ -1,12 +1,19 @@
 import type { MetadataRoute } from "next";
-import { mockRestaurants } from "@/data/mock-restaurants";
+import { createAdminClient } from "@/lib/supabase/server";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch";
-  const locales = ["fr", "de", "en"];
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = "https://just-tag.ch";
+  const locales = ["fr", "de", "en", "pt", "es"];
   const now = new Date();
 
   const entries: MetadataRoute.Sitemap = [];
+
+  // Helper to generate alternates for a given path
+  const alternates = (path: string) => ({
+    languages: Object.fromEntries(
+      locales.map((l) => [l, `${baseUrl}/${l}${path}`])
+    ),
+  });
 
   // Homepage
   for (const locale of locales) {
@@ -15,11 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "daily",
       priority: 1.0,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, `${baseUrl}/${l}`])
-        ),
-      },
+      alternates: alternates(""),
     });
   }
 
@@ -30,49 +33,43 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, `${baseUrl}/${l}/restaurants`])
-        ),
-      },
+      alternates: alternates("/restaurants"),
     });
   }
 
-  // Individual restaurant pages
-  const publishedRestaurants = mockRestaurants.filter((r) => r.isPublished);
-  for (const restaurant of publishedRestaurants) {
+  // Collections page
+  for (const locale of locales) {
+    entries.push({
+      url: `${baseUrl}/${locale}/collections`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+      alternates: alternates("/collections"),
+    });
+  }
+
+  // B2B and info pages
+  const weeklyPages = ["pour-restaurateurs"];
+  for (const page of weeklyPages) {
     for (const locale of locales) {
       entries.push({
-        url: `${baseUrl}/${locale}/restaurants/${restaurant.slug}`,
+        url: `${baseUrl}/${locale}/${page}`,
         lastModified: now,
         changeFrequency: "weekly",
         priority: 0.8,
-        alternates: {
-          languages: Object.fromEntries(
-            locales.map((l) => [l, `${baseUrl}/${l}/restaurants/${restaurant.slug}`])
-          ),
-        },
+        alternates: alternates(`/${page}`),
       });
     }
   }
 
-  // B2B landing page
-  for (const locale of locales) {
-    entries.push({
-      url: `${baseUrl}/${locale}/pour-restaurateurs`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.8,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, `${baseUrl}/${l}/pour-restaurateurs`])
-        ),
-      },
-    });
-  }
-
   // Static pages
-  const staticPages = ["contact", "faq"];
+  const staticPages = [
+    "contact",
+    "faq",
+    "politique-de-confidentialite",
+    "conditions-generales",
+    "mentions-legales",
+  ];
   for (const page of staticPages) {
     for (const locale of locales) {
       entries.push({
@@ -80,13 +77,36 @@ export default function sitemap(): MetadataRoute.Sitemap {
         lastModified: now,
         changeFrequency: "monthly",
         priority: 0.5,
-        alternates: {
-          languages: Object.fromEntries(
-            locales.map((l) => [l, `${baseUrl}/${l}/${page}`])
-          ),
-        },
+        alternates: alternates(`/${page}`),
       });
     }
+  }
+
+  // Individual restaurant pages from Supabase
+  try {
+    const supabase = createAdminClient();
+    const { data: restaurants } = await supabase
+      .from("restaurants")
+      .select("slug, updated_at")
+      .eq("is_published", true);
+
+    if (restaurants) {
+      for (const restaurant of restaurants) {
+        for (const locale of locales) {
+          entries.push({
+            url: `${baseUrl}/${locale}/restaurants/${restaurant.slug}`,
+            lastModified: restaurant.updated_at
+              ? new Date(restaurant.updated_at)
+              : now,
+            changeFrequency: "weekly",
+            priority: 0.8,
+            alternates: alternates(`/restaurants/${restaurant.slug}`),
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching restaurants for sitemap:", error);
   }
 
   return entries;
