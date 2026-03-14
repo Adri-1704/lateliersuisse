@@ -34,12 +34,14 @@ export function HeroSection() {
 
   const [canton, setCanton] = useState("");
   const [cuisine, setCuisine] = useState("");
+  const [city, setCity] = useState("");
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {
     const searchParams = new URLSearchParams();
     if (canton) searchParams.set("canton", canton);
     if (cuisine) searchParams.set("cuisine", cuisine);
+    if (city) searchParams.set("city", city);
     if (query) searchParams.set("q", query);
     router.push(`/${locale}/restaurants?${searchParams.toString()}`);
   };
@@ -109,7 +111,16 @@ export function HeroSection() {
                       ))}
                     </select>
                   </div>
-                  {/* Row 2: Text search + Button */}
+                  {/* Row 2: City */}
+                  <Input
+                    type="text"
+                    placeholder={locale === "de" ? "Stadt (z.B. Zürich, Genf...)" : locale === "en" ? "City (e.g. Zurich, Geneva...)" : locale === "pt" ? "Cidade (ex: Zurique, Genebra...)" : locale === "es" ? "Ciudad (ej: Zúrich, Ginebra...)" : "Ville (ex: Lausanne, Genève...)"}
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    className="h-[46px] border-gray-200 bg-gray-50 focus-visible:ring-[var(--color-just-tag)]/20"
+                  />
+                  {/* Row 3: Text search + Button */}
                   <div className="flex gap-3">
                     <Input
                       type="text"

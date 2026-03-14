@@ -108,6 +108,7 @@ function RestaurantsContent() {
 
     const canton = searchParams.get("canton");
     const cuisine = searchParams.get("cuisine");
+    const city = searchParams.get("city")?.toLowerCase();
     const price = searchParams.get("price");
     const rating = searchParams.get("rating");
     const features = searchParams.get("features")?.split(",").filter(Boolean) || [];
@@ -116,6 +117,7 @@ function RestaurantsContent() {
 
     if (canton) results = results.filter((r) => r.canton === canton);
     if (cuisine) results = results.filter((r) => r.cuisineType === cuisine);
+    if (city) results = results.filter((r) => r.city.toLowerCase().includes(city));
     if (price) results = results.filter((r) => r.priceRange <= parseInt(price));
     if (rating) results = results.filter((r) => r.avgRating >= parseFloat(rating));
     if (features.length > 0) {
