@@ -292,7 +292,7 @@ export default function MenuPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="font-semibold">
-                        CHF {typeof item.price === "number" ? item.price.toFixed(2) : item.price}
+                        {typeof item.price === "number" ? item.price.toFixed(2) : item.price} CHF
                       </span>
                       <Button variant="ghost" size="icon" onClick={() => startEdit(item)}>
                         <Pencil className="h-3.5 w-3.5" />
