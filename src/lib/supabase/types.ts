@@ -169,6 +169,20 @@ export interface B2BContactRequest {
   created_at: string;
 }
 
+export interface DbPromotion {
+  id: string;
+  restaurant_id: string;
+  title: string;
+  description: string | null;
+  promotion_type: string;
+  value: string | null;
+  is_active: boolean;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // ============================================
 // Supabase Database type for client
 // ============================================

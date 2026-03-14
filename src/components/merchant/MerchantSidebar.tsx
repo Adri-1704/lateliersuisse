@@ -22,6 +22,7 @@ import {
   ImageIcon,
   MessageSquare,
   CreditCard,
+  Tag,
 } from "lucide-react";
 
 export function MerchantSidebar() {
@@ -37,6 +38,7 @@ export function MerchantSidebar() {
     { title: t("sidebar.myRestaurant"), href: `${basePath}/mon-restaurant`, icon: UtensilsCrossed },
     { title: t("sidebar.menu"), href: `${basePath}/carte`, icon: BookOpen },
     { title: t("sidebar.photos"), href: `${basePath}/photos`, icon: ImageIcon },
+    { title: "Offres du moment", href: `${basePath}/offres`, icon: Tag },
     { title: t("sidebar.reviews"), href: `${basePath}/avis`, icon: MessageSquare },
     { title: t("sidebar.subscription"), href: `${basePath}/abonnement`, icon: CreditCard },
   ];
