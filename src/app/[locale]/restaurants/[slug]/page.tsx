@@ -5,7 +5,8 @@ import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers"
 import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { createAdminClient } from "@/lib/supabase/server";
-import type { DbMenuItem, DbReview, RestaurantImage } from "@/lib/supabase/types";
+import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/supabase/types";
+import type { RestaurantPromotion } from "@/data/mock-restaurants";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch";
 
@@ -122,6 +123,24 @@ async function getMenuItems(restaurantId: string) {
   }));
 }
 
+async function getRestaurantPromotions(restaurantId: string): Promise<RestaurantPromotion[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("restaurant_promotions")
+    .select("*")
+    .eq("restaurant_id", restaurantId)
+    .eq("is_active", true) as { data: DbPromotion[] | null; error: unknown };
+
+  if (error || !data) return [];
+  return data.map((row) => ({
+    type: (row.promotion_type as RestaurantPromotion["type"]) || "special_event",
+    title: row.title,
+    description: row.description || undefined,
+    discountPercentage: row.promotion_type === "percentage" && row.value ? parseInt(row.value) : undefined,
+    endDate: row.end_date || undefined,
+  }));
+}
+
 async function getRestaurantImages(restaurantId: string): Promise<string[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -197,10 +216,11 @@ export default async function RestaurantDetailPage({
   const { restaurant } = result;
 
   // Fetch reviews, menu items, and images in parallel
-  const [reviews, menuItems, images] = await Promise.all([
+  const [reviews, menuItems, images, promotions] = await Promise.all([
     getReviews(restaurant.id),
     getMenuItems(restaurant.id),
     getRestaurantImages(restaurant.id),
+    getRestaurantPromotions(restaurant.id),
   ]);
 
   // Enrich restaurant with menu items and images
@@ -208,6 +228,7 @@ export default async function RestaurantDetailPage({
     ...restaurant,
     menuItems,
     images: images.length > 0 ? images : restaurant.images,
+    promotions: promotions.length > 0 ? promotions : undefined,
   };
 
   // Structured data - Restaurant (Schema.org)

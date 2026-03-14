@@ -78,7 +78,7 @@ export interface RestaurantBadge {
   year?: number;
 }
 
-export type PromotionType = "percentage" | "daily_menu" | "happy_hour" | "special_event";
+export type PromotionType = "percentage" | "fixed_discount" | "daily_menu" | "happy_hour" | "free_item" | "special_event";
 
 export interface RestaurantPromotion {
   type: PromotionType;

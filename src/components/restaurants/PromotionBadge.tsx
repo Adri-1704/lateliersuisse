@@ -1,13 +1,15 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Percent, UtensilsCrossed, Clock, Sparkles } from "lucide-react";
+import { Percent, UtensilsCrossed, Clock, Sparkles, Gift, Tag } from "lucide-react";
 import type { RestaurantPromotion } from "@/data/mock-restaurants";
 
 const promoConfig: Record<string, { icon: typeof Percent; color: string }> = {
   percentage: { icon: Percent, color: "bg-red-500 text-white" },
+  fixed_discount: { icon: Tag, color: "bg-red-600 text-white" },
   daily_menu: { icon: UtensilsCrossed, color: "bg-orange-500 text-white" },
   happy_hour: { icon: Clock, color: "bg-purple-500 text-white" },
+  free_item: { icon: Gift, color: "bg-green-500 text-white" },
   special_event: { icon: Sparkles, color: "bg-blue-500 text-white" },
 };
 
