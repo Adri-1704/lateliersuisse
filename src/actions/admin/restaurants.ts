@@ -84,6 +84,12 @@ export async function listRestaurants(params: {
       cover_image: r.coverImage,
       is_featured: r.isFeatured,
       is_published: r.isPublished,
+      video_url: null,
+      promotion_title: null,
+      promotion_description: null,
+      promotion_type: null,
+      promotion_value: null,
+      promotion_active: false,
       search_vector: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -116,6 +122,8 @@ export async function getRestaurant(id: string): Promise<{ success: boolean; err
       opening_hours: mock.openingHours as DbRestaurant["opening_hours"],
       features: mock.features, cover_image: mock.coverImage,
       is_featured: mock.isFeatured, is_published: mock.isPublished,
+      video_url: null, promotion_title: null, promotion_description: null,
+      promotion_type: null, promotion_value: null, promotion_active: false,
       search_vector: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
     }};
   }
@@ -179,6 +187,9 @@ export async function updateRestaurant(
     postal_code?: string; phone?: string; email?: string; website?: string;
     instagram?: string; facebook?: string; tiktok?: string;
     price_range?: string; features?: string[]; is_published?: boolean; is_featured?: boolean;
+    video_url?: string;
+    promotion_title?: string; promotion_description?: string;
+    promotion_type?: string; promotion_value?: string; promotion_active?: boolean;
   }
 ): Promise<{ success: boolean; error: string | null }> {
   try {

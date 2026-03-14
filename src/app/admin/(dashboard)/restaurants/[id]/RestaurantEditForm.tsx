@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { CheckCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2, Video, Tag } from "lucide-react";
 import type { DbRestaurant } from "@/lib/supabase/types";
 
 export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant }) {
@@ -38,6 +38,12 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
     price_range: restaurant.price_range,
     is_published: restaurant.is_published,
     is_featured: restaurant.is_featured,
+    video_url: restaurant.video_url || "",
+    promotion_title: restaurant.promotion_title || "",
+    promotion_description: restaurant.promotion_description || "",
+    promotion_type: restaurant.promotion_type || "percentage",
+    promotion_value: restaurant.promotion_value || "",
+    promotion_active: restaurant.promotion_active || false,
   });
 
   function update(field: string, value: string | boolean) {
@@ -168,6 +174,97 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
               <Label>Description (EN)</Label>
               <Textarea rows={3} value={form.description_en} onChange={(e) => update("description_en", e.target.value)} />
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Video className="h-5 w-5" />
+              Video de presentation
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>URL de la video</Label>
+              <Input
+                value={form.video_url}
+                onChange={(e) => update("video_url", e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=... ou https://vimeo.com/..."
+              />
+              <p className="text-xs text-gray-500">
+                Collez un lien YouTube ou Vimeo. La video sera affichee sur la page du restaurant.
+              </p>
+            </div>
+            {form.video_url && (
+              <div className="rounded-lg border bg-gray-50 p-3">
+                <p className="text-sm text-green-600 font-medium">Video configuree</p>
+                <p className="text-xs text-gray-500 truncate mt-1">{form.video_url}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5" />
+              Promotion / Offre speciale
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>Promotion active</Label>
+              <Switch checked={form.promotion_active} onCheckedChange={(v) => update("promotion_active", v)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Type de promotion</Label>
+              <select
+                value={form.promotion_type}
+                onChange={(e) => update("promotion_type", e.target.value)}
+                className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="percentage">Reduction en %</option>
+                <option value="daily_menu">Menu du jour</option>
+                <option value="happy_hour">Happy Hour</option>
+                <option value="special_event">Evenement special</option>
+                <option value="free_item">Article offert</option>
+                <option value="fixed_discount">Reduction fixe (CHF)</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Titre de l&apos;offre</Label>
+              <Input
+                value={form.promotion_title}
+                onChange={(e) => update("promotion_title", e.target.value)}
+                placeholder="Ex: -20% sur le menu du soir"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Valeur (optionnel)</Label>
+              <Input
+                value={form.promotion_value}
+                onChange={(e) => update("promotion_value", e.target.value)}
+                placeholder="Ex: 20, 15.00, etc."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description de l&apos;offre</Label>
+              <Textarea
+                rows={2}
+                value={form.promotion_description}
+                onChange={(e) => update("promotion_description", e.target.value)}
+                placeholder="Decrivez les conditions de l'offre..."
+              />
+            </div>
+            {form.promotion_active && form.promotion_title && (
+              <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+                <p className="text-sm font-semibold text-orange-700">{form.promotion_title}</p>
+                {form.promotion_description && (
+                  <p className="text-xs text-orange-600 mt-1">{form.promotion_description}</p>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

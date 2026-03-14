@@ -72,6 +72,12 @@ export interface DbRestaurant {
   opening_hours: Record<string, { open: string; close: string; closed?: boolean }>;
   features: string[];
   cover_image: string | null;
+  video_url: string | null;
+  promotion_title: string | null;
+  promotion_description: string | null;
+  promotion_type: string | null;
+  promotion_value: string | null;
+  promotion_active: boolean;
   is_featured: boolean;
   is_published: boolean;
   search_vector: string | null;
