@@ -40,7 +40,7 @@ export function FounderSection() {
                 Le Bouveret, Valais
               </span>
               <span className="rounded-full bg-red-100 px-4 py-1.5 text-sm font-medium text-red-700">
-                Entrepreneur depuis 2017
+                Indépendant depuis +20 ans
               </span>
             </div>
           </div>
