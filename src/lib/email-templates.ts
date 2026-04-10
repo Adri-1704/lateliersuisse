@@ -266,7 +266,7 @@ function getLocale(locale: string): Locale {
   return "fr";
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lateliersuisse.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
 // ---------------------------------------------------------------------------
 // 1. B2B Admin Notification (always in French)
