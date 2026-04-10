@@ -6,6 +6,7 @@ import { StatsSection } from "@/components/home/StatsSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { Testimonials } from "@/components/home/Testimonials";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
+import { FounderSection } from "@/components/home/FounderSection";
 import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { createAdminClient } from "@/lib/supabase/server";
 import { cantons } from "@/data/cantons";
@@ -78,6 +79,7 @@ export default async function HomePage() {
       <StatsSection totalRestaurants={totalRestaurants} />
       <HowItWorks />
       <Testimonials />
+      <FounderSection />
       <NewsletterSection />
     </>
   );
