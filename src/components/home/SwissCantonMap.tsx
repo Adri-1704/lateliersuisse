@@ -333,21 +333,18 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
               );
             })}
 
-            {/* Legend */}
-            <g transform="translate(-10, 350)">
-              <text x="0" y="-8" fontSize="9" fontWeight="700" fill="#6b7280" letterSpacing="0.5">
-                {locale === "de" ? "RESTAURANTS" : locale === "en" ? "RESTAURANTS" : locale === "pt" ? "RESTAURANTES" : locale === "es" ? "RESTAURANTES" : "RESTAURANTS"}
-              </text>
-              {legendItems.map((item, i) => (
-                <g key={item.label} transform={`translate(0, ${i * 16 + 6})`}>
-                  <rect x="0" y="0" width="14" height="10" rx="2" fill={item.color} />
-                  <text x="20" y="5" fontSize="9" fontWeight="500" fill="#6b7280" dominantBaseline="central">
-                    {item.label}
-                  </text>
-                </g>
-              ))}
-            </g>
           </svg>
+
+          {/* Legend — below the map */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-500">
+            <span className="font-semibold uppercase tracking-wide">Restaurants</span>
+            {legendItems.map((item) => (
+              <div key={item.label} className="flex items-center gap-1.5">
+                <span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: item.color }} />
+                {item.label}
+              </div>
+            ))}
+          </div>
 
           {/* HTML Tooltip */}
           {hoveredCanton && (
