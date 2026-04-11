@@ -304,11 +304,9 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   // Category colors for menu
   const categoryColors = ["border-l-[var(--color-just-tag)]", "border-l-blue-500", "border-l-green-500", "border-l-purple-500", "border-l-orange-500"];
 
-  // OpenStreetMap embed URL
+  // Google Maps embed URL (works with address, no coordinates needed)
   const hasCoords = restaurant.latitude && restaurant.longitude && restaurant.latitude !== 0 && restaurant.longitude !== 0;
-  const osmUrl = hasCoords
-    ? `https://www.openstreetmap.org/export/embed.html?bbox=${restaurant.longitude - 0.005}%2C${restaurant.latitude - 0.003}%2C${restaurant.longitude + 0.005}%2C${restaurant.latitude + 0.003}&layer=mapnik&marker=${restaurant.latitude}%2C${restaurant.longitude}`
-    : "";
+  const googleEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBfA5dBbaaKV_-8ZOgt94eKSEMQZX6zWwQ&q=${encodeURIComponent(`${restaurant.nameFr}, ${restaurant.address}, ${restaurant.postalCode} ${restaurant.city}, Suisse`)}`;
   const directionsUrl = hasCoords
     ? `https://www.google.com/maps/dir/?api=1&destination=${restaurant.latitude},${restaurant.longitude}`
     : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${restaurant.address}, ${restaurant.postalCode} ${restaurant.city}`)}`;
@@ -970,20 +968,16 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               </div>
             </div>
 
-            {/* OpenStreetMap */}
+            {/* Google Maps */}
             <div className="overflow-hidden rounded-xl border">
-              {hasCoords ? (
-                <iframe
-                  src={osmUrl}
-                  className="h-48 w-full border-0"
-                  loading="lazy"
-                  title={`${name} - ${t("location")}`}
-                />
-              ) : (
-                <div className="flex h-48 items-center justify-center bg-gray-50">
-                  <MapPin className="h-8 w-8 text-gray-300" />
-                </div>
-              )}
+              <iframe
+                src={googleEmbedUrl}
+                className="h-56 w-full border-0"
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                title={`${name} - ${t("location")}`}
+              />
               <div className="bg-white p-3">
                 <p className="text-xs text-gray-500">
                   {restaurant.address}, {restaurant.postalCode} {restaurant.city}
