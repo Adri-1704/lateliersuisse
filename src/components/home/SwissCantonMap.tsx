@@ -334,7 +334,7 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
             })}
 
             {/* Legend */}
-            <g transform="translate(370, 290)">
+            <g transform="translate(-10, 350)">
               <text x="0" y="-8" fontSize="9" fontWeight="700" fill="#6b7280" letterSpacing="0.5">
                 {locale === "de" ? "RESTAURANTS" : locale === "en" ? "RESTAURANTS" : locale === "pt" ? "RESTAURANTES" : locale === "es" ? "RESTAURANTES" : "RESTAURANTS"}
               </text>
