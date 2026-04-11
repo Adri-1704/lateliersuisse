@@ -7,11 +7,28 @@ import Image from "next/image";
 import { Star, MapPin, ChevronLeft, ChevronRight, Clock, Quote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { mockRestaurants, mockReviews, type Restaurant } from "@/data/mock-restaurants";
+import type { Restaurant } from "@/data/mock-restaurants";
 import { getLocalizedName } from "@/lib/locale-helpers";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+
+interface DbReview {
+  id: string;
+  restaurant_id: string;
+  author_name: string;
+  rating: number;
+  comment: string;
+}
+
+const placeholderImages = [
+  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
+  "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80",
+  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
+  "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&q=80",
+  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80",
+];
 
 function PriceRange({ range }: { range: number }) {
   return (
@@ -37,16 +54,11 @@ function isOpenNow(openingHours: Record<string, { open: string; close: string } 
   return currentMinutes >= openH * 60 + openM && currentMinutes <= closeH * 60 + closeM;
 }
 
-function RestaurantSlideCard({ restaurant, locale }: { restaurant: Restaurant; locale: string }) {
+function RestaurantSlideCard({ restaurant, bestReview, locale }: { restaurant: Restaurant; bestReview?: DbReview; locale: string }) {
   const t = useTranslations("featured");
   const tR = useTranslations("restaurant");
   const name = getLocalizedName(restaurant, locale);
   const open = isOpenNow(restaurant.openingHours);
-
-  // Get the best review for this restaurant
-  const bestReview = mockReviews
-    .filter((r) => r.restaurantId === restaurant.id)
-    .sort((a, b) => b.rating - a.rating)[0];
 
   return (
     <div className="min-w-0 flex-[0_0_100%] pl-4 sm:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
@@ -113,16 +125,11 @@ function RestaurantSlideCard({ restaurant, locale }: { restaurant: Restaurant; l
   );
 }
 
-function RestaurantSlideCardCompact({ restaurant, locale }: { restaurant: Restaurant; locale: string }) {
+function RestaurantSlideCardCompact({ restaurant, bestReview, locale }: { restaurant: Restaurant; bestReview?: DbReview; locale: string }) {
   const t = useTranslations("featured");
   const tR = useTranslations("restaurant");
   const name = getLocalizedName(restaurant, locale);
   const open = isOpenNow(restaurant.openingHours);
-
-  // Get the best review for this restaurant
-  const bestReview = mockReviews
-    .filter((r) => r.restaurantId === restaurant.id)
-    .sort((a, b) => b.rating - a.rating)[0];
 
   return (
     <Link href={`/${locale}/restaurants/${restaurant.slug}`}>
@@ -138,7 +145,7 @@ function RestaurantSlideCardCompact({ restaurant, locale }: { restaurant: Restau
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           {restaurant.isFeatured && (
             <Badge className="absolute left-3 top-3 bg-[var(--color-just-tag)] text-white border-0 text-xs px-2.5 py-0.5 animate-pulse-gentle">
-              ⭐ {t("badge")}
+              {t("badge")}
             </Badge>
           )}
           <div className="absolute bottom-3 left-3">
@@ -188,10 +195,45 @@ function RestaurantSlideCardCompact({ restaurant, locale }: { restaurant: Restau
   );
 }
 
+function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaurant {
+  return {
+    id: row.id as string,
+    slug: row.slug as string,
+    nameFr: row.name_fr as string,
+    nameDe: row.name_de as string,
+    nameEn: row.name_en as string,
+    descriptionFr: (row.description_fr as string) || "",
+    descriptionDe: (row.description_de as string) || "",
+    descriptionEn: (row.description_en as string) || "",
+    cuisineType: (row.cuisine_type as string) || "",
+    canton: row.canton as string,
+    city: row.city as string,
+    address: (row.address as string) || "",
+    postalCode: (row.postal_code as string) || "",
+    latitude: (row.latitude as number) || 0,
+    longitude: (row.longitude as number) || 0,
+    phone: (row.phone as string) || "",
+    email: (row.email as string) || "",
+    website: (row.website as string) || "",
+    priceRange: parseInt(row.price_range as string || "2") as 1 | 2 | 3 | 4,
+    avgRating: parseFloat(row.avg_rating as string) || 0,
+    reviewCount: (row.review_count as number) || 0,
+    openingHours: (row.opening_hours as Record<string, { open: string; close: string }>) || {},
+    features: (row.features as string[]) || [],
+    coverImage: (row.cover_image as string) || placeholderImages[index % placeholderImages.length],
+    images: [],
+    isFeatured: (row.is_featured as boolean) || false,
+    isPublished: (row.is_published as boolean) || true,
+    menuItems: [],
+  };
+}
+
 export function RestaurantOfMonth() {
   const t = useTranslations("featured");
   const params = useParams();
   const locale = params.locale as string;
+  const [topRestaurants, setTopRestaurants] = useState<Restaurant[]>([]);
+  const [reviews, setReviews] = useState<DbReview[]>([]);
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "start" },
@@ -201,17 +243,70 @@ export function RestaurantOfMonth() {
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
-  // Show top 8 restaurants (featured first, then by rating)
-  const topRestaurants = [
-    ...mockRestaurants.filter((r) => r.isFeatured),
-    ...mockRestaurants.filter((r) => !r.isFeatured).sort((a, b) => b.avgRating - a.avgRating),
-  ].slice(0, 8);
+  // Fetch real restaurants from Supabase
+  useEffect(() => {
+    async function fetchFeatured() {
+      const supabase = createClient();
+
+      // Fetch top 8: featured first, then by review_count desc
+      const { data: featured } = await supabase
+        .from("restaurants")
+        .select("*")
+        .eq("is_published", true)
+        .eq("is_featured", true)
+        .order("review_count", { ascending: false })
+        .limit(8);
+
+      let restaurants = (featured || []).map((row, i) =>
+        mapDbToRestaurant(row as Record<string, unknown>, i)
+      );
+
+      // If less than 8 featured, fill with top rated
+      if (restaurants.length < 8) {
+        const featuredIds = restaurants.map((r) => r.id);
+        const { data: topRated } = await supabase
+          .from("restaurants")
+          .select("*")
+          .eq("is_published", true)
+          .eq("is_featured", false)
+          .order("review_count", { ascending: false })
+          .limit(8 - restaurants.length);
+
+        const extra = (topRated || []).map((row, i) =>
+          mapDbToRestaurant(row as Record<string, unknown>, restaurants.length + i)
+        ).filter((r) => !featuredIds.includes(r.id));
+
+        restaurants = [...restaurants, ...extra].slice(0, 8);
+      }
+
+      setTopRestaurants(restaurants);
+
+      // Fetch best review per restaurant
+      if (restaurants.length > 0) {
+        const ids = restaurants.map((r) => r.id);
+        const { data: revs } = await supabase
+          .from("reviews")
+          .select("id, restaurant_id, author_name, rating, comment")
+          .in("restaurant_id", ids)
+          .order("rating", { ascending: false });
+
+        setReviews((revs as DbReview[]) || []);
+      }
+    }
+    fetchFeatured();
+  }, []);
+
+  function getBestReview(restaurantId: string): DbReview | undefined {
+    return reviews.find((r) => r.restaurant_id === restaurantId);
+  }
 
   // Split into pairs for 2-row layout
   const slides: Restaurant[][] = [];
   for (let i = 0; i < topRestaurants.length; i += 2) {
     slides.push(topRestaurants.slice(i, i + 2));
   }
+
+  if (topRestaurants.length === 0) return null;
 
   return (
     <section className="py-16 sm:py-20">
@@ -242,6 +337,7 @@ export function RestaurantOfMonth() {
                     <RestaurantSlideCardCompact
                       key={restaurant.id}
                       restaurant={restaurant}
+                      bestReview={getBestReview(restaurant.id)}
                       locale={locale}
                     />
                   ))}
