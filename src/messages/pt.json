@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Just-Tag | Os melhores restaurantes da Suíça",
-    "description": "Descubra os melhores restaurantes da Suíça. Pesquise por cantão, cozinha e orçamento para encontrar o seu restaurante ideal."
+    "title": "Just-Tag | Os melhores restaurantes da Suíça Romanda",
+    "description": "Descubra os melhores restaurantes da Suíça Romanda. Pesquise por cantão, cozinha e orçamento para encontrar o seu restaurante ideal."
   },
   "nav": {
     "home": "Início",
@@ -14,17 +14,17 @@
     "search": "Pesquisar"
   },
   "hero": {
-    "title": "A Suíça à mesa",
-    "subtitle": "Dos Alpes aos lagos, descubra as melhores mesas de cada cantão suíço",
+    "title": "A Suíça Romanda à mesa",
+    "subtitle": "Descubra os melhores restaurantes da Suíça ocidental francófona, de cantão em cantão",
     "searchPlaceholder": "Nome de restaurante, cozinha...",
     "canton": "Cantão",
     "allCantons": "Todos os cantões",
     "cuisineType": "Tipo de cozinha",
     "allCuisines": "Todas as cozinhas",
     "searchButton": "Pesquisar",
-    "swissBadge": "100% Suíço",
+    "swissBadge": "100% Romando",
     "popularSearches": "Pesquisas populares",
-    "statsCounter": "26 cantões, {count} restaurantes"
+    "statsCounter": "7 cantões, {count} restaurantes"
   },
   "featured": {
     "title": "Restaurantes do mês",
@@ -64,7 +64,7 @@
     "cantons": "Cantões abrangidos",
     "reviews": "Avaliações verificadas",
     "cuisines": "Tipos de cozinha",
-    "swissQuality": "Qualidade Suíça"
+    "swissQuality": "Qualidade Romanda"
   },
   "search": {
     "title": "Encontrar um restaurante",
@@ -134,7 +134,7 @@
   },
   "merchant": {
     "title": "Junte-se ao Just-Tag",
-    "subtitle": "Destaque o seu restaurante junto de milhares de gourmets suíços",
+    "subtitle": "Destaque o seu restaurante junto de milhares de gourmets romandos",
     "monthly": "Mensal",
     "semiannual": "Semestral",
     "annual": "Anual",
@@ -173,7 +173,7 @@
     }
   },
   "footer": {
-    "description": "A plataforma de referência para descobrir os melhores restaurantes da Suíça.",
+    "description": "A plataforma de referência para descobrir os melhores restaurantes da Suíça Romanda.",
     "quickLinks": "Ligações rápidas",
     "legal": "Informações legais",
     "privacy": "Política de privacidade",
@@ -181,16 +181,16 @@
     "imprint": "Aviso legal",
     "followUs": "Siga-nos",
     "copyright": "Todos os direitos reservados.",
-    "swissMade": "Concebido na Suíça",
+    "swissMade": "Concebido na Suíça Romanda",
     "secureData": "Dados seguros na Suíça",
     "ctaTitle": "É restaurador?",
     "ctaSubtitle": "Inscreva o seu restaurante e atraia novos clientes"
   },
   "b2b": {
     "hero": {
-      "title": "A primeira plataforma 100% dedicada aos restaurantes suíços",
-      "subtitle": "Junte-se à plataforma de referência para restaurantes na Suíça e atraia novos clientes todos os dias.",
-      "benefit1": "Visibilidade junto de milhares de gourmets suíços",
+      "title": "A primeira plataforma 100% dedicada aos restaurantes da Suíça Romanda",
+      "subtitle": "Junte-se à plataforma de referência para restaurantes na Suíça Romanda e atraia novos clientes todos os dias.",
+      "benefit1": "Visibilidade junto de milhares de gourmets romandos",
       "benefit2": "Ficha de restaurante completa com menu, fotos e avaliações",
       "benefit3": "Ferramentas de marketing para impulsionar a sua reputação",
       "socialProof": "Junte-se aos mais de 100 restauradores que confiam em nós",
@@ -198,16 +198,16 @@
       "ctaSecondary": "Ver as tarifas"
     },
     "swissAdvantage": {
-      "badge": "Vantagem Suíça",
-      "title": "Porquê uma plataforma 100% suíça?",
-      "subtitle": "O Just-Tag foi concebido para o mercado suíço, por suíços",
+      "badge": "Vantagem Romanda",
+      "title": "Porquê uma plataforma 100% romanda?",
+      "subtitle": "O Just-Tag foi concebido para o mercado da Suíça Romanda, por romandos",
       "trilingual": {
         "title": "Multilingue por definição",
         "desc": "A ficha do seu restaurante está automaticamente disponível em cinco idiomas: francês, alemão, inglês, português e espanhol."
       },
       "seo": {
         "title": "SEO por cantão",
-        "desc": "Visibilidade otimizada nas pesquisas locais para cada cantão suíço."
+        "desc": "Visibilidade otimizada nas pesquisas locais para cada cantão romando."
       },
       "data": {
         "title": "Dados na Suíça",
@@ -215,7 +215,7 @@
       },
       "community": {
         "title": "Comunidade local",
-        "desc": "Avaliações verificadas da comunidade suíça para uma confiança autêntica."
+        "desc": "Avaliações verificadas da comunidade romanda para uma confiança autêntica."
       }
     },
     "stats": {
@@ -229,10 +229,10 @@
       "subtitle": "Tudo o que precisa para desenvolver a sua clientela",
       "visibility": {
         "title": "Visibilidade máxima",
-        "desc": "O seu restaurante aparece nas pesquisas de milhares de gourmets suíços, com uma ficha otimizada para o posicionamento nos motores de busca.",
+        "desc": "O seu restaurante aparece nas pesquisas de milhares de gourmets romandos, com uma ficha otimizada para o posicionamento nos motores de busca.",
         "point1": "Ficha de restaurante detalhada e profissional",
         "point2": "Posicionamento SEO otimizado no Google",
-        "point3": "Presença na plataforma n.º 1 na Suíça"
+        "point3": "Presença na plataforma n.º 1 na Suíça Romanda"
       },
       "reviews": {
         "title": "Gestão das avaliações de clientes",
@@ -278,7 +278,7 @@
     },
     "testimonials": {
       "title": "Confiam em nós",
-      "subtitle": "Restauradores suíços partilham a sua experiência",
+      "subtitle": "Restauradores romandos partilham a sua experiência",
       "t1": {
         "name": "Marco Bernasconi",
         "restaurant": "Trattoria da Marco",
@@ -289,7 +289,7 @@
         "name": "Sophie Müller",
         "restaurant": "Gasthof zum Bären",
         "city": "Berna",
-        "quote": "A interface é muito fácil de utilizar e o suporte é excelente. Recomendo o Just-Tag a todos os restauradores suíços."
+        "quote": "A interface é muito fácil de utilizar e o suporte é excelente. Recomendo o Just-Tag a todos os restauradores romandos."
       },
       "t3": {
         "name": "Antoine Girard",

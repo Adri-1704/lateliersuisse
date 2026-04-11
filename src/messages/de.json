@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Just-Tag | Die besten Restaurants der Schweiz",
-    "description": "Entdecken Sie die besten Restaurants der Schweiz. Suchen Sie nach Kanton, Küche und Budget, um Ihr ideales Restaurant zu finden."
+    "title": "Just-Tag | Die besten Restaurants der Westschweiz",
+    "description": "Entdecken Sie die besten Restaurants der Westschweiz. Suchen Sie nach Kanton, Küche und Budget, um Ihr ideales Restaurant zu finden."
   },
   "nav": {
     "home": "Startseite",
@@ -14,17 +14,17 @@
     "search": "Suchen"
   },
   "hero": {
-    "title": "Die Schweiz zu Tisch",
-    "subtitle": "Von den Alpen bis zu den Seen, entdecken Sie die besten Tische in jedem Schweizer Kanton",
+    "title": "Die Romandie zu Tisch",
+    "subtitle": "Von den Alpen bis zu den Seen, entdecken Sie die besten Tische in der Westschweiz",
     "searchPlaceholder": "Restaurantname, Küche...",
     "canton": "Kanton",
     "allCantons": "Alle Kantone",
     "cuisineType": "Küchenart",
     "allCuisines": "Alle Küchen",
     "searchButton": "Suchen",
-    "swissBadge": "100% Schweiz",
+    "swissBadge": "100% Romandie",
     "popularSearches": "Beliebte Suchen",
-    "statsCounter": "26 Kantone, {count} Restaurants"
+    "statsCounter": "7 Kantone, {count} Restaurants"
   },
   "featured": {
     "title": "Restaurants des Monats",
@@ -61,10 +61,10 @@
   },
   "stats": {
     "restaurants": "Restaurants",
-    "cantons": "Abgedeckte Kantone",
+    "cantons": "Westschweizer Kantone",
     "reviews": "Verifizierte Bewertungen",
     "cuisines": "Küchenarten",
-    "swissQuality": "Schweizer Qualität"
+    "swissQuality": "Qualität aus der Romandie"
   },
   "search": {
     "title": "Restaurant finden",
@@ -173,7 +173,7 @@
     }
   },
   "footer": {
-    "description": "Die Referenzplattform, um die besten Restaurants der Schweiz zu entdecken.",
+    "description": "Die Referenzplattform, um die besten Restaurants der Westschweiz zu entdecken.",
     "quickLinks": "Schnelllinks",
     "legal": "Rechtliche Informationen",
     "privacy": "Datenschutzrichtlinie",
@@ -188,9 +188,9 @@
   },
   "b2b": {
     "hero": {
-      "title": "Die erste Plattform 100% für Schweizer Restaurants",
-      "subtitle": "Treten Sie der führenden Plattform für Restaurants in der Schweiz bei und gewinnen Sie täglich neue Kunden.",
-      "benefit1": "Sichtbarkeit bei Tausenden Schweizer Feinschmeckern",
+      "title": "Die erste Plattform 100% für Restaurants der Westschweiz",
+      "subtitle": "Treten Sie der führenden Plattform für Restaurants in der Westschweiz bei und gewinnen Sie täglich neue Kunden.",
+      "benefit1": "Sichtbarkeit bei Tausenden Westschweizer Feinschmeckern",
       "benefit2": "Vollständiges Restaurantprofil mit Menü, Fotos und Bewertungen",
       "benefit3": "Marketing-Tools zur Stärkung Ihrer Reputation",
       "socialProof": "Schliessen Sie sich den 100+ Restaurantbesitzern an, die uns vertrauen",
@@ -198,16 +198,16 @@
       "ctaSecondary": "Preise ansehen"
     },
     "swissAdvantage": {
-      "badge": "Schweizer Vorteil",
-      "title": "Warum eine 100% Schweizer Plattform?",
-      "subtitle": "Just-Tag wurde für den Schweizer Markt entwickelt, von Schweizern",
+      "badge": "Vorteil Romandie",
+      "title": "Warum eine 100% Romandie Plattform?",
+      "subtitle": "Just-Tag wurde für den Westschweizer Markt entwickelt, von Westschweizern",
       "trilingual": {
         "title": "Standardmässig mehrsprachig",
         "desc": "Ihr Restaurantprofil ist automatisch auf Französisch, Deutsch, Englisch, Portugiesisch und Spanisch verfügbar."
       },
       "seo": {
         "title": "SEO nach Kanton",
-        "desc": "Optimierte Sichtbarkeit in lokalen Suchergebnissen für jeden Schweizer Kanton."
+        "desc": "Optimierte Sichtbarkeit in lokalen Suchergebnissen für jeden Westschweizer Kanton."
       },
       "data": {
         "title": "Daten in der Schweiz",
@@ -215,12 +215,12 @@
       },
       "community": {
         "title": "Lokale Gemeinschaft",
-        "desc": "Verifizierte Bewertungen der Schweizer Gemeinschaft für authentisches Vertrauen."
+        "desc": "Verifizierte Bewertungen der Westschweizer Gemeinschaft für authentisches Vertrauen."
       }
     },
     "stats": {
       "restaurants": "Partnerrestaurants",
-      "cantons": "Abgedeckte Kantone",
+      "cantons": "Westschweizer Kantone",
       "reviews": "Veröffentlichte Bewertungen",
       "cuisines": "Küchenarten"
     },
@@ -229,10 +229,10 @@
       "subtitle": "Alles, was Sie brauchen, um Ihren Kundenstamm zu erweitern",
       "visibility": {
         "title": "Maximale Sichtbarkeit",
-        "desc": "Ihr Restaurant erscheint in den Suchergebnissen von Tausenden Schweizer Feinschmeckern, mit einem für Suchmaschinen optimierten Profil.",
+        "desc": "Ihr Restaurant erscheint in den Suchergebnissen von Tausenden Westschweizer Feinschmeckern, mit einem für Suchmaschinen optimierten Profil.",
         "point1": "Detailliertes und professionelles Restaurantprofil",
         "point2": "SEO-optimierte Präsenz bei Google",
-        "point3": "Präsenz auf der Nr. 1 Plattform der Schweiz"
+        "point3": "Präsenz auf der Nr. 1 Plattform der Westschweiz"
       },
       "reviews": {
         "title": "Bewertungsmanagement",
@@ -278,7 +278,7 @@
     },
     "testimonials": {
       "title": "Sie vertrauen uns",
-      "subtitle": "Schweizer Restaurantbesitzer teilen ihre Erfahrungen",
+      "subtitle": "Westschweizer Restaurantbesitzer teilen ihre Erfahrungen",
       "t1": {
         "name": "Marco Bernasconi",
         "restaurant": "Trattoria da Marco",

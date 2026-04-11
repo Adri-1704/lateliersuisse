@@ -57,7 +57,7 @@ export async function generateMetadata({
           url: `${baseUrl}/og-image.png`,
           width: 1200,
           height: 630,
-          alt: "Just-Tag - Les meilleurs restaurants de Suisse",
+          alt: "Just-Tag - Les meilleurs restaurants de Suisse Romande",
         },
       ],
     },
@@ -105,7 +105,7 @@ export default async function LocaleLayout({
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     description:
-      "Just-Tag.ch est l'annuaire de reference pour decouvrir les meilleurs restaurants en Suisse. Trouvez des restaurants par ville, cuisine et avis.",
+      "Just-Tag.ch est l'annuaire de reference pour decouvrir les meilleurs restaurants de Suisse Romande. Trouvez des restaurants par ville, cuisine et avis.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "CH",
@@ -120,7 +120,7 @@ export default async function LocaleLayout({
     name: "Just-Tag.ch",
     url: baseUrl,
     description:
-      "Annuaire des meilleurs restaurants de Suisse — recherche par ville, type de cuisine et avis clients.",
+      "Annuaire des meilleurs restaurants de Suisse Romande — recherche par ville, type de cuisine et avis clients.",
     inLanguage: ["fr", "de", "en", "pt", "es"],
     potentialAction: {
       "@type": "SearchAction",

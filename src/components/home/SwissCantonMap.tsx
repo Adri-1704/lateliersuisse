@@ -67,6 +67,9 @@ const cantonCenters: Record<string, { x: number; y: number; abbr: string }> = {
   zurich: { x: 478, y: 90, abbr: "ZH" },
 };
 
+// Cantons romands (Suisse Romande)
+const romandCantons = new Set(["geneve", "vaud", "fribourg", "neuchatel", "valais", "jura", "berne"]);
+
 // Default empty counts (will be populated from DB via props)
 const defaultCounts: Record<string, number> = {};
 
@@ -208,7 +211,7 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
         <div className="mb-6 text-center sm:mb-8">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[var(--color-alpine-green)]/10 px-4 py-1.5 text-sm font-medium text-[var(--color-alpine-green)]">
             <MapPin className="h-4 w-4" />
-            26 {locale === "de" ? "Kantone" : locale === "en" ? "cantons" : locale === "pt" ? "cantões" : locale === "es" ? "cantones" : "cantons"}
+            7 {locale === "de" ? "Kantone" : locale === "en" ? "cantons" : locale === "pt" ? "cantões" : locale === "es" ? "cantones" : "cantons"}
           </div>
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
             {t("title")}
@@ -217,7 +220,7 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
             {t("subtitle")}
           </p>
           <p className="mt-1 text-sm font-medium text-[var(--color-alpine-green)]">
-            {totalRestaurants}+ {locale === "de" ? "Restaurants in der ganzen Schweiz" : locale === "en" ? "restaurants across Switzerland" : locale === "pt" ? "restaurantes em toda a Suíça" : locale === "es" ? "restaurantes en toda Suiza" : "restaurants dans toute la Suisse"}
+            {totalRestaurants}+ {locale === "de" ? "Restaurants in der Westschweiz" : locale === "en" ? "restaurants in Western Switzerland" : locale === "pt" ? "restaurantes na Suíça Romanda" : locale === "es" ? "restaurantes en la Suiza Romanda" : "restaurants en Suisse Romande"}
           </p>
         </div>
 
@@ -255,8 +258,24 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
             {renderOrder.map((slug) => {
               const pathData = cantonPaths[slug];
               if (!pathData) return null;
+              const isRomand = romandCantons.has(slug);
               const count = restaurantCounts[slug] || 0;
-              const isHovered = hoveredCanton === slug;
+              const isHovered = hoveredCanton === slug && isRomand;
+
+              if (!isRomand) {
+                return (
+                  <path
+                    key={slug}
+                    d={pathData}
+                    fill="#e5e7eb"
+                    stroke="#ffffff"
+                    strokeWidth="1"
+                    strokeLinejoin="round"
+                    className="opacity-50"
+                  />
+                );
+              }
+
               return (
                 <path
                   key={slug}
@@ -292,8 +311,9 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
 
             {/* Canton abbreviation labels */}
             {Object.entries(cantonCenters).map(([slug, center]) => {
+              const isRomand = romandCantons.has(slug);
               const count = restaurantCounts[slug] || 0;
-              const isHovered = hoveredCanton === slug;
+              const isHovered = hoveredCanton === slug && isRomand;
               return (
                 <text
                   key={`label-${slug}`}
@@ -301,11 +321,11 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
                   y={center.y}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize={isHovered ? "11.5" : "10"}
-                  fontWeight="700"
-                  fill={getTextColor(count, isHovered)}
+                  fontSize={isRomand ? (isHovered ? "11.5" : "10") : "9"}
+                  fontWeight={isRomand ? "700" : "500"}
+                  fill={isRomand ? getTextColor(count, isHovered) : "#9ca3af"}
                   className="pointer-events-none select-none transition-all duration-200"
-                  style={{ textShadow: count >= 20 || isHovered ? "0 1px 2px rgba(0,0,0,0.3)" : "none" }}
+                  style={{ textShadow: isRomand && (count >= 20 || isHovered) ? "0 1px 2px rgba(0,0,0,0.3)" : "none" }}
                 >
                   {center.abbr}
                 </text>

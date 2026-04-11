@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "À propos - Just-Tag.ch",
   description:
-    "Découvrez Just-Tag.ch, la plateforme suisse de référence pour trouver les meilleurs restaurants dans les 26 cantons de Suisse.",
+    "Découvrez Just-Tag.ch, la plateforme de référence pour trouver les meilleurs restaurants de Suisse Romande.",
 };
 
 export default async function AboutPage({
@@ -36,21 +36,21 @@ export default async function AboutPage({
     fr: {
       title: "À propos de Just-Tag.ch",
       intro:
-        "Just-Tag.ch est une plateforme suisse, conçue en Suisse, pour la Suisse. Notre ambition est simple : vous aider à découvrir les meilleures tables du pays, du Léman au lac de Constance, des sommets alpins aux rives du Rhin.",
+        "Just-Tag.ch est une plateforme romande, conçue en Suisse Romande, pour la Suisse Romande. Notre ambition est simple : vous aider à découvrir les meilleures tables de la région, du Léman au lac de Neuchâtel, des sommets alpins aux vignobles du Lavaux.",
       missionTitle: "Notre mission",
       missionText:
-        "La Suisse regorge de restaurants exceptionnels, mais il n'est pas toujours facile de les trouver. Just-Tag.ch a pour mission de mettre en lumière la richesse gastronomique des 26 cantons suisses. Que vous cherchiez une auberge de montagne authentique dans les Grisons, un bistrot branché à Zurich ou une table étoilée à Genève, nous sommes là pour vous guider.",
+        "La Suisse Romande regorge de restaurants exceptionnels, mais il n'est pas toujours facile de les trouver. Just-Tag.ch a pour mission de mettre en lumière la richesse gastronomique des 7 cantons romands. Que vous cherchiez un chalet d'alpage authentique en Valais, un bistrot branché à Lausanne ou une table étoilée à Genève, nous sommes là pour vous guider.",
       howTitle: "Comment ça fonctionne",
       dinersTitle: "Pour les gourmets",
       dinersItems: [
-        "Explorez des restaurants dans toute la Suisse, par canton, type de cuisine ou ambiance.",
+        "Explorez des restaurants dans toute la Suisse Romande, par canton, type de cuisine ou ambiance.",
         "Consultez des fiches détaillées avec menus, horaires, photos et avis.",
         "Enregistrez vos restaurants favoris et partagez vos découvertes.",
       ],
       restaurantsTitle: "Pour les restaurateurs",
       restaurantsItems: [
         "Créez une fiche complète pour présenter votre établissement.",
-        "Gagnez en visibilité auprès de milliers de gourmets suisses.",
+        "Gagnez en visibilité auprès de milliers de gourmets romands.",
         "Accédez à des outils marketing pour développer votre clientèle.",
       ],
       valuesTitle: "Nos valeurs",
@@ -66,9 +66,9 @@ export default async function AboutPage({
             "Des informations claires, des avis authentiques et aucun classement payant. Ce que vous voyez est ce que vous obtenez.",
         },
         {
-          name: "Identité suisse",
+          name: "Identité romande",
           description:
-            "Nous célébrons la diversité culinaire de la Suisse et ses traditions régionales, du rösti bernois à la fondue vaudoise.",
+            "Nous célébrons la diversité culinaire de la Suisse Romande et ses traditions régionales, de la fondue fribourgeoise à la raclette valaisanne.",
         },
       ],
       ctaTitle: "Vous êtes restaurateur ?",
@@ -79,21 +79,21 @@ export default async function AboutPage({
     de: {
       title: "Über Just-Tag.ch",
       intro:
-        "Just-Tag.ch ist eine Schweizer Plattform, entwickelt in der Schweiz, für die Schweiz. Unser Ziel ist einfach: Ihnen zu helfen, die besten Restaurants des Landes zu entdecken — vom Genfersee bis zum Bodensee, von den Alpengipfeln bis zu den Ufern des Rheins.",
+        "Just-Tag.ch ist eine Westschweizer Plattform, entwickelt in der Romandie, für die Romandie. Unser Ziel ist einfach: Ihnen zu helfen, die besten Restaurants der Westschweiz zu entdecken — vom Genfersee bis zum Neuenburgersee, von den Alpengipfeln bis zu den Weinbergen des Lavaux.",
       missionTitle: "Unsere Mission",
       missionText:
-        "Die Schweiz steckt voller aussergewöhnlicher Restaurants, doch es ist nicht immer einfach, sie zu finden. Just-Tag.ch hat es sich zur Aufgabe gemacht, den gastronomischen Reichtum aller 26 Schweizer Kantone sichtbar zu machen. Ob Sie ein authentisches Berggasthaus in Graubünden, ein trendiges Bistro in Zürich oder ein Sternerestaurant in Genf suchen — wir begleiten Sie.",
+        "Die Westschweiz steckt voller aussergewöhnlicher Restaurants, doch es ist nicht immer einfach, sie zu finden. Just-Tag.ch hat es sich zur Aufgabe gemacht, den gastronomischen Reichtum der 7 Westschweizer Kantone sichtbar zu machen. Ob Sie eine authentische Alphütte im Wallis, ein trendiges Bistro in Lausanne oder ein Sternerestaurant in Genf suchen — wir begleiten Sie.",
       howTitle: "So funktioniert's",
       dinersTitle: "Für Feinschmecker",
       dinersItems: [
-        "Entdecken Sie Restaurants in der ganzen Schweiz — nach Kanton, Küche oder Ambiente.",
+        "Entdecken Sie Restaurants in der Westschweiz — nach Kanton, Küche oder Ambiente.",
         "Sehen Sie detaillierte Profile mit Menüs, Öffnungszeiten, Fotos und Bewertungen.",
         "Speichern Sie Ihre Lieblingsrestaurants und teilen Sie Ihre Entdeckungen.",
       ],
       restaurantsTitle: "Für Restaurantbesitzer",
       restaurantsItems: [
         "Erstellen Sie ein vollständiges Profil für Ihr Restaurant.",
-        "Gewinnen Sie Sichtbarkeit bei Tausenden von Schweizer Feinschmeckern.",
+        "Gewinnen Sie Sichtbarkeit bei Tausenden von Westschweizer Feinschmeckern.",
         "Nutzen Sie Marketing-Tools, um Ihre Kundschaft zu erweitern.",
       ],
       valuesTitle: "Unsere Werte",
@@ -109,9 +109,9 @@ export default async function AboutPage({
             "Klare Informationen, authentische Bewertungen und keine bezahlten Rankings. Was Sie sehen, ist was Sie bekommen.",
         },
         {
-          name: "Schweizer Identität",
+          name: "Westschweizer Identität",
           description:
-            "Wir feiern die kulinarische Vielfalt der Schweiz und ihre regionalen Traditionen — von Berner Rösti bis Waadtländer Fondue.",
+            "Wir feiern die kulinarische Vielfalt der Westschweiz und ihre regionalen Traditionen — von Freiburger Fondue bis Walliser Raclette.",
         },
       ],
       ctaTitle: "Sind Sie Restaurantbesitzer?",
@@ -122,21 +122,21 @@ export default async function AboutPage({
     en: {
       title: "About Just-Tag.ch",
       intro:
-        "Just-Tag.ch is a Swiss platform, built in Switzerland, for Switzerland. Our ambition is simple: help you discover the finest restaurants across the country — from Lake Geneva to Lake Constance, from Alpine peaks to the banks of the Rhine.",
+        "Just-Tag.ch is a Western Swiss platform, built in the Romandie, for the Romandie. Our ambition is simple: help you discover the finest restaurants across Western Switzerland — from Lake Geneva to Lake Neuchatel, from Alpine peaks to the Lavaux vineyards.",
       missionTitle: "Our mission",
       missionText:
-        "Switzerland is home to exceptional restaurants, but they are not always easy to find. Just-Tag.ch's mission is to showcase the gastronomic richness of all 26 Swiss cantons. Whether you're looking for an authentic mountain inn in Graubünden, a trendy bistro in Zurich, or a Michelin-starred table in Geneva, we're here to guide you.",
+        "Western Switzerland is home to exceptional restaurants, but they are not always easy to find. Just-Tag.ch's mission is to showcase the gastronomic richness of the 7 Romand cantons. Whether you're looking for an authentic Alpine chalet in Valais, a trendy bistro in Lausanne, or a Michelin-starred table in Geneva, we're here to guide you.",
       howTitle: "How it works",
       dinersTitle: "For diners",
       dinersItems: [
-        "Explore restaurants across Switzerland by canton, cuisine type, or ambiance.",
+        "Explore restaurants across Western Switzerland by canton, cuisine type, or ambiance.",
         "View detailed profiles with menus, opening hours, photos, and reviews.",
         "Save your favourite restaurants and share your discoveries.",
       ],
       restaurantsTitle: "For restaurant owners",
       restaurantsItems: [
         "Create a complete profile to showcase your establishment.",
-        "Gain visibility among thousands of Swiss food lovers.",
+        "Gain visibility among thousands of Western Swiss food lovers.",
         "Access marketing tools to grow your customer base.",
       ],
       valuesTitle: "Our values",
@@ -152,9 +152,9 @@ export default async function AboutPage({
             "Clear information, authentic reviews, and no paid rankings. What you see is what you get.",
         },
         {
-          name: "Swiss identity",
+          name: "Romand identity",
           description:
-            "We celebrate Switzerland's culinary diversity and regional traditions — from Bernese rösti to Vaudois fondue.",
+            "We celebrate Western Switzerland's culinary diversity and regional traditions — from Fribourg fondue to Valais raclette.",
         },
       ],
       ctaTitle: "Are you a restaurant owner?",
