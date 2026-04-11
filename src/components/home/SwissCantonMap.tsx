@@ -367,8 +367,8 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
           )}
         </div>
 
-        {/* Canton grid for mobile / supplementary navigation */}
-        <div className="mt-8 grid grid-cols-3 gap-2 sm:hidden">
+        {/* Canton grid — navigation rapide */}
+        <div className="mt-8 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-7">
           {cantons.map((canton) => {
             const count = restaurantCounts[canton.value] || 0;
             return (
