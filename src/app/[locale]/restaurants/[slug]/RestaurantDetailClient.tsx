@@ -862,8 +862,6 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
             </TabsContent>
           </Tabs>
 
-          {/* Similar Restaurants */}
-          <SimilarRestaurants restaurant={restaurant} />
         </div>
 
         {/* Sidebar - Contact Card */}
@@ -995,6 +993,11 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Similar Restaurants - always at the bottom */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-8">
+        <SimilarRestaurants restaurant={restaurant} />
       </div>
     </div>
   );
