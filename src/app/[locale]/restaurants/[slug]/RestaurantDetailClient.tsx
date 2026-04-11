@@ -312,6 +312,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   const directionsUrl = hasCoords
     ? `https://www.google.com/maps/dir/?api=1&destination=${restaurant.latitude},${restaurant.longitude}`
     : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${restaurant.address}, ${restaurant.postalCode} ${restaurant.city}`)}`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.nameFr} ${restaurant.address} ${restaurant.city}`)}`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -590,6 +591,15 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                     ))}
                   </div>
                   <p className="mt-1 text-sm text-gray-500">{localReviewCount} {t("reviews")}</p>
+                  <a
+                    href={googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#4285F4"/></svg>
+                    {locale === "de" ? "Alle Bewertungen auf Google" : locale === "en" ? "All reviews on Google" : "Tous les avis sur Google"}
+                  </a>
                 </div>
                 <div className="w-full max-w-xs">
                   <RatingDistribution reviews={localReviews} />
