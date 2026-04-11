@@ -135,10 +135,10 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={outfit.variable}>
       <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-M093459LR7" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-WMX94S9LR7" />
         <script
           dangerouslySetInnerHTML={{
-            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-M093459LR7');`,
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WMX94S9LR7');`,
           }}
         />
         <script
