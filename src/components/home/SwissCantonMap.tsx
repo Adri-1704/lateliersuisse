@@ -224,10 +224,10 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
           </p>
         </div>
 
-        {/* Map container */}
-        <div className="relative mx-auto w-full max-w-6xl">
+        {/* Map container - zoomed on Suisse Romande */}
+        <div className="relative mx-auto w-full max-w-4xl">
           <svg
-            viewBox="-10 -10 820 500"
+            viewBox="-30 50 500 440"
             xmlns="http://www.w3.org/2000/svg"
             className="h-auto w-full"
             role="img"
@@ -267,11 +267,11 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
                   <path
                     key={slug}
                     d={pathData}
-                    fill="#e5e7eb"
-                    stroke="#ffffff"
-                    strokeWidth="1"
+                    fill="#f3f4f6"
+                    stroke="#e5e7eb"
+                    strokeWidth="0.8"
                     strokeLinejoin="round"
-                    className="opacity-50"
+                    className="opacity-40"
                   />
                 );
               }
@@ -309,11 +309,12 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
               );
             })}
 
-            {/* Canton abbreviation labels */}
+            {/* Canton abbreviation labels — only Romand cantons */}
             {Object.entries(cantonCenters).map(([slug, center]) => {
               const isRomand = romandCantons.has(slug);
+              if (!isRomand) return null;
               const count = restaurantCounts[slug] || 0;
-              const isHovered = hoveredCanton === slug && isRomand;
+              const isHovered = hoveredCanton === slug;
               return (
                 <text
                   key={`label-${slug}`}
@@ -321,11 +322,11 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
                   y={center.y}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize={isRomand ? (isHovered ? "11.5" : "10") : "9"}
-                  fontWeight={isRomand ? "700" : "500"}
-                  fill={isRomand ? getTextColor(count, isHovered) : "#9ca3af"}
+                  fontSize={isHovered ? "13" : "11"}
+                  fontWeight="700"
+                  fill={getTextColor(count, isHovered)}
                   className="pointer-events-none select-none transition-all duration-200"
-                  style={{ textShadow: isRomand && (count >= 20 || isHovered) ? "0 1px 2px rgba(0,0,0,0.3)" : "none" }}
+                  style={{ textShadow: count >= 20 || isHovered ? "0 1px 2px rgba(0,0,0,0.3)" : "none" }}
                 >
                   {center.abbr}
                 </text>
@@ -333,7 +334,7 @@ export function SwissCantonMap({ restaurantCounts: propCounts }: SwissCantonMapP
             })}
 
             {/* Legend */}
-            <g transform="translate(20, 420)">
+            <g transform="translate(350, 370)">
               <text x="0" y="-8" fontSize="9" fontWeight="700" fill="#6b7280" letterSpacing="0.5">
                 {locale === "de" ? "RESTAURANTS" : locale === "en" ? "RESTAURANTS" : locale === "pt" ? "RESTAURANTES" : locale === "es" ? "RESTAURANTES" : "RESTAURANTS"}
               </text>
