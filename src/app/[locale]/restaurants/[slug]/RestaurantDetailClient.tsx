@@ -444,6 +444,32 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
             {/* Menu Tab */}
             <TabsContent value="menu" className="mt-6">
+              {/* Link to restaurant website if no menu items */}
+              {restaurant.menuItems.length === 0 && restaurant.website && (
+                <div className="flex flex-col items-center justify-center rounded-xl border bg-gray-50 py-12 px-6 text-center">
+                  <div className="text-4xl mb-4">📋</div>
+                  <p className="text-gray-600 mb-4">
+                    {locale === "de" ? "Die Speisekarte ist auf der Website des Restaurants verfügbar." : locale === "en" ? "The menu is available on the restaurant's website." : "La carte est disponible sur le site du restaurant."}
+                  </p>
+                  <a
+                    href={restaurant.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-just-tag)] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    {locale === "de" ? "Speisekarte ansehen" : locale === "en" ? "View the menu" : "Voir la carte"}
+                  </a>
+                </div>
+              )}
+              {restaurant.menuItems.length === 0 && !restaurant.website && (
+                <div className="flex flex-col items-center justify-center rounded-xl border bg-gray-50 py-12 px-6 text-center">
+                  <div className="text-4xl mb-4">📋</div>
+                  <p className="text-gray-500">
+                    {locale === "de" ? "Speisekarte noch nicht verfügbar." : locale === "en" ? "Menu not yet available." : "Menu pas encore disponible."}
+                  </p>
+                </div>
+              )}
               {/* Average price indicator */}
               {avgMenuPrice > 0 && (
                 <div className="mb-6 inline-flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 text-sm">
