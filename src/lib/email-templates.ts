@@ -537,35 +537,35 @@ export interface FreeTrialData {
 
 const freeTrialT = {
   fr: {
-    subject: "Bienvenue sur L'Atelier Suisse ! Votre essai gratuit est actif",
+    subject: "Bienvenue sur Just-Tag ! Votre essai gratuit est actif",
     title: "Bienvenue partenaire ! 🎉",
     body: "Votre essai gratuit de 30 jours est maintenant actif. Profitez de toutes les fonctionnalités pour faire rayonner votre restaurant.",
     trialEnd: "Fin de l'essai",
     cta: "Accéder à mon espace",
   },
   de: {
-    subject: "Willkommen bei L'Atelier Suisse! Ihre kostenlose Testphase ist aktiv",
+    subject: "Willkommen bei Just-Tag! Ihre kostenlose Testphase ist aktiv",
     title: "Willkommen Partner! 🎉",
     body: "Ihre 30-tägige kostenlose Testphase ist jetzt aktiv. Nutzen Sie alle Funktionen, um Ihr Restaurant bekannt zu machen.",
     trialEnd: "Ende der Testphase",
     cta: "Zu meinem Bereich",
   },
   en: {
-    subject: "Welcome to L'Atelier Suisse! Your free trial is active",
+    subject: "Welcome to Just-Tag! Your free trial is active",
     title: "Welcome partner! 🎉",
     body: "Your 30-day free trial is now active. Enjoy all features to boost your restaurant's visibility.",
     trialEnd: "Trial ends",
     cta: "Access my dashboard",
   },
   pt: {
-    subject: "Bem-vindo ao L'Atelier Suisse! O seu período de teste gratuito está ativo",
+    subject: "Bem-vindo ao Just-Tag! O seu período de teste gratuito está ativo",
     title: "Bem-vindo parceiro! 🎉",
     body: "O seu período de teste gratuito de 30 dias está agora ativo. Aproveite todas as funcionalidades para destacar o seu restaurante.",
     trialEnd: "Fim do teste",
     cta: "Aceder ao meu espaço",
   },
   es: {
-    subject: "¡Bienvenido a L'Atelier Suisse! Su prueba gratuita está activa",
+    subject: "¡Bienvenido a Just-Tag! Su prueba gratuita está activa",
     title: "¡Bienvenido socio! 🎉",
     body: "Su prueba gratuita de 30 días ya está activa. Disfrute de todas las funciones para dar visibilidad a su restaurante.",
     trialEnd: "Fin de la prueba",

@@ -49,7 +49,7 @@ export function AdminSidebar() {
             <UtensilsCrossed className="h-4 w-4" />
           </div>
           <span className="text-lg font-bold">
-            L&apos;Atelier <span className="text-[var(--color-just-tag)]">Suisse</span>
+            Just<span className="text-[var(--color-just-tag)]">-Tag</span>
           </span>
         </Link>
       </SidebarHeader>
@@ -79,7 +79,7 @@ export function AdminSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t px-6 py-3">
-        <p className="text-xs text-muted-foreground">L&apos;Atelier Suisse Admin</p>
+        <p className="text-xs text-muted-foreground">Just-Tag Admin</p>
       </SidebarFooter>
     </Sidebar>
   );
