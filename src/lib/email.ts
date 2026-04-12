@@ -32,7 +32,7 @@ export async function sendEmail(
 
   try {
     const { error } = await resend.emails.send({
-      from: process.env.FROM_EMAIL || "Just-Tag <noreply@just-tag.ch>",
+      from: process.env.FROM_EMAIL || "Just-Tag <contact@just-tag.app>",
       to: params.to,
       subject: params.subject,
       html: params.html,

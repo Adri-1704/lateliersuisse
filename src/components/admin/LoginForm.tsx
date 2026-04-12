@@ -48,7 +48,7 @@ export function LoginForm() {
               id="email"
               name="email"
               type="email"
-              placeholder="admin@just-tag.ch"
+              placeholder="contact@just-tag.app"
               required
               autoComplete="email"
             />

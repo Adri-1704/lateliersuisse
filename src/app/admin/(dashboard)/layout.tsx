@@ -5,7 +5,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  let email = "admin@just-tag.ch";
+  let email = "contact@just-tag.app";
 
   try {
     const user = await getAdminUser();

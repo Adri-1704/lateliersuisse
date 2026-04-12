@@ -64,7 +64,7 @@ export async function submitContactForm(
     }
 
     // Send notification emails
-    const adminEmailAddress = process.env.ADMIN_EMAIL || "admin@just-tag.ch";
+    const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
 
     const adminTemplate = contactAdminNotification(data);
     await sendEmail({

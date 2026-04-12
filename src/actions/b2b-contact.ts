@@ -79,7 +79,7 @@ export async function submitB2BContactRequest(
     }
 
     // Send notification emails (non-blocking: errors don't fail the request)
-    const adminEmailAddress = process.env.ADMIN_EMAIL || "admin@just-tag.ch";
+    const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
 
     const adminTemplate = b2bAdminNotification(data);
     await sendEmail({
