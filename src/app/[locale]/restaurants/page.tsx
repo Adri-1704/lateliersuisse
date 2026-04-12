@@ -287,17 +287,9 @@ function RestaurantsContent() {
                     {locale === "de" ? "Zurück" : locale === "en" ? "Previous" : "Précédent"}
                   </Button>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={page === currentPage ? "default" : "outline"}
-                      size="sm"
-                      className={page === currentPage ? "bg-[var(--color-just-tag)] text-white" : ""}
-                      onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    >
-                      {page}
-                    </Button>
-                  ))}
+                  <span className="text-sm text-gray-600 px-2">
+                    {currentPage} / {totalPages}
+                  </span>
 
                   <Button
                     variant="outline"
