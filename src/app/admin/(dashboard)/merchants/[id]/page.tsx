@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Mail, Phone, Calendar, CreditCard } from "lucide-react";
+import { DeleteMerchantButton } from "./DeleteMerchantButton";
 
 const statusColors: Record<string, string> = {
   active: "bg-green-100 text-green-700",
@@ -53,6 +54,9 @@ export default async function MerchantDetailPage({
         <div>
           <h1 className="text-2xl font-bold">{m.name}</h1>
           <p className="text-muted-foreground">{m.email}</p>
+        </div>
+        <div className="ml-auto">
+          <DeleteMerchantButton merchantId={m.id} merchantName={m.name} />
         </div>
       </div>
 

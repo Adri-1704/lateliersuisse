@@ -31,6 +31,35 @@ export async function getMerchant(id: string): Promise<{ success: boolean; error
   }
 }
 
+export async function deleteMerchant(id: string): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = createAdminClient();
+
+    // 1. Get merchant to find auth_user_id
+    const { data: merchant } = await supabase.from("merchants").select("auth_user_id").eq("id", id).single() as { data: { auth_user_id: string | null } | null; error: unknown };
+
+    // 2. Unlink restaurants (set merchant_id to null)
+    await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
+      .update({ merchant_id: null } as Record<string, unknown>)
+      .eq("merchant_id", id);
+
+    // 3. Delete subscriptions
+    await supabase.from("subscriptions").delete().eq("merchant_id", id);
+
+    // 4. Delete merchant record
+    await supabase.from("merchants").delete().eq("id", id);
+
+    // 5. Delete auth user if exists
+    if (merchant?.auth_user_id) {
+      await supabase.auth.admin.deleteUser(merchant.auth_user_id);
+    }
+
+    return { success: true, error: null };
+  } catch (err) {
+    return { success: false, error: "Erreur lors de la suppression" };
+  }
+}
+
 export async function listMerchants(params: {
   page?: number;
   limit?: number;
