@@ -231,6 +231,21 @@ export default async function RestaurantDetailPage({
     promotions: promotions.length > 0 ? promotions : undefined,
   };
 
+  // Also check inline promotion fields on the restaurant row
+  if (!enrichedRestaurant.promotions) {
+    const sb = createAdminClient();
+    const { data: promoRow } = await sb.from("restaurants").select("promotion_active,promotion_title,promotion_description,promotion_type,promotion_value").eq("slug", slug).single() as { data: Record<string, string | boolean | null> | null; error: unknown };
+
+    if (promoRow?.promotion_active && promoRow?.promotion_title) {
+      enrichedRestaurant.promotions = [{
+        type: ((promoRow.promotion_type as string) as RestaurantPromotion["type"]) || "special_event",
+        title: promoRow.promotion_title as string,
+        description: (promoRow.promotion_description as string) || undefined,
+        discountPercentage: promoRow.promotion_type === "percentage" && promoRow.promotion_value ? parseInt(promoRow.promotion_value as string) : undefined,
+      }];
+    }
+  }
+
   // Structured data - Restaurant (Schema.org)
   const restaurantJsonLd = {
     "@context": "https://schema.org",
