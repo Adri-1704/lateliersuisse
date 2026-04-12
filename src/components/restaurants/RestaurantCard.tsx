@@ -40,16 +40,11 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   return (
     <Link href={`/${locale}/restaurants/${restaurant.slug}`}>
       <div className="group h-full overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
-        <div className="relative h-56 overflow-hidden">
-          <Image
-            src={restaurant.coverImage}
-            alt={name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-110"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        <div className="relative h-56 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
+          <div className="absolute inset-0 opacity-10">
+            <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none"><pattern id={`p-${restaurant.slug}`} width="20" height="20" patternUnits="userSpaceOnUse"><path d="M10 0v20M0 10h20" stroke="white" strokeWidth="0.5" fill="none"/></pattern><rect width="100" height="100" fill={`url(#p-${restaurant.slug})`}/></svg>
+          </div>
+          <h4 className="relative z-10 px-6 text-center text-xl font-bold text-white leading-tight">{name}</h4>
 
           {/* Top left: Featured badge or cuisine */}
           <div className="absolute left-3 top-3 flex flex-col gap-1.5">

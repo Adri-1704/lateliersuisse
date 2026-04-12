@@ -134,15 +134,11 @@ function RestaurantSlideCardCompact({ restaurant, bestReview, locale }: { restau
   return (
     <Link href={`/${locale}/restaurants/${restaurant.slug}`}>
       <div className="group overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-lg">
-        <div className="relative h-48 overflow-hidden">
-          <Image
-            src={restaurant.coverImage}
-            alt={name}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
+          <div className="absolute inset-0 opacity-10">
+            <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none"><pattern id={`hm-${restaurant.slug}`} width="20" height="20" patternUnits="userSpaceOnUse"><path d="M10 0v20M0 10h20" stroke="white" strokeWidth="0.5" fill="none"/></pattern><rect width="100" height="100" fill={`url(#hm-${restaurant.slug})`}/></svg>
+          </div>
+          <h4 className="relative z-10 px-6 text-center text-lg font-bold text-white leading-tight">{name}</h4>
           {restaurant.isFeatured && (
             <Badge className="absolute left-3 top-3 bg-[var(--color-just-tag)] text-white border-0 text-xs px-2.5 py-0.5 animate-pulse-gentle">
               {t("badge")}

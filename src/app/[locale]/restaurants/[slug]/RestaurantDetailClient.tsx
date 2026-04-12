@@ -334,72 +334,13 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
         <span className="text-gray-900 font-medium truncate">{name}</span>
       </nav>
 
-      {/* Photo Gallery */}
-      {restaurant.images.length >= 3 ? (
-        <div className="relative grid grid-cols-1 gap-2 md:grid-cols-3 overflow-hidden rounded-2xl">
-          <div
-            className="relative col-span-1 md:col-span-2 h-64 md:h-[400px] cursor-pointer"
-            onClick={() => { setLightboxIndex(0); setLightboxOpen(true); }}
-          >
-            <Image
-              src={restaurant.images[0]}
-              alt={name}
-              fill
-              className="object-cover hover:brightness-95 transition-all"
-              priority
-            />
-          </div>
-          <div className="hidden md:grid gap-2">
-            {restaurant.images.slice(1, 3).map((img, i) => (
-              <div
-                key={i}
-                className="relative h-[196px] cursor-pointer"
-                onClick={() => { setLightboxIndex(i + 1); setLightboxOpen(true); }}
-              >
-                <Image
-                  src={img}
-                  alt={`${name} ${i + 2}`}
-                  fill
-                  className="object-cover hover:brightness-95 transition-all"
-                  sizes="33vw"
-                />
-                {/* "See all photos" on last visible image */}
-                {i === 1 && restaurant.images.length > 3 && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/50 transition-colors">
-                    <span className="flex items-center gap-2 text-sm font-medium text-white">
-                      <Camera className="h-4 w-4" />
-                      {t("photos")} ({restaurant.images.length})
-                    </span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+      {/* Restaurant Name Banner */}
+      <div className="relative h-48 md:h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
+        <div className="absolute inset-0 opacity-10">
+          <svg className="h-full w-full" viewBox="0 0 200 100" preserveAspectRatio="none"><pattern id="detail-pattern" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M10 0v20M0 10h20" stroke="white" strokeWidth="0.3" fill="none"/></pattern><rect width="200" height="100" fill="url(#detail-pattern)"/></svg>
         </div>
-      ) : (
-        <div
-          className="relative h-64 md:h-[400px] overflow-hidden rounded-2xl cursor-pointer"
-          onClick={() => { setLightboxIndex(0); setLightboxOpen(true); }}
-        >
-          <Image
-            src={restaurant.images[0] || restaurant.coverImage}
-            alt={name}
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-      )}
-
-      {/* Lightbox */}
-      {lightboxOpen && (
-        <PhotoLightbox
-          images={restaurant.images}
-          initialIndex={lightboxIndex}
-          name={name}
-          onClose={() => setLightboxOpen(false)}
-        />
-      )}
+        <h2 className="relative z-10 px-8 text-center text-3xl md:text-5xl font-bold text-white leading-tight">{name}</h2>
+      </div>
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Main Content */}
