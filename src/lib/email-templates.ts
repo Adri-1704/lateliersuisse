@@ -1,5 +1,5 @@
 /**
- * Email templates for Just-Tag.ch
+ * Email templates for Just-Tag.app
  * All templates return { subject, html } and support 5 locales.
  */
 
@@ -50,7 +50,7 @@ function emailLayout(content: string): string {
           <tr>
             <td style="background-color:${COLORS.cream};padding:20px 32px;border-top:1px solid #e5e7eb;">
               <p style="margin:0;font-size:12px;color:${COLORS.lightText};text-align:center;">
-                <a href="https://just-tag.ch" style="color:${COLORS.green};text-decoration:none;font-weight:600;">just-tag.ch</a>
+                <a href="https://just-tag.app" style="color:${COLORS.green};text-decoration:none;font-weight:600;">just-tag.app</a>
                 &nbsp;·&nbsp; Made in Switzerland 🇨🇭
               </p>
             </td>

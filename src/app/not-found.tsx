@@ -50,7 +50,7 @@ export default function NotFound() {
           </Link>
 
           <p className="mt-12 text-sm text-gray-400">
-            Just-Tag.ch — Les meilleurs restaurants de Suisse
+            Just-Tag.app — Les meilleurs restaurants de Suisse
           </p>
         </div>
       </body>

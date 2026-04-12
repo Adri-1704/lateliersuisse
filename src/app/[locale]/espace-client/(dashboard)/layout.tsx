@@ -12,7 +12,7 @@ export default async function MerchantDashboardLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  let email = "marchand@just-tag.ch";
+  let email = "marchand@just-tag.app";
   let restaurantName: string | undefined;
 
   try {

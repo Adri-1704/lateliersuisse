@@ -92,7 +92,7 @@ export async function createBillingPortalSession(locale: string = "fr"): Promise
     const stripe = getStripe();
     const session = await stripe.billingPortal.sessions.create({
       customer: merchant.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch"}/${locale}/espace-client/abonnement`,
+      return_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app"}/${locale}/espace-client/abonnement`,
     });
 
     return { url: session.url, error: null };

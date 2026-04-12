@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://just-tag.ch";
+  const baseUrl = "https://just-tag.app";
   const locales = ["fr", "de", "en", "pt", "es"];
   const now = new Date();
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialité - Just-Tag.ch",
+  title: "Politique de confidentialité - Just-Tag.app",
 };
 
 export default async function PrivacyPolicyPage({
@@ -17,11 +17,11 @@ export default async function PrivacyPolicyPage({
       sections: [
         {
           heading: "1. Introduction",
-          text: "Just-Tag.ch (ci-après « nous », « notre » ou « Just-Tag ») accorde une grande importance à la protection de vos données personnelles. La présente politique de confidentialité décrit la manière dont nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre plateforme accessible à l'adresse just-tag.ch.",
+          text: "Just-Tag.app (ci-après « nous », « notre » ou « Just-Tag ») accorde une grande importance à la protection de vos données personnelles. La présente politique de confidentialité décrit la manière dont nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre plateforme accessible à l'adresse just-tag.app.",
         },
         {
           heading: "2. Responsable du traitement",
-          text: "Le responsable du traitement des données est Just-Tag.ch, opéré depuis la Suisse. Pour toute question relative à la protection des données, vous pouvez nous contacter à l'adresse : contact@just-tag.ch.",
+          text: "Le responsable du traitement des données est Just-Tag.app, opéré depuis la Suisse. Pour toute question relative à la protection des données, vous pouvez nous contacter à l'adresse : contact@just-tag.app.",
         },
         {
           heading: "3. Données collectées",
@@ -45,7 +45,7 @@ export default async function PrivacyPolicyPage({
         },
         {
           heading: "8. Vos droits",
-          text: "Conformément à la Loi fédérale sur la protection des données (LPD) et au RGPD (pour les résidents de l'UE), vous disposez des droits suivants :\n\n• Droit d'accès : obtenir une copie de vos données personnelles.\n• Droit de rectification : corriger des données inexactes.\n• Droit à l'effacement : demander la suppression de vos données.\n• Droit à la portabilité : recevoir vos données dans un format structuré.\n• Droit d'opposition : vous opposer au traitement de vos données.\n• Droit de retrait du consentement : retirer votre consentement à tout moment.\n\nPour exercer ces droits, contactez-nous à : contact@just-tag.ch.",
+          text: "Conformément à la Loi fédérale sur la protection des données (LPD) et au RGPD (pour les résidents de l'UE), vous disposez des droits suivants :\n\n• Droit d'accès : obtenir une copie de vos données personnelles.\n• Droit de rectification : corriger des données inexactes.\n• Droit à l'effacement : demander la suppression de vos données.\n• Droit à la portabilité : recevoir vos données dans un format structuré.\n• Droit d'opposition : vous opposer au traitement de vos données.\n• Droit de retrait du consentement : retirer votre consentement à tout moment.\n\nPour exercer ces droits, contactez-nous à : contact@just-tag.app.",
         },
         {
           heading: "9. Cookies",
@@ -61,26 +61,26 @@ export default async function PrivacyPolicyPage({
         },
         {
           heading: "12. Contact",
-          text: "Pour toute question concernant cette politique de confidentialité ou vos données personnelles, contactez-nous :\n\nE-mail : contact@just-tag.ch\nSite web : just-tag.ch",
+          text: "Pour toute question concernant cette politique de confidentialité ou vos données personnelles, contactez-nous :\n\nE-mail : contact@just-tag.app\nSite web : just-tag.app",
         },
       ],
     },
     de: {
       title: "Datenschutzrichtlinie",
       sections: [
-        { heading: "1. Einleitung", text: "Just-Tag.ch legt grossen Wert auf den Schutz Ihrer persönlichen Daten. Diese Datenschutzrichtlinie beschreibt, wie wir Ihre Informationen bei der Nutzung unserer Plattform just-tag.ch erfassen, verwenden und schützen." },
-        { heading: "2. Verantwortlicher", text: "Der Verantwortliche für die Datenverarbeitung ist Just-Tag.ch, betrieben in der Schweiz. Kontakt: contact@just-tag.ch." },
+        { heading: "1. Einleitung", text: "Just-Tag.app legt grossen Wert auf den Schutz Ihrer persönlichen Daten. Diese Datenschutzrichtlinie beschreibt, wie wir Ihre Informationen bei der Nutzung unserer Plattform just-tag.app erfassen, verwenden und schützen." },
+        { heading: "2. Verantwortlicher", text: "Der Verantwortliche für die Datenverarbeitung ist Just-Tag.app, betrieben in der Schweiz. Kontakt: contact@just-tag.app." },
         { heading: "3. Erhobene Daten", text: "Wir erheben: Kontodaten (Name, E-Mail, Telefon), Navigationsdaten (IP, Browser, besuchte Seiten), Restaurantdaten, Bewertungen, Kontaktformulardaten und Newsletter-Daten." },
-        { heading: "4. Ihre Rechte", text: "Gemäss dem Schweizer Datenschutzgesetz (DSG) und der DSGVO haben Sie das Recht auf Auskunft, Berichtigung, Löschung, Datenübertragbarkeit und Widerspruch. Kontakt: contact@just-tag.ch." },
+        { heading: "4. Ihre Rechte", text: "Gemäss dem Schweizer Datenschutzgesetz (DSG) und der DSGVO haben Sie das Recht auf Auskunft, Berichtigung, Löschung, Datenübertragbarkeit und Widerspruch. Kontakt: contact@just-tag.app." },
       ],
     },
     en: {
       title: "Privacy Policy",
       sections: [
-        { heading: "1. Introduction", text: "Just-Tag.ch values the protection of your personal data. This privacy policy describes how we collect, use and protect your information when you use our platform at just-tag.ch." },
-        { heading: "2. Data Controller", text: "The data controller is Just-Tag.ch, operated from Switzerland. Contact: contact@just-tag.ch." },
+        { heading: "1. Introduction", text: "Just-Tag.app values the protection of your personal data. This privacy policy describes how we collect, use and protect your information when you use our platform at just-tag.app." },
+        { heading: "2. Data Controller", text: "The data controller is Just-Tag.app, operated from Switzerland. Contact: contact@just-tag.app." },
         { heading: "3. Data Collected", text: "We collect: account data (name, email, phone), browsing data (IP, browser, pages visited), restaurant data, reviews, contact form data and newsletter data." },
-        { heading: "4. Your Rights", text: "Under the Swiss Data Protection Act (FADP) and GDPR (for EU residents), you have the right to access, rectify, erase, port and object to the processing of your data. Contact: contact@just-tag.ch." },
+        { heading: "4. Your Rights", text: "Under the Swiss Data Protection Act (FADP) and GDPR (for EU residents), you have the right to access, rectify, erase, port and object to the processing of your data. Contact: contact@just-tag.app." },
       ],
     },
   };

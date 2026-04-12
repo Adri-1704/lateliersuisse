@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/espace-client/"],
       },
     ],
-    sitemap: "https://just-tag.ch/sitemap.xml",
+    sitemap: "https://just-tag.app/sitemap.xml",
   };
 }

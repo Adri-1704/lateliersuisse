@@ -134,7 +134,7 @@ export async function resetMerchantPassword(email: string) {
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch"}/fr/espace-client/connexion`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app"}/fr/espace-client/connexion`,
     });
 
     if (error) {

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "À propos - Just-Tag.ch",
+  title: "À propos - Just-Tag.app",
   description:
-    "Découvrez Just-Tag.ch, la plateforme de référence pour trouver les meilleurs restaurants de Suisse Romande.",
+    "Découvrez Just-Tag.app, la plateforme de référence pour trouver les meilleurs restaurants de Suisse Romande.",
 };
 
 export default async function AboutPage({
@@ -34,12 +34,12 @@ export default async function AboutPage({
     }
   > = {
     fr: {
-      title: "À propos de Just-Tag.ch",
+      title: "À propos de Just-Tag.app",
       intro:
-        "Just-Tag.ch est une plateforme romande, conçue en Suisse Romande, pour la Suisse Romande. Notre ambition est simple : vous aider à découvrir les meilleures tables de la région, du Léman au lac de Neuchâtel, des sommets alpins aux vignobles du Lavaux.",
+        "Just-Tag.app est une plateforme romande, conçue en Suisse Romande, pour la Suisse Romande. Notre ambition est simple : vous aider à découvrir les meilleures tables de la région, du Léman au lac de Neuchâtel, des sommets alpins aux vignobles du Lavaux.",
       missionTitle: "Notre mission",
       missionText:
-        "La Suisse Romande regorge de restaurants exceptionnels, mais il n'est pas toujours facile de les trouver. Just-Tag.ch a pour mission de mettre en lumière la richesse gastronomique des 7 cantons romands. Que vous cherchiez un chalet d'alpage authentique en Valais, un bistrot branché à Lausanne ou une table étoilée à Genève, nous sommes là pour vous guider.",
+        "La Suisse Romande regorge de restaurants exceptionnels, mais il n'est pas toujours facile de les trouver. Just-Tag.app a pour mission de mettre en lumière la richesse gastronomique des 7 cantons romands. Que vous cherchiez un chalet d'alpage authentique en Valais, un bistrot branché à Lausanne ou une table étoilée à Genève, nous sommes là pour vous guider.",
       howTitle: "Comment ça fonctionne",
       dinersTitle: "Pour les gourmets",
       dinersItems: [
@@ -73,16 +73,16 @@ export default async function AboutPage({
       ],
       ctaTitle: "Vous êtes restaurateur ?",
       ctaText:
-        "Rejoignez Just-Tag.ch et donnez à votre restaurant la visibilité qu'il mérite. L'inscription est simple et rapide.",
+        "Rejoignez Just-Tag.app et donnez à votre restaurant la visibilité qu'il mérite. L'inscription est simple et rapide.",
       ctaButton: "Inscrire mon restaurant",
     },
     de: {
-      title: "Über Just-Tag.ch",
+      title: "Über Just-Tag.app",
       intro:
-        "Just-Tag.ch ist eine Westschweizer Plattform, entwickelt in der Romandie, für die Romandie. Unser Ziel ist einfach: Ihnen zu helfen, die besten Restaurants der Westschweiz zu entdecken — vom Genfersee bis zum Neuenburgersee, von den Alpengipfeln bis zu den Weinbergen des Lavaux.",
+        "Just-Tag.app ist eine Westschweizer Plattform, entwickelt in der Romandie, für die Romandie. Unser Ziel ist einfach: Ihnen zu helfen, die besten Restaurants der Westschweiz zu entdecken — vom Genfersee bis zum Neuenburgersee, von den Alpengipfeln bis zu den Weinbergen des Lavaux.",
       missionTitle: "Unsere Mission",
       missionText:
-        "Die Westschweiz steckt voller aussergewöhnlicher Restaurants, doch es ist nicht immer einfach, sie zu finden. Just-Tag.ch hat es sich zur Aufgabe gemacht, den gastronomischen Reichtum der 7 Westschweizer Kantone sichtbar zu machen. Ob Sie eine authentische Alphütte im Wallis, ein trendiges Bistro in Lausanne oder ein Sternerestaurant in Genf suchen — wir begleiten Sie.",
+        "Die Westschweiz steckt voller aussergewöhnlicher Restaurants, doch es ist nicht immer einfach, sie zu finden. Just-Tag.app hat es sich zur Aufgabe gemacht, den gastronomischen Reichtum der 7 Westschweizer Kantone sichtbar zu machen. Ob Sie eine authentische Alphütte im Wallis, ein trendiges Bistro in Lausanne oder ein Sternerestaurant in Genf suchen — wir begleiten Sie.",
       howTitle: "So funktioniert's",
       dinersTitle: "Für Feinschmecker",
       dinersItems: [
@@ -116,16 +116,16 @@ export default async function AboutPage({
       ],
       ctaTitle: "Sind Sie Restaurantbesitzer?",
       ctaText:
-        "Treten Sie Just-Tag.ch bei und geben Sie Ihrem Restaurant die Sichtbarkeit, die es verdient. Die Anmeldung ist einfach und schnell.",
+        "Treten Sie Just-Tag.app bei und geben Sie Ihrem Restaurant die Sichtbarkeit, die es verdient. Die Anmeldung ist einfach und schnell.",
       ctaButton: "Mein Restaurant eintragen",
     },
     en: {
-      title: "About Just-Tag.ch",
+      title: "About Just-Tag.app",
       intro:
-        "Just-Tag.ch is a Western Swiss platform, built in the Romandie, for the Romandie. Our ambition is simple: help you discover the finest restaurants across Western Switzerland — from Lake Geneva to Lake Neuchatel, from Alpine peaks to the Lavaux vineyards.",
+        "Just-Tag.app is a Western Swiss platform, built in the Romandie, for the Romandie. Our ambition is simple: help you discover the finest restaurants across Western Switzerland — from Lake Geneva to Lake Neuchatel, from Alpine peaks to the Lavaux vineyards.",
       missionTitle: "Our mission",
       missionText:
-        "Western Switzerland is home to exceptional restaurants, but they are not always easy to find. Just-Tag.ch's mission is to showcase the gastronomic richness of the 7 Romand cantons. Whether you're looking for an authentic Alpine chalet in Valais, a trendy bistro in Lausanne, or a Michelin-starred table in Geneva, we're here to guide you.",
+        "Western Switzerland is home to exceptional restaurants, but they are not always easy to find. Just-Tag.app's mission is to showcase the gastronomic richness of the 7 Romand cantons. Whether you're looking for an authentic Alpine chalet in Valais, a trendy bistro in Lausanne, or a Michelin-starred table in Geneva, we're here to guide you.",
       howTitle: "How it works",
       dinersTitle: "For diners",
       dinersItems: [
@@ -159,7 +159,7 @@ export default async function AboutPage({
       ],
       ctaTitle: "Are you a restaurant owner?",
       ctaText:
-        "Join Just-Tag.ch and give your restaurant the visibility it deserves. Registration is simple and fast.",
+        "Join Just-Tag.app and give your restaurant the visibility it deserves. Registration is simple and fast.",
       ctaButton: "Register my restaurant",
     },
   };

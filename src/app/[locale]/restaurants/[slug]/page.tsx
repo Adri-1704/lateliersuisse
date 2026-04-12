@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/supabase/types";
 import type { RestaurantPromotion } from "@/data/mock-restaurants";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
 // Placeholder images for restaurants without cover images
 const placeholderImages = [

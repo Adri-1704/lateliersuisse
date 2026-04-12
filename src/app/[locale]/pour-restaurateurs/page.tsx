@@ -11,7 +11,7 @@ import { B2BPricing } from "@/components/b2b/B2BPricing";
 import { B2BContactForm } from "@/components/b2b/B2BContactForm";
 import { B2BFAQ } from "@/components/b2b/B2BFAQ";
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
 export async function generateMetadata({
   params,

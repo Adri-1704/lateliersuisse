@@ -15,7 +15,7 @@ const outfit = Outfit({
   variable: "--font-geist-sans",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.ch";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
 export async function generateMetadata({
   params,
@@ -31,7 +31,7 @@ export async function generateMetadata({
   return {
     title: {
       default: title,
-      template: `%s | Just-Tag.ch`,
+      template: `%s | Just-Tag.app`,
     },
     description,
     metadataBase: new URL(baseUrl),
@@ -49,7 +49,7 @@ export async function generateMetadata({
       title,
       description,
       url: `${baseUrl}/${locale}`,
-      siteName: "Just-Tag.ch",
+      siteName: "Just-Tag.app",
       locale: locale === "fr" ? "fr_CH" : locale === "de" ? "de_CH" : locale === "pt" ? "pt_PT" : locale === "es" ? "es_ES" : "en",
       type: "website",
       images: [
@@ -101,11 +101,11 @@ export default async function LocaleLayout({
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Just-Tag.ch",
+    name: "Just-Tag.app",
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     description:
-      "Just-Tag.ch est l'annuaire de reference pour decouvrir les meilleurs restaurants de Suisse Romande. Trouvez des restaurants par ville, cuisine et avis.",
+      "Just-Tag.app est l'annuaire de reference pour decouvrir les meilleurs restaurants de Suisse Romande. Trouvez des restaurants par ville, cuisine et avis.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "CH",
@@ -117,7 +117,7 @@ export default async function LocaleLayout({
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Just-Tag.ch",
+    name: "Just-Tag.app",
     url: baseUrl,
     description:
       "Annuaire des meilleurs restaurants de Suisse Romande — recherche par ville, type de cuisine et avis clients.",

@@ -81,7 +81,7 @@ export function MerchantSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="border-t px-6 py-3">
-        <p className="text-xs text-muted-foreground">Just-Tag.ch {t("sidebar.clientArea")}</p>
+        <p className="text-xs text-muted-foreground">Just-Tag.app {t("sidebar.clientArea")}</p>
       </SidebarFooter>
     </Sidebar>
   );

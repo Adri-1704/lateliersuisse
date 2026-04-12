@@ -6,7 +6,7 @@ import "../globals.css";
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-geist-sans" });
 
 export const metadata: Metadata = {
-  title: { default: "Administration | Just-Tag.ch", template: "%s | Admin Just-Tag" },
+  title: { default: "Administration | Just-Tag.app", template: "%s | Admin Just-Tag" },
   robots: { index: false, follow: false },
 };
 

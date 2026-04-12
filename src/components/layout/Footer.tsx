@@ -108,7 +108,7 @@ export function Footer({ locale }: { locale: string }) {
         {/* Bottom */}
         <div className="mt-12 border-t border-gray-800 pt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
           <p className="text-xs text-gray-500">
-            &copy; {new Date().getFullYear()} Just-Tag.ch. {t("copyright")}
+            &copy; {new Date().getFullYear()} Just-Tag.app. {t("copyright")}
           </p>
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span>{t("secureData")}</span>
