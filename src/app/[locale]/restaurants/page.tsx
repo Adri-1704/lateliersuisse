@@ -76,7 +76,7 @@ function RestaurantsContent() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 25;
+  const ITEMS_PER_PAGE = 24;
 
   // Fetch restaurants from Supabase
   useEffect(() => {
