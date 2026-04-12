@@ -75,6 +75,8 @@ function RestaurantsContent() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 25;
 
   // Fetch restaurants from Supabase
   useEffect(() => {
@@ -171,6 +173,19 @@ function RestaurantsContent() {
     return results;
   }, [searchParams, locale, restaurants]);
 
+  // Reset to page 1 when filters change
+  const prevFilteredCount = filteredRestaurants.length;
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchParams]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredRestaurants.length / ITEMS_PER_PAGE);
+  const paginatedRestaurants = filteredRestaurants.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Top bar */}
@@ -253,11 +268,52 @@ function RestaurantsContent() {
               <RestaurantMap restaurants={filteredRestaurants} locale={locale} />
             </div>
           ) : filteredRestaurants.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredRestaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {paginatedRestaurants.map((restaurant) => (
+                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === 1}
+                    onClick={() => { setCurrentPage(currentPage - 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  >
+                    {locale === "de" ? "Zurück" : locale === "en" ? "Previous" : "Précédent"}
+                  </Button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={page === currentPage ? "default" : "outline"}
+                      size="sm"
+                      className={page === currentPage ? "bg-[var(--color-just-tag)] text-white" : ""}
+                      onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={currentPage === totalPages}
+                    onClick={() => { setCurrentPage(currentPage + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  >
+                    {locale === "de" ? "Weiter" : locale === "en" ? "Next" : "Suivant"}
+                  </Button>
+                </div>
+              )}
+
+              <p className="mt-4 text-center text-sm text-gray-400">
+                {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredRestaurants.length)} / {filteredRestaurants.length}
+              </p>
+            </>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="text-5xl">🍽️</div>
