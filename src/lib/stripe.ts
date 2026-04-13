@@ -15,6 +15,7 @@ export function getStripe(): Stripe {
       typescript: true,
       maxNetworkRetries: 3,
       timeout: 20000,
+      httpClient: Stripe.createFetchHttpClient(),
     });
   }
   return _stripe;
