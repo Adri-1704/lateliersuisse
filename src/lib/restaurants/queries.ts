@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import type { PriceRange } from "@/lib/supabase/types";
 
 // ---------------------------------------------------------------------------
@@ -177,7 +177,7 @@ export async function fetchFilteredRestaurants(
   totalCount: number;
 }> {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     let query = supabase
       .from("restaurants")
@@ -210,6 +210,32 @@ export async function fetchFilteredRestaurants(
 }
 
 // ---------------------------------------------------------------------------
+// Cuisine counts — for filtering out empty categories in dropdowns/grids
+// ---------------------------------------------------------------------------
+
+export async function fetchCuisineCounts(): Promise<Record<string, number>> {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("restaurants")
+      .select("cuisine_type")
+      .eq("is_published", true)
+      .not("cuisine_type", "is", null)
+      .neq("cuisine_type", "");
+
+    if (error || !data) return {};
+
+    const counts: Record<string, number> = {};
+    for (const row of data as { cuisine_type: string }[]) {
+      counts[row.cuisine_type] = (counts[row.cuisine_type] || 0) + 1;
+    }
+    return counts;
+  } catch {
+    return {};
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Map-specific query — all matching restaurants, minimal columns
 // ---------------------------------------------------------------------------
 
@@ -217,7 +243,7 @@ export async function fetchAllFilteredForMap(
   filters: RestaurantFilters
 ): Promise<RestaurantMapItem[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     let query = supabase
       .from("restaurants")
