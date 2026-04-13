@@ -44,10 +44,10 @@ export function B2BProblemSolution() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Vous avez un super restaurant.
+            Vous avez un super restaurant,
             <br />
             <span className="text-[var(--color-just-tag)]">
-              Le probleme, c&apos;est que personne ne le sait.
+              à nous de le mettre en lumière.
             </span>
           </h2>
         </div>
