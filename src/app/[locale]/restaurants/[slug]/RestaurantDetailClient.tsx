@@ -334,13 +334,46 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
         <span className="text-gray-900 font-medium truncate">{name}</span>
       </nav>
 
-      {/* Restaurant Name Banner */}
+      {/* Restaurant Name Banner - toujours en premier */}
       <div className="relative h-48 md:h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
-        <div className="absolute inset-0 opacity-10">
-          <svg className="h-full w-full" viewBox="0 0 200 100" preserveAspectRatio="none"><pattern id="detail-pattern" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M10 0v20M0 10h20" stroke="white" strokeWidth="0.3" fill="none"/></pattern><rect width="200" height="100" fill="url(#detail-pattern)"/></svg>
-        </div>
         <h2 className="relative z-10 px-8 text-center text-3xl md:text-5xl font-bold text-white leading-tight">{name}</h2>
       </div>
+
+      {/* Photos ajoutées par le restaurateur (si disponibles) */}
+      {restaurant.images && restaurant.images.length > 0 && (
+        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+          {restaurant.images.slice(0, 8).map((img, i) => (
+            <div
+              key={i}
+              className="relative aspect-square overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
+            >
+              <Image
+                src={img}
+                alt={`${name} photo ${i + 1}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              />
+              {i === 7 && restaurant.images.length > 8 && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold text-lg">
+                  +{restaurant.images.length - 8}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxOpen && restaurant.images && restaurant.images.length > 0 && (
+        <PhotoLightbox
+          images={restaurant.images}
+          initialIndex={lightboxIndex}
+          name={name}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
 
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Main Content */}
