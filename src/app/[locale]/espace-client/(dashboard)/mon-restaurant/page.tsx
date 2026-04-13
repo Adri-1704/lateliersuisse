@@ -20,11 +20,7 @@ const DAY_LABELS: Record<string, string> = {
 };
 
 const CANTONS = [
-  "geneve", "vaud", "valais", "fribourg", "neuchatel", "jura",
-  "berne", "zurich", "bale-ville", "bale-campagne", "lucerne", "argovie",
-  "soleure", "schwyz", "zoug", "uri", "obwald", "nidwald",
-  "glaris", "schaffhouse", "thurgovie", "appenzell-rh-ext", "appenzell-rh-int",
-  "saint-gall", "grisons", "tessin",
+  "geneve", "vaud", "valais", "fribourg", "neuchatel", "jura", "berne",
 ];
 
 export default function MyRestaurantPage() {
