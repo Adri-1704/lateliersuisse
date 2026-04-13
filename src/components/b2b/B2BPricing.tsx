@@ -177,9 +177,6 @@ export function B2BPricing() {
           <p className="text-base sm:text-lg font-semibold">
             Tarifs préférentiels réservés aux <strong>100 premiers restaurants inscrits</strong>
           </p>
-          <p className="mt-1 text-sm text-white/90">
-            Profitez d&apos;une réduction exceptionnelle - Plus que quelques places disponibles
-          </p>
         </div>
 
         {/* Included in all plans */}
