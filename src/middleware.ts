@@ -3,6 +3,22 @@ import { createServerClient } from "@supabase/ssr";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
+/**
+ * Parse the ADMIN_EMAILS env var into a Set of lowercase emails.
+ * Duplicated here because middleware runs at the Edge and cannot import
+ * from lib/admin.ts which may use Node-only APIs (createAdminClient).
+ */
+function getAdminEmailWhitelist(): Set<string> {
+  const raw = process.env.ADMIN_EMAILS || "";
+  if (!raw.trim()) return new Set();
+  return new Set(
+    raw
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
@@ -49,6 +65,17 @@ export async function middleware(request: NextRequest) {
 
     if (!user) {
       return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+
+    // ── Admin role check (C1 fix) ──
+    // At the Edge we can only check the email whitelist.
+    // The Server Component layout performs a deeper check (profiles.is_admin).
+    const adminEmails = getAdminEmailWhitelist();
+    const userEmail = (user.email || "").toLowerCase();
+
+    if (adminEmails.size > 0 && !adminEmails.has(userEmail)) {
+      // User is authenticated but not an admin — redirect to homepage
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     return response;

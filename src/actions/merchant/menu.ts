@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { assertMerchantOwnsMenuItem } from "@/lib/merchant-auth";
 import type { DbMenuItem } from "@/lib/supabase/types";
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -138,11 +139,9 @@ export async function updateMenuItem(
   item: Partial<MenuItemData>
 ): Promise<{ success: boolean; error: string | null }> {
   try {
-    // If restaurant_id is provided, verify ownership
-    if (item.restaurant_id) {
-      const isOwner = await verifyRestaurantOwnership(item.restaurant_id);
-      if (!isOwner) return { success: false, error: "Accès non autorisé" };
-    }
+    // ── Ownership check — always verify via menu item ID (C2 fix) ──
+    const authCheck = await assertMerchantOwnsMenuItem(id);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
 
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -161,6 +160,10 @@ export async function deleteMenuItem(
   id: string
 ): Promise<{ success: boolean; error: string | null }> {
   try {
+    // ── Ownership check (C2 fix) ──
+    const authCheck = await assertMerchantOwnsMenuItem(id);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
+
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin.from("menu_items") as any)
@@ -234,6 +237,10 @@ export async function deleteMenuItemImage(
   menuItemId: string
 ): Promise<{ success: boolean; error: string | null }> {
   try {
+    // ── Ownership check (C2 fix) ──
+    const authCheck = await assertMerchantOwnsMenuItem(menuItemId);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
+
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin.from("menu_items") as any)

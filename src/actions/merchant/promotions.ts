@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { assertMerchantOwnsPromotion } from "@/lib/merchant-auth";
 import type { DbPromotion } from "@/lib/supabase/types";
 
 export interface PromotionData {
@@ -125,10 +126,9 @@ export async function updatePromotion(
   item: Partial<PromotionData>
 ): Promise<{ success: boolean; error: string | null }> {
   try {
-    if (item.restaurant_id) {
-      const isOwner = await verifyRestaurantOwnership(item.restaurant_id);
-      if (!isOwner) return { success: false, error: "Accès non autorisé" };
-    }
+    // ── Ownership check — always verify via promotion ID (C2 fix) ──
+    const authCheck = await assertMerchantOwnsPromotion(id);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
 
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -147,6 +147,10 @@ export async function deletePromotion(
   id: string
 ): Promise<{ success: boolean; error: string | null }> {
   try {
+    // ── Ownership check (C2 fix) ──
+    const authCheck = await assertMerchantOwnsPromotion(id);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
+
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin.from("restaurant_promotions") as any)
@@ -165,6 +169,10 @@ export async function togglePromotion(
   isActive: boolean
 ): Promise<{ success: boolean; error: string | null }> {
   try {
+    // ── Ownership check (C2 fix) ──
+    const authCheck = await assertMerchantOwnsPromotion(id);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
+
     const admin = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin.from("restaurant_promotions") as any)

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { handleSubscriptionWebhook } from "@/actions/subscriptions";
+import { createAdminClient } from "@/lib/supabase/server";
 
 /**
  * Stripe Webhook Handler
@@ -43,7 +44,31 @@ export async function POST(request: NextRequest) {
       event = JSON.parse(body);
     }
 
-    console.log(`Stripe webhook: ${event.type}`, { id: event.id });
+    console.log(`Stripe webhook: ${event.type}`);
+
+    // ── Event-level idempotence (C3 fix) ──
+    // Check if we already processed this Stripe event ID
+    try {
+      const supabase = createAdminClient();
+      const { data: existingEvent } = await supabase
+        .from("stripe_events" as string)
+        .select("id")
+        .eq("id", event.id)
+        .maybeSingle();
+
+      if (existingEvent) {
+        console.log(`[Stripe Webhook] Event ${event.id} already processed — skipping.`);
+        return NextResponse.json({ received: true, deduplicated: true });
+      }
+
+      // Record this event as processed
+      await (supabase.from("stripe_events" as string) as ReturnType<typeof supabase.from>)
+        .insert({ id: event.id, event_type: event.type });
+    } catch (dedupeErr) {
+      // If stripe_events table doesn't exist yet, continue processing
+      // (the subscription-level idempotence in handleSubscriptionWebhook is the fallback)
+      console.warn("[Stripe Webhook] Event dedup check failed (table may not exist yet):", dedupeErr);
+    }
 
     // Handle the event
     switch (event.type) {

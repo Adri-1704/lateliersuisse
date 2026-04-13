@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { assertMerchantOwnsImage, assertMerchantOwnsAllImages } from "@/lib/merchant-auth";
 import type { RestaurantImage } from "@/lib/supabase/types";
 
 const MAX_IMAGES = 10;
@@ -175,6 +176,10 @@ export async function deleteImage(imageId: string): Promise<{
   error: string | null;
 }> {
   try {
+    // ── Ownership check (C2 fix) ──
+    const authCheck = await assertMerchantOwnsImage(imageId);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
+
     const admin = createAdminClient();
 
     // Get image URL to delete from storage
@@ -235,6 +240,10 @@ export async function reorderImages(
   imageIds: string[]
 ): Promise<{ success: boolean; error: string | null }> {
   try {
+    // ── Ownership check (C2 fix) ──
+    const authCheck = await assertMerchantOwnsAllImages(imageIds);
+    if (!authCheck.authorized) return { success: false, error: authCheck.error };
+
     const admin = createAdminClient();
 
     // Update each image position in parallel

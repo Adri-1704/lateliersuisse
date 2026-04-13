@@ -33,6 +33,7 @@ export interface Subscription {
   id: string;
   merchant_id: string;
   stripe_subscription_id: string | null;
+  stripe_checkout_session_id: string | null;
   plan_type: SubscriptionPlan;
   status: SubscriptionStatus;
   current_period_start: string | null;
@@ -233,7 +234,7 @@ export interface Database {
       };
       subscriptions: {
         Row: Subscription;
-        Insert: Omit<Subscription, "id" | "created_at" | "updated_at"> & { id?: string };
+        Insert: Omit<Subscription, "id" | "created_at" | "updated_at" | "stripe_checkout_session_id"> & { id?: string; stripe_checkout_session_id?: string | null };
         Update: Partial<Omit<Subscription, "id">>;
         Relationships: [];
       };

@@ -354,20 +354,30 @@ export async function handleSubscriptionWebhook(
           }
         }
 
-        // ── Create subscription record ──
+        // ── Create subscription record (idempotent — C3 fix) ──
         const isEarlyBird = metadata.is_early_bird === "true" || metadata.early_bird === "true";
         const planType = metadata.plan_type || (isLifetime ? "lifetime" : "monthly");
+        const checkoutSessionId: string = data.id; // cs_xxx — unique per checkout
 
-        if (isLifetime) {
-          // Lifetime: one-time payment → subscription record with status active, no period end
+        // Skip if we already processed this checkout session (idempotence guard)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: existingSub } = await (supabase.from("subscriptions") as any)
+          .select("id")
+          .eq("stripe_checkout_session_id", checkoutSessionId)
+          .maybeSingle();
+
+        if (existingSub) {
+          console.log(`[Webhook] Subscription for checkout ${checkoutSessionId} already exists — skipping (idempotent).`);
+        } else if (isLifetime) {
+          // Lifetime: one-time payment -> subscription record with status active, no period end
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await (supabase.from("subscriptions") as any).insert({
             merchant_id: merchant.id,
             stripe_subscription_id: data.payment_intent || data.id,
+            stripe_checkout_session_id: checkoutSessionId,
             plan_type: "lifetime",
             status: "active",
             is_early_bird: isEarlyBird,
-            stripe_price_id: data.amount_total ? undefined : undefined, // price in line_items, not directly available
             current_period_start: new Date().toISOString(),
             current_period_end: "2099-12-31T23:59:59.000Z",
           });
@@ -377,6 +387,7 @@ export async function handleSubscriptionWebhook(
           await (supabase.from("subscriptions") as any).insert({
             merchant_id: merchant.id,
             stripe_subscription_id: data.subscription || data.payment_intent,
+            stripe_checkout_session_id: checkoutSessionId,
             plan_type: planType,
             status: "active",
             is_early_bird: isEarlyBird,
