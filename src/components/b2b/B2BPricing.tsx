@@ -288,12 +288,20 @@ export function B2BPricing() {
                   </div>
                 )}
 
-                {/* Features */}
+                {/* Features - identiques pour tous les plans */}
                 <ul className="mt-5 space-y-3">
-                  {plan.features.map((feature) => (
+                  {[
+                    "Fiche complète",
+                    "Photos",
+                    "Vidéo de présentation",
+                    "Menus",
+                    "Contact",
+                    "Localisation",
+                    "Offres du moment",
+                  ].map((feature) => (
                     <li key={feature} className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 shrink-0 text-[var(--color-just-tag)]" />
-                      <span className="text-gray-700">{t(`features.${feature}`)}</span>
+                      <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}
                 </ul>
