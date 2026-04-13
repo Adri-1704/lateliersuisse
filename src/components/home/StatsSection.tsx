@@ -40,7 +40,7 @@ export function StatsSection({ totalRestaurants }: StatsSectionProps) {
   const stats = [
     { icon: UtensilsCrossed, target: totalRestaurants, suffix: "+", label: t("restaurants") },
     { icon: MapPin, target: 7, suffix: "", label: t("cantons") },
-    { icon: Star, target: 15000, suffix: "+", label: t("reviews") },
+    { icon: Star, target: 1488, suffix: "+", label: t("reviews") },
     { icon: ChefHat, target: 40, suffix: "+", label: t("cuisines") },
   ];
 

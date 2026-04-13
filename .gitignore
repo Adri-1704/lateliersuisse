@@ -48,3 +48,4 @@ supabase/.branches/
 scripts/apply-migrations.mjs
 .env.local.save
 scripts/
+.env*.local

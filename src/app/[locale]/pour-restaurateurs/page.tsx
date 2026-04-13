@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { getEarlyBirdSpotsRemaining } from "@/lib/subscriptions/queries";
+import { B2BEarlyBirdBanner } from "@/components/b2b/B2BEarlyBirdBanner";
 import { B2BHero } from "@/components/b2b/B2BHero";
 import { B2BTrustStats } from "@/components/b2b/B2BTrustStats";
-import { B2BSwissAdvantage } from "@/components/b2b/B2BSwissAdvantage";
-import { B2BAdvantages } from "@/components/b2b/B2BAdvantages";
-import { B2BHowItWorks } from "@/components/b2b/B2BHowItWorks";
-import { B2BTestimonials } from "@/components/b2b/B2BTestimonials";
+import { B2BProblemSolution } from "@/components/b2b/B2BProblemSolution";
+import { B2BFeatures } from "@/components/b2b/B2BFeatures";
 import { B2BPricing } from "@/components/b2b/B2BPricing";
-import { B2BContactForm } from "@/components/b2b/B2BContactForm";
+import { B2BFindRestaurant } from "@/components/b2b/B2BFindRestaurant";
 import { B2BFAQ } from "@/components/b2b/B2BFAQ";
+import { B2BFinalCTA } from "@/components/b2b/B2BFinalCTA";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -19,18 +19,21 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "b2b" });
 
   const titles: Record<string, string> = {
-    fr: "Pour les restaurateurs - Developpez votre restaurant",
-    de: "Fuer Restaurantbesitzer - Entwickeln Sie Ihr Restaurant",
-    en: "For restaurant owners - Grow your restaurant",
+    fr: "Pour les restaurateurs — Remplissez vos tables sans commission",
+    de: "Fuer Restaurantbesitzer — Fuellen Sie Ihre Tische ohne Provision",
+    en: "For restaurant owners — Fill your tables without commission",
+    pt: "Para restauradores — Encha as suas mesas sem comissao",
+    es: "Para restauradores — Llene sus mesas sin comision",
   };
 
   const descriptions: Record<string, string> = {
-    fr: "Rejoignez Just-Tag, la plateforme de reference pour les restaurants en Suisse. Visibilite, avis clients, outils marketing. A partir de CHF 49/mois.",
-    de: "Treten Sie Just-Tag bei, der fuehrenden Plattform fuer Restaurants in der Schweiz. Sichtbarkeit, Kundenbewertungen, Marketing-Tools. Ab CHF 49/Monat.",
-    en: "Join Just-Tag, the leading platform for restaurants in Switzerland. Visibility, customer reviews, marketing tools. From CHF 49/month.",
+    fr: "Rejoignez Just-Tag : 500+ restaurants romands, 1 488 avis verifies, zero commission. A partir de CHF 24.90/mois avec 14 jours d'essai gratuit.",
+    de: "Treten Sie Just-Tag bei: 500+ Westschweizer Restaurants, 1 488 verifizierte Bewertungen, keine Provision. Ab CHF 24.90/Monat mit 14 Tagen Probezeit.",
+    en: "Join Just-Tag: 500+ Western Swiss restaurants, 1,488 verified reviews, zero commission. From CHF 24.90/month with 14-day free trial.",
+    pt: "Junte-se ao Just-Tag: 500+ restaurantes da Suica Romanda, 1 488 avaliacoes verificadas, zero comissao. A partir de CHF 24.90/mes com 14 dias gratis.",
+    es: "Unase a Just-Tag: 500+ restaurantes de la Suiza Romanda, 1 488 resenas verificadas, cero comision. Desde CHF 24.90/mes con 14 dias de prueba gratis.",
   };
 
   return {
@@ -53,14 +56,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function PourRestaurateursPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "b2b.faq" });
-
+export default async function PourRestaurateursPage() {
   // Fetch real restaurant count
   let totalRestaurants = 0;
   try {
@@ -74,17 +70,30 @@ export default async function PourRestaurateursPage({
     // Fallback to 0 if Supabase is unavailable
   }
 
-  // FAQPage structured data (Schema.org)
-  const faqKeys = ["q1", "q2", "q3", "q4", "q5", "q6"];
+  // Fetch Early Bird spots remaining
+  const spotsRemaining = await getEarlyBirdSpotsRemaining();
+
+  // FAQ structured data (Schema.org)
+  const faqItems = [
+    { q: "Combien ca me rapporte concretement ?", a: "A CHF 24.90/mois, il suffit d'un seul client supplementaire par mois pour rentabiliser votre abonnement." },
+    { q: "Comment vous verifiez que je suis bien le proprietaire ?", a: "Notre equipe verifie manuellement que les informations correspondent avant d'activer votre acces." },
+    { q: "Je peux annuler quand je veux ?", a: "Oui. Le plan mensuel est sans engagement. Vous annulez depuis votre espace client." },
+    { q: "Vous prenez une commission sur mes reservations ?", a: "Non. Zero commission, zero frais de transaction." },
+    { q: "Mes donnees appartiennent a qui ?", a: "A vous. Hebergement en Suisse, conforme LPD et RGPD." },
+    { q: "Quelle difference avec les plateformes a commission ?", a: "Just-Tag combine fiche professionnelle, avis verifies, zero commission et SEO local en 5 langues." },
+    { q: "Je peux essayer gratuitement ?", a: "Oui. Tous les plans incluent 14 jours d'essai gratuit via Stripe." },
+    { q: "Que se passe-t-il apres les 14 jours ?", a: "Votre abonnement demarre automatiquement. Annulation possible a tout moment sur le plan mensuel." },
+  ];
+
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: faqKeys.map((key) => ({
+    mainEntity: faqItems.map((item) => ({
       "@type": "Question",
-      name: t(`${key}.question`),
+      name: item.q,
       acceptedAnswer: {
         "@type": "Answer",
-        text: t(`${key}.answer`),
+        text: item.a,
       },
     })),
   };
@@ -95,15 +104,15 @@ export default async function PourRestaurateursPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <B2BHero />
+      <B2BEarlyBirdBanner spotsRemaining={spotsRemaining} />
+      <B2BHero totalRestaurants={totalRestaurants} />
       <B2BTrustStats totalRestaurants={totalRestaurants} />
-      <B2BSwissAdvantage />
-      <B2BAdvantages />
-      <B2BHowItWorks />
-      <B2BTestimonials />
-      <B2BPricing />
-      <B2BContactForm />
+      <B2BProblemSolution />
+      <B2BFeatures />
+      <B2BPricing spotsRemaining={spotsRemaining} />
+      <B2BFindRestaurant />
       <B2BFAQ />
+      <B2BFinalCTA spotsRemaining={spotsRemaining} />
     </>
   );
 }

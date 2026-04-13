@@ -1,12 +1,159 @@
 "use server";
 
-import { getStripe, PLAN_PRICES, getPriceId, TRIAL_DAYS } from "@/lib/stripe";
+import { getStripe, getPriceId, TRIAL_DAYS, EARLY_BIRD_LIMIT } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { paymentConfirmation, merchantWelcome, freeTrialWelcome, freeTrialAdminNotification } from "@/lib/email-templates";
 import { createServerClient } from "@supabase/ssr";
 
+// ────────────────────────────────────────────────────────────────────────────
+// Early Bird seats counter (used by signup flow + landing page)
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Returns how many Early Bird seats are still available (out of 100).
+ * Counts subscriptions with is_early_bird = true AND status active/trialing.
+ */
+export async function getEarlyBirdSeatsAvailable(): Promise<number> {
+  try {
+    const supabase = createAdminClient();
+    const { count } = await supabase
+      .from("subscriptions")
+      .select("id", { count: "exact", head: true })
+      .eq("is_early_bird", true)
+      .in("status", ["active", "trialing"]);
+
+    const taken = count || 0;
+    return Math.max(0, EARLY_BIRD_LIMIT - taken);
+  } catch {
+    // If query fails, assume seats available (don't block sales)
+    return EARLY_BIRD_LIMIT;
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Checkout session (unified: subscription + lifetime)
+// ────────────────────────────────────────────────────────────────────────────
+
 interface CreateCheckoutParams {
+  planType: "monthly" | "semiannual" | "annual" | "lifetime";
+  merchantId: string;
+  locale: string;
+  restaurantId?: string;
+}
+
+interface CheckoutResult {
+  url: string | null;
+  error: string | null;
+}
+
+/**
+ * Create a Stripe Checkout session for an EXISTING merchant.
+ * - Subscriptions (monthly/semiannual/annual) -> mode "subscription" with 14-day trial
+ * - Lifetime -> mode "payment" (one-time)
+ * The merchant must already exist in DB (created during signup step).
+ */
+export async function createCheckoutSession(
+  params: CreateCheckoutParams
+): Promise<CheckoutResult> {
+  const { planType, merchantId, locale, restaurantId } = params;
+
+  try {
+    // If Stripe is not configured, return placeholder
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.log(
+        `[Stripe] Not configured. Placeholder checkout for merchant ${merchantId} — Plan: ${planType}`
+      );
+      return {
+        url: `/${locale}/espace-client`,
+        error: null,
+      };
+    }
+
+    const stripe = getStripe();
+    const supabase = createAdminClient();
+
+    // Get merchant email for Stripe customer_email
+    const { data: merchant } = await supabase
+      .from("merchants")
+      .select("email, name")
+      .eq("id", merchantId)
+      .single() as { data: { email: string; name: string } | null; error: unknown };
+
+    if (!merchant) {
+      return { url: null, error: "Marchand introuvable" };
+    }
+
+    // Count active subscribers to determine Early Bird eligibility
+    const { count } = await supabase
+      .from("subscriptions")
+      .select("id", { count: "exact", head: true })
+      .eq("is_early_bird", true)
+      .in("status", ["active", "trialing"]);
+
+    const subscriberCount = count || 0;
+    const isEarlyBird = subscriberCount < EARLY_BIRD_LIMIT;
+    const priceId = getPriceId(planType, subscriberCount);
+
+    if (!priceId) {
+      return { url: null, error: "Plan invalide ou prix Stripe non configuré" };
+    }
+
+    const isLifetime = planType === "lifetime";
+
+    const metadata: Record<string, string> = {
+      merchant_id: merchantId,
+      plan_type: planType,
+      locale: locale,
+      is_early_bird: isEarlyBird ? "true" : "false",
+    };
+    if (restaurantId) {
+      metadata.restaurant_id = restaurantId;
+    }
+
+    const stripeLocale =
+      locale === "fr" ? "fr"
+        : locale === "de" ? "de"
+          : locale === "pt" ? "pt"
+            : locale === "es" ? "es"
+              : "en";
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sessionParams: any = {
+      mode: isLifetime ? "payment" : "subscription",
+      payment_method_types: ["card"],
+      customer_email: merchant.email,
+      line_items: [{ price: priceId, quantity: 1 }],
+      metadata,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/espace-client?checkout=success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription?step=plan&canceled=1`,
+      locale: stripeLocale,
+    };
+
+    // Only add trial for subscriptions (not lifetime)
+    if (!isLifetime) {
+      sessionParams.subscription_data = {
+        trial_period_days: TRIAL_DAYS,
+        metadata,
+      };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
+
+    return { url: session.url, error: null };
+  } catch (error) {
+    console.error("Checkout error:", error);
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    return { url: null, error: `Erreur Stripe: ${msg}` };
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Legacy: createCheckoutSession for B2BPricing (backwards-compatible)
+// Kept for transition period — will be removed once B2BPricing redirects
+// ────────────────────────────────────────────────────────────────────────────
+
+interface LegacyCheckoutParams {
   planType: "monthly" | "semiannual" | "annual";
   merchantName: string;
   merchantEmail: string;
@@ -16,39 +163,30 @@ interface CreateCheckoutParams {
   locale: string;
 }
 
-interface CheckoutResult {
-  url: string | null;
-  error: string | null;
-}
-
 /**
- * Create a Stripe Checkout session for merchant subscription.
- * Falls back to a placeholder URL when Stripe is not configured.
+ * @deprecated Use the new createCheckoutSession with merchantId instead.
+ * Kept for B2BPricing backward compatibility during transition.
  */
-export async function createCheckoutSession(
-  params: CreateCheckoutParams
+export async function createLegacyCheckoutSession(
+  params: LegacyCheckoutParams
 ): Promise<CheckoutResult> {
   const { planType, merchantEmail, locale } = params;
 
   try {
-    // If Stripe is not configured, return placeholder
     if (!process.env.STRIPE_SECRET_KEY) {
-      console.log(
-        `[Stripe] Not configured. Placeholder checkout for ${merchantEmail} — Plan: ${planType}`
-      );
       return {
-        url: `/${locale}/partenaire-inscription/succes`,
+        url: `/${locale}/partenaire-inscription`,
         error: null,
       };
     }
 
     const stripe = getStripe();
-
-    // Count active subscribers to determine Early Bird eligibility
     const supabase = createAdminClient();
+
     const { count } = await supabase
       .from("subscriptions")
       .select("id", { count: "exact", head: true })
+      .eq("is_early_bird", true)
       .in("status", ["active", "trialing"]);
 
     const subscriberCount = count || 0;
@@ -62,12 +200,7 @@ export async function createCheckoutSession(
       mode: "subscription",
       payment_method_types: ["card"],
       customer_email: merchantEmail,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       subscription_data: {
         trial_period_days: TRIAL_DAYS,
       },
@@ -78,19 +211,15 @@ export async function createCheckoutSession(
         restaurant_city: params.restaurantCity,
         plan_type: planType,
         locale: locale,
-        early_bird: subscriberCount < 100 ? "true" : "false",
+        early_bird: subscriberCount < EARLY_BIRD_LIMIT ? "true" : "false",
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription/succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription`,
       locale:
-        locale === "fr"
-          ? "fr"
-          : locale === "de"
-            ? "de"
-            : locale === "pt"
-              ? "pt"
-              : locale === "es"
-                ? "es"
+        locale === "fr" ? "fr"
+          : locale === "de" ? "de"
+            : locale === "pt" ? "pt"
+              : locale === "es" ? "es"
                 : "en",
     });
 
@@ -105,6 +234,10 @@ export async function createCheckoutSession(
 /**
  * Handle Stripe webhook events for subscription lifecycle.
  * Called from /api/webhooks/stripe/route.ts
+ *
+ * PR 2 change: merchant must already exist (created during signup).
+ * The webhook reads metadata.merchant_id to link the subscription.
+ * Falls back to legacy flow (create merchant from email) for old sessions.
  */
 export async function handleSubscriptionWebhook(
   eventType: string,
@@ -115,39 +248,61 @@ export async function handleSubscriptionWebhook(
     case "checkout.session.completed": {
       console.log("Checkout completed:", data.id);
 
-      // Create merchant + subscription in Supabase
       try {
         const supabase = createAdminClient();
-        const metadata = data.metadata;
+        const metadata = data.metadata || {};
+        const isLifetime = data.mode === "payment";
+        const merchantId = metadata.merchant_id;
 
-        // Create merchant
+        // ── Resolve merchant ──
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: merchant } = await (supabase.from("merchants") as any)
-          .upsert(
-            {
-              email: data.customer_email,
-              name: metadata.merchant_name,
-              phone: metadata.merchant_phone,
-              stripe_customer_id: data.customer,
-            },
-            { onConflict: "email" }
-          )
-          .select()
-          .single();
+        let merchant: any = null;
 
-        if (merchant) {
-          // Create subscription
+        if (merchantId) {
+          // New flow: merchant already exists
+          const { data: existing } = await supabase
+            .from("merchants")
+            .select("*")
+            .eq("id", merchantId)
+            .single();
+          merchant = existing;
+
+          if (!merchant) {
+            console.warn(`[Webhook] merchant_id ${merchantId} from metadata not found in DB — skipping.`);
+            return;
+          }
+
+          // Update stripe_customer_id if not yet set
+          if (!merchant.stripe_customer_id && data.customer) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase.from("merchants") as any)
+              .update({ stripe_customer_id: data.customer })
+              .eq("id", merchant.id);
+          }
+        } else {
+          // Legacy flow (B2BPricing without signup): upsert merchant from email
+          console.log("[Webhook] No merchant_id in metadata — using legacy flow (upsert by email)");
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.from("subscriptions") as any).insert({
-            merchant_id: merchant.id,
-            stripe_subscription_id:
-              data.subscription || data.payment_intent,
-            plan_type: metadata.plan_type,
-            status: "active",
-            current_period_start: new Date().toISOString(),
-          });
+          const { data: upserted } = await (supabase.from("merchants") as any)
+            .upsert(
+              {
+                email: data.customer_email,
+                name: metadata.merchant_name || data.customer_email,
+                phone: metadata.merchant_phone || null,
+                stripe_customer_id: data.customer,
+              },
+              { onConflict: "email" }
+            )
+            .select()
+            .single();
+          merchant = upserted;
 
-          // Create Supabase Auth user for merchant portal access
+          if (!merchant) {
+            console.error("[Webhook] Failed to upsert merchant from email");
+            return;
+          }
+
+          // Legacy: create auth user + send welcome email (as before)
           try {
             const adminAuth = createServerClient(
               process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -155,14 +310,12 @@ export async function handleSubscriptionWebhook(
               { cookies: { getAll() { return []; }, setAll() {} } }
             );
 
-            // Create auth user with confirmed email
             const { data: authUser, error: authError } = await adminAuth.auth.admin.createUser({
               email: data.customer_email,
               email_confirm: true,
             });
 
             if (authError && authError.message?.includes("already been registered")) {
-              // User already exists — link to merchant
               const { data: existingUsers } = await adminAuth.auth.admin.listUsers();
               const existingUser = existingUsers?.users?.find((u: { email?: string }) => u.email === data.customer_email);
               if (existingUser) {
@@ -172,21 +325,16 @@ export async function handleSubscriptionWebhook(
                   .eq("id", merchant.id);
               }
             } else if (authUser?.user) {
-              // Link auth user to merchant
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               await (supabase.from("merchants") as any)
                 .update({ auth_user_id: authUser.user.id })
                 .eq("id", merchant.id);
 
-              // Generate password reset link
               const { data: linkData } = await adminAuth.auth.admin.generateLink({
                 type: "recovery",
                 email: data.customer_email,
               });
-
               const recoveryUrl = linkData?.properties?.action_link || "";
-
-              // Send welcome email with password setup link
               if (recoveryUrl && data.customer_email) {
                 const locale = metadata.locale || "fr";
                 const template = merchantWelcome(
@@ -198,44 +346,77 @@ export async function handleSubscriptionWebhook(
                   },
                   locale
                 );
-                await sendEmail({
-                  to: data.customer_email,
-                  subject: template.subject,
-                  html: template.html,
-                });
+                await sendEmail({ to: data.customer_email, subject: template.subject, html: template.html });
               }
             }
           } catch (authErr) {
-            console.error("Auth user creation error:", authErr);
+            console.error("Auth user creation error (legacy):", authErr);
           }
         }
+
+        // ── Create subscription record ──
+        const isEarlyBird = metadata.is_early_bird === "true" || metadata.early_bird === "true";
+        const planType = metadata.plan_type || (isLifetime ? "lifetime" : "monthly");
+
+        if (isLifetime) {
+          // Lifetime: one-time payment → subscription record with status active, no period end
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from("subscriptions") as any).insert({
+            merchant_id: merchant.id,
+            stripe_subscription_id: data.payment_intent || data.id,
+            plan_type: "lifetime",
+            status: "active",
+            is_early_bird: isEarlyBird,
+            stripe_price_id: data.amount_total ? undefined : undefined, // price in line_items, not directly available
+            current_period_start: new Date().toISOString(),
+            current_period_end: "2099-12-31T23:59:59.000Z",
+          });
+        } else {
+          // Subscription mode
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (supabase.from("subscriptions") as any).insert({
+            merchant_id: merchant.id,
+            stripe_subscription_id: data.subscription || data.payment_intent,
+            plan_type: planType,
+            status: "active",
+            is_early_bird: isEarlyBird,
+            current_period_start: new Date().toISOString(),
+          });
+        }
       } catch (err) {
-        console.error(
-          "Supabase error in checkout.session.completed:",
-          err
-        );
+        console.error("Supabase error in checkout.session.completed:", err);
       }
 
       // Send payment confirmation email
       try {
         const metadata = data.metadata || {};
         const locale = metadata.locale || "fr";
+
+        // For new flow, get merchant name from DB
+        let merchantName = metadata.merchant_name || "";
+        let restaurantName = metadata.restaurant_name || "";
+        if (metadata.merchant_id && !merchantName) {
+          const supabase = createAdminClient();
+          const { data: m } = await supabase
+            .from("merchants")
+            .select("name, email")
+            .eq("id", metadata.merchant_id)
+            .single() as { data: { name: string; email: string } | null; error: unknown };
+          if (m) merchantName = m.name;
+        }
+
         const template = paymentConfirmation(
           {
-            merchantName: metadata.merchant_name || "",
+            merchantName,
             merchantEmail: data.customer_email || "",
-            restaurantName: metadata.restaurant_name || "",
+            restaurantName,
             planType: metadata.plan_type || "",
           },
           locale
         );
 
         if (data.customer_email) {
-          await sendEmail({
-            to: data.customer_email,
-            subject: template.subject,
-            html: template.html,
-          });
+          await sendEmail({ to: data.customer_email, subject: template.subject, html: template.html });
         }
       } catch (err) {
         console.error("Email error in checkout.session.completed:", err);
@@ -318,7 +499,7 @@ export async function createFreeTrial(params: {
     if (merchantError) throw merchantError;
     const now = new Date();
     const trialEnd = new Date(now);
-    trialEnd.setDate(trialEnd.getDate() + 30);
+    trialEnd.setDate(trialEnd.getDate() + 14);
     const { error: subError } = await (supabase.from("subscriptions") as any).insert({
       merchant_id: merchant.id,
       plan_type: "monthly",

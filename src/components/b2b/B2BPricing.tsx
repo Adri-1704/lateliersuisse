@@ -1,15 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { Check, Gift, Star, Zap, ShieldCheck, Store, Camera, UtensilsCrossed, MapPin, Clock, Video, Crown, Infinity, Loader2, ArrowLeft, CreditCard } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Check, Gift, Zap, ShieldCheck, Store, Camera, UtensilsCrossed, MapPin, Clock, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { createCheckoutSession } from "@/actions/subscriptions";
-import { toast } from "sonner";
 
 const includedFeatures = [
   { key: "presence", icon: Store },
@@ -24,9 +20,8 @@ const earlyBirdPlans = [
   {
     id: "monthly",
     pricePerMonth: "29.95",
+    standardPrice: "49.95",
     totalPrice: null,
-    periodKey: "perMonth",
-    features: ["listing", "photos", "stats"],
     toteBags: null,
     badge: null,
     highlighted: false,
@@ -34,9 +29,8 @@ const earlyBirdPlans = [
   {
     id: "semiannual",
     pricePerMonth: "26.50",
+    standardPrice: "44.80",
     totalPrice: "159",
-    periodKey: "perSemester",
-    features: ["listing", "photos", "stats", "badge"],
     toteBags: 50,
     badge: null,
     highlighted: false,
@@ -44,42 +38,8 @@ const earlyBirdPlans = [
   {
     id: "annual",
     pricePerMonth: "24.90",
+    standardPrice: "41.60",
     totalPrice: "299",
-    periodKey: "perYear",
-    features: ["listing", "photos", "stats", "badge", "priority"],
-    toteBags: 100,
-    badge: "bestValue",
-    highlighted: true,
-  },
-];
-
-const standardPlans = [
-  {
-    id: "monthly",
-    pricePerMonth: "49.95",
-    totalPrice: null,
-    periodKey: "perMonth",
-    features: ["listing", "photos", "stats"],
-    toteBags: null,
-    badge: null,
-    highlighted: false,
-  },
-  {
-    id: "semiannual",
-    pricePerMonth: "44.80",
-    totalPrice: "269",
-    periodKey: "perSemester",
-    features: ["listing", "photos", "stats", "badge"],
-    toteBags: 50,
-    badge: null,
-    highlighted: false,
-  },
-  {
-    id: "annual",
-    pricePerMonth: "41.60",
-    totalPrice: "499",
-    periodKey: "perYear",
-    features: ["listing", "photos", "stats", "badge", "priority"],
     toteBags: 100,
     badge: "bestValue",
     highlighted: true,
@@ -92,61 +52,23 @@ const lifetimePlan = {
   features: ["listing", "photos", "stats", "badge", "priority", "support"],
 };
 
-const planIcons: Record<string, typeof Star> = {
-  monthly: Star,
-  semiannual: Zap,
-  annual: Crown,
-  lifetime: Infinity,
-};
+interface B2BPricingProps {
+  /** Number of Early Bird spots remaining. If not provided, defaults to 100 (shown as available). */
+  spotsRemaining?: number;
+}
 
-export function B2BPricing() {
+export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
   const t = useTranslations("b2b.pricing");
   const tMerchant = useTranslations("merchant");
   const params = useParams();
   const locale = params.locale as string;
-  const [activeTab, setActiveTab] = useState<"earlyBird" | "standard">("earlyBird");
+  const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const plans = earlyBirdPlans;
-
-  const selectedPlanData = selectedPlan === "lifetime"
-    ? { id: "lifetime", pricePerMonth: null, totalPrice: lifetimePlan.price, periodKey: "oneTime", features: lifetimePlan.features, toteBags: lifetimePlan.toteBags, badge: null, highlighted: false }
-    : plans.find((p) => p.id === selectedPlan);
 
   function handleSelectPlan(planId: string) {
     setSelectedPlan(planId);
-    setShowForm(true);
-    setTimeout(() => {
-      document.getElementById("b2b-signup-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 100);
-  }
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setFormError(null);
-    const formData = new FormData(e.currentTarget);
-
-    startTransition(async () => {
-      const res = await createCheckoutSession({
-        planType: (selectedPlan === "lifetime" ? "annual" : selectedPlan || "annual") as "monthly" | "semiannual" | "annual",
-        merchantName: formData.get("name") as string,
-        merchantEmail: formData.get("email") as string,
-        merchantPhone: formData.get("phone") as string,
-        restaurantName: formData.get("restaurantName") as string,
-        restaurantCity: formData.get("city") as string,
-        locale,
-      });
-
-      if (res.url) {
-        window.location.href = res.url;
-      } else {
-        setFormError(res.error || "Erreur lors de la création du paiement");
-        toast.error(res.error || "Erreur lors de la création du paiement");
-      }
-    });
+    const planParam = planId === "lifetime" ? "lifetime" : `${planId}_early`;
+    router.push(`/${locale}/partenaire-inscription?plan=${planParam}`);
   }
 
   return (
@@ -155,19 +77,19 @@ export function B2BPricing() {
         {/* Header */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            {t("title")}
+            Des prix clairs, sans surprise
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            {t("subtitle")}
+            Tous les plans incluent les memes fonctionnalites. La seule difference : la duree de l&apos;engagement et le prix.
           </p>
           {/* Guarantee badge */}
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ShieldCheck className="h-4 w-4" />
-            {t("guarantee")}
+            14 jours d&apos;essai gratuit — satisfait ou rembourse
           </div>
         </div>
 
-        {/* Bannière Early Bird */}
+        {/* Early Bird banner */}
         <div className="mt-10 rounded-2xl bg-gradient-to-r from-[var(--color-just-tag)] to-[var(--color-just-tag-dark)] p-6 text-center text-white shadow-lg">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Zap className="h-5 w-5" />
@@ -175,7 +97,9 @@ export function B2BPricing() {
             <Badge className="bg-white text-[var(--color-just-tag)] border-0 font-bold">-40%</Badge>
           </div>
           <p className="text-base sm:text-lg font-semibold">
-            Tarifs préférentiels réservés aux <strong>100 premiers restaurants inscrits</strong>
+            {spotsRemaining > 0
+              ? <>Offre de lancement : -40% pour les 100 premiers restaurants. Plus que <strong>{spotsRemaining}</strong> places disponibles. Ces tarifs ne reviendront pas.</>
+              : <>Offre Early Bird bientot terminee. Inscrivez-vous avant qu&apos;il ne soit trop tard.</>}
           </p>
         </div>
 
@@ -200,7 +124,7 @@ export function B2BPricing() {
 
         {/* Plans Grid */}
         <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {plans.map((plan) => {
+          {earlyBirdPlans.map((plan) => {
             const isSelected = selectedPlan === plan.id;
             return (
               <div
@@ -216,7 +140,7 @@ export function B2BPricing() {
               >
                 {plan.badge === "bestValue" && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--color-just-tag)] text-white border-0 px-3">
-                    {t("bestValue")}
+                    Meilleur rapport qualite-prix
                   </Badge>
                 )}
 
@@ -230,27 +154,19 @@ export function B2BPricing() {
                     <span className="text-3xl font-bold text-[var(--color-just-tag)]">
                       CHF {plan.pricePerMonth}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      {t("perMonthLabel")}
-                    </span>
+                    <span className="text-sm text-gray-500">/mois</span>
                   </div>
-                  {/* Standard price (struck-through) */}
-                  {(() => {
-                    const stdPlan = standardPlans.find(p => p.id === plan.id);
-                    return stdPlan ? (
-                      <div className="mt-1 flex items-baseline gap-2 text-sm">
-                        <span className="text-gray-400 line-through">CHF {stdPlan.pricePerMonth}/mois</span>
-                        <span className="font-semibold text-[var(--color-just-tag)]">après 100 inscrits</span>
-                      </div>
-                    ) : null;
-                  })()}
+                  <div className="mt-1 flex items-baseline gap-2 text-sm">
+                    <span className="text-gray-400 line-through">CHF {plan.standardPrice}/mois</span>
+                    <span className="font-semibold text-[var(--color-just-tag)]">apres 100 inscrits</span>
+                  </div>
                   {plan.totalPrice && (
                     <p className="mt-1 text-sm text-gray-500">
-                      {t("totalLabel", { price: plan.totalPrice })}
+                      soit CHF {plan.totalPrice} au total
                     </p>
                   )}
                   <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
-                    🎁 14 jours gratuits
+                    14 jours gratuits
                   </div>
                 </div>
 
@@ -259,17 +175,17 @@ export function B2BPricing() {
                   <div className="mt-3 flex items-center gap-2 rounded-lg bg-[var(--color-just-tag-light)] px-3 py-2">
                     <Gift className="h-4 w-4 shrink-0 text-[var(--color-just-tag)]" />
                     <span className="text-sm font-medium text-[var(--color-just-tag-dark)]">
-                      {t("toteBags", { count: plan.toteBags })}
+                      + {plan.toteBags} tote-bags personnalises offerts
                     </span>
                   </div>
                 )}
 
-                {/* Features - identiques pour tous les plans */}
+                {/* Features */}
                 <ul className="mt-5 space-y-3">
                   {[
-                    "Fiche complète",
+                    "Fiche complete",
                     "Photos",
-                    "Vidéo de présentation",
+                    "Video de presentation",
                     "Menus",
                     "Contact",
                     "Localisation",
@@ -293,7 +209,7 @@ export function B2BPricing() {
                     handleSelectPlan(plan.id);
                   }}
                 >
-                  {isSelected ? "✓ Sélectionné" : "Choisir ce plan"}
+                  Commencer l&apos;essai gratuit
                 </Button>
               </div>
             );
@@ -314,14 +230,16 @@ export function B2BPricing() {
               <div className="flex items-center gap-2">
                 <h3 className="text-xl font-bold">{t("lifetimeTitle")}</h3>
                 <Badge className="bg-[var(--color-just-tag)] text-white border-0">
-                  {t("lifetimeExclusive")}
+                  Exclusif
                 </Badge>
               </div>
-              <p className="mt-2 text-gray-300">{t("lifetimeDesc")}</p>
+              <p className="mt-2 text-gray-300 max-w-lg">
+                Le calcul est simple : a CHF 24.90/mois, vous atteignez CHF 1 495 en 5 ans. Avec l&apos;offre a vie, vous economisez tout ce qui vient apres. Et les 500 tote-bags personnalises (valeur estimee CHF 2 500) sont offerts.
+              </p>
               <div className="mt-3 flex items-center gap-2">
                 <Gift className="h-5 w-5 text-[var(--color-just-tag)]" />
                 <span className="font-medium text-[var(--color-just-tag)]">
-                  {t("toteBags", { count: lifetimePlan.toteBags })}
+                  + 500 tote-bags personnalises offerts
                 </span>
               </div>
             </div>
@@ -330,7 +248,7 @@ export function B2BPricing() {
                 <div className="text-3xl font-bold sm:text-4xl">
                   CHF {lifetimePlan.price}
                 </div>
-                <span className="text-sm text-gray-400">{t("oneTimePayment")}</span>
+                <span className="text-sm text-gray-400">paiement unique</span>
               </div>
               <Button
                 className={`${
@@ -343,7 +261,7 @@ export function B2BPricing() {
                   handleSelectPlan("lifetime");
                 }}
               >
-                {selectedPlan === "lifetime" ? "✓ Sélectionné" : "Choisir ce plan"}
+                Commencer l&apos;essai gratuit
               </Button>
             </div>
           </div>
@@ -357,78 +275,15 @@ export function B2BPricing() {
           </div>
         </div>
 
-        {/* Inline signup form */}
-        {showForm && selectedPlanData && (
-          <div id="b2b-signup-form" className="mx-auto mt-12 max-w-lg">
-            <div className="rounded-2xl border-2 border-[var(--color-just-tag)] bg-white p-8 shadow-lg">
-              <div className="mb-6 text-center">
-                <h3 className="text-xl font-bold text-gray-900">Finaliser votre inscription</h3>
-                <Badge className="mt-2 bg-[var(--color-just-tag)] text-white border-0 text-sm px-4 py-1">
-                  {tMerchant(selectedPlanData.id)} — {selectedPlanData.pricePerMonth ? `CHF ${selectedPlanData.pricePerMonth}/mois` : `CHF ${selectedPlanData.totalPrice}`}
-                </Badge>
-                <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
-                  <Gift className="h-4 w-4" />
-                  Essai 14 jours gratuits
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="pricing-name">Nom complet *</Label>
-                  <Input id="pricing-name" name="name" required className="mt-1.5" placeholder="Jean Dupont" />
-                </div>
-                <div>
-                  <Label htmlFor="pricing-email">Email *</Label>
-                  <Input id="pricing-email" name="email" type="email" required className="mt-1.5" placeholder="jean@monrestaurant.ch" />
-                </div>
-                <div>
-                  <Label htmlFor="pricing-phone">Téléphone *</Label>
-                  <Input id="pricing-phone" name="phone" type="tel" required className="mt-1.5" placeholder="+41 22 123 45 67" />
-                </div>
-                <div>
-                  <Label htmlFor="pricing-restaurant">Nom du restaurant *</Label>
-                  <Input id="pricing-restaurant" name="restaurantName" required className="mt-1.5" placeholder="Le Petit Prince" />
-                </div>
-                <div>
-                  <Label htmlFor="pricing-city">Ville *</Label>
-                  <Input id="pricing-city" name="city" required className="mt-1.5" placeholder="Genève" />
-                </div>
-
-                {formError && (
-                  <p className="text-sm text-red-600">{formError}</p>
-                )}
-
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="mt-2 w-full bg-[var(--color-just-tag)] py-3 text-base hover:bg-[var(--color-just-tag-dark)]"
-                >
-                  {isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Redirection vers le paiement...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="mr-2 h-5 w-5" />
-                      Payer et s&apos;inscrire
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              <Button
-                variant="ghost"
-                className="mt-4 w-full"
-                onClick={() => { setShowForm(false); setSelectedPlan(null); }}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Changer de plan
-              </Button>
-            </div>
-          </div>
-        )}
-
+        {/* Light contact alternative */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-gray-500">
+            Pas pret ? Laissez-nous votre numero, on vous rappelle :{" "}
+            <a href="mailto:contact@just-tag.app" className="text-[var(--color-just-tag)] underline hover:text-[var(--color-just-tag-dark)]">
+              contact@just-tag.app
+            </a>
+          </p>
+        </div>
       </div>
     </section>
   );

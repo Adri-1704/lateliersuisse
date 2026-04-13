@@ -162,3 +162,151 @@ export async function searchAvailableRestaurants(query: string): Promise<{ slug:
   if (error || !data) return [];
   return data.map((r) => ({ slug: r.slug, name: r.name_fr, city: r.city }));
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// PR 2: Additional actions for multi-step signup flow
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Get a merchant's ID by their email. Used by the signup flow to retrieve
+ * the merchant ID after account creation (registerMerchant doesn't return it).
+ */
+export async function getMerchantIdByEmail(email: string): Promise<string | null> {
+  if (!email) return null;
+
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("merchants")
+    .select("id")
+    .eq("email", email)
+    .single() as { data: { id: string } | null; error: unknown };
+
+  return data?.id || null;
+}
+
+/**
+ * Create a claim request for an existing merchant (already created via registerMerchant).
+ * This is the separated claim step in the multi-step flow.
+ */
+export async function createClaimRequest(params: {
+  merchantId: string;
+  merchantName: string;
+  merchantEmail: string;
+  merchantPhone: string;
+  restaurantSlug: string;
+}): Promise<{ success: boolean; error: string | null }> {
+  const { merchantId, merchantName, merchantEmail, merchantPhone, restaurantSlug } = params;
+
+  const supabase = createAdminClient();
+
+  // Get restaurant
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("id, name_fr, city, email, merchant_id")
+    .eq("slug", restaurantSlug)
+    .single() as { data: { id: string; name_fr: string; city: string; email: string | null; merchant_id: string | null } | null; error: unknown };
+
+  if (!restaurant) {
+    return { success: false, error: "Restaurant introuvable" };
+  }
+
+  if (restaurant.merchant_id) {
+    return { success: false, error: "Ce restaurant est deja revendique par un autre compte" };
+  }
+
+  // Create claim request
+  const { data: claimRequest, error: claimError } = await (supabase
+    .from("claim_requests") as ReturnType<typeof supabase.from>)
+    .insert({
+      restaurant_id: restaurant.id,
+      merchant_id: merchantId,
+      method: "manual",
+      status: "pending",
+    } as Record<string, unknown>)
+    .select("id")
+    .single();
+
+  if (claimError) {
+    console.error("Claim request insert error:", claimError);
+    return { success: false, error: "Erreur lors de la revendication" };
+  }
+
+  // Update restaurant claim_status
+  await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
+    .update({ claim_status: "pending" } as Record<string, unknown>)
+    .eq("id", restaurant.id);
+
+  // Send admin notification email
+  const claimId = claimRequest ? (claimRequest as Record<string, unknown>).id as string : undefined;
+  try {
+    const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
+    const template = claimRequestAdminNotification({
+      restaurantName: restaurant.name_fr,
+      merchantName,
+      merchantEmail,
+      merchantPhone: merchantPhone || "Non renseigne",
+      claimId: claimId || "unknown",
+    });
+    await sendEmail({
+      to: adminEmailAddress,
+      subject: template.subject,
+      html: template.html,
+      replyTo: merchantEmail,
+    });
+  } catch (emailErr) {
+    console.error("Failed to send claim admin notification:", emailErr);
+  }
+
+  return { success: true, error: null };
+}
+
+/**
+ * Create a new restaurant record linked to a merchant (is_published = false).
+ * Used when the merchant's restaurant is not found in the search.
+ */
+export async function createRestaurantForMerchant(params: {
+  merchantId: string;
+  name: string;
+  city: string;
+  cuisine: string;
+}): Promise<{ success: boolean; error: string | null; restaurantId?: string }> {
+  const { merchantId, name, city, cuisine } = params;
+
+  if (!name || !city) {
+    return { success: false, error: "Nom et ville requis" };
+  }
+
+  const supabase = createAdminClient();
+
+  // Generate slug from name
+  const slug = name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+  const { data: restaurant, error } = await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
+    .insert({
+      merchant_id: merchantId,
+      name_fr: name,
+      name_de: name,
+      name_en: name,
+      slug: `${slug}-${Date.now().toString(36)}`, // Append timestamp hash to avoid slug conflicts
+      cuisine_type: cuisine || null,
+      canton: "", // Will be filled in later by the merchant
+      city,
+      is_published: false,
+      claim_status: "claimed",
+    } as Record<string, unknown>)
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("Create restaurant error:", error);
+    return { success: false, error: "Erreur lors de la creation du restaurant" };
+  }
+
+  const restaurantId = restaurant ? (restaurant as Record<string, unknown>).id as string : undefined;
+  return { success: true, error: null, restaurantId };
+}
