@@ -1,6 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
 import { collections, type Collection } from "@/data/collections";
+import { createAdminClient } from "@/lib/supabase/server";
+
+async function getCollectionCount(collection: Collection): Promise<number> {
+  const supabase = createAdminClient();
+  let query = supabase
+    .from("restaurants")
+    .select("id", { count: "exact", head: true })
+    .eq("is_published", true);
+  if (collection.filterFeature) {
+    query = query.contains("features", [collection.filterFeature]);
+  }
+  if (collection.filterCuisine) {
+    query = query.eq("cuisine_type", collection.filterCuisine);
+  }
+  const { count } = await query;
+  return count ?? 0;
+}
 
 export default async function CollectionsPage({
   params,
@@ -8,6 +25,20 @@ export default async function CollectionsPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+
+  // Compte le nombre de restaurants par collection, filtre les vides
+  const counts = await Promise.all(collections.map(getCollectionCount));
+  const visible = collections
+    .map((c, i) => ({ collection: c, count: counts[i] }))
+    .filter(({ count }) => count > 0);
+
+  const restaurantsLabel = (n: number) => {
+    if (locale === "de") return n === 1 ? "1 Restaurant" : `${n} Restaurants`;
+    if (locale === "en") return n === 1 ? "1 restaurant" : `${n} restaurants`;
+    if (locale === "pt") return n === 1 ? "1 restaurante" : `${n} restaurantes`;
+    if (locale === "es") return n === 1 ? "1 restaurante" : `${n} restaurantes`;
+    return n === 1 ? "1 restaurant" : `${n} restaurants`;
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -19,7 +50,7 @@ export default async function CollectionsPage({
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {collections.map((collection) => {
+        {visible.map(({ collection, count }) => {
           const title = locale === "de" ? collection.titleDe : locale === "en" ? collection.titleEn : locale === "pt" ? collection.titlePt : locale === "es" ? collection.titleEs : collection.titleFr;
           const desc = locale === "de" ? collection.descriptionDe : locale === "en" ? collection.descriptionEn : locale === "pt" ? collection.descriptionPt : locale === "es" ? collection.descriptionEs : collection.descriptionFr;
           return (
@@ -40,6 +71,7 @@ export default async function CollectionsPage({
                 <div className="absolute bottom-0 left-0 right-0 p-5">
                   <span className="text-3xl">{collection.icon}</span>
                   <h2 className="mt-1 text-xl font-bold text-white">{title}</h2>
+                  <p className="mt-0.5 text-xs font-medium text-white/80">{restaurantsLabel(count)}</p>
                 </div>
               </div>
               <div className="p-4">
