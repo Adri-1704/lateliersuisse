@@ -29,7 +29,7 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<string, string> = {
-    fr: "Rejoignez Just-Tag : 500+ restaurants romands, 1 488 avis verifies, zero commission. A partir de CHF 24.90/mois avec 14 jours d'essai gratuit.",
+    fr: "Rejoignez Just-Tag : 500+ restaurants romands, 1 488 avis vérifiés, zéro commission. À partir de CHF 24.90/mois avec 14 jours d'essai gratuit.",
     de: "Treten Sie Just-Tag bei: 500+ Westschweizer Restaurants, 1 488 verifizierte Bewertungen, keine Provision. Ab CHF 24.90/Monat mit 14 Tagen Probezeit.",
     en: "Join Just-Tag: 500+ Western Swiss restaurants, 1,488 verified reviews, zero commission. From CHF 24.90/month with 14-day free trial.",
     pt: "Junte-se ao Just-Tag: 500+ restaurantes da Suica Romanda, 1 488 avaliacoes verificadas, zero comissao. A partir de CHF 24.90/mes com 14 dias gratis.",
@@ -75,14 +75,14 @@ export default async function PourRestaurateursPage() {
 
   // FAQ structured data (Schema.org)
   const faqItems = [
-    { q: "Combien ca me rapporte concretement ?", a: "A CHF 24.90/mois, il suffit d'un seul client supplementaire par mois pour rentabiliser votre abonnement." },
-    { q: "Comment vous verifiez que je suis bien le proprietaire ?", a: "Notre equipe verifie manuellement que les informations correspondent avant d'activer votre acces." },
+    { q: "Combien ça me rapporte concrètement ?", a: "À CHF 24.90/mois, il suffit d'un seul client supplémentaire par mois pour rentabiliser votre abonnement." },
+    { q: "Comment vous vérifiez que je suis bien le propriétaire ?", a: "Notre équipe vérifie manuellement que les informations correspondent avant d'activer votre accès." },
     { q: "Je peux annuler quand je veux ?", a: "Oui. Le plan mensuel est sans engagement. Vous annulez depuis votre espace client." },
-    { q: "Vous prenez une commission sur mes reservations ?", a: "Non. Zero commission, zero frais de transaction." },
-    { q: "Mes donnees appartiennent a qui ?", a: "A vous. Hebergement en Suisse, conforme LPD et RGPD." },
-    { q: "Quelle difference avec les plateformes a commission ?", a: "Just-Tag combine fiche professionnelle, avis verifies, zero commission et SEO local en 5 langues." },
+    { q: "Vous prenez une commission sur mes réservations ?", a: "Non. Zéro commission, zéro frais de transaction." },
+    { q: "Mes données appartiennent à qui ?", a: "À vous. Hébergement en Suisse, conforme LPD et RGPD." },
+    { q: "Quelle différence avec les plateformes à commission ?", a: "Just-Tag combine fiche professionnelle, avis vérifiés, zéro commission et SEO local en 5 langues." },
     { q: "Je peux essayer gratuitement ?", a: "Oui. Tous les plans incluent 14 jours d'essai gratuit via Stripe." },
-    { q: "Que se passe-t-il apres les 14 jours ?", a: "Votre abonnement demarre automatiquement. Annulation possible a tout moment sur le plan mensuel." },
+    { q: "Que se passe-t-il après les 14 jours ?", a: "Votre abonnement démarre automatiquement. Annulation possible à tout moment sur le plan mensuel." },
   ];
 
   const faqJsonLd = {

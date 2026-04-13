@@ -80,12 +80,12 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
             Des prix clairs, sans surprise
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            Tous les plans incluent les memes fonctionnalites. La seule difference : la duree de l&apos;engagement et le prix.
+            Tous les plans incluent les mêmes fonctionnalités. La seule différence : la durée de l&apos;engagement et le prix.
           </p>
           {/* Guarantee badge */}
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ShieldCheck className="h-4 w-4" />
-            14 jours d&apos;essai gratuit — satisfait ou rembourse
+            14 jours d&apos;essai gratuit — satisfait ou remboursé
           </div>
         </div>
 
@@ -99,7 +99,7 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
           <p className="text-base sm:text-lg font-semibold">
             {spotsRemaining > 0
               ? <>Offre de lancement : -40% pour les 100 premiers restaurants. Plus que <strong>{spotsRemaining}</strong> places disponibles. Ces tarifs ne reviendront pas.</>
-              : <>Offre Early Bird bientot terminee. Inscrivez-vous avant qu&apos;il ne soit trop tard.</>}
+              : <>Offre Early Bird bientôt terminée. Inscrivez-vous avant qu&apos;il ne soit trop tard.</>}
           </p>
         </div>
 
@@ -140,7 +140,7 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
               >
                 {plan.badge === "bestValue" && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--color-just-tag)] text-white border-0 px-3">
-                    Meilleur rapport qualite-prix
+                    Meilleur rapport qualité-prix
                   </Badge>
                 )}
 
@@ -158,7 +158,7 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
                   </div>
                   <div className="mt-1 flex items-baseline gap-2 text-sm">
                     <span className="text-gray-400 line-through">CHF {plan.standardPrice}/mois</span>
-                    <span className="font-semibold text-[var(--color-just-tag)]">apres 100 inscrits</span>
+                    <span className="font-semibold text-[var(--color-just-tag)]">après 100 inscrits</span>
                   </div>
                   {plan.totalPrice && (
                     <p className="mt-1 text-sm text-gray-500">
@@ -175,7 +175,7 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
                   <div className="mt-3 flex items-center gap-2 rounded-lg bg-[var(--color-just-tag-light)] px-3 py-2">
                     <Gift className="h-4 w-4 shrink-0 text-[var(--color-just-tag)]" />
                     <span className="text-sm font-medium text-[var(--color-just-tag-dark)]">
-                      + {plan.toteBags} tote-bags personnalises offerts
+                      + {plan.toteBags} tote-bags personnalisés offerts
                     </span>
                   </div>
                 )}
@@ -183,9 +183,9 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
                 {/* Features */}
                 <ul className="mt-5 space-y-3">
                   {[
-                    "Fiche complete",
+                    "Fiche complète",
                     "Photos",
-                    "Video de presentation",
+                    "Vidéo de présentation",
                     "Menus",
                     "Contact",
                     "Localisation",
@@ -234,12 +234,12 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
                 </Badge>
               </div>
               <p className="mt-2 text-gray-300 max-w-lg">
-                Le calcul est simple : a CHF 24.90/mois, vous atteignez CHF 1 495 en 5 ans. Avec l&apos;offre a vie, vous economisez tout ce qui vient apres. Et les 500 tote-bags personnalises (valeur estimee CHF 2 500) sont offerts.
+                Le calcul est simple : à CHF 24.90/mois, vous atteignez CHF 1 495 en 5 ans. Avec l&apos;offre à vie, vous économisez tout ce qui vient après. Et les 500 tote-bags personnalisés (valeur estimée CHF 2 500) sont offerts.
               </p>
               <div className="mt-3 flex items-center gap-2">
                 <Gift className="h-5 w-5 text-[var(--color-just-tag)]" />
                 <span className="font-medium text-[var(--color-just-tag)]">
-                  + 500 tote-bags personnalises offerts
+                  + 500 tote-bags personnalisés offerts
                 </span>
               </div>
             </div>
@@ -278,7 +278,7 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
         {/* Light contact alternative */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            Pas pret ? Laissez-nous votre numero, on vous rappelle :{" "}
+            Pas prêt ? Laissez-nous votre numéro, on vous rappelle :{" "}
             <a href="mailto:contact@just-tag.app" className="text-[var(--color-just-tag)] underline hover:text-[var(--color-just-tag-dark)]">
               contact@just-tag.app
             </a>

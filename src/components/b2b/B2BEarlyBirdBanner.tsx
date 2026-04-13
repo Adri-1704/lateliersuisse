@@ -12,7 +12,7 @@ export function B2BEarlyBirdBanner({ spotsRemaining }: B2BEarlyBirdBannerProps) 
       <div className="sticky top-0 z-50 bg-gradient-to-r from-orange-600 to-red-600 py-2.5 text-center text-sm font-semibold text-white shadow-md">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4">
           <Zap className="h-4 w-4" />
-          <span>Offre Early Bird bientot terminee</span>
+          <span>Offre Early Bird bientôt terminée</span>
         </div>
       </div>
     );
@@ -25,7 +25,7 @@ export function B2BEarlyBirdBanner({ spotsRemaining }: B2BEarlyBirdBannerProps) 
         <span>
           Offre Early Bird : plus que{" "}
           <strong className="text-yellow-200">{spotsRemaining}</strong>/100
-          places a -40%. Apres, c&apos;est fini.
+          places à -40%. Après, c&apos;est fini.
         </span>
       </div>
     </div>

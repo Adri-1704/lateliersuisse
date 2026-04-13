@@ -28,10 +28,10 @@ export function B2BFinalCTA({ spotsRemaining }: B2BFinalCTAProps) {
         <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
           {spotsRemaining > 0
             ? `Plus que ${spotsRemaining} places en offre Early Bird`
-            : "Rejoignez Just-Tag des maintenant"}
+            : "Rejoignez Just-Tag dès maintenant"}
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-gray-300">
-          14 jours gratuits. Zero commission. Annulation a tout moment.
+          14 jours gratuits. Zéro commission. Annulation à tout moment.
         </p>
 
         <Button
@@ -44,7 +44,7 @@ export function B2BFinalCTA({ spotsRemaining }: B2BFinalCTAProps) {
         </Button>
 
         <p className="mt-6 text-sm text-gray-400">
-          Vous avez une question ? Ecrivez-nous a{" "}
+          Vous avez une question ? Écrivez-nous à{" "}
           <a
             href="mailto:contact@just-tag.app"
             className="text-white underline hover:text-gray-200"

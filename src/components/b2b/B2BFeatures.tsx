@@ -6,7 +6,7 @@ const features = [
   {
     icon: Store,
     title: "Fiche professionnelle",
-    desc: "Photos, menu, horaires, carte interactive. Votre vitrine en ligne, toujours a jour.",
+    desc: "Photos, menu, horaires, carte interactive. Votre vitrine en ligne, toujours à jour.",
   },
   {
     icon: Search,
@@ -16,22 +16,22 @@ const features = [
   {
     icon: Camera,
     title: "Galerie photos et video",
-    desc: "Montrez votre ambiance, vos plats, votre equipe. Jusqu'a 20 photos + 1 video de presentation.",
+    desc: "Montrez votre ambiance, vos plats, votre équipe. Jusqu'à 20 photos + 1 vidéo de présentation.",
   },
   {
     icon: MessageSquare,
     title: "Gestion des avis",
-    desc: "Recevez des avis verifies, repondez-y, ameliorez votre note. Tout depuis votre tableau de bord.",
+    desc: "Recevez des avis vérifiés, répondez-y, améliorez votre note. Tout depuis votre tableau de bord.",
   },
   {
     icon: BarChart3,
     title: "Statistiques de visites",
-    desc: "Combien de personnes ont vu votre fiche, clique sur votre numero, consulte votre menu. Chaque semaine.",
+    desc: "Combien de personnes ont vu votre fiche, cliqué sur votre numéro, consulté votre menu. Chaque semaine.",
   },
   {
     icon: Phone,
     title: "Contact direct client",
-    desc: "Les clients vous appellent ou vous ecrivent sans intermediaire. Pas de commission, pas de plateforme entre vous deux.",
+    desc: "Les clients vous appellent ou vous écrivent sans intermédiaire. Pas de commission, pas de plateforme entre vous deux.",
   },
 ];
 

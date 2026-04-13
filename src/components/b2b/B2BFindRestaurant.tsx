@@ -47,10 +47,10 @@ export function B2BFindRestaurant() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Votre restaurant est peut-etre deja sur Just-Tag
+            Votre restaurant est peut-être déjà sur Just-Tag
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            Recherchez votre etablissement et prenez le controle de votre fiche.
+            Recherchez votre établissement et prenez le contrôle de votre fiche.
           </p>
         </div>
 
@@ -105,7 +105,7 @@ export function B2BFindRestaurant() {
                 <span className="text-[var(--color-just-tag)]">
                   {selectedRestaurant.name}
                 </span>{" "}
-                est deja sur Just-Tag.
+                est déjà sur Just-Tag.
               </p>
               <p className="mt-2 text-sm text-gray-600">
                 Revendiquez votre fiche pour la personnaliser et attirer plus de clients.

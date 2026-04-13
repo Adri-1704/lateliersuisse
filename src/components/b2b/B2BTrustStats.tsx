@@ -10,8 +10,8 @@ export function B2BTrustStats({ totalRestaurants }: B2BTrustStatsProps) {
   const stats = [
     { value: `${totalRestaurants}+`, label: "Restaurants inscrits", icon: UtensilsCrossed },
     { value: "7", label: "Cantons romands couverts", icon: MapPin },
-    { value: "1 488+", label: "Avis Google verifies", icon: Star },
-    { value: "0%", label: "Commission sur vos reservations", icon: Ban },
+    { value: "1 488+", label: "Avis Google vérifiés", icon: Star },
+    { value: "0%", label: "Commission sur vos réservations", icon: Ban },
   ];
 
   return (

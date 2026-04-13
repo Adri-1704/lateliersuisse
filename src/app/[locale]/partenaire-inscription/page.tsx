@@ -207,7 +207,7 @@ export default function MerchantSignupPage() {
   // ── If returning from canceled checkout ──
   useEffect(() => {
     if (canceled === "1" && stepParam === "plan") {
-      setError("Paiement annule. Vous pouvez choisir un autre plan ou reessayer.");
+      setError("Paiement annulé. Vous pouvez choisir un autre plan ou réessayer.");
     }
   }, [canceled, stepParam]);
 
@@ -240,7 +240,7 @@ export default function MerchantSignupPage() {
     const merchantId = await fetchMerchantIdByEmail(signupData.email);
     if (!merchantId) {
       setError(
-        "Compte cree mais impossible de recuperer l'identifiant. Veuillez contacter le support."
+        "Compte créé mais impossible de récupérer l'identifiant. Veuillez contacter le support."
       );
       return;
     }
@@ -283,7 +283,7 @@ export default function MerchantSignupPage() {
         newRestaurantCuisine
       );
       if (!createResult.success) {
-        setError(createResult.error || "Erreur lors de la creation");
+        setError(createResult.error || "Erreur lors de la création");
         setLoading(false);
         return;
       }
@@ -320,7 +320,7 @@ export default function MerchantSignupPage() {
       setCurrentStep("redirecting");
       window.location.href = result.url;
     } else {
-      setError(result.error || "Erreur lors de la creation du paiement");
+      setError(result.error || "Erreur lors de la création du paiement");
       setLoading(false);
     }
   }
@@ -354,7 +354,7 @@ export default function MerchantSignupPage() {
           Devenir partenaire
         </h1>
         <p className="mt-2 text-gray-500">
-          Creez votre compte, associez votre restaurant et choisissez votre plan
+          Créez votre compte, associez votre restaurant et choisissez votre plan
         </p>
       </div>
 
@@ -453,14 +453,14 @@ export default function MerchantSignupPage() {
               onChange={(e) =>
                 setSignupData((p) => ({ ...p, password: e.target.value }))
               }
-              placeholder="Minimum 6 caracteres"
+              placeholder="Minimum 6 caractères"
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Telephone
+              Téléphone
             </label>
             <input
               type="tel"
@@ -481,18 +481,18 @@ export default function MerchantSignupPage() {
             {loading ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Creation en cours...
+                Création en cours...
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                Creer mon compte
+                Créer mon compte
                 <ArrowRight className="h-4 w-4" />
               </span>
             )}
           </Button>
 
           <p className="text-center text-sm text-gray-500">
-            Deja un compte ?{" "}
+            Déjà un compte ?{" "}
             <Link
               href={`/${locale}/espace-client/connexion`}
               className="text-[var(--color-just-tag)] hover:underline font-medium"
@@ -512,7 +512,7 @@ export default function MerchantSignupPage() {
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4" />
               <span>
-                Compte cree avec succes ! Associez maintenant votre restaurant.
+                Compte créé avec succès ! Associez maintenant votre restaurant.
               </span>
             </div>
           </div>
@@ -524,7 +524,7 @@ export default function MerchantSignupPage() {
                 Rechercher votre restaurant
               </label>
               <p className="text-xs text-gray-400 mt-0.5">
-                Trouvez votre restaurant dans notre base de donnees
+                Trouvez votre restaurant dans notre base de données
               </p>
 
               {restaurantChoice?.type === "existing" ? (
@@ -597,10 +597,10 @@ export default function MerchantSignupPage() {
                     !searching && (
                       <div className="absolute z-10 mt-1 w-full rounded-lg border bg-white shadow-lg p-4 text-center">
                         <p className="text-sm text-gray-500">
-                          Aucun restaurant trouve
+                          Aucun restaurant trouvé
                         </p>
                         <p className="text-xs text-gray-400 mt-1">
-                          Vous pouvez creer votre fiche ci-dessous
+                          Vous pouvez créer votre fiche ci-dessous
                         </p>
                       </div>
                     )}
@@ -636,7 +636,7 @@ export default function MerchantSignupPage() {
               ) : (
                 <div className="rounded-lg border border-gray-200 p-4 space-y-4">
                   <h3 className="text-sm font-semibold text-gray-900">
-                    Creer une nouvelle fiche restaurant
+                    Créer une nouvelle fiche restaurant
                   </h3>
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
@@ -660,7 +660,7 @@ export default function MerchantSignupPage() {
                       required
                       value={newRestaurantCity}
                       onChange={(e) => setNewRestaurantCity(e.target.value)}
-                      placeholder="Geneve"
+                      placeholder="Genève"
                       className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
                     />
                   </div>
@@ -672,7 +672,7 @@ export default function MerchantSignupPage() {
                       type="text"
                       value={newRestaurantCuisine}
                       onChange={(e) => setNewRestaurantCuisine(e.target.value)}
-                      placeholder="Francaise, Italienne, Suisse..."
+                      placeholder="Française, Italienne, Suisse..."
                       className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
                     />
                   </div>
@@ -702,7 +702,7 @@ export default function MerchantSignupPage() {
               }}
               className="flex-1"
             >
-              Passer cette etape
+              Passer cette étape
             </Button>
             <Button
               disabled={
@@ -753,7 +753,7 @@ export default function MerchantSignupPage() {
                 <strong>
                   {earlyBirdSeats} place{earlyBirdSeats !== 1 ? "s" : ""}
                 </strong>{" "}
-                au tarif preferentiel !
+                au tarif préférentiel !
               </p>
             </div>
           )}
@@ -842,7 +842,7 @@ export default function MerchantSignupPage() {
                   </Badge>
                 </div>
                 <p className="mt-1 text-sm text-gray-400">
-                  Paiement unique, acces a vie. Aucun abonnement recurrent.
+                  Paiement unique, accès à vie. Aucun abonnement récurrent.
                 </p>
               </div>
               <div className="text-right shrink-0">
@@ -898,7 +898,7 @@ export default function MerchantSignupPage() {
             Redirection vers Stripe...
           </p>
           <p className="text-sm text-gray-500">
-            Vous allez etre redirige vers la page de paiement securisee.
+            Vous allez être redirigé vers la page de paiement sécurisée.
           </p>
         </div>
       )}

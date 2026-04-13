@@ -42,19 +42,19 @@ export function B2BHero({ totalRestaurants }: B2BHeroProps) {
             Remplissez vos tables sans payer de commission
           </h1>
           <p className="mt-6 text-lg text-gray-300 animate-fade-in-up animate-delay-100">
-            Votre restaurant est deja sur Just-Tag avec {totalRestaurants}+ etablissements romands.
-            Prenez le controle de votre fiche et attirez de nouveaux clients.
+            Votre restaurant est déjà sur Just-Tag avec {totalRestaurants}+ établissements romands.
+            Prenez le contrôle de votre fiche et attirez de nouveaux clients.
           </p>
 
           {/* Benefits list */}
           <ul className="mt-8 space-y-3 animate-fade-in-up animate-delay-200">
             <li className="flex items-center gap-3 text-white">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
-              <span className="text-base sm:text-lg">Zero commission sur vos reservations et contacts</span>
+              <span className="text-base sm:text-lg">Zéro commission sur vos réservations et contacts</span>
             </li>
             <li className="flex items-center gap-3 text-white">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
-              <span className="text-base sm:text-lg">Votre fiche complete : menu, photos, horaires, avis verifies</span>
+              <span className="text-base sm:text-lg">Votre fiche complète : menu, photos, horaires, avis vérifiés</span>
             </li>
             <li className="flex items-center gap-3 text-white">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
@@ -65,7 +65,7 @@ export function B2BHero({ totalRestaurants }: B2BHeroProps) {
           {/* Social proof */}
           <div className="mt-6 flex items-center gap-2 text-sm text-gray-400 animate-fade-in-up animate-delay-200">
             <Users className="h-4 w-4" />
-            {totalRestaurants} restaurants romands deja sur la plateforme
+            {totalRestaurants} restaurants romands déjà sur la plateforme
           </div>
 
           {/* CTAs */}
