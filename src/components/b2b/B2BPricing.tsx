@@ -110,7 +110,7 @@ export function B2BPricing() {
   const [isPending, startTransition] = useTransition();
   const [formError, setFormError] = useState<string | null>(null);
 
-  const plans = activeTab === "earlyBird" ? earlyBirdPlans : standardPlans;
+  const plans = earlyBirdPlans;
 
   const selectedPlanData = selectedPlan === "lifetime"
     ? { id: "lifetime", pricePerMonth: null, totalPrice: lifetimePlan.price, periodKey: "oneTime", features: lifetimePlan.features, toteBags: lifetimePlan.toteBags, badge: null, highlighted: false }
@@ -167,51 +167,20 @@ export function B2BPricing() {
           </div>
         </div>
 
-        {/* Tab toggle */}
-        <div className="mt-10 flex items-center justify-center">
-          <div className="inline-flex rounded-xl bg-gray-200 p-1">
-            <button
-              onClick={() => { setActiveTab("earlyBird"); setShowForm(false); setSelectedPlan(null); }}
-              className={`relative flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-all ${
-                activeTab === "earlyBird"
-                  ? "bg-[var(--color-just-tag)] text-white shadow-md"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              <Zap className="h-4 w-4" />
-              {t("earlyBirdTab")}
-              <Badge className="ml-1 bg-white/20 text-white text-[10px] border-0 px-1.5 py-0">
-                {t("earlyBirdBadge")}
-              </Badge>
-            </button>
-            <button
-              onClick={() => { setActiveTab("standard"); setShowForm(false); setSelectedPlan(null); }}
-              className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all ${
-                activeTab === "standard"
-                  ? "bg-gray-900 text-white shadow-md"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {t("standardTab")}
-            </button>
+        {/* Bannière Early Bird */}
+        <div className="mt-10 rounded-2xl bg-gradient-to-r from-[var(--color-just-tag)] to-[var(--color-just-tag-dark)] p-6 text-center text-white shadow-lg">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Zap className="h-5 w-5" />
+            <span className="text-sm font-bold uppercase tracking-wider">Offre de lancement</span>
+            <Badge className="bg-white text-[var(--color-just-tag)] border-0 font-bold">-40%</Badge>
           </div>
+          <p className="text-base sm:text-lg font-semibold">
+            Tarifs préférentiels réservés aux <strong>100 premiers restaurants inscrits</strong>
+          </p>
+          <p className="mt-1 text-sm text-white/90">
+            Profitez d&apos;une réduction exceptionnelle - Plus que quelques places disponibles
+          </p>
         </div>
-
-        {activeTab === "earlyBird" && (
-          <div className="mt-4 text-center">
-            <p className="text-sm text-[var(--color-just-tag)] font-medium">
-              <Star className="mr-1 inline h-4 w-4" />
-              {t("earlyBirdNote")}
-            </p>
-            {/* Progress bar for early bird spots */}
-            <div className="mx-auto mt-3 max-w-sm">
-              <div className="h-2 overflow-hidden rounded-full bg-gray-200">
-                <div className="h-full rounded-full bg-[var(--color-just-tag)] transition-all" style={{ width: "62%" }} />
-              </div>
-              <p className="mt-1.5 text-xs text-gray-500">{t("spotsLeft", { count: 38 })}</p>
-            </div>
-          </div>
-        )}
 
         {/* Included in all plans */}
         <div className="mt-10 rounded-2xl border border-[var(--color-alpine-green)]/20 bg-[var(--color-warm-cream)] p-6 sm:p-8">
@@ -260,14 +229,24 @@ export function B2BPricing() {
 
                 {/* Price */}
                 <div className="mt-4">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold text-gray-900">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-bold text-[var(--color-just-tag)]">
                       CHF {plan.pricePerMonth}
                     </span>
                     <span className="text-sm text-gray-500">
                       {t("perMonthLabel")}
                     </span>
                   </div>
+                  {/* Standard price (struck-through) */}
+                  {(() => {
+                    const stdPlan = standardPlans.find(p => p.id === plan.id);
+                    return stdPlan ? (
+                      <div className="mt-1 flex items-baseline gap-2 text-sm">
+                        <span className="text-gray-400 line-through">CHF {stdPlan.pricePerMonth}/mois</span>
+                        <span className="font-semibold text-[var(--color-just-tag)]">après 100 inscrits</span>
+                      </div>
+                    ) : null;
+                  })()}
                   {plan.totalPrice && (
                     <p className="mt-1 text-sm text-gray-500">
                       {t("totalLabel", { price: plan.totalPrice })}
