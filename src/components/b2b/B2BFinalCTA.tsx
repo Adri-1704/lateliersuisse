@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 interface B2BFinalCTAProps {
@@ -8,6 +9,8 @@ interface B2BFinalCTAProps {
 }
 
 export function B2BFinalCTA({ spotsRemaining }: B2BFinalCTAProps) {
+  const t = useTranslations("b2bLanding.finalCta");
+
   const scrollToPricing = () => {
     document.getElementById("b2b-pricing")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -27,11 +30,11 @@ export function B2BFinalCTA({ spotsRemaining }: B2BFinalCTAProps) {
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
           {spotsRemaining > 0
-            ? `Plus que ${spotsRemaining} places en offre Early Bird`
-            : "Rejoignez Just-Tag dès maintenant"}
+            ? t("spotsLeft", { count: spotsRemaining })
+            : t("joinNow")}
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-gray-300">
-          14 jours gratuits. Zéro commission. Annulation à tout moment.
+          {t("subtitle")}
         </p>
 
         <Button
@@ -39,12 +42,12 @@ export function B2BFinalCTA({ spotsRemaining }: B2BFinalCTAProps) {
           className="mt-8 bg-[var(--color-just-tag)] px-10 py-6 text-lg font-semibold hover:bg-[var(--color-just-tag-dark)]"
           onClick={scrollToPricing}
         >
-          Commencer mon essai gratuit
+          {t("cta")}
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
 
         <p className="mt-6 text-sm text-gray-400">
-          Vous avez une question ? Écrivez-nous à{" "}
+          {t("contactNote")}{" "}
           <a
             href="mailto:contact@just-tag.app"
             className="text-white underline hover:text-gray-200"

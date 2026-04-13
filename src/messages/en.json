@@ -380,6 +380,292 @@
       }
     }
   },
+  "b2bLanding": {
+    "hero": {
+      "badge": "100% Swiss",
+      "headline": "Fill your tables without paying any commission",
+      "subheadline": "Your restaurant is already on Just-Tag alongside {count}+ Western Swiss venues. Take control of your listing and attract new customers.",
+      "benefit1": "Zero commission on your bookings and enquiries",
+      "benefit2": "Your complete listing: menu, photos, opening hours, verified reviews",
+      "benefit3": "Visible in 5 languages to reach tourists too",
+      "socialProof": "{count} Western Swiss restaurants already on the platform",
+      "cta": "Try free for 14 days",
+      "ctaSecondary": "See an example listing"
+    },
+    "trustStats": {
+      "restaurants": "Registered restaurants",
+      "cantons": "Western Swiss cantons covered",
+      "reviews": "Verified Google reviews",
+      "commission": "Commission on your bookings"
+    },
+    "problemSolution": {
+      "title": "You have a great restaurant,",
+      "titleHighlight": "we'll put it in the spotlight.",
+      "problems": {
+        "visibility": {
+          "title": "Invisible online",
+          "text": "Your restaurant is lost among thousands on Google. No standout photos, no readable menu, no listing that makes people want to visit. Potential customers scroll right past."
+        },
+        "commission": {
+          "title": "Platforms take a commission",
+          "text": "Commission-based platforms take between 15% and 30% per order or booking. On a CHF 25 dish, you lose up to CHF 7.50. It adds up fast."
+        },
+        "reviews": {
+          "title": "Uncontrollable reviews",
+          "text": "On generic platforms, anyone can post a review — even someone who has never set foot in your restaurant. And responding is a hassle."
+        }
+      },
+      "solutions": {
+        "visibility": {
+          "title": "Optimised professional listing",
+          "text": "A professional listing optimised for SEO, with your photos, menu and opening hours. You appear in local searches in 5 languages — including for tourists."
+        },
+        "commission": {
+          "title": "Zero commission, zero hidden fees",
+          "text": "Customers contact you directly by phone or email. You only pay a fixed subscription from CHF 24.90/month — you know exactly what it costs."
+        },
+        "reviews": {
+          "title": "Verified and moderated reviews",
+          "text": "Our reviews are verified and moderated. You can reply to each review from your dashboard. Your rating truly reflects the quality of your cuisine."
+        }
+      }
+    },
+    "features": {
+      "title": "Everything you need, nothing you don't",
+      "subtitle": "No gimmicks. Practical tools to fill your restaurant.",
+      "items": {
+        "profile": {
+          "title": "Professional listing",
+          "desc": "Photos, menu, opening hours, interactive map. Your online shopfront, always up to date."
+        },
+        "seo": {
+          "title": "SEO by canton",
+          "desc": "Your restaurant appears when a customer searches \"restaurant [your city]\" on Google."
+        },
+        "gallery": {
+          "title": "Photo and video gallery",
+          "desc": "Showcase your atmosphere, your dishes, your team. Up to 20 photos + 1 presentation video."
+        },
+        "reviewMgmt": {
+          "title": "Review management",
+          "desc": "Receive verified reviews, reply to them, improve your rating. All from your dashboard."
+        },
+        "stats": {
+          "title": "Visit statistics",
+          "desc": "How many people viewed your listing, clicked your number, checked your menu. Every week."
+        },
+        "directContact": {
+          "title": "Direct customer contact",
+          "desc": "Customers call or write to you directly. No commission, no platform standing between you."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Clear pricing, no surprises",
+      "subtitle": "All plans include the same features. The only difference: the commitment length and the price.",
+      "guarantee": "14-day free trial — satisfaction guaranteed",
+      "earlyBirdLabel": "Launch offer",
+      "earlyBirdBannerActive": "Launch offer: -40% for the first 100 restaurants. Only {count} spots left. These rates won't come back.",
+      "earlyBirdBannerExpiring": "Early Bird offer ending soon. Sign up before it's too late.",
+      "bestValue": "Best value",
+      "perMonth": "/month",
+      "afterHundred": "after 100 sign-ups",
+      "totalPrice": "i.e. CHF {price} total",
+      "freeTrial": "14 days free",
+      "toteBags": "+ {count} personalised tote bags included",
+      "planFeatures": {
+        "fullProfile": "Complete listing",
+        "photos": "Photos",
+        "video": "Presentation video",
+        "menus": "Menus",
+        "contact": "Contact",
+        "location": "Location",
+        "offers": "Current offers"
+      },
+      "startTrial": "Start free trial",
+      "lifetimeExclusive": "Exclusive",
+      "lifetimeDesc": "The maths is simple: at CHF 24.90/month, you reach CHF 1,495 in 5 years. With the lifetime offer, you save everything after that. And 500 personalised tote bags (estimated value CHF 2,500) are included.",
+      "lifetimeToteBags": "+ 500 personalised tote bags included",
+      "singlePayment": "one-time payment",
+      "contactNote": "Not ready? Leave us your number, we'll call you back:"
+    },
+    "faq": {
+      "title": "Your questions, our answers",
+      "items": {
+        "q1": {
+          "question": "What does it actually bring me in concrete terms?",
+          "answer": "It's hard to promise an exact figure — it depends on your location, cuisine type and average spend. What we do know: restaurants with a complete listing (photos, menu, up-to-date hours) on Just-Tag receive more visits on average than those without. At CHF 24.90/month, just one extra customer per month is enough to recoup your subscription. (Based on an average spend of CHF 30-40 in Western Swiss restaurants.)"
+        },
+        "q2": {
+          "question": "How do you verify I'm the actual owner?",
+          "answer": "When you register, you provide your restaurant's name and city. Our team then manually verifies that the information matches before activating your dashboard access. If your restaurant is already in our database, you can claim it directly."
+        },
+        "q3": {
+          "question": "Can I cancel whenever I want?",
+          "answer": "Yes. The monthly plan has no commitment. You cancel from your client area, no questions asked, effective at the end of the current month. Semi-annual and annual plans are billed upfront; if you cancel, your access remains active until the end of the paid period."
+        },
+        "q4": {
+          "question": "Do you take a commission on my bookings?",
+          "answer": "No. Zero commission, zero transaction fees. Customers contact you directly (phone, email). You only pay your monthly, semi-annual or annual subscription. That's it."
+        },
+        "q5": {
+          "question": "Who owns my data?",
+          "answer": "You do. Your photos, menu and texts remain your property. If you cancel, we delete your listing and data. Hosting is in Switzerland, compliant with the Swiss Federal Data Protection Act (FADP) and GDPR."
+        },
+        "q6": {
+          "question": "What's the difference with commission platforms or generic directories?",
+          "answer": "Generic directories offer a basic listing: no readable menu, poorly showcased photos, unmoderated reviews. Commission platforms charge 2 to 5 EUR per seated cover. Just-Tag combines a complete professional listing, verified reviews, zero commission and local SEO in 5 languages. All for a predictable fixed price."
+        },
+        "q7": {
+          "question": "Can I try for free?",
+          "answer": "Yes. All plans include a 14-day free trial. You enter your bank details at sign-up (powered by Stripe, fully secure), but you're only charged on day 15. If you cancel before then, zero charges."
+        },
+        "q8": {
+          "question": "What happens after the 14 days?",
+          "answer": "Your subscription starts automatically. You receive a confirmation email with your invoice. If you chose the monthly plan, you can still cancel at any time. If you chose semi-annual or annual, you benefit from the reduced rate for the entire period."
+        }
+      }
+    },
+    "finalCta": {
+      "spotsLeft": "Only {count} Early Bird spots left",
+      "joinNow": "Join Just-Tag now",
+      "subtitle": "14 days free. Zero commission. Cancel anytime.",
+      "cta": "Start my free trial",
+      "contactNote": "Have a question? Write to us at"
+    },
+    "earlyBirdBanner": {
+      "active": "Early Bird offer: only {count}/100 spots left at -40%. After that, it's over.",
+      "expired": "Early Bird offer ending soon"
+    },
+    "findRestaurant": {
+      "title": "Your restaurant may already be on Just-Tag",
+      "subtitle": "Search for your venue and take control of your listing.",
+      "placeholder": "Type the name of your restaurant...",
+      "foundTitle": "Your restaurant {name} is already on Just-Tag.",
+      "foundSubtitle": "Claim your listing to personalise it and attract more customers.",
+      "claimCta": "Claim my listing",
+      "notFoundTitle": "Your restaurant is not yet on Just-Tag.",
+      "notFoundSubtitle": "Add it and take advantage of the Early Bird offer!",
+      "addCta": "Add my restaurant"
+    },
+    "meta": {
+      "faqSchema": {
+        "q1": {
+          "q": "What does it actually bring me?",
+          "a": "At CHF 24.90/month, just one extra customer per month is enough to recoup your subscription."
+        },
+        "q2": {
+          "q": "How do you verify I'm the actual owner?",
+          "a": "Our team manually verifies that the information matches before activating your access."
+        },
+        "q3": {
+          "q": "Can I cancel whenever I want?",
+          "a": "Yes. The monthly plan has no commitment. Cancel from your client area."
+        },
+        "q4": {
+          "q": "Do you take a commission on my bookings?",
+          "a": "No. Zero commission, zero transaction fees."
+        },
+        "q5": {
+          "q": "Who owns my data?",
+          "a": "You do. Hosting in Switzerland, compliant with FADP and GDPR."
+        },
+        "q6": {
+          "q": "What's the difference with commission platforms?",
+          "a": "Just-Tag combines a professional listing, verified reviews, zero commission and local SEO in 5 languages."
+        },
+        "q7": {
+          "q": "Can I try for free?",
+          "a": "Yes. All plans include a 14-day free trial via Stripe."
+        },
+        "q8": {
+          "q": "What happens after the 14 days?",
+          "a": "Your subscription starts automatically. Cancel anytime on the monthly plan."
+        }
+      }
+    }
+  },
+  "signupFlow": {
+    "steps": {
+      "signup": "Account",
+      "restaurant": "Restaurant",
+      "plan": "Plan & Payment"
+    },
+    "title": "Become a partner",
+    "subtitle": "Create your account, link your restaurant and choose your plan",
+    "signup": {
+      "name": "Full name *",
+      "namePlaceholder": "John Smith",
+      "email": "Professional email *",
+      "emailPlaceholder": "you@restaurant.ch",
+      "password": "Password *",
+      "passwordPlaceholder": "Minimum 6 characters",
+      "passwordConfirm": "Confirm password *",
+      "passwordConfirmPlaceholder": "Re-type your password",
+      "passwordMismatch": "Passwords do not match",
+      "phone": "Phone",
+      "phonePlaceholder": "+41 XX XXX XX XX",
+      "submitLoading": "Creating account...",
+      "submit": "Create my account",
+      "alreadyAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "restaurant": {
+      "successBanner": "Account created successfully! Now link your restaurant.",
+      "searchLabel": "Search for your restaurant",
+      "searchHint": "Find your restaurant in our database",
+      "searchPlaceholder": "Type the name of your restaurant...",
+      "change": "Change",
+      "noResults": "No restaurant found",
+      "noResultsHint": "You can create your listing below",
+      "or": "or",
+      "notInList": "My restaurant is not in the list",
+      "newTitle": "Create a new restaurant listing",
+      "newName": "Restaurant name *",
+      "newNamePlaceholder": "The Little Prince",
+      "newCity": "City *",
+      "newCityPlaceholder": "Geneva",
+      "newCuisine": "Cuisine type",
+      "newCuisinePlaceholder": "French, Italian, Swiss...",
+      "cancel": "Cancel",
+      "skip": "Skip this step",
+      "continueLoading": "Processing...",
+      "continue": "Continue"
+    },
+    "plan": {
+      "earlyBirdTitle": "Early Bird Offer",
+      "earlyBirdSeats": "Only {count} spot(s) left at the preferential rate!",
+      "trialInfo": "14-day free trial on all subscriptions. No commitment.",
+      "monthly": "Monthly",
+      "semiannual": "Semi-annual",
+      "annual": "Annual",
+      "perMonth": "/month",
+      "totalLabel": "i.e. CHF {price} {period}",
+      "freeTrial": "14 days free",
+      "bestValue": "Best value",
+      "lifetimeTitle": "Lifetime",
+      "lifetimeExclusive": "Exclusive",
+      "lifetimeDesc": "One-time payment, lifetime access. No recurring subscription.",
+      "lifetimePrice": "CHF 1,495",
+      "lifetimeSingle": "One-time payment",
+      "back": "Back",
+      "checkoutLoading": "Redirecting to payment...",
+      "checkoutLifetime": "Pay CHF 1,495",
+      "checkoutTrial": "Start free trial (14 days)"
+    },
+    "redirecting": {
+      "title": "Redirecting to Stripe...",
+      "subtitle": "You will be redirected to the secure payment page."
+    },
+    "errors": {
+      "unknown": "Unknown error",
+      "merchantIdFetch": "Account created but unable to retrieve the identifier. Please contact support.",
+      "claimFailed": "Error during claim",
+      "createFailed": "Error during creation",
+      "checkoutFailed": "Error creating payment session",
+      "paymentCanceled": "Payment cancelled. You can choose another plan or try again."
+    }
+  },
   "cantonMap": {
     "title": "Explore by canton",
     "subtitle": "Click on a canton to discover its restaurants"

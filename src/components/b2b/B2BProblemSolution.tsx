@@ -1,59 +1,32 @@
 "use client";
 
 import { AlertTriangle, CheckCircle2, ArrowRight, Eye, Banknote, MessageSquare } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-const painPoints = [
-  {
-    icon: Eye,
-    problem: {
-      title: "Invisibilité en ligne",
-      text: "Votre restaurant est noyé parmi des milliers sur Google. Pas de photos mises en valeur, pas de menu lisible, pas de fiche qui donne envie. Les clients passent à côté.",
-    },
-    solution: {
-      title: "Fiche professionnelle optimisée",
-      text: "Une fiche professionnelle optimisée pour le SEO, avec vos photos, votre menu, vos horaires. Vous apparaissez dans les recherches locales en 5 langues — y compris pour les touristes.",
-    },
-  },
-  {
-    icon: Banknote,
-    problem: {
-      title: "Les plateformes prennent une commission",
-      text: "Les plateformes à commission prennent entre 15% et 30% par commande ou réservation. Sur un plat à CHF 25, vous perdez jusqu'à CHF 7.50. Ça s'accumule vite.",
-    },
-    solution: {
-      title: "Zéro commission, zéro frais cachés",
-      text: "Les clients vous contactent directement par téléphone ou email. Vous ne payez qu'un abonnement fixe à partir de CHF 24.90/mois — vous savez exactement ce que ça coûte.",
-    },
-  },
-  {
-    icon: MessageSquare,
-    problem: {
-      title: "Avis incontrolables",
-      text: "Sur les plateformes génériques, n'importe qui peut poster un avis, même quelqu'un qui n'a jamais mis les pieds chez vous. Et répondre est compliqué.",
-    },
-    solution: {
-      title: "Avis vérifiés et modérés",
-      text: "Nos avis sont vérifiés et modérés. Vous pouvez répondre à chaque avis depuis votre tableau de bord. Votre note reflète vraiment la qualité de votre cuisine.",
-    },
-  },
-];
+const painPointKeys = [
+  { icon: Eye, key: "visibility" },
+  { icon: Banknote, key: "commission" },
+  { icon: MessageSquare, key: "reviews" },
+] as const;
 
 export function B2BProblemSolution() {
+  const t = useTranslations("b2bLanding.problemSolution");
+
   return (
     <section className="py-16 sm:py-24 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Vous avez un super restaurant,
+            {t("title")}
             <br />
             <span className="text-[var(--color-just-tag)]">
-              à nous de le mettre en lumière.
+              {t("titleHighlight")}
             </span>
           </h2>
         </div>
 
         <div className="mt-16 space-y-12">
-          {painPoints.map((item, index) => {
+          {painPointKeys.map((item, index) => {
             const Icon = item.icon;
             return (
               <div
@@ -67,11 +40,11 @@ export function B2BProblemSolution() {
                       <AlertTriangle className="h-5 w-5 text-red-600" />
                     </div>
                     <h3 className="font-semibold text-red-900">
-                      {item.problem.title}
+                      {t(`problems.${item.key}.title`)}
                     </h3>
                   </div>
                   <p className="text-sm text-red-800/80 leading-relaxed">
-                    {item.problem.text}
+                    {t(`problems.${item.key}.text`)}
                   </p>
                 </div>
 
@@ -94,11 +67,11 @@ export function B2BProblemSolution() {
                       <CheckCircle2 className="h-5 w-5 text-green-600" />
                     </div>
                     <h3 className="font-semibold text-green-900">
-                      {item.solution.title}
+                      {t(`solutions.${item.key}.title`)}
                     </h3>
                   </div>
                   <p className="text-sm text-green-800/80 leading-relaxed">
-                    {item.solution.text}
+                    {t(`solutions.${item.key}.text`)}
                   </p>
                 </div>
               </div>

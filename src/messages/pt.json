@@ -380,6 +380,292 @@
       }
     }
   },
+  "b2bLanding": {
+    "hero": {
+      "badge": "100% Suíço",
+      "headline": "Encha as suas mesas sem pagar comissão",
+      "subheadline": "O seu restaurante já está no Just-Tag, junto de {count}+ estabelecimentos da Suíça Romanda. Assuma o controlo da sua ficha e atraia novos clientes.",
+      "benefit1": "Zero comissão sobre as suas reservas e contactos",
+      "benefit2": "A sua ficha completa: menu, fotos, horários, avaliações verificadas",
+      "benefit3": "Visível em 5 idiomas para alcançar também os turistas",
+      "socialProof": "{count} restaurantes romandos já na plataforma",
+      "cta": "Experimentar grátis durante 14 dias",
+      "ctaSecondary": "Ver uma ficha exemplo"
+    },
+    "trustStats": {
+      "restaurants": "Restaurantes registados",
+      "cantons": "Cantões romandos cobertos",
+      "reviews": "Avaliações Google verificadas",
+      "commission": "Comissão sobre as suas reservas"
+    },
+    "problemSolution": {
+      "title": "Tem um restaurante excelente,",
+      "titleHighlight": "cabe-nos destacá-lo.",
+      "problems": {
+        "visibility": {
+          "title": "Invisibilidade online",
+          "text": "O seu restaurante perde-se entre milhares no Google. Sem fotos atrativas, sem menu legível, sem ficha que desperte interesse. Os clientes passam ao lado."
+        },
+        "commission": {
+          "title": "As plataformas cobram comissão",
+          "text": "As plataformas com comissão cobram entre 15% e 30% por encomenda ou reserva. Num prato a CHF 25, perde até CHF 7.50. Acumula-se rapidamente."
+        },
+        "reviews": {
+          "title": "Avaliações incontroláveis",
+          "text": "Nas plataformas genéricas, qualquer pessoa pode publicar uma avaliação, mesmo alguém que nunca esteve no seu restaurante. E responder é complicado."
+        }
+      },
+      "solutions": {
+        "visibility": {
+          "title": "Ficha profissional otimizada",
+          "text": "Uma ficha profissional otimizada para SEO, com as suas fotos, o seu menu e os seus horários. Aparece nas pesquisas locais em 5 idiomas — incluindo para turistas."
+        },
+        "commission": {
+          "title": "Zero comissão, zero custos ocultos",
+          "text": "Os clientes contactam-no diretamente por telefone ou email. Paga apenas uma subscrição fixa a partir de CHF 24.90/mês — sabe exatamente quanto custa."
+        },
+        "reviews": {
+          "title": "Avaliações verificadas e moderadas",
+          "text": "As nossas avaliações são verificadas e moderadas. Pode responder a cada avaliação a partir do seu painel de controlo. A sua nota reflete verdadeiramente a qualidade da sua cozinha."
+        }
+      }
+    },
+    "features": {
+      "title": "Tudo o que precisa, sem supérfluo",
+      "subtitle": "Sem truques inúteis. Ferramentas concretas para encher o seu restaurante.",
+      "items": {
+        "profile": {
+          "title": "Ficha profissional",
+          "desc": "Fotos, menu, horários, mapa interativo. A sua montra online, sempre atualizada."
+        },
+        "seo": {
+          "title": "SEO por cantão",
+          "desc": "O seu restaurante aparece quando um cliente pesquisa \"restaurante [a sua cidade]\" no Google."
+        },
+        "gallery": {
+          "title": "Galeria de fotos e vídeo",
+          "desc": "Mostre o seu ambiente, os seus pratos, a sua equipa. Até 20 fotos + 1 vídeo de apresentação."
+        },
+        "reviewMgmt": {
+          "title": "Gestão de avaliações",
+          "desc": "Receba avaliações verificadas, responda-lhes, melhore a sua nota. Tudo a partir do seu painel de controlo."
+        },
+        "stats": {
+          "title": "Estatísticas de visitas",
+          "desc": "Quantas pessoas viram a sua ficha, clicaram no seu número, consultaram o seu menu. Todas as semanas."
+        },
+        "directContact": {
+          "title": "Contacto direto com o cliente",
+          "desc": "Os clientes ligam-lhe ou escrevem-lhe diretamente. Sem comissão, sem plataforma de intermediário."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Preços claros, sem surpresas",
+      "subtitle": "Todos os planos incluem as mesmas funcionalidades. A única diferença: a duração do compromisso e o preço.",
+      "guarantee": "14 dias de teste grátis — garantia de satisfação",
+      "earlyBirdLabel": "Oferta de lançamento",
+      "earlyBirdBannerActive": "Oferta de lançamento: -40% para os primeiros 100 restaurantes. Restam apenas {count} lugares. Estas tarifas não voltarão.",
+      "earlyBirdBannerExpiring": "Oferta Early Bird a terminar em breve. Inscreva-se antes que seja tarde.",
+      "bestValue": "Melhor relação qualidade-preço",
+      "perMonth": "/mês",
+      "afterHundred": "após 100 inscrições",
+      "totalPrice": "ou seja, CHF {price} no total",
+      "freeTrial": "14 dias grátis",
+      "toteBags": "+ {count} tote bags personalizados oferecidos",
+      "planFeatures": {
+        "fullProfile": "Ficha completa",
+        "photos": "Fotos",
+        "video": "Vídeo de apresentação",
+        "menus": "Menus",
+        "contact": "Contacto",
+        "location": "Localização",
+        "offers": "Ofertas do momento"
+      },
+      "startTrial": "Começar teste grátis",
+      "lifetimeExclusive": "Exclusivo",
+      "lifetimeDesc": "O cálculo é simples: a CHF 24.90/mês, atinge CHF 1 495 em 5 anos. Com a oferta vitalícia, poupa tudo o que vem depois. E os 500 tote bags personalizados (valor estimado de CHF 2 500) estão incluídos.",
+      "lifetimeToteBags": "+ 500 tote bags personalizados oferecidos",
+      "singlePayment": "pagamento único",
+      "contactNote": "Ainda não está pronto? Deixe-nos o seu número, nós ligamos:"
+    },
+    "faq": {
+      "title": "As suas perguntas, as nossas respostas",
+      "items": {
+        "q1": {
+          "question": "Quanto é que me rende concretamente?",
+          "answer": "É difícil prometer um valor exato — depende da sua localização, tipo de cozinha e ticket médio. O que sabemos: os restaurantes com uma ficha completa (fotos, menu, horários atualizados) no Just-Tag recebem, em média, mais visitas do que os que não têm ficha. A CHF 24.90/mês, basta um único cliente adicional por mês para rentabilizar a sua subscrição. (Estimativa baseada num ticket médio de CHF 30-40 na restauração romanda.)"
+        },
+        "q2": {
+          "question": "Como verificam que sou o verdadeiro proprietário?",
+          "answer": "Na inscrição, indica o nome e a cidade do seu restaurante. A nossa equipa verifica manualmente se as informações correspondem antes de ativar o seu acesso ao painel de controlo. Se o seu restaurante já constar da nossa base de dados, pode reivindicá-lo diretamente."
+        },
+        "q3": {
+          "question": "Posso cancelar quando quiser?",
+          "answer": "Sim. O plano mensal é sem compromisso. Cancela a partir da sua área de cliente, sem justificação, com efeito no final do mês em curso. Os planos semestral e anual são faturados de uma vez; em caso de cancelamento, o seu acesso permanece ativo até ao final do período pago."
+        },
+        "q4": {
+          "question": "Cobram comissão sobre as minhas reservas?",
+          "answer": "Não. Zero comissão, zero taxas de transação. Os clientes contactam-no diretamente (telefone, email). Paga apenas a sua subscrição mensal, semestral ou anual. É tudo."
+        },
+        "q5": {
+          "question": "A quem pertencem os meus dados?",
+          "answer": "A si. As suas fotos, o seu menu e os seus textos continuam a ser sua propriedade. Se cancelar, eliminamos a sua ficha e os seus dados. O alojamento é na Suíça, em conformidade com a Lei Federal de Proteção de Dados (LPD) e o RGPD."
+        },
+        "q6": {
+          "question": "Qual é a diferença em relação às plataformas com comissão ou aos diretórios genéricos?",
+          "answer": "Os diretórios genéricos oferecem uma ficha básica: sem menu legível, fotos mal apresentadas, avaliações não moderadas. As plataformas com comissão cobram 2 a 5 EUR por coberto reservado. O Just-Tag combina uma ficha profissional completa, avaliações verificadas, zero comissão e posicionamento SEO local em 5 idiomas. Tudo por um preço fixo previsível."
+        },
+        "q7": {
+          "question": "Posso experimentar gratuitamente?",
+          "answer": "Sim. Todos os planos incluem 14 dias de teste grátis. Introduz os seus dados bancários na inscrição (através do Stripe, totalmente seguro), mas só é debitado ao 15.º dia. Se cancelar antes, zero custos."
+        },
+        "q8": {
+          "question": "O que acontece após os 14 dias?",
+          "answer": "A sua subscrição inicia-se automaticamente. Recebe um email de confirmação com a sua fatura. Se escolheu o plano mensal, pode continuar a cancelar a qualquer momento. Se escolheu semestral ou anual, beneficia da tarifa reduzida durante todo o período."
+        }
+      }
+    },
+    "finalCta": {
+      "spotsLeft": "Restam apenas {count} lugares na oferta Early Bird",
+      "joinNow": "Junte-se ao Just-Tag agora",
+      "subtitle": "14 dias grátis. Zero comissão. Cancele a qualquer momento.",
+      "cta": "Começar o meu teste grátis",
+      "contactNote": "Tem alguma pergunta? Escreva-nos para"
+    },
+    "earlyBirdBanner": {
+      "active": "Oferta Early Bird: restam apenas {count}/100 lugares com -40%. Depois, acabou.",
+      "expired": "Oferta Early Bird a terminar em breve"
+    },
+    "findRestaurant": {
+      "title": "O seu restaurante já pode estar no Just-Tag",
+      "subtitle": "Pesquise o seu estabelecimento e assuma o controlo da sua ficha.",
+      "placeholder": "Escreva o nome do seu restaurante...",
+      "foundTitle": "O seu restaurante {name} já está no Just-Tag.",
+      "foundSubtitle": "Reivindique a sua ficha para a personalizar e atrair mais clientes.",
+      "claimCta": "Reivindicar a minha ficha",
+      "notFoundTitle": "O seu restaurante ainda não está no Just-Tag.",
+      "notFoundSubtitle": "Adicione-o e aproveite a oferta Early Bird!",
+      "addCta": "Adicionar o meu restaurante"
+    },
+    "meta": {
+      "faqSchema": {
+        "q1": {
+          "q": "Quanto me rende concretamente?",
+          "a": "A CHF 24.90/mês, basta um único cliente adicional por mês para rentabilizar a sua subscrição."
+        },
+        "q2": {
+          "q": "Como verificam que sou o proprietário?",
+          "a": "A nossa equipa verifica manualmente se as informações correspondem antes de ativar o seu acesso."
+        },
+        "q3": {
+          "q": "Posso cancelar quando quiser?",
+          "a": "Sim. O plano mensal é sem compromisso. Cancele na sua área de cliente."
+        },
+        "q4": {
+          "q": "Cobram comissão sobre as minhas reservas?",
+          "a": "Não. Zero comissão, zero taxas de transação."
+        },
+        "q5": {
+          "q": "A quem pertencem os meus dados?",
+          "a": "A si. Alojamento na Suíça, conforme LPD e RGPD."
+        },
+        "q6": {
+          "q": "Qual a diferença com plataformas com comissão?",
+          "a": "Just-Tag combina ficha profissional, avaliações verificadas, zero comissão e SEO local em 5 idiomas."
+        },
+        "q7": {
+          "q": "Posso experimentar gratuitamente?",
+          "a": "Sim. Todos os planos incluem 14 dias grátis via Stripe."
+        },
+        "q8": {
+          "q": "O que acontece após os 14 dias?",
+          "a": "A subscrição inicia-se automaticamente. No plano mensal, cancele a qualquer momento."
+        }
+      }
+    }
+  },
+  "signupFlow": {
+    "steps": {
+      "signup": "Conta",
+      "restaurant": "Restaurante",
+      "plan": "Plano e Pagamento"
+    },
+    "title": "Tornar-se parceiro",
+    "subtitle": "Crie a sua conta, associe o seu restaurante e escolha o seu plano",
+    "signup": {
+      "name": "Nome completo *",
+      "namePlaceholder": "João Silva",
+      "email": "Email profissional *",
+      "emailPlaceholder": "voce@restaurante.ch",
+      "password": "Palavra-passe *",
+      "passwordPlaceholder": "Mínimo 6 caracteres",
+      "passwordConfirm": "Confirmar palavra-passe *",
+      "passwordConfirmPlaceholder": "Reescreva a sua palavra-passe",
+      "passwordMismatch": "As palavras-passe não coincidem",
+      "phone": "Telefone",
+      "phonePlaceholder": "+41 XX XXX XX XX",
+      "submitLoading": "A criar conta...",
+      "submit": "Criar a minha conta",
+      "alreadyAccount": "Já tem conta?",
+      "login": "Iniciar sessão"
+    },
+    "restaurant": {
+      "successBanner": "Conta criada com sucesso! Associe agora o seu restaurante.",
+      "searchLabel": "Procurar o seu restaurante",
+      "searchHint": "Encontre o seu restaurante na nossa base de dados",
+      "searchPlaceholder": "Escreva o nome do seu restaurante...",
+      "change": "Alterar",
+      "noResults": "Nenhum restaurante encontrado",
+      "noResultsHint": "Pode criar a sua ficha abaixo",
+      "or": "ou",
+      "notInList": "O meu restaurante não está na lista",
+      "newTitle": "Criar uma nova ficha de restaurante",
+      "newName": "Nome do restaurante *",
+      "newNamePlaceholder": "O Pequeno Príncipe",
+      "newCity": "Cidade *",
+      "newCityPlaceholder": "Genebra",
+      "newCuisine": "Tipo de cozinha",
+      "newCuisinePlaceholder": "Francesa, Italiana, Suíça...",
+      "cancel": "Cancelar",
+      "skip": "Saltar esta etapa",
+      "continueLoading": "A processar...",
+      "continue": "Continuar"
+    },
+    "plan": {
+      "earlyBirdTitle": "Oferta Early Bird",
+      "earlyBirdSeats": "Restam apenas {count} lugar(es) à tarifa preferencial!",
+      "trialInfo": "14 dias de teste grátis nas subscrições. Sem compromisso.",
+      "monthly": "Mensal",
+      "semiannual": "Semestral",
+      "annual": "Anual",
+      "perMonth": "/mês",
+      "totalLabel": "Ou seja, CHF {price} {period}",
+      "freeTrial": "14 dias grátis",
+      "bestValue": "Melhor relação qualidade-preço",
+      "lifetimeTitle": "Lifetime",
+      "lifetimeExclusive": "Exclusivo",
+      "lifetimeDesc": "Pagamento único, acesso vitalício. Sem subscrição recorrente.",
+      "lifetimePrice": "CHF 1 495",
+      "lifetimeSingle": "Pagamento único",
+      "back": "Voltar",
+      "checkoutLoading": "A redirecionar para o pagamento...",
+      "checkoutLifetime": "Pagar CHF 1 495",
+      "checkoutTrial": "Começar teste grátis (14 dias)"
+    },
+    "redirecting": {
+      "title": "A redirecionar para o Stripe...",
+      "subtitle": "Será redirecionado para a página de pagamento segura."
+    },
+    "errors": {
+      "unknown": "Erro desconhecido",
+      "merchantIdFetch": "Conta criada mas não foi possível obter o identificador. Por favor, contacte o suporte.",
+      "claimFailed": "Erro ao reivindicar",
+      "createFailed": "Erro na criação",
+      "checkoutFailed": "Erro ao criar sessão de pagamento",
+      "paymentCanceled": "Pagamento cancelado. Pode escolher outro plano ou tentar novamente."
+    }
+  },
   "cantonMap": {
     "title": "Explore por cantão",
     "subtitle": "Clique num cantão para descobrir os seus restaurantes"

@@ -380,6 +380,292 @@
       }
     }
   },
+  "b2bLanding": {
+    "hero": {
+      "badge": "100% Schweizer",
+      "headline": "Füllen Sie Ihre Tische — ohne Provision",
+      "subheadline": "Ihr Restaurant ist bereits auf Just-Tag — zusammen mit {count}+ Westschweizer Betrieben. Übernehmen Sie die Kontrolle über Ihr Profil und gewinnen Sie neue Gäste.",
+      "benefit1": "Keine Provision auf Ihre Reservierungen und Anfragen",
+      "benefit2": "Ihr vollständiges Profil: Speisekarte, Fotos, Öffnungszeiten, verifizierte Bewertungen",
+      "benefit3": "Sichtbar in 5 Sprachen — auch für Touristen",
+      "socialProof": "{count} Westschweizer Restaurants bereits auf der Plattform",
+      "cta": "14 Tage kostenlos testen",
+      "ctaSecondary": "Beispielprofil ansehen"
+    },
+    "trustStats": {
+      "restaurants": "Registrierte Restaurants",
+      "cantons": "Westschweizer Kantone abgedeckt",
+      "reviews": "Verifizierte Google-Bewertungen",
+      "commission": "Provision auf Ihre Reservierungen"
+    },
+    "problemSolution": {
+      "title": "Sie haben ein tolles Restaurant,",
+      "titleHighlight": "wir bringen es ins Rampenlicht.",
+      "problems": {
+        "visibility": {
+          "title": "Online unsichtbar",
+          "text": "Ihr Restaurant geht unter Tausenden auf Google unter. Keine ansprechenden Fotos, keine lesbare Speisekarte, kein Profil, das Lust macht. Potenzielle Gäste scrollen vorbei."
+        },
+        "commission": {
+          "title": "Plattformen kassieren Provision",
+          "text": "Provisionsbasierte Plattformen verlangen 15% bis 30% pro Bestellung oder Reservierung. Bei einem Gericht für CHF 25 verlieren Sie bis zu CHF 7.50. Das summiert sich schnell."
+        },
+        "reviews": {
+          "title": "Unkontrollierbare Bewertungen",
+          "text": "Auf generischen Plattformen kann jeder eine Bewertung abgeben — selbst jemand, der nie bei Ihnen war. Und darauf zu antworten, ist umständlich."
+        }
+      },
+      "solutions": {
+        "visibility": {
+          "title": "Professionelles, optimiertes Profil",
+          "text": "Ein SEO-optimiertes Profil mit Ihren Fotos, Ihrer Speisekarte und Ihren Öffnungszeiten. Sie erscheinen in lokalen Suchergebnissen in 5 Sprachen — auch für Touristen."
+        },
+        "commission": {
+          "title": "Keine Provision, keine versteckten Kosten",
+          "text": "Gäste kontaktieren Sie direkt per Telefon oder E-Mail. Sie zahlen nur ein festes Abonnement ab CHF 24.90/Monat — Sie wissen genau, was es kostet."
+        },
+        "reviews": {
+          "title": "Verifizierte und moderierte Bewertungen",
+          "text": "Unsere Bewertungen sind verifiziert und moderiert. Sie können über Ihr Dashboard auf jede Bewertung antworten. Ihre Bewertung spiegelt tatsächlich die Qualität Ihrer Küche wider."
+        }
+      }
+    },
+    "features": {
+      "title": "Alles, was Sie brauchen — nichts Überflüssiges",
+      "subtitle": "Keine unnötigen Spielereien. Konkrete Werkzeuge, um Ihr Restaurant zu füllen.",
+      "items": {
+        "profile": {
+          "title": "Professionelles Profil",
+          "desc": "Fotos, Speisekarte, Öffnungszeiten, interaktive Karte. Ihr Online-Schaufenster, immer aktuell."
+        },
+        "seo": {
+          "title": "SEO nach Kanton",
+          "desc": "Ihr Restaurant erscheint, wenn ein Gast auf Google nach \"Restaurant [Ihre Stadt]\" sucht."
+        },
+        "gallery": {
+          "title": "Foto- und Videogalerie",
+          "desc": "Zeigen Sie Ihr Ambiente, Ihre Gerichte, Ihr Team. Bis zu 20 Fotos + 1 Präsentationsvideo."
+        },
+        "reviewMgmt": {
+          "title": "Bewertungsmanagement",
+          "desc": "Erhalten Sie verifizierte Bewertungen, antworten Sie darauf, verbessern Sie Ihre Note. Alles über Ihr Dashboard."
+        },
+        "stats": {
+          "title": "Besuchsstatistiken",
+          "desc": "Wie viele Personen Ihr Profil gesehen, Ihre Nummer angeklickt, Ihre Speisekarte aufgerufen haben. Wöchentlich."
+        },
+        "directContact": {
+          "title": "Direkter Kundenkontakt",
+          "desc": "Gäste rufen Sie an oder schreiben Ihnen direkt. Keine Provision, keine Plattform dazwischen."
+        }
+      }
+    },
+    "pricing": {
+      "title": "Klare Preise, keine Überraschungen",
+      "subtitle": "Alle Pläne beinhalten die gleichen Funktionen. Der einzige Unterschied: Laufzeit und Preis.",
+      "guarantee": "14 Tage kostenlos testen — Zufriedenheitsgarantie",
+      "earlyBirdLabel": "Einführungsangebot",
+      "earlyBirdBannerActive": "Einführungsangebot: -40% für die ersten 100 Restaurants. Nur noch {count} Plätze verfügbar. Diese Preise kommen nicht wieder.",
+      "earlyBirdBannerExpiring": "Early-Bird-Angebot endet bald. Melden Sie sich an, bevor es zu spät ist.",
+      "bestValue": "Bestes Preis-Leistungs-Verhältnis",
+      "perMonth": "/Monat",
+      "afterHundred": "nach 100 Anmeldungen",
+      "totalPrice": "d.h. CHF {price} insgesamt",
+      "freeTrial": "14 Tage gratis",
+      "toteBags": "+ {count} personalisierte Tote-Bags gratis",
+      "planFeatures": {
+        "fullProfile": "Vollständiges Profil",
+        "photos": "Fotos",
+        "video": "Präsentationsvideo",
+        "menus": "Speisekarte",
+        "contact": "Kontakt",
+        "location": "Standort",
+        "offers": "Aktuelle Angebote"
+      },
+      "startTrial": "Kostenlos testen",
+      "lifetimeExclusive": "Exklusiv",
+      "lifetimeDesc": "Die Rechnung ist einfach: Bei CHF 24.90/Monat erreichen Sie CHF 1 495 in 5 Jahren. Mit dem Lebenslang-Angebot sparen Sie alles danach. Und 500 personalisierte Tote-Bags (geschätzter Wert CHF 2 500) sind inklusive.",
+      "lifetimeToteBags": "+ 500 personalisierte Tote-Bags gratis",
+      "singlePayment": "Einmalzahlung",
+      "contactNote": "Noch nicht bereit? Hinterlassen Sie Ihre Nummer, wir rufen Sie an:"
+    },
+    "faq": {
+      "title": "Ihre Fragen, unsere Antworten",
+      "items": {
+        "q1": {
+          "question": "Was bringt es mir konkret?",
+          "answer": "Einen genauen Betrag zu versprechen, ist schwierig — das hängt von Ihrem Standort, Ihrer Küche und Ihrem Durchschnittsbon ab. Was wir wissen: Restaurants mit einem vollständigen Profil (Fotos, Speisekarte, aktuelle Öffnungszeiten) auf Just-Tag erhalten im Durchschnitt mehr Besuche als solche ohne Profil. Bei CHF 24.90/Monat genügt bereits ein einziger zusätzlicher Gast pro Monat, um Ihr Abonnement zu amortisieren. (Schätzung basierend auf einem durchschnittlichen Bon von CHF 30-40 in der Westschweizer Gastronomie.)"
+        },
+        "q2": {
+          "question": "Wie überprüfen Sie, dass ich tatsächlich der Inhaber bin?",
+          "answer": "Bei der Anmeldung geben Sie den Namen und die Stadt Ihres Restaurants an. Unser Team überprüft anschliessend manuell, ob die Angaben übereinstimmen, bevor Ihr Dashboard-Zugang freigeschaltet wird. Wenn Ihr Restaurant bereits in unserer Datenbank ist, können Sie es direkt beanspruchen."
+        },
+        "q3": {
+          "question": "Kann ich jederzeit kündigen?",
+          "answer": "Ja. Der Monatsplan ist ohne Bindung. Sie kündigen über Ihren Kundenbereich, ohne Begründung, wirksam zum Monatsende. Halbjahres- und Jahrespläne werden einmalig abgerechnet; bei Kündigung bleibt Ihr Zugang bis zum Ende des bezahlten Zeitraums aktiv."
+        },
+        "q4": {
+          "question": "Nehmen Sie eine Provision auf meine Reservierungen?",
+          "answer": "Nein. Null Provision, null Transaktionsgebühren. Gäste kontaktieren Sie direkt (Telefon, E-Mail). Sie zahlen nur Ihr monatliches, halbjährliches oder jährliches Abonnement. Punkt."
+        },
+        "q5": {
+          "question": "Wem gehören meine Daten?",
+          "answer": "Ihnen. Ihre Fotos, Ihre Speisekarte, Ihre Texte bleiben Ihr Eigentum. Bei Kündigung löschen wir Ihr Profil und Ihre Daten. Das Hosting befindet sich in der Schweiz, konform mit dem Schweizer Datenschutzgesetz (DSG) und der DSGVO."
+        },
+        "q6": {
+          "question": "Was unterscheidet Sie von Provisionsplattformen oder generischen Verzeichnissen?",
+          "answer": "Generische Verzeichnisse bieten ein einfaches Profil: keine lesbare Speisekarte, schlecht präsentierte Fotos, unmoderierte Bewertungen. Provisionsplattformen verlangen 2 bis 5 EUR pro gedecktem Couvert. Just-Tag kombiniert ein vollständiges professionelles Profil, verifizierte Bewertungen, null Provision und lokales SEO in 5 Sprachen. Alles zu einem vorhersehbaren Festpreis."
+        },
+        "q7": {
+          "question": "Kann ich kostenlos testen?",
+          "answer": "Ja. Alle Pläne beinhalten eine 14-tägige kostenlose Testphase. Sie hinterlegen bei der Anmeldung Ihre Bankdaten (über Stripe, absolut sicher), werden aber erst am 15. Tag belastet. Wenn Sie vorher kündigen, fallen keine Kosten an."
+        },
+        "q8": {
+          "question": "Was passiert nach den 14 Tagen?",
+          "answer": "Ihr Abonnement startet automatisch. Sie erhalten eine Bestätigungs-E-Mail mit Ihrer Rechnung. Beim Monatsplan können Sie weiterhin jederzeit kündigen. Beim Halbjahres- oder Jahresplan profitieren Sie vom reduzierten Tarif für den gesamten Zeitraum."
+        }
+      }
+    },
+    "finalCta": {
+      "spotsLeft": "Nur noch {count} Plätze im Early-Bird-Angebot",
+      "joinNow": "Jetzt Just-Tag beitreten",
+      "subtitle": "14 Tage gratis. Keine Provision. Jederzeit kündbar.",
+      "cta": "Kostenlose Testphase starten",
+      "contactNote": "Haben Sie eine Frage? Schreiben Sie uns an"
+    },
+    "earlyBirdBanner": {
+      "active": "Early-Bird-Angebot: nur noch {count}/100 Plätze mit -40%. Danach ist Schluss.",
+      "expired": "Early-Bird-Angebot endet bald"
+    },
+    "findRestaurant": {
+      "title": "Ihr Restaurant ist vielleicht schon auf Just-Tag",
+      "subtitle": "Suchen Sie nach Ihrem Betrieb und übernehmen Sie die Kontrolle über Ihr Profil.",
+      "placeholder": "Geben Sie den Namen Ihres Restaurants ein...",
+      "foundTitle": "Ihr Restaurant {name} ist bereits auf Just-Tag.",
+      "foundSubtitle": "Beanspruchen Sie Ihr Profil, um es anzupassen und mehr Gäste zu gewinnen.",
+      "claimCta": "Mein Profil beanspruchen",
+      "notFoundTitle": "Ihr Restaurant ist noch nicht auf Just-Tag.",
+      "notFoundSubtitle": "Fügen Sie es hinzu und profitieren Sie vom Early-Bird-Angebot!",
+      "addCta": "Mein Restaurant hinzufügen"
+    },
+    "meta": {
+      "faqSchema": {
+        "q1": {
+          "q": "Was bringt es mir konkret?",
+          "a": "Bei CHF 24.90/Monat genügt ein einziger zusätzlicher Gast pro Monat, um Ihr Abonnement zu amortisieren."
+        },
+        "q2": {
+          "q": "Wie überprüfen Sie, dass ich der Inhaber bin?",
+          "a": "Unser Team überprüft manuell, ob die Angaben übereinstimmen, bevor Ihr Zugang freigeschaltet wird."
+        },
+        "q3": {
+          "q": "Kann ich jederzeit kündigen?",
+          "a": "Ja. Der Monatsplan ist ohne Bindung. Kündigung über Ihren Kundenbereich."
+        },
+        "q4": {
+          "q": "Nehmen Sie Provision auf meine Reservierungen?",
+          "a": "Nein. Null Provision, null Transaktionsgebühren."
+        },
+        "q5": {
+          "q": "Wem gehören meine Daten?",
+          "a": "Ihnen. Hosting in der Schweiz, konform mit DSG und DSGVO."
+        },
+        "q6": {
+          "q": "Was unterscheidet Sie von Provisionsplattformen?",
+          "a": "Just-Tag kombiniert professionelles Profil, verifizierte Bewertungen, null Provision und lokales SEO in 5 Sprachen."
+        },
+        "q7": {
+          "q": "Kann ich kostenlos testen?",
+          "a": "Ja. Alle Pläne beinhalten 14 Tage kostenlose Testphase über Stripe."
+        },
+        "q8": {
+          "q": "Was passiert nach den 14 Tagen?",
+          "a": "Ihr Abonnement startet automatisch. Beim Monatsplan jederzeit kündbar."
+        }
+      }
+    }
+  },
+  "signupFlow": {
+    "steps": {
+      "signup": "Konto",
+      "restaurant": "Restaurant",
+      "plan": "Plan & Zahlung"
+    },
+    "title": "Partner werden",
+    "subtitle": "Erstellen Sie Ihr Konto, verknüpfen Sie Ihr Restaurant und wählen Sie Ihren Plan",
+    "signup": {
+      "name": "Vollständiger Name *",
+      "namePlaceholder": "Max Müller",
+      "email": "Geschäftliche E-Mail *",
+      "emailPlaceholder": "sie@restaurant.ch",
+      "password": "Passwort *",
+      "passwordPlaceholder": "Mindestens 6 Zeichen",
+      "passwordConfirm": "Passwort bestätigen *",
+      "passwordConfirmPlaceholder": "Passwort erneut eingeben",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein",
+      "phone": "Telefon",
+      "phonePlaceholder": "+41 XX XXX XX XX",
+      "submitLoading": "Konto wird erstellt...",
+      "submit": "Mein Konto erstellen",
+      "alreadyAccount": "Bereits ein Konto?",
+      "login": "Anmelden"
+    },
+    "restaurant": {
+      "successBanner": "Konto erfolgreich erstellt! Verknüpfen Sie jetzt Ihr Restaurant.",
+      "searchLabel": "Ihr Restaurant suchen",
+      "searchHint": "Finden Sie Ihr Restaurant in unserer Datenbank",
+      "searchPlaceholder": "Geben Sie den Namen Ihres Restaurants ein...",
+      "change": "Ändern",
+      "noResults": "Kein Restaurant gefunden",
+      "noResultsHint": "Sie können Ihr Profil unten erstellen",
+      "or": "oder",
+      "notInList": "Mein Restaurant ist nicht in der Liste",
+      "newTitle": "Neues Restaurantprofil erstellen",
+      "newName": "Restaurantname *",
+      "newNamePlaceholder": "Der Kleine Prinz",
+      "newCity": "Stadt *",
+      "newCityPlaceholder": "Genf",
+      "newCuisine": "Küchenart",
+      "newCuisinePlaceholder": "Französisch, Italienisch, Schweizer...",
+      "cancel": "Abbrechen",
+      "skip": "Diesen Schritt überspringen",
+      "continueLoading": "Wird verarbeitet...",
+      "continue": "Weiter"
+    },
+    "plan": {
+      "earlyBirdTitle": "Early-Bird-Angebot",
+      "earlyBirdSeats": "Nur noch {count} Platz/Plätze zum Vorzugstarif!",
+      "trialInfo": "14 Tage kostenlos testen. Ohne Bindung.",
+      "monthly": "Monatlich",
+      "semiannual": "Halbjährlich",
+      "annual": "Jährlich",
+      "perMonth": "/Monat",
+      "totalLabel": "D.h. CHF {price} {period}",
+      "freeTrial": "14 Tage gratis",
+      "bestValue": "Bestes Preis-Leistungs-Verhältnis",
+      "lifetimeTitle": "Lifetime",
+      "lifetimeExclusive": "Exklusiv",
+      "lifetimeDesc": "Einmalzahlung, lebenslanger Zugang. Kein wiederkehrendes Abonnement.",
+      "lifetimePrice": "CHF 1 495",
+      "lifetimeSingle": "Einmalzahlung",
+      "back": "Zurück",
+      "checkoutLoading": "Weiterleitung zur Zahlung...",
+      "checkoutLifetime": "CHF 1 495 bezahlen",
+      "checkoutTrial": "Kostenlose Testphase starten (14 Tage)"
+    },
+    "redirecting": {
+      "title": "Weiterleitung zu Stripe...",
+      "subtitle": "Sie werden zur sicheren Zahlungsseite weitergeleitet."
+    },
+    "errors": {
+      "unknown": "Unbekannter Fehler",
+      "merchantIdFetch": "Konto erstellt, aber die Kennung konnte nicht abgerufen werden. Bitte kontaktieren Sie den Support.",
+      "claimFailed": "Fehler bei der Beanspruchung",
+      "createFailed": "Fehler bei der Erstellung",
+      "checkoutFailed": "Fehler bei der Erstellung der Zahlungssitzung",
+      "paymentCanceled": "Zahlung abgebrochen. Sie können einen anderen Plan wählen oder es erneut versuchen."
+    }
+  },
   "cantonMap": {
     "title": "Nach Kanton entdecken",
     "subtitle": "Klicken Sie auf einen Kanton, um seine Restaurants zu entdecken"

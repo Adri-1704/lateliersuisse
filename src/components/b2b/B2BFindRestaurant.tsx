@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Search, Loader2, MapPin, ArrowRight, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { searchAllRestaurants } from "@/actions/b2b-search";
 import Link from "next/link";
@@ -14,6 +15,7 @@ interface RestaurantResult {
 }
 
 export function B2BFindRestaurant() {
+  const t = useTranslations("b2bLanding.findRestaurant");
   const params = useParams();
   const locale = params.locale as string;
   const [query, setQuery] = useState("");
@@ -47,10 +49,10 @@ export function B2BFindRestaurant() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Votre restaurant est peut-être déjà sur Just-Tag
+            {t("title")}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            Recherchez votre établissement et prenez le contrôle de votre fiche.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -65,7 +67,7 @@ export function B2BFindRestaurant() {
                 setQuery(e.target.value);
                 setSelectedRestaurant(null);
               }}
-              placeholder="Tapez le nom de votre restaurant..."
+              placeholder={t("placeholder")}
               className="block w-full rounded-xl border-2 border-gray-200 bg-white pl-12 pr-12 py-4 text-base outline-none transition-colors focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
             />
             {searching && (
@@ -101,20 +103,16 @@ export function B2BFindRestaurant() {
           {selectedRestaurant && (
             <div className="mt-6 rounded-2xl border-2 border-[var(--color-just-tag)] bg-[var(--color-just-tag)]/5 p-6 text-center">
               <p className="text-lg font-semibold text-gray-900">
-                Votre restaurant{" "}
-                <span className="text-[var(--color-just-tag)]">
-                  {selectedRestaurant.name}
-                </span>{" "}
-                est déjà sur Just-Tag.
+                {t("foundTitle", { name: selectedRestaurant.name })}
               </p>
               <p className="mt-2 text-sm text-gray-600">
-                Revendiquez votre fiche pour la personnaliser et attirer plus de clients.
+                {t("foundSubtitle")}
               </p>
               <Link
                 href={`/${locale}/partenaire-inscription?restaurant=${selectedRestaurant.slug}`}
               >
                 <Button className="mt-4 bg-[var(--color-just-tag)] px-8 py-3 text-base hover:bg-[var(--color-just-tag-dark)]">
-                  Revendiquer ma fiche
+                  {t("claimCta")}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -125,15 +123,15 @@ export function B2BFindRestaurant() {
           {hasSearched && query.length >= 2 && results.length === 0 && !selectedRestaurant && !searching && (
             <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center">
               <p className="text-gray-700">
-                Votre restaurant n&apos;est pas encore sur Just-Tag.
+                {t("notFoundTitle")}
               </p>
               <p className="mt-1 text-sm text-gray-500">
-                Ajoutez-le et profitez de l&apos;offre Early Bird !
+                {t("notFoundSubtitle")}
               </p>
               <Link href={`/${locale}/partenaire-inscription`}>
                 <Button className="mt-4 bg-[var(--color-just-tag)] px-8 py-3 text-base hover:bg-[var(--color-just-tag-dark)]">
                   <Plus className="mr-2 h-5 w-5" />
-                  Ajouter mon restaurant
+                  {t("addCta")}
                 </Button>
               </Link>
             </div>

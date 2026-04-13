@@ -1,17 +1,20 @@
 "use client";
 
 import { UtensilsCrossed, MapPin, Star, Ban } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface B2BTrustStatsProps {
   totalRestaurants: number;
 }
 
 export function B2BTrustStats({ totalRestaurants }: B2BTrustStatsProps) {
+  const t = useTranslations("b2bLanding.trustStats");
+
   const stats = [
-    { value: `${totalRestaurants}+`, label: "Restaurants inscrits", icon: UtensilsCrossed },
-    { value: "7", label: "Cantons romands couverts", icon: MapPin },
-    { value: "1 488+", label: "Avis Google vérifiés", icon: Star },
-    { value: "0%", label: "Commission sur vos réservations", icon: Ban },
+    { value: `${totalRestaurants}+`, label: t("restaurants"), icon: UtensilsCrossed },
+    { value: "7", label: t("cantons"), icon: MapPin },
+    { value: "1 488+", label: t("reviews"), icon: Star },
+    { value: "0%", label: t("commission"), icon: Ban },
   ];
 
   return (
