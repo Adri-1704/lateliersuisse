@@ -53,9 +53,9 @@ function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaur
     openingHours: (row.opening_hours as Record<string, { open: string; close: string }>) || {},
     features: (row.features as string[]) || [],
     coverImage: (row.cover_image as string) || placeholderImages[index % placeholderImages.length],
-    images: (row.cover_image as string)
-      ? [row.cover_image as string]
-      : [placeholderImages[index % placeholderImages.length]],
+    // Gallery affiche uniquement les photos uploadées par le restaurateur
+    // (table restaurant_images). Pas de fallback sur cover_image ou placeholder.
+    images: [],
     isFeatured: (row.is_featured as boolean) || false,
     isPublished: (row.is_published as boolean) || true,
     menuItems: [],
