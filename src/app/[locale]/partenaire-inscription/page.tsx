@@ -41,6 +41,7 @@ interface SignupData {
   name: string;
   email: string;
   password: string;
+  passwordConfirm: string;
   phone: string;
   merchantId: string | null;
 }
@@ -145,6 +146,7 @@ export default function MerchantSignupPage() {
     name: "",
     email: "",
     password: "",
+    passwordConfirm: "",
     phone: "",
     merchantId: null,
   });
@@ -218,6 +220,13 @@ export default function MerchantSignupPage() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    // Vérification que les deux mots de passe correspondent
+    if (signupData.password !== signupData.passwordConfirm) {
+      setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
     setLoading(true);
 
     const result = await registerMerchant({
@@ -456,6 +465,34 @@ export default function MerchantSignupPage() {
               placeholder="Minimum 6 caractères"
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Confirmer le mot de passe *
+            </label>
+            <input
+              type="password"
+              required
+              minLength={6}
+              value={signupData.passwordConfirm}
+              onChange={(e) =>
+                setSignupData((p) => ({ ...p, passwordConfirm: e.target.value }))
+              }
+              placeholder="Retapez votre mot de passe"
+              className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:ring-1 ${
+                signupData.passwordConfirm &&
+                signupData.passwordConfirm !== signupData.password
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-[var(--color-just-tag)] focus:ring-[var(--color-just-tag)]"
+              }`}
+            />
+            {signupData.passwordConfirm &&
+              signupData.passwordConfirm !== signupData.password && (
+                <p className="mt-1 text-xs text-red-600">
+                  Les mots de passe ne correspondent pas
+                </p>
+              )}
           </div>
 
           <div>
