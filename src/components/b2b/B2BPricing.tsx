@@ -131,7 +131,7 @@ export function B2BPricing() {
 
     startTransition(async () => {
       const res = await createCheckoutSession({
-        planType: (selectedPlan || "annual") as "monthly" | "semiannual" | "annual" | "lifetime",
+        planType: (selectedPlan === "lifetime" ? "annual" : selectedPlan || "annual") as "monthly" | "semiannual" | "annual",
         merchantName: formData.get("name") as string,
         merchantEmail: formData.get("email") as string,
         merchantPhone: formData.get("phone") as string,

@@ -1,13 +1,13 @@
 "use server";
 
-import { getStripe, PLAN_PRICES } from "@/lib/stripe";
+import { getStripe, PLAN_PRICES, getPriceId, TRIAL_DAYS } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { paymentConfirmation, merchantWelcome, freeTrialWelcome, freeTrialAdminNotification } from "@/lib/email-templates";
 import { createServerClient } from "@supabase/ssr";
 
 interface CreateCheckoutParams {
-  planType: "monthly" | "semiannual" | "annual" | "lifetime";
+  planType: "monthly" | "semiannual" | "annual";
   merchantName: string;
   merchantEmail: string;
   merchantPhone: string;
@@ -43,15 +43,23 @@ export async function createCheckoutSession(
     }
 
     const stripe = getStripe();
-    const priceId = PLAN_PRICES[planType];
+
+    // Count active subscribers to determine Early Bird eligibility
+    const supabase = createAdminClient();
+    const { count } = await supabase
+      .from("subscriptions")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["active", "trialing"]);
+
+    const subscriberCount = count || 0;
+    const priceId = getPriceId(planType, subscriberCount);
+
     if (!priceId) {
-      return { url: null, error: "Invalid plan type" };
+      return { url: null, error: "Invalid plan type or missing price configuration" };
     }
 
-    const isLifetime = planType === "lifetime";
-
     const session = await stripe.checkout.sessions.create({
-      mode: isLifetime ? "payment" : "subscription",
+      mode: "subscription",
       payment_method_types: ["card"],
       customer_email: merchantEmail,
       line_items: [
@@ -60,6 +68,9 @@ export async function createCheckoutSession(
           quantity: 1,
         },
       ],
+      subscription_data: {
+        trial_period_days: TRIAL_DAYS,
+      },
       metadata: {
         merchant_name: params.merchantName,
         merchant_phone: params.merchantPhone,
@@ -67,6 +78,7 @@ export async function createCheckoutSession(
         restaurant_city: params.restaurantCity,
         plan_type: planType,
         locale: locale,
+        early_bird: subscriberCount < 100 ? "true" : "false",
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription/succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription`,
