@@ -61,14 +61,14 @@ export default async function B2BRequestsPage({
                     </TableCell>
                     <TableCell className="font-medium">
                       <Link href={`/admin/b2b-requests/${r.id}`} className="block">
-                        {r.first_name} {r.last_name}
+                        {r.first_name || r.last_name ? `${r.first_name || ""} ${r.last_name || ""}`.trim() : "\u2014"}
                       </Link>
                     </TableCell>
                     <TableCell>
                       <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.restaurant_name}</Link>
                     </TableCell>
                     <TableCell>
-                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.city}</Link>
+                      <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.city || "\u2014"}</Link>
                     </TableCell>
                     <TableCell className="text-sm">
                       <Link href={`/admin/b2b-requests/${r.id}`} className="block">{r.email}</Link>

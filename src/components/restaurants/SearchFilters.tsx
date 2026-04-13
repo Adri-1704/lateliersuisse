@@ -11,7 +11,11 @@ import { cuisineCategories } from "@/data/mock-categories";
 import { featuresOptions } from "@/data/mock-restaurants";
 import { getLocalizedLabel, getLocalizedName, getLocalizedLabelAlt } from "@/lib/locale-helpers";
 
-export function SearchFilters() {
+interface SearchFiltersProps {
+  cuisineCounts?: Record<string, number>;
+}
+
+export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
   const t = useTranslations("search");
   const tHero = useTranslations("hero");
   const params = useParams();
@@ -106,7 +110,9 @@ export function SearchFilters() {
           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
         >
           <option value="">{tHero("allCuisines")}</option>
-          {cuisineCategories.map((c) => (
+          {cuisineCategories
+            .filter((c) => !cuisineCounts || (cuisineCounts[c.slug] || 0) > 0)
+            .map((c) => (
             <option key={c.slug} value={c.slug}>
               {c.icon} {getLocalizedName(c, locale)}
             </option>

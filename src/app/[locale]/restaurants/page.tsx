@@ -3,6 +3,7 @@ import { RestaurantCardSkeletonGrid } from "@/components/restaurants/RestaurantC
 import {
   fetchFilteredRestaurants,
   fetchAllFilteredForMap,
+  fetchCuisineCounts,
   type RestaurantFilters,
 } from "@/lib/restaurants/queries";
 import RestaurantsView from "./RestaurantsView";
@@ -61,9 +62,10 @@ export default async function RestaurantsPage({
 
   // ---- Fetch data ----
 
-  const [listResult, mapData] = await Promise.all([
+  const [listResult, mapData, cuisineCounts] = await Promise.all([
     fetchFilteredRestaurants(filters, page, 24),
     viewIsMap ? fetchAllFilteredForMap(filters) : Promise.resolve(null),
+    fetchCuisineCounts(),
   ]);
 
   // ---- Render ----
@@ -82,6 +84,7 @@ export default async function RestaurantsPage({
         currentPage={page}
         mapRestaurants={mapData}
         locale={locale}
+        cuisineCounts={cuisineCounts}
       />
     </Suspense>
   );

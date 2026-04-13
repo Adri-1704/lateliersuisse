@@ -8,12 +8,9 @@ import {
 } from "@/lib/email-templates";
 
 interface B2BContactData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
   restaurantName: string;
-  city: string;
+  email: string;
+  phone: string;
   message?: string;
   locale: string;
 }
@@ -32,11 +29,9 @@ export async function submitB2BContactRequest(
 ): Promise<B2BContactResult> {
   // Basic validation
   if (
-    !data.firstName ||
-    !data.lastName ||
-    !data.email ||
     !data.restaurantName ||
-    !data.city
+    !data.email ||
+    !data.phone
   ) {
     return { success: false, error: "Missing required fields" };
   }
@@ -52,12 +47,9 @@ export async function submitB2BContactRequest(
       const supabase = createAdminClient();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from("b2b_contact_requests") as any).insert({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email,
-        phone: data.phone || null,
         restaurant_name: data.restaurantName,
-        city: data.city,
+        email: data.email,
+        phone: data.phone,
         message: data.message || null,
         locale: data.locale,
       });
@@ -68,11 +60,9 @@ export async function submitB2BContactRequest(
     } catch {
       // Fallback: Supabase not configured
       console.log("B2B Contact Request (fallback):", {
-        name: `${data.firstName} ${data.lastName}`,
         email: data.email,
         phone: data.phone,
         restaurant: data.restaurantName,
-        city: data.city,
         message: data.message,
         locale: data.locale,
       });

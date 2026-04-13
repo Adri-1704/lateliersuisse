@@ -272,12 +272,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 // 1. B2B Admin Notification (always in French)
 // ---------------------------------------------------------------------------
 export interface B2BEmailData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
   restaurantName: string;
-  city: string;
+  email: string;
+  phone: string;
   message?: string;
   locale: string;
 }
@@ -292,11 +289,9 @@ export function b2bAdminNotification(data: B2BEmailData): {
       `Un restaurateur souhaite être contacté. Voici les détails :`
     ),
     divider(),
-    label("Nom", `${data.firstName} ${data.lastName}`),
-    label("Email", data.email),
-    data.phone ? label("Téléphone", data.phone) : "",
     label("Restaurant", data.restaurantName),
-    label("Ville", data.city),
+    label("Email", data.email),
+    label("Téléphone", data.phone),
     label("Langue", data.locale.toUpperCase()),
     data.message
       ? `${divider()}${label("Message", data.message)}`
@@ -308,7 +303,7 @@ export function b2bAdminNotification(data: B2BEmailData): {
   ].join("");
 
   return {
-    subject: `Nouvelle demande B2B — ${data.restaurantName} (${data.city})`,
+    subject: `Nouvelle demande B2B — ${data.restaurantName}`,
     html: emailLayout(content),
   };
 }
@@ -328,9 +323,9 @@ export function b2bConfirmation(
     paragraph(tr.body),
     divider(),
     `<p style="margin:0 0 8px;font-size:13px;font-weight:600;color:${COLORS.lightText};text-transform:uppercase;letter-spacing:0.5px;">${tr.details}</p>`,
-    label(l === "de" ? "Name" : l === "en" ? "Name" : "Nom", `${data.firstName} ${data.lastName}`),
     label("Restaurant", data.restaurantName),
-    label(l === "de" ? "Stadt" : l === "en" ? "City" : l === "pt" ? "Cidade" : l === "es" ? "Ciudad" : "Ville", data.city),
+    label("Email", data.email),
+    label(l === "de" ? "Telefon" : l === "en" ? "Phone" : l === "pt" ? "Telefone" : l === "es" ? "Teléfono" : "Téléphone", data.phone),
     button(`${siteUrl}/${l}/pour-restaurateurs`, tr.cta),
   ].join("");
 

@@ -71,7 +71,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection totalRestaurants={totalRestaurants} />
+      <HeroSection totalRestaurants={totalRestaurants} cuisineCounts={cuisineCounts} />
       <RestaurantOfMonth />
       <SwissCantonMap restaurantCounts={cantonCounts} />
       <CategoryGrid cuisineCounts={cuisineCounts} />

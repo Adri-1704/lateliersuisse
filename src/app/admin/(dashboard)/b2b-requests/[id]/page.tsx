@@ -35,8 +35,11 @@ export default async function B2BRequestDetailPage({
           </Link>
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">{r.first_name} {r.last_name}</h1>
-          <p className="text-muted-foreground">{r.restaurant_name} — {r.city}</p>
+          <h1 className="text-2xl font-bold">{r.restaurant_name}</h1>
+          <p className="text-muted-foreground">
+            {r.first_name || r.last_name ? `${r.first_name || ""} ${r.last_name || ""}`.trim() : ""}
+            {r.city ? ` — ${r.city}` : ""}
+          </p>
         </div>
       </div>
 
@@ -58,10 +61,12 @@ export default async function B2BRequestDetailPage({
               <Store className="h-4 w-4 text-muted-foreground" />
               <span>{r.restaurant_name}</span>
             </div>
-            <div className="flex items-center gap-3 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span>{r.city}</span>
-            </div>
+            {r.city && (
+              <div className="flex items-center gap-3 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{r.city}</span>
+              </div>
+            )}
             <div className="flex items-center gap-3 text-sm">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <span>Recu le {new Date(r.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>

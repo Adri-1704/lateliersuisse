@@ -40,10 +40,15 @@ export function CategoryGrid({ cuisineCounts }: CategoryGridProps = {}) {
   const params = useParams();
   const locale = params.locale as string;
 
+  // Only keep categories that have at least 1 published restaurant
+  const nonEmptyCategories = cuisineCounts
+    ? cuisineCategories.filter((c) => (cuisineCounts[c.slug] || 0) > 0)
+    : cuisineCategories;
+
   // Put Swiss cuisine first, then the rest
   const sortedCategories = [
-    ...cuisineCategories.filter((c) => c.slug === "suisse"),
-    ...cuisineCategories.filter((c) => c.slug !== "suisse"),
+    ...nonEmptyCategories.filter((c) => c.slug === "suisse"),
+    ...nonEmptyCategories.filter((c) => c.slug !== "suisse"),
   ];
 
   return (

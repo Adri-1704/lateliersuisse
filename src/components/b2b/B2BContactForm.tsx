@@ -8,9 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { cantons } from "@/data/cantons";
-import { cuisineCategories } from "@/data/mock-categories";
-import { getLocalizedLabel, getLocalizedName } from "@/lib/locale-helpers";
 import { submitB2BContactRequest } from "@/actions/b2b-contact";
 
 export function B2BContactForm() {
@@ -22,14 +19,6 @@ export function B2BContactForm() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getCantonLabelLocal = (c: { label: string; labelDe: string; labelEn: string; labelPt?: string; labelEs?: string }) => {
-    return getLocalizedLabel(c, locale);
-  };
-
-  const getCuisineLabel = (c: { nameFr: string; nameDe: string; nameEn: string; namePt?: string; nameEs?: string }) => {
-    return getLocalizedName(c, locale);
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -38,12 +27,9 @@ export function B2BContactForm() {
     const formData = new FormData(e.currentTarget);
 
     const result = await submitB2BContactRequest({
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
-      email: formData.get("email") as string,
-      phone: (formData.get("phone") as string) || undefined,
       restaurantName: formData.get("restaurantName") as string,
-      city: formData.get("city") as string,
+      email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
       message: (formData.get("message") as string) || undefined,
       locale,
     });
@@ -108,25 +94,14 @@ export function B2BContactForm() {
           {/* Contact form */}
           <div className="mt-8 rounded-2xl border bg-white p-8 shadow-sm">
               <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <Label htmlFor="firstName">{t("firstName")} *</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      required
-                      className="mt-1.5"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName">{t("lastName")} *</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      required
-                      className="mt-1.5"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="restaurantName">{t("restaurantName")} *</Label>
+                  <Input
+                    id="restaurantName"
+                    name="restaurantName"
+                    required
+                    className="mt-1.5"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -141,68 +116,14 @@ export function B2BContactForm() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="phone">{t("phone")}</Label>
+                    <Label htmlFor="phone">{t("phone")} *</Label>
                     <Input
                       id="phone"
                       name="phone"
                       type="tel"
-                      className="mt-1.5"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <Label htmlFor="restaurantName">{t("restaurantName")} *</Label>
-                    <Input
-                      id="restaurantName"
-                      name="restaurantName"
                       required
                       className="mt-1.5"
                     />
-                  </div>
-                  <div>
-                    <Label htmlFor="city">{t("city")} *</Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      required
-                      className="mt-1.5"
-                    />
-                  </div>
-                </div>
-
-                {/* Canton + Cuisine dropdowns */}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <Label htmlFor="canton">{t("canton")}</Label>
-                    <select
-                      id="canton"
-                      name="canton"
-                      className="mt-1.5 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-                    >
-                      <option value="">{t("allCantons")}</option>
-                      {cantons.map((c) => (
-                        <option key={c.value} value={c.value}>
-                          {getCantonLabelLocal(c)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="cuisineType">{t("cuisineType")}</Label>
-                    <select
-                      id="cuisineType"
-                      name="cuisineType"
-                      className="mt-1.5 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-                    >
-                      <option value="">{t("allCuisines")}</option>
-                      {cuisineCategories.map((c) => (
-                        <option key={c.slug} value={c.slug}>
-                          {getCuisineLabel(c)}
-                        </option>
-                      ))}
-                    </select>
                   </div>
                 </div>
 

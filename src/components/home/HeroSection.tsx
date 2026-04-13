@@ -28,9 +28,10 @@ const popularTags = [
 
 interface HeroSectionProps {
   totalRestaurants: number;
+  cuisineCounts?: Record<string, number>;
 }
 
-export function HeroSection({ totalRestaurants }: HeroSectionProps) {
+export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProps) {
   const t = useTranslations("hero");
   const params = useParams();
   const locale = params.locale as string;
@@ -108,7 +109,9 @@ export function HeroSection({ totalRestaurants }: HeroSectionProps) {
                       className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
                     >
                       <option value="">{t("allCuisines")}</option>
-                      {cuisineCategories.map((c) => (
+                      {cuisineCategories
+                        .filter((c) => !cuisineCounts || (cuisineCounts[c.slug] || 0) > 0)
+                        .map((c) => (
                         <option key={c.slug} value={c.slug}>
                           {c.icon} {getLocalizedName(c, locale)}
                         </option>
