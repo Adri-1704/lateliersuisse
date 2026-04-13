@@ -97,7 +97,8 @@ export async function createCheckoutSession(
     return { url: session.url, error: null };
   } catch (error) {
     console.error("Checkout error:", error);
-    return { url: null, error: "Failed to create checkout session" };
+    const msg = error instanceof Error ? error.message : "Unknown error";
+    return { url: null, error: `Stripe error: ${msg}` };
   }
 }
 
