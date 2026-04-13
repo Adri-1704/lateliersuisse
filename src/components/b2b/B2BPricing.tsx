@@ -273,6 +273,9 @@ export function B2BPricing() {
                       {t("totalLabel", { price: plan.totalPrice })}
                     </p>
                   )}
+                  <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+                    🎁 14 jours gratuits
+                  </div>
                 </div>
 
                 {/* Tote bags bonus */}
@@ -379,6 +382,10 @@ export function B2BPricing() {
                 <Badge className="mt-2 bg-[var(--color-just-tag)] text-white border-0 text-sm px-4 py-1">
                   {tMerchant(selectedPlanData.id)} — {selectedPlanData.pricePerMonth ? `CHF ${selectedPlanData.pricePerMonth}/mois` : `CHF ${selectedPlanData.totalPrice}`}
                 </Badge>
+                <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
+                  <Gift className="h-4 w-4" />
+                  Essai 14 jours gratuits
+                </div>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
