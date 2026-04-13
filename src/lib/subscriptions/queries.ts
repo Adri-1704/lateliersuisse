@@ -2,8 +2,9 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { EARLY_BIRD_LIMIT } from "@/lib/stripe";
 
 /**
- * Count active + trialing subscriptions for Early Bird tracking.
- * Returns the number of spots remaining (max 100).
+ * Count active + trialing Early Bird subscriptions only.
+ * Legacy subscriptions (is_early_bird = false) are excluded so they
+ * don't consume Early Bird slots. Returns spots remaining (max 100).
  */
 export async function getEarlyBirdSpotsRemaining(): Promise<number> {
   try {
@@ -11,6 +12,7 @@ export async function getEarlyBirdSpotsRemaining(): Promise<number> {
     const { count } = await supabase
       .from("subscriptions")
       .select("id", { count: "exact", head: true })
+      .eq("is_early_bird", true)
       .in("status", ["active", "trialing"]);
 
     const subscriberCount = count ?? 0;
