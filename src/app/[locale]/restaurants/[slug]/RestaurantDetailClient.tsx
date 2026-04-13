@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   Star,
   MapPin,
