@@ -1,6 +1,8 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { sendEmail } from "@/lib/email";
+import { claimRequestAdminNotification } from "@/lib/email-templates";
 
 interface RegisterParams {
   name: string;
@@ -13,6 +15,8 @@ interface RegisterParams {
 interface RegisterResult {
   success: boolean;
   error: string | null;
+  claim_request_id?: string;
+  claim_status?: "pending";
 }
 
 export async function registerMerchant(params: RegisterParams): Promise<RegisterResult> {
@@ -71,28 +75,76 @@ export async function registerMerchant(params: RegisterParams): Promise<Register
     return { success: false, error: "Erreur lors de la création du profil" };
   }
 
-  // 4. Link restaurant if selected
+  const merchantId = (merchant as Record<string, unknown>).id as string;
+
+  // 4. If restaurant selected, create a claim request (manual validation by admin)
   if (restaurantSlug) {
     // Get restaurant
     const { data: restaurant } = await supabase
       .from("restaurants")
-      .select("id, email, merchant_id")
+      .select("id, name_fr, city, email, merchant_id")
       .eq("slug", restaurantSlug)
-      .single() as { data: { id: string; email: string | null; merchant_id: string | null } | null; error: unknown };
+      .single() as { data: { id: string; name_fr: string; city: string; email: string | null; merchant_id: string | null } | null; error: unknown };
 
     if (restaurant && !restaurant.merchant_id) {
-      // Link restaurant to merchant
+      // Create claim request (pending manual approval)
+      const { data: claimRequest, error: claimError } = await (supabase
+        .from("claim_requests") as ReturnType<typeof supabase.from>)
+        .insert({
+          restaurant_id: restaurant.id,
+          merchant_id: merchantId,
+          method: "manual",
+          status: "pending",
+        } as Record<string, unknown>)
+        .select("id")
+        .single();
+
+      if (claimError) {
+        console.error("Claim request insert error:", claimError);
+        // Non-blocking: merchant is created, claim just failed
+      }
+
+      // Update restaurant claim_status to 'pending' to block concurrent claims
       await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
-        .update({ merchant_id: (merchant as Record<string, unknown>).id } as Record<string, unknown>)
+        .update({ claim_status: "pending" } as Record<string, unknown>)
         .eq("id", restaurant.id);
+
+      // Send admin notification email
+      const claimId = claimRequest ? (claimRequest as Record<string, unknown>).id as string : undefined;
+      try {
+        const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
+        const template = claimRequestAdminNotification({
+          restaurantName: restaurant.name_fr,
+          merchantName: name,
+          merchantEmail: email,
+          merchantPhone: phone || "Non renseigné",
+          claimId: claimId || "unknown",
+        });
+        await sendEmail({
+          to: adminEmailAddress,
+          subject: template.subject,
+          html: template.html,
+          replyTo: email,
+        });
+      } catch (emailErr) {
+        console.error("Failed to send claim admin notification:", emailErr);
+      }
+
+      return {
+        success: true,
+        error: null,
+        claim_request_id: claimId,
+        claim_status: "pending",
+      };
     }
   }
 
+  // No restaurant selected — merchant created without claim
   return { success: true, error: null };
 }
 
 /**
- * Search restaurants available for claiming (no merchant_id set)
+ * Search restaurants available for claiming (no merchant_id set and not already pending)
  */
 export async function searchAvailableRestaurants(query: string): Promise<{ slug: string; name: string; city: string }[]> {
   if (!query || query.length < 2) return [];
@@ -102,6 +154,7 @@ export async function searchAvailableRestaurants(query: string): Promise<{ slug:
     .from("restaurants")
     .select("slug, name_fr, city")
     .is("merchant_id", null)
+    .neq("claim_status", "pending")
     .eq("is_published", true)
     .ilike("name_fr", `%${query}%`)
     .limit(10) as { data: { slug: string; name_fr: string; city: string }[] | null; error: unknown };

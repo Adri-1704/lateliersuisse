@@ -38,6 +38,8 @@ export interface Subscription {
   current_period_start: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
+  is_early_bird: boolean;
+  stripe_price_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -81,6 +83,8 @@ export interface DbRestaurant {
   is_featured: boolean;
   is_published: boolean;
   search_vector: string | null;
+  claim_status: RestaurantClaimStatus;
+  claimed_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -184,6 +188,28 @@ export interface DbPromotion {
 }
 
 // ============================================
+// Claim Requests
+// ============================================
+
+export type ClaimMethod = "manual" | "email_domain" | "sms_code";
+export type ClaimStatus = "pending" | "approved" | "rejected";
+export type RestaurantClaimStatus = "unclaimed" | "pending" | "claimed";
+
+export interface ClaimRequest {
+  id: string;
+  restaurant_id: string;
+  merchant_id: string;
+  method: ClaimMethod;
+  status: ClaimStatus;
+  verification_code: string | null;
+  verification_email: string | null;
+  proof_url: string | null;
+  admin_notes: string | null;
+  created_at: string;
+  resolved_at: string | null;
+}
+
+// ============================================
 // Supabase Database type for client
 // ============================================
 
@@ -255,6 +281,19 @@ export interface Database {
         Row: NewsletterSubscriber;
         Insert: Omit<NewsletterSubscriber, "id" | "created_at"> & { id?: string };
         Update: Partial<Omit<NewsletterSubscriber, "id">>;
+        Relationships: [];
+      };
+      claim_requests: {
+        Row: ClaimRequest;
+        Insert: Omit<ClaimRequest, "id" | "created_at" | "resolved_at" | "status" | "verification_code" | "verification_email" | "proof_url" | "admin_notes"> & {
+          id?: string;
+          status?: ClaimStatus;
+          verification_code?: string | null;
+          verification_email?: string | null;
+          proof_url?: string | null;
+          admin_notes?: string | null;
+        };
+        Update: Partial<Omit<ClaimRequest, "id">>;
         Relationships: [];
       };
       b2b_contact_requests: {

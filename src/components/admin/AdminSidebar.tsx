@@ -24,6 +24,7 @@ import {
   Newspaper,
   Star,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
 
 const navItems = [
@@ -32,6 +33,7 @@ const navItems = [
   { title: "Commercants", href: "/admin/merchants", icon: Store },
   { title: "Avis", href: "/admin/reviews", icon: MessageSquare },
   { title: "Demandes B2B", href: "/admin/b2b-requests", icon: Briefcase },
+  { title: "Claims restaurants", href: "/admin/claim-requests", icon: ShieldCheck },
   { title: "Contacts", href: "/admin/contacts", icon: Mail },
   { title: "Newsletter", href: "/admin/newsletter", icon: Newspaper },
   { title: "Restaurants du mois", href: "/admin/featured", icon: Star },

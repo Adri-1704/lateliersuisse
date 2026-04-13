@@ -90,6 +90,8 @@ export async function listRestaurants(params: {
       promotion_type: null,
       promotion_value: null,
       promotion_active: false,
+      claim_status: "unclaimed" as const,
+      claimed_at: null,
       search_vector: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -124,6 +126,7 @@ export async function getRestaurant(id: string): Promise<{ success: boolean; err
       is_featured: mock.isFeatured, is_published: mock.isPublished,
       video_url: null, promotion_title: null, promotion_description: null,
       promotion_type: null, promotion_value: null, promotion_active: false,
+      claim_status: "unclaimed" as const, claimed_at: null,
       search_vector: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
     }};
   }

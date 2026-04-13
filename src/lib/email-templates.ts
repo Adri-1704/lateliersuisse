@@ -593,6 +593,108 @@ export function freeTrialWelcome(
 // ---------------------------------------------------------------------------
 // 9. Free Trial Admin Notification (always in French)
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// 10. Claim Request Admin Notification (always in French — sent to Adrien)
+// ---------------------------------------------------------------------------
+export interface ClaimRequestEmailData {
+  restaurantName: string;
+  merchantName: string;
+  merchantEmail: string;
+  merchantPhone: string;
+  claimId: string;
+}
+
+export function claimRequestAdminNotification(data: ClaimRequestEmailData): {
+  subject: string;
+  html: string;
+} {
+  const adminUrl = `${siteUrl}/admin/claim-requests/${data.claimId}`;
+
+  const content = [
+    heading("🔔 Nouvelle demande de claim"),
+    paragraph(
+      `Un restaurateur vient de s'inscrire et souhaite revendiquer un restaurant. Validation manuelle requise.`
+    ),
+    divider(),
+    label("Restaurant", data.restaurantName),
+    label("Nom du commercant", data.merchantName),
+    label("Email", data.merchantEmail),
+    label("Telephone", data.merchantPhone),
+    divider(),
+    button(adminUrl, "Voir dans l'admin"),
+    paragraph(
+      `<a href="mailto:${data.merchantEmail}" style="color:${COLORS.red};font-weight:600;">Contacter par email</a>`
+    ),
+  ].join("");
+
+  return {
+    subject: `Nouveau claim — ${data.restaurantName} par ${data.merchantName}`,
+    html: emailLayout(content),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 11. Claim Approved Notification (sent to merchant)
+// ---------------------------------------------------------------------------
+export interface ClaimResultEmailData {
+  merchantName: string;
+  restaurantName: string;
+}
+
+export function claimApprovedNotification(data: ClaimResultEmailData): {
+  subject: string;
+  html: string;
+} {
+  const content = [
+    heading("Votre fiche a ete validee ! 🎉"),
+    paragraph(
+      `Bonjour ${data.merchantName},`
+    ),
+    paragraph(
+      `Votre demande pour <strong>${data.restaurantName}</strong> a ete approuvee. Votre fiche restaurant est maintenant liee a votre compte.`
+    ),
+    paragraph(
+      `Prochaine etape : choisissez votre abonnement pour beneficier de toutes les fonctionnalites et donner un maximum de visibilite a votre restaurant.`
+    ),
+    button(`${siteUrl}/fr/partenaire-inscription`, "Choisir mon abonnement"),
+  ].join("");
+
+  return {
+    subject: `Votre fiche ${data.restaurantName} est validee — Just-Tag`,
+    html: emailLayout(content),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 12. Claim Rejected Notification (sent to merchant)
+// ---------------------------------------------------------------------------
+export function claimRejectedNotification(data: ClaimResultEmailData): {
+  subject: string;
+  html: string;
+} {
+  const content = [
+    heading("Votre demande n'a pas pu etre validee"),
+    paragraph(
+      `Bonjour ${data.merchantName},`
+    ),
+    paragraph(
+      `Nous n'avons pas pu valider votre demande pour <strong>${data.restaurantName}</strong>. Cela peut etre du a un manque d'informations ou a une verification incomplete.`
+    ),
+    paragraph(
+      `N'hesitez pas a nous contacter pour en discuter et soumettre une nouvelle demande.`
+    ),
+    button(`mailto:contact@just-tag.app`, "Nous contacter"),
+  ].join("");
+
+  return {
+    subject: `Votre demande pour ${data.restaurantName} — Just-Tag`,
+    html: emailLayout(content),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 9. Free Trial Admin Notification (always in French)
+// ---------------------------------------------------------------------------
 export function freeTrialAdminNotification(data: FreeTrialData): {
   subject: string;
   html: string;
