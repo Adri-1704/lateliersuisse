@@ -215,6 +215,20 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   const [localAvgRating, setLocalAvgRating] = useState(restaurant.avgRating);
   const [localReviewCount, setLocalReviewCount] = useState(restaurant.reviewCount);
 
+  // Track page view (once per session per restaurant)
+  useEffect(() => {
+    const sessionKey = `view_${restaurant.id}`;
+    if (typeof window !== "undefined" && !sessionStorage.getItem(sessionKey)) {
+      sessionStorage.setItem(sessionKey, "1");
+      const source = document.referrer ? new URL(document.referrer).hostname : "direct";
+      fetch("/api/track-view", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ restaurantId: restaurant.id, source }),
+      }).catch(() => {});
+    }
+  }, [restaurant.id]);
+
   const handleSubmitReview = useCallback(async () => {
     setReviewError(null);
 
