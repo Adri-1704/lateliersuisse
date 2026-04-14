@@ -20,7 +20,7 @@ export function ClaimBanner({ restaurantName, restaurantSlug, locale }: ClaimBan
               Vous êtes le propriétaire de {restaurantName} ?
             </p>
             <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
-              Revendiquez votre fiche gratuitement pour la personnaliser, ajouter vos photos et gérer vos avis.
+              Revendiquez votre fiche pour la personnaliser, ajouter vos photos et gérer vos avis.
             </p>
           </div>
           <Link
