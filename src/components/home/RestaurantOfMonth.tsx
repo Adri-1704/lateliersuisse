@@ -228,27 +228,19 @@ export function RestaurantOfMonth() {
   const [topRestaurants, setTopRestaurants] = useState<Restaurant[]>([]);
   const [reviews, setReviews] = useState<DbReview[]>([]);
 
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "start" },
-    [Autoplay({ delay: 4000, stopOnInteraction: true })]
-  );
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-
-  // Fetch real restaurants from Supabase
+  // Fetch 12 featured restaurants from Supabase
   useEffect(() => {
     async function fetchFeatured() {
       const supabase = createClient();
 
-      // Fetch top 8: featured first, then by review_count desc
+      // Fetch all 12 featured restaurants
       const { data: featured } = await supabase
         .from("restaurants")
         .select("*")
         .eq("is_published", true)
         .eq("is_featured", true)
         .order("review_count", { ascending: false })
-        .limit(8);
+        .limit(12);
 
       let restaurants = (featured || []).map((row, i) =>
         mapDbToRestaurant(row as Record<string, unknown>, i)
@@ -293,51 +285,27 @@ export function RestaurantOfMonth() {
     return reviews.find((r) => r.restaurant_id === restaurantId);
   }
 
-  // Split into pairs for 2-row layout
-  const slides: Restaurant[][] = [];
-  for (let i = 0; i < topRestaurants.length; i += 2) {
-    slides.push(topRestaurants.slice(i, i + 2));
-  }
-
   if (topRestaurants.length === 0) return null;
 
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-              {t("title")}
-            </h2>
-            <p className="mt-2 text-gray-600">{t("subtitle")}</p>
-          </div>
-          <div className="hidden items-center gap-2 sm:flex">
-            <Button variant="outline" size="icon" onClick={scrollPrev} className="rounded-full">
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon" onClick={scrollNext} className="rounded-full">
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+        <div className="text-center mb-10">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+            {t("title")}
+          </h2>
+          <p className="mt-2 text-gray-600">{t("subtitle")}</p>
         </div>
 
-        <div className="mt-8 overflow-hidden" ref={emblaRef}>
-          <div className="-ml-4 flex">
-            {slides.map((pair, idx) => (
-              <div key={idx} className="min-w-0 flex-[0_0_100%] pl-4 sm:flex-[0_0_50%] lg:flex-[0_0_33.333%]">
-                <div className="flex flex-col gap-6">
-                  {pair.map((restaurant) => (
-                    <RestaurantSlideCardCompact
-                      key={restaurant.id}
-                      restaurant={restaurant}
-                      bestReview={getBestReview(restaurant.id)}
-                      locale={locale}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {topRestaurants.map((restaurant) => (
+            <RestaurantSlideCardCompact
+              key={restaurant.id}
+              restaurant={restaurant}
+              bestReview={getBestReview(restaurant.id)}
+              locale={locale}
+            />
+          ))}
         </div>
       </div>
     </section>
