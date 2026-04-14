@@ -231,3 +231,34 @@ export async function togglePublishRestaurant(id: string, isPublished: boolean):
     return { success: false, error: "Impossible de modifier la publication (mode demo)" };
   }
 }
+
+/**
+ * Délier un restaurant de son commerçant (admin only).
+ * Remet merchant_id, claim_status, claimed_at à null/unclaimed.
+ * Rejette les claim_requests pending associés.
+ */
+export async function unlinkMerchantFromRestaurant(restaurantId: string): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = createAdminClient();
+
+    // Reset restaurant
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("restaurants").update({
+      merchant_id: null,
+      claim_status: "unclaimed",
+      claimed_at: null,
+    }).eq("id", restaurantId);
+
+    // Reject all pending/approved claims for this restaurant
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from("claim_requests").update({
+      status: "rejected",
+      resolved_at: new Date().toISOString(),
+      admin_notes: "Délié manuellement par l'administrateur",
+    }).eq("restaurant_id", restaurantId).in("status", ["pending", "approved"]);
+
+    return { success: true, error: null };
+  } catch {
+    return { success: false, error: "Erreur lors de la suppression du lien" };
+  }
+}
