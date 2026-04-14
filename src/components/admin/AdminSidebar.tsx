@@ -25,10 +25,12 @@ import {
   Star,
   Settings,
   ShieldCheck,
+  BarChart3,
 } from "lucide-react";
 
 const navItems = [
   { title: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
+  { title: "Statistiques", href: "/admin/stats", icon: BarChart3 },
   { title: "Restaurants", href: "/admin/restaurants", icon: UtensilsCrossed },
   { title: "Commercants", href: "/admin/merchants", icon: Store },
   { title: "Avis", href: "/admin/reviews", icon: MessageSquare },
