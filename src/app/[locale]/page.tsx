@@ -42,7 +42,8 @@ async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, num
     const { data, error } = await supabase
       .from("restaurants")
       .select("canton, cuisine_type")
-      .eq("is_published", true);
+      .eq("is_published", true)
+      .limit(50000);
 
     if (error || !data) return { cantonCounts: {}, cuisineCounts: {} };
 
