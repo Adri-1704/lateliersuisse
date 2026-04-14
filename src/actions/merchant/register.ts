@@ -2,7 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
-import { claimRequestAdminNotification } from "@/lib/email-templates";
+import { claimRequestAdminNotification, claimApprovedNotification } from "@/lib/email-templates";
 
 interface RegisterParams {
   name: string;
@@ -214,14 +214,25 @@ export async function createClaimRequest(params: {
     return { success: false, error: "Ce restaurant est deja revendique par un autre compte" };
   }
 
+  // Auto-approve si l'email du merchant correspond à l'email du restaurant en base
+  // (preuve de propriété : seul le vrai proprio a accès à cet email)
+  const emailMatch = restaurant.email
+    && merchantEmail
+    && restaurant.email.toLowerCase().trim() === merchantEmail.toLowerCase().trim();
+
+  const claimStatus = emailMatch ? "approved" : "pending";
+  const claimMethod = emailMatch ? "email_domain" : "manual";
+
   // Create claim request
   const { data: claimRequest, error: claimError } = await (supabase
     .from("claim_requests") as ReturnType<typeof supabase.from>)
     .insert({
       restaurant_id: restaurant.id,
       merchant_id: merchantId,
-      method: "manual",
-      status: "pending",
+      method: claimMethod,
+      status: claimStatus,
+      resolved_at: emailMatch ? new Date().toISOString() : null,
+      admin_notes: emailMatch ? "Auto-approuvé : email du merchant correspond à l'email du restaurant en base" : null,
     } as Record<string, unknown>)
     .select("id")
     .single();
@@ -231,30 +242,78 @@ export async function createClaimRequest(params: {
     return { success: false, error: "Erreur lors de la revendication" };
   }
 
-  // Update restaurant claim_status
-  await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
-    .update({ claim_status: "pending" } as Record<string, unknown>)
-    .eq("id", restaurant.id);
-
-  // Send admin notification email
   const claimId = claimRequest ? (claimRequest as Record<string, unknown>).id as string : undefined;
-  try {
-    const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
-    const template = claimRequestAdminNotification({
-      restaurantName: restaurant.name_fr,
-      merchantName,
-      merchantEmail,
-      merchantPhone: merchantPhone || "Non renseigne",
-      claimId: claimId || "unknown",
-    });
-    await sendEmail({
-      to: adminEmailAddress,
-      subject: template.subject,
-      html: template.html,
-      replyTo: merchantEmail,
-    });
-  } catch (emailErr) {
-    console.error("Failed to send claim admin notification:", emailErr);
+
+  if (emailMatch) {
+    // Auto-approve : lier le restaurant au merchant immédiatement
+    await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
+      .update({
+        merchant_id: merchantId,
+        claim_status: "claimed",
+        claimed_at: new Date().toISOString(),
+      } as Record<string, unknown>)
+      .eq("id", restaurant.id);
+
+    // Notifier le merchant que sa fiche est validée
+    try {
+      const template = claimApprovedNotification({
+        restaurantName: restaurant.name_fr,
+        merchantName,
+        merchantEmail,
+      });
+      await sendEmail({
+        to: merchantEmail,
+        subject: template.subject,
+        html: template.html,
+      });
+    } catch (emailErr) {
+      console.error("Failed to send auto-approval email:", emailErr);
+    }
+
+    // Notifier aussi l'admin (pour info)
+    try {
+      const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
+      const template = claimRequestAdminNotification({
+        restaurantName: restaurant.name_fr,
+        merchantName,
+        merchantEmail,
+        merchantPhone: merchantPhone || "Non renseigné",
+        claimId: claimId || "unknown",
+      });
+      await sendEmail({
+        to: adminEmailAddress,
+        subject: `[AUTO-APPROUVÉ] ${template.subject}`,
+        html: template.html,
+        replyTo: merchantEmail,
+      });
+    } catch (emailErr) {
+      console.error("Failed to send admin notification:", emailErr);
+    }
+  } else {
+    // Claim en attente : validation manuelle par l'admin
+    await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
+      .update({ claim_status: "pending" } as Record<string, unknown>)
+      .eq("id", restaurant.id);
+
+    // Notifier l'admin pour validation
+    try {
+      const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
+      const template = claimRequestAdminNotification({
+        restaurantName: restaurant.name_fr,
+        merchantName,
+        merchantEmail,
+        merchantPhone: merchantPhone || "Non renseigné",
+        claimId: claimId || "unknown",
+      });
+      await sendEmail({
+        to: adminEmailAddress,
+        subject: template.subject,
+        html: template.html,
+        replyTo: merchantEmail,
+      });
+    } catch (emailErr) {
+      console.error("Failed to send claim admin notification:", emailErr);
+    }
   }
 
   return { success: true, error: null };
