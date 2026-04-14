@@ -19,7 +19,7 @@ export function ClaimActions({ claimId }: { claimId: string }) {
     const result = await approveClaim(claimId, notes || undefined);
     setSaving(false);
     if (result.success) {
-      setMessage({ text: "Claim approuve avec succes !", type: "success" });
+      setMessage({ text: "Claim approuvé avec succès !", type: "success" });
       router.refresh();
     } else {
       setMessage({ text: result.error || "Erreur", type: "error" });
@@ -36,7 +36,7 @@ export function ClaimActions({ claimId }: { claimId: string }) {
     const result = await rejectClaim(claimId, notes);
     setSaving(false);
     if (result.success) {
-      setMessage({ text: "Claim rejete", type: "success" });
+      setMessage({ text: "Claim rejeté", type: "success" });
       router.refresh();
     } else {
       setMessage({ text: result.error || "Erreur", type: "error" });
@@ -53,7 +53,7 @@ export function ClaimActions({ claimId }: { claimId: string }) {
           id="admin-notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Raison de la decision, observations..."
+          placeholder="Raison de la décision, observations..."
           rows={3}
           className="mt-1"
         />

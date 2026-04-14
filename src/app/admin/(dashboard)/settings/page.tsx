@@ -17,7 +17,7 @@ export default function SettingsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (password.length < 6) {
-      setMessage({ type: "error", text: "Le mot de passe doit contenir au moins 6 caracteres." });
+      setMessage({ type: "error", text: "Le mot de passe doit contenir au moins 6 caractères." });
       return;
     }
     if (password !== confirm) {
@@ -29,17 +29,17 @@ export default function SettingsPage() {
     const result = await updateAdminPassword(password);
     setSaving(false);
     if (result.success) {
-      setMessage({ type: "success", text: "Mot de passe mis a jour avec succes." });
+      setMessage({ type: "success", text: "Mot de passe mis à jour avec succès." });
       setPassword("");
       setConfirm("");
     } else {
-      setMessage({ type: "error", text: result.error || "Erreur lors de la mise a jour." });
+      setMessage({ type: "error", text: result.error || "Erreur lors de la mise à jour." });
     }
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Parametres</h1>
+      <h1 className="text-2xl font-bold">Paramètres</h1>
 
       <Card className="max-w-md">
         <CardHeader>
@@ -54,7 +54,7 @@ export default function SettingsPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min. 6 caracteres"
+                placeholder="Min. 6 caractères"
               />
             </div>
             <div className="space-y-2">

@@ -53,7 +53,7 @@ export default async function RestaurantsPage({
       <SearchInput placeholder="Rechercher par nom, ville, canton..." />
 
       {restaurants.length === 0 ? (
-        <EmptyState title="Aucun restaurant" description="Aucun restaurant ne correspond a votre recherche." />
+        <EmptyState title="Aucun restaurant" description="Aucun restaurant ne correspond à votre recherche." />
       ) : (
         <>
           <div className="rounded-md border">
@@ -86,7 +86,7 @@ export default async function RestaurantsPage({
                     </TableCell>
                     <TableCell>
                       <Badge variant={r.is_published ? "default" : "secondary"}>
-                        {r.is_published ? "Publie" : "Brouillon"}
+                        {r.is_published ? "Publié" : "Brouillon"}
                       </Badge>
                     </TableCell>
                     <TableCell>

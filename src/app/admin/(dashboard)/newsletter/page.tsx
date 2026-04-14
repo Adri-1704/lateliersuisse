@@ -7,7 +7,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
-const localeLabels: Record<string, string> = { fr: "Francais", de: "Allemand", en: "Anglais" };
+const localeLabels: Record<string, string> = { fr: "Français", de: "Allemand", en: "Anglais" };
 
 export default async function NewsletterPage({
   searchParams,
@@ -26,13 +26,13 @@ export default async function NewsletterPage({
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Newsletter</h1>
-        <p className="text-muted-foreground">{total} abonne{total > 1 ? "s" : ""}</p>
+        <p className="text-muted-foreground">{total} abonné{total > 1 ? "s" : ""}</p>
       </div>
 
       <SearchInput placeholder="Rechercher par email..." />
 
       {subscribers.length === 0 ? (
-        <EmptyState title="Aucun abonne" description="Aucun abonne a la newsletter." />
+        <EmptyState title="Aucun abonné" description="Aucun abonné à la newsletter." />
       ) : (
         <>
           <div className="rounded-md border">

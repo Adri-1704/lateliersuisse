@@ -6,8 +6,8 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  title = "Aucun resultat",
-  description = "Aucun element ne correspond a votre recherche.",
+  title = "Aucun résultat",
+  description = "Aucun élément ne correspond à votre recherche.",
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">

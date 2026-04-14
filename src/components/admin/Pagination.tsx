@@ -26,7 +26,7 @@ export function Pagination({ page, totalPages, total }: PaginationProps) {
   return (
     <div className="flex items-center justify-between pt-4">
       <p className="text-sm text-muted-foreground">
-        {total} resultat{total > 1 ? "s" : ""}
+        {total} résultat{total > 1 ? "s" : ""}
       </p>
       <div className="flex items-center gap-2">
         <Button
@@ -36,7 +36,7 @@ export function Pagination({ page, totalPages, total }: PaginationProps) {
           disabled={page <= 1}
         >
           <ChevronLeft className="h-4 w-4" />
-          Precedent
+          Précédent
         </Button>
         <span className="text-sm text-muted-foreground">
           {page} / {totalPages}

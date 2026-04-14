@@ -14,7 +14,7 @@ export function RestaurantDeleteButton({ id, name }: { id: string; name: string 
     startTransition(async () => {
       const res = await deleteRestaurant(id);
       if (res.success) {
-        toast.success(`${name} supprime`);
+        toast.success(`${name} supprimé`);
         router.refresh();
       } else {
         toast.error(res.error || "Erreur lors de la suppression");
@@ -26,7 +26,7 @@ export function RestaurantDeleteButton({ id, name }: { id: string; name: string 
     <div className={isPending ? "opacity-50 pointer-events-none" : ""}>
       <DeleteConfirmDialog
         title="Supprimer ce restaurant ?"
-        description={`Voulez-vous vraiment supprimer "${name}" ? Cette action est irreversible.`}
+        description={`Voulez-vous vraiment supprimer "${name}" ? Cette action est irréversible.`}
         onConfirm={handleDelete}
       />
     </div>

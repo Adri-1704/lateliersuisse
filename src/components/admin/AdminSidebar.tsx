@@ -32,14 +32,14 @@ const navItems = [
   { title: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
   { title: "Statistiques", href: "/admin/stats", icon: BarChart3 },
   { title: "Restaurants", href: "/admin/restaurants", icon: UtensilsCrossed },
-  { title: "Commercants", href: "/admin/merchants", icon: Store },
+  { title: "Commerçants", href: "/admin/merchants", icon: Store },
   { title: "Avis", href: "/admin/reviews", icon: MessageSquare },
   { title: "Demandes B2B", href: "/admin/b2b-requests", icon: Briefcase },
   { title: "Claims restaurants", href: "/admin/claim-requests", icon: ShieldCheck },
   { title: "Contacts", href: "/admin/contacts", icon: Mail },
   { title: "Newsletter", href: "/admin/newsletter", icon: Newspaper },
   { title: "Restaurants du mois", href: "/admin/featured", icon: Star },
-  { title: "Parametres", href: "/admin/settings", icon: Settings },
+  { title: "Paramètres", href: "/admin/settings", icon: Settings },
 ];
 
 export function AdminSidebar() {

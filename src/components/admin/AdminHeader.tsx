@@ -27,7 +27,7 @@ export function AdminHeader({ email }: AdminHeaderProps) {
       <span className="text-sm text-muted-foreground">{email}</span>
       <Button variant="ghost" size="sm" onClick={handleLogout}>
         <LogOut className="mr-2 h-4 w-4" />
-        Deconnexion
+        Déconnexion
       </Button>
     </header>
   );

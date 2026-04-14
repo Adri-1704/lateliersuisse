@@ -109,7 +109,7 @@ export async function getRestaurant(id: string): Promise<{ success: boolean; err
     return { success: true, error: null, data };
   } catch {
     const mock = mockRestaurants.find((r) => r.id === id);
-    if (!mock) return { success: false, error: "Restaurant non trouve" };
+    if (!mock) return { success: false, error: "Restaurant non trouvé" };
     return { success: true, error: null, data: {
       id: mock.id, merchant_id: null, slug: mock.slug,
       name_fr: mock.nameFr, name_de: mock.nameDe, name_en: mock.nameEn,
@@ -176,7 +176,7 @@ export async function createRestaurant(params: {
     revalidatePath("/admin/restaurants");
     return { success: true, error: null };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Impossible de creer le restaurant";
+    const msg = e instanceof Error ? e.message : "Impossible de créer le restaurant";
     return { success: false, error: msg };
   }
 }
@@ -204,7 +204,7 @@ export async function updateRestaurant(
     revalidatePath(`/admin/restaurants/${id}`);
     return { success: true, error: null };
   } catch {
-    return { success: false, error: "Impossible de mettre à jour le restaurant (mode demo)" };
+    return { success: false, error: "Impossible de mettre à jour le restaurant (mode démo)" };
   }
 }
 
@@ -216,7 +216,7 @@ export async function deleteRestaurant(id: string): Promise<{ success: boolean; 
     revalidatePath("/admin/restaurants");
     return { success: true, error: null };
   } catch {
-    return { success: false, error: "Impossible de supprimer le restaurant (mode demo)" };
+    return { success: false, error: "Impossible de supprimer le restaurant (mode démo)" };
   }
 }
 
@@ -228,7 +228,7 @@ export async function togglePublishRestaurant(id: string, isPublished: boolean):
     if (error) throw error;
     return { success: true, error: null };
   } catch {
-    return { success: false, error: "Impossible de modifier la publication (mode demo)" };
+    return { success: false, error: "Impossible de modifier la publication (mode démo)" };
   }
 }
 

@@ -35,7 +35,7 @@ export default async function B2BRequestsPage({
       <SearchInput placeholder="Rechercher par nom, restaurant, email..." />
 
       {requests.length === 0 ? (
-        <EmptyState title="Aucune demande" description="Aucune demande B2B ne correspond a votre recherche." />
+        <EmptyState title="Aucune demande" description="Aucune demande B2B ne correspond à votre recherche." />
       ) : (
         <>
           <div className="rounded-md border">
@@ -47,7 +47,7 @@ export default async function B2BRequestsPage({
                   <TableHead>Restaurant</TableHead>
                   <TableHead>Ville</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Telephone</TableHead>
+                  <TableHead>Téléphone</TableHead>
                   <TableHead>Statut</TableHead>
                 </TableRow>
               </TableHeader>

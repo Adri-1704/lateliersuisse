@@ -16,9 +16,9 @@ export default async function B2BRequestDetailPage({
   if (!result.success || !result.data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Demande non trouvee</h1>
+        <h1 className="text-2xl font-bold">Demande non trouvée</h1>
         <Button asChild>
-          <Link href="/admin/b2b-requests">Retour a la liste</Link>
+          <Link href="/admin/b2b-requests">Retour à la liste</Link>
         </Button>
       </div>
     );
@@ -69,7 +69,7 @@ export default async function B2BRequestDetailPage({
             )}
             <div className="flex items-center gap-3 text-sm">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>Recu le {new Date(r.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+              <span>Reçu le {new Date(r.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
             </div>
           </CardContent>
         </Card>

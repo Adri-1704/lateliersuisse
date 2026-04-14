@@ -6,9 +6,9 @@ import type { B2BContactRequest, B2BContactStatus } from "@/lib/supabase/types";
 const mockB2BRequests: B2BContactRequest[] = [
   { id: "1", first_name: "Marco", last_name: "Bernasconi", email: "marco@trattoria.ch", phone: "+41 91 123 45 67", restaurant_name: "Trattoria da Marco", city: "Lugano", message: "Nous aimerions rejoindre votre plateforme.", status: "new", locale: "fr", notes: null, created_at: "2026-02-20T10:00:00Z" },
   { id: "2", first_name: "Sophie", last_name: "Mueller", email: "sophie@gasthof.ch", phone: "+41 31 234 56 78", restaurant_name: "Gasthof zum Baeren", city: "Bern", message: null, status: "contacted", locale: "de", notes: null, created_at: "2026-02-18T14:30:00Z" },
-  { id: "3", first_name: "Antoine", last_name: "Girard", email: "antoine@lecomptoir.ch", phone: "+41 21 345 67 89", restaurant_name: "Le Comptoir du Lac", city: "Lausanne", message: "Interesse par le plan annuel.", status: "new", locale: "fr", notes: null, created_at: "2026-02-15T09:00:00Z" },
-  { id: "4", first_name: "Hans", last_name: "Weber", email: "hans@alpenstube.ch", phone: "+41 44 456 78 90", restaurant_name: "Alpenstube", city: "Zurich", message: "Comment fonctionne le badge verifie ?", status: "new", locale: "de", notes: null, created_at: "2026-02-14T16:45:00Z" },
-  { id: "5", first_name: "Claire", last_name: "Dupont", email: "claire@labrasserie.ch", phone: null, restaurant_name: "La Brasserie", city: "Geneve", message: null, status: "converted", locale: "fr", notes: null, created_at: "2026-02-10T11:20:00Z" },
+  { id: "3", first_name: "Antoine", last_name: "Girard", email: "antoine@lecomptoir.ch", phone: "+41 21 345 67 89", restaurant_name: "Le Comptoir du Lac", city: "Lausanne", message: "Intéressé par le plan annuel.", status: "new", locale: "fr", notes: null, created_at: "2026-02-15T09:00:00Z" },
+  { id: "4", first_name: "Hans", last_name: "Weber", email: "hans@alpenstube.ch", phone: "+41 44 456 78 90", restaurant_name: "Alpenstube", city: "Zurich", message: "Comment fonctionne le badge vérifié ?", status: "new", locale: "de", notes: null, created_at: "2026-02-14T16:45:00Z" },
+  { id: "5", first_name: "Claire", last_name: "Dupont", email: "claire@labrasserie.ch", phone: null, restaurant_name: "La Brasserie", city: "Genève", message: null, status: "converted", locale: "fr", notes: null, created_at: "2026-02-10T11:20:00Z" },
 ];
 
 export async function getB2BRequest(id: string): Promise<{ success: boolean; error: string | null; data?: B2BContactRequest }> {
@@ -80,6 +80,6 @@ export async function updateB2BRequestStatus(
     if (error) throw error;
     return { success: true, error: null };
   } catch {
-    return { success: false, error: "Impossible de mettre a jour le statut (mode demo)" };
+    return { success: false, error: "Impossible de mettre à jour le statut (mode démo)" };
   }
 }

@@ -57,7 +57,7 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
     const result = await updateRestaurant(restaurant.id, form);
     setSaving(false);
     if (result.success) {
-      setMessage({ type: "success", text: "Restaurant mis a jour." });
+      setMessage({ type: "success", text: "Restaurant mis à jour." });
       router.refresh();
     } else {
       setMessage({ type: "error", text: result.error || "Erreur" });
@@ -111,7 +111,7 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
           <CardHeader><CardTitle>Contact</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Telephone</Label>
+              <Label>Téléphone</Label>
               <Input value={form.phone} onChange={(e) => update("phone", e.target.value)} />
             </div>
             <div className="space-y-2">
@@ -138,7 +138,7 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Details</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Détails</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>Type de cuisine</Label>
@@ -149,7 +149,7 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
               <Input value={form.price_range} onChange={(e) => update("price_range", e.target.value)} />
             </div>
             <div className="flex items-center justify-between">
-              <Label>Publie</Label>
+              <Label>Publié</Label>
               <Switch checked={form.is_published} onCheckedChange={(v) => update("is_published", v)} />
             </div>
             <div className="flex items-center justify-between">
@@ -181,24 +181,24 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Video className="h-5 w-5" />
-              Video de presentation
+              Vidéo de présentation
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>URL de la video</Label>
+              <Label>URL de la vidéo</Label>
               <Input
                 value={form.video_url}
                 onChange={(e) => update("video_url", e.target.value)}
                 placeholder="https://www.youtube.com/watch?v=... ou https://vimeo.com/..."
               />
               <p className="text-xs text-gray-500">
-                Collez un lien YouTube ou Vimeo. La video sera affichee sur la page du restaurant.
+                Collez un lien YouTube ou Vimeo. La vidéo sera affichée sur la page du restaurant.
               </p>
             </div>
             {form.video_url && (
               <div className="rounded-lg border bg-gray-50 p-3">
-                <p className="text-sm text-green-600 font-medium">Video configuree</p>
+                <p className="text-sm text-green-600 font-medium">Vidéo configurée</p>
                 <p className="text-xs text-gray-500 truncate mt-1">{form.video_url}</p>
               </div>
             )}
@@ -209,7 +209,7 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Tag className="h-5 w-5" />
-              Promotion / Offre speciale
+              Promotion / Offre spéciale
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -224,12 +224,12 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
                 onChange={(e) => update("promotion_type", e.target.value)}
                 className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               >
-                <option value="percentage">Reduction en %</option>
+                <option value="percentage">Réduction en %</option>
                 <option value="daily_menu">Menu du jour</option>
                 <option value="happy_hour">Happy Hour</option>
-                <option value="special_event">Evenement special</option>
+                <option value="special_event">Événement spécial</option>
                 <option value="free_item">Article offert</option>
-                <option value="fixed_discount">Reduction fixe (CHF)</option>
+                <option value="fixed_discount">Réduction fixe (CHF)</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -254,7 +254,7 @@ export function RestaurantEditForm({ restaurant }: { restaurant: DbRestaurant })
                 rows={2}
                 value={form.promotion_description}
                 onChange={(e) => update("promotion_description", e.target.value)}
-                placeholder="Decrivez les conditions de l'offre..."
+                placeholder="Décrivez les conditions de l'offre..."
               />
             </div>
             {form.promotion_active && form.promotion_title && (

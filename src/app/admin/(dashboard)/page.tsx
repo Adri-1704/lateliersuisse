@@ -14,12 +14,12 @@ export default async function AdminDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatsCard title="Restaurants" value={stats.totalRestaurants} icon={UtensilsCrossed} />
-        <StatsCard title="Commercants actifs" value={stats.activeMerchants} icon={Store} />
+        <StatsCard title="Commerçants actifs" value={stats.activeMerchants} icon={Store} />
         <StatsCard title="Demandes B2B en attente" value={stats.pendingB2BRequests} icon={Briefcase} />
         <StatsCard title="Claims en attente" value={stats.pendingClaims} icon={ShieldCheck} />
-        <StatsCard title="Avis publies" value={stats.recentReviews} icon={MessageSquare} />
+        <StatsCard title="Avis publiés" value={stats.recentReviews} icon={MessageSquare} />
         <StatsCard title="Messages contact" value={stats.totalContacts} icon={Mail} />
-        <StatsCard title="Abonnes newsletter" value={stats.totalSubscribers} icon={Newspaper} />
+        <StatsCard title="Abonnés newsletter" value={stats.totalSubscribers} icon={Newspaper} />
       </div>
     </div>
   );

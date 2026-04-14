@@ -15,7 +15,7 @@ const cantons = [
   "Glaris", "Zoug", "Fribourg", "Soleure", "Bale-Ville", "Bale-Campagne",
   "Schaffhouse", "Appenzell Rh.-Ext.", "Appenzell Rh.-Int.", "Saint-Gall",
   "Grisons", "Argovie", "Thurgovie", "Tessin", "Vaud", "Valais",
-  "Neuchatel", "Geneve", "Jura",
+  "Neuchâtel", "Genève", "Jura",
 ];
 
 export function NewRestaurantForm() {
@@ -44,11 +44,11 @@ export function NewRestaurantForm() {
       });
 
       if (res.success) {
-        toast.success("Restaurant cree avec succes");
+        toast.success("Restaurant créé avec succès");
         router.push("/admin/restaurants");
         router.refresh();
       } else {
-        toast.error(res.error || "Erreur lors de la creation");
+        toast.error(res.error || "Erreur lors de la création");
       }
     });
   }
@@ -63,7 +63,7 @@ export function NewRestaurantForm() {
 
         <div className="space-y-2">
           <Label htmlFor="cuisine_type">Type de cuisine</Label>
-          <Input id="cuisine_type" name="cuisine_type" placeholder="Ex: Francaise, Italienne..." />
+          <Input id="cuisine_type" name="cuisine_type" placeholder="Ex: Française, Italienne..." />
         </div>
 
         <div className="space-y-2">
@@ -85,7 +85,7 @@ export function NewRestaurantForm() {
           <Label>Canton *</Label>
           <Select value={canton} onValueChange={setCanton} required>
             <SelectTrigger>
-              <SelectValue placeholder="Selectionner un canton" />
+              <SelectValue placeholder="Sélectionner un canton" />
             </SelectTrigger>
             <SelectContent>
               {cantons.map((c) => (
@@ -97,12 +97,12 @@ export function NewRestaurantForm() {
 
         <div className="space-y-2">
           <Label htmlFor="city">Ville *</Label>
-          <Input id="city" name="city" required placeholder="Ex: Geneve" />
+          <Input id="city" name="city" required placeholder="Ex: Genève" />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="address">Adresse</Label>
-          <Input id="address" name="address" placeholder="Ex: Rue du Rhone 15" />
+          <Input id="address" name="address" placeholder="Ex: Rue du Rhône 15" />
         </div>
 
         <div className="space-y-2">
@@ -111,7 +111,7 @@ export function NewRestaurantForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">Telephone</Label>
+          <Label htmlFor="phone">Téléphone</Label>
           <Input id="phone" name="phone" type="tel" placeholder="Ex: +41 22 123 45 67" />
         </div>
 
@@ -133,7 +133,7 @@ export function NewRestaurantForm() {
 
       <div className="flex gap-3">
         <Button type="submit" disabled={isPending || !canton}>
-          {isPending ? "Creation..." : "Creer le restaurant"}
+          {isPending ? "Création..." : "Créer le restaurant"}
         </Button>
         <Button type="button" variant="outline" onClick={() => router.push("/admin/restaurants")}>
           Annuler

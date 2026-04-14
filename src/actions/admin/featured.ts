@@ -64,7 +64,7 @@ export async function addFeatured(params: {
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Impossible d'ajouter le restaurant";
     if (msg.includes("duplicate") || msg.includes("unique")) {
-      return { success: false, error: "Ce restaurant est deja selectionne pour ce mois" };
+      return { success: false, error: "Ce restaurant est déjà sélectionné pour ce mois" };
     }
     return { success: false, error: msg };
   }
@@ -78,7 +78,7 @@ export async function removeFeatured(id: string): Promise<{ success: boolean; er
     revalidatePath("/admin/featured");
     return { success: true, error: null };
   } catch {
-    return { success: false, error: "Impossible de retirer le restaurant (mode demo)" };
+    return { success: false, error: "Impossible de retirer le restaurant (mode démo)" };
   }
 }
 

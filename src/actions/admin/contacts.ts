@@ -52,6 +52,6 @@ export async function markContactAsRead(id: string): Promise<{ success: boolean;
     if (error) throw error;
     return { success: true, error: null };
   } catch {
-    return { success: false, error: "Impossible de marquer comme lu (mode demo)" };
+    return { success: false, error: "Impossible de marquer comme lu (mode démo)" };
   }
 }

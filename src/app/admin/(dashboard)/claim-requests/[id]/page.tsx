@@ -8,8 +8,8 @@ import { ClaimActions } from "./ClaimActions";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "En attente", variant: "default" },
-  approved: { label: "Approuve", variant: "outline" },
-  rejected: { label: "Rejete", variant: "destructive" },
+  approved: { label: "Approuvé", variant: "outline" },
+  rejected: { label: "Rejeté", variant: "destructive" },
 };
 
 export default async function ClaimRequestDetailPage({
@@ -23,9 +23,9 @@ export default async function ClaimRequestDetailPage({
   if (!result.success || !result.data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Demande non trouvee</h1>
+        <h1 className="text-2xl font-bold">Demande non trouvée</h1>
         <Button asChild>
-          <Link href="/admin/claim-requests">Retour a la liste</Link>
+          <Link href="/admin/claim-requests">Retour à la liste</Link>
         </Button>
       </div>
     );
@@ -79,7 +79,7 @@ export default async function ClaimRequestDetailPage({
 
         {/* Merchant info */}
         <Card>
-          <CardHeader><CardTitle>Commercant</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Commerçant</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3 text-sm">
               <Store className="h-4 w-4 text-muted-foreground" />
@@ -127,7 +127,7 @@ export default async function ClaimRequestDetailPage({
               <div className="flex items-center gap-3 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span>
-                  Traite le{" "}
+                  Traité le{" "}
                   {new Date(c.resolved_at).toLocaleDateString("fr-CH", {
                     day: "numeric",
                     month: "long",
@@ -139,7 +139,7 @@ export default async function ClaimRequestDetailPage({
               </div>
             )}
             <div className="text-sm">
-              <span className="text-muted-foreground">Methode :</span>{" "}
+              <span className="text-muted-foreground">Méthode :</span>{" "}
               <span className="font-medium">{c.method}</span>
             </div>
             {c.admin_notes && (

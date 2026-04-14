@@ -57,7 +57,7 @@ export function FeaturedManager({ featured, month, year }: FeaturedManagerProps)
         position: parseInt(position) || featured.length + 1,
       });
       if (res.success) {
-        toast.success(`${selectedRestaurant.name} ajoute aux restaurants du mois`);
+        toast.success(`${selectedRestaurant.name} ajouté aux restaurants du mois`);
         setDialogOpen(false);
         setSearch("");
         setResults([]);
@@ -74,7 +74,7 @@ export function FeaturedManager({ featured, month, year }: FeaturedManagerProps)
     startTransition(async () => {
       const res = await removeFeatured(id);
       if (res.success) {
-        toast.success(`${name} retire des restaurants du mois`);
+        toast.success(`${name} retiré des restaurants du mois`);
         router.refresh();
       } else {
         toast.error(res.error || "Erreur lors de la suppression");
@@ -103,7 +103,7 @@ export function FeaturedManager({ featured, month, year }: FeaturedManagerProps)
             <DialogHeader>
               <DialogTitle>Ajouter un restaurant du mois</DialogTitle>
               <DialogDescription>
-                Recherchez un restaurant et ajoutez-le a la selection du mois.
+                Recherchez un restaurant et ajoutez-le à la sélection du mois.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
@@ -130,10 +130,10 @@ export function FeaturedManager({ featured, month, year }: FeaturedManagerProps)
                     <p className="p-3 text-sm text-muted-foreground">Recherche...</p>
                   )}
                   {!searching && results.length === 0 && search.length >= 2 && (
-                    <p className="p-3 text-sm text-muted-foreground">Aucun restaurant trouve</p>
+                    <p className="p-3 text-sm text-muted-foreground">Aucun restaurant trouvé</p>
                   )}
                   {!searching && search.length < 2 && (
-                    <p className="p-3 text-sm text-muted-foreground">Tapez au moins 2 caracteres</p>
+                    <p className="p-3 text-sm text-muted-foreground">Tapez au moins 2 caractères</p>
                   )}
                   {results.map((r) => (
                     <button
@@ -172,7 +172,7 @@ export function FeaturedManager({ featured, month, year }: FeaturedManagerProps)
 
       {featured.length === 0 ? (
         <div className="rounded-md border p-8 text-center text-muted-foreground">
-          Aucun restaurant selectionne pour cette periode.
+          Aucun restaurant sélectionné pour cette période.
         </div>
       ) : (
         <div className="rounded-md border">
@@ -181,7 +181,7 @@ export function FeaturedManager({ featured, month, year }: FeaturedManagerProps)
               <TableRow>
                 <TableHead>Position</TableHead>
                 <TableHead>Restaurant</TableHead>
-                <TableHead>Ajoute le</TableHead>
+                <TableHead>Ajouté le</TableHead>
                 <TableHead className="w-16">Actions</TableHead>
               </TableRow>
             </TableHeader>

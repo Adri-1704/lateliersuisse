@@ -90,7 +90,7 @@ export default async function StatsPage() {
       <div>
         <h1 className="text-2xl font-bold">Statistiques SaaS</h1>
         <p className="text-muted-foreground">
-          Tableau de bord en temps reel — Just-Tag.app
+          Tableau de bord en temps réel — Just-Tag.app
         </p>
       </div>
 
@@ -106,7 +106,7 @@ export default async function StatsPage() {
             <p className="mt-2 text-3xl font-bold">{formatCHF(m.mrr)}</p>
             <div className="mt-1 flex items-center gap-2">
               <TrendIndicator value={m.mom} />
-              <span className="text-xs text-muted-foreground">vs mois prec.</span>
+              <span className="text-xs text-muted-foreground">vs mois préc.</span>
             </div>
           </CardContent>
         </Card>
@@ -127,7 +127,7 @@ export default async function StatsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Abonnes actifs</p>
+              <p className="text-sm font-medium text-muted-foreground">Abonnés actifs</p>
               <Users className="h-4 w-4 text-muted-foreground" />
             </div>
             <p className="mt-2 text-3xl font-bold">{m.activeSubscribers}</p>
@@ -179,7 +179,7 @@ export default async function StatsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Revenue total estime</p>
+              <p className="text-sm font-medium text-muted-foreground">Revenue total estimé</p>
               <DollarSign className="h-4 w-4 text-emerald-600" />
             </div>
             <p className="mt-2 text-2xl font-bold">{formatCHF(m.revenueTotalEstime)}</p>
@@ -196,7 +196,7 @@ export default async function StatsPage() {
             </div>
             <p className="mt-2 text-2xl font-bold">{formatCHF(m.revenueLifetime)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {m.subscribersByPlan.lifetime} abonne{m.subscribersByPlan.lifetime !== 1 ? "s" : ""} lifetime
+              {m.subscribersByPlan.lifetime} abonné{m.subscribersByPlan.lifetime !== 1 ? "s" : ""} lifetime
             </p>
           </CardContent>
         </Card>
@@ -210,7 +210,7 @@ export default async function StatsPage() {
             </div>
             <p className="mt-2 text-2xl font-bold">{m.newSubscribersThisMonth}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              vs {m.newSubscribersPrevMonth} mois prec.
+              vs {m.newSubscribersPrevMonth} mois préc.
             </p>
           </CardContent>
         </Card>
@@ -232,14 +232,14 @@ export default async function StatsPage() {
         </Card>
       </div>
 
-      {/* ── Section Repartition ────────────────────────── */}
+      {/* ── Section Répartition ────────────────────────── */}
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Par plan */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <BarChart3 className="h-4 w-4" />
-              Repartition par plan
+              Répartition par plan
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -255,7 +255,7 @@ export default async function StatsPage() {
               )
             )}
             {totalByPlan === 0 && (
-              <p className="text-sm text-muted-foreground">Aucun abonne pour le moment</p>
+              <p className="text-sm text-muted-foreground">Aucun abonné pour le moment</p>
             )}
           </CardContent>
         </Card>
@@ -297,7 +297,7 @@ export default async function StatsPage() {
               />
             </div>
             {m.earlyBirdCount + m.standardCount === 0 && (
-              <p className="text-sm text-muted-foreground">Aucun abonne pour le moment</p>
+              <p className="text-sm text-muted-foreground">Aucun abonné pour le moment</p>
             )}
           </CardContent>
         </Card>
@@ -307,7 +307,7 @@ export default async function StatsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Users className="h-4 w-4" />
-              Abonnes par canton
+              Abonnés par canton
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -321,7 +321,7 @@ export default async function StatsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Aucune donnee canton disponible</p>
+              <p className="text-sm text-muted-foreground">Aucune donnée canton disponible</p>
             )}
           </CardContent>
         </Card>
@@ -334,7 +334,7 @@ export default async function StatsPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Total commercants</p>
+                <p className="text-sm font-medium text-muted-foreground">Total commerçants</p>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="mt-2 text-2xl font-bold">{m.totalMerchants}</p>
@@ -350,14 +350,14 @@ export default async function StatsPage() {
               <p className="mt-2 text-2xl font-bold">{m.totalClaimRequests}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <Badge variant="default" className="bg-emerald-600">
-                  {m.claimsApproved} approuve{m.claimsApproved !== 1 ? "s" : ""}
+                  {m.claimsApproved} approuvé{m.claimsApproved !== 1 ? "s" : ""}
                 </Badge>
                 <Badge variant="secondary">
                   {m.claimsPending} en attente
                 </Badge>
                 {m.claimsRejected > 0 && (
                   <Badge variant="destructive">
-                    {m.claimsRejected} rejete{m.claimsRejected !== 1 ? "s" : ""}
+                    {m.claimsRejected} rejeté{m.claimsRejected !== 1 ? "s" : ""}
                   </Badge>
                 )}
               </div>
@@ -367,14 +367,14 @@ export default async function StatsPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Conversion claim → abonne</p>
+                <p className="text-sm font-medium text-muted-foreground">Conversion claim → abonné</p>
                 <Target className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className={`mt-2 text-2xl font-bold ${m.claimToSubscriberRate >= 50 ? "text-emerald-600" : m.claimToSubscriberRate > 0 ? "text-amber-600" : ""}`}>
                 {m.claimToSubscriberRate}%
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                claims approuves avec abonnement actif
+                claims approuvés avec abonnement actif
               </p>
             </CardContent>
           </Card>
@@ -392,14 +392,14 @@ export default async function StatsPage() {
         </div>
       </div>
 
-      {/* ── Section Operationnel ───────────────────────── */}
+      {/* ── Section Opérationnel ───────────────────────── */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold">Indicateurs operationnels</h2>
+        <h2 className="mb-4 text-lg font-semibold">Indicateurs opérationnels</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Restaurants publies</p>
+                <p className="text-sm font-medium text-muted-foreground">Restaurants publiés</p>
                 <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="mt-2 text-2xl font-bold">{m.totalPublishedRestaurants}</p>
@@ -409,7 +409,7 @@ export default async function StatsPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Restaurants revendiques</p>
+                <p className="text-sm font-medium text-muted-foreground">Restaurants revendiqués</p>
                 <ShieldCheck className="h-4 w-4 text-emerald-600" />
               </div>
               <p className="mt-2 text-2xl font-bold">{m.claimedRestaurants}</p>
@@ -432,7 +432,7 @@ export default async function StatsPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Ratio revendique / total</p>
+                <p className="text-sm font-medium text-muted-foreground">Ratio revendiqué / total</p>
                 <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="mt-2 text-2xl font-bold">

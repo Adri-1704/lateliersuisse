@@ -30,7 +30,7 @@ export default async function ReviewsPage({
       <SearchInput placeholder="Rechercher par auteur, commentaire..." />
 
       {reviews.length === 0 ? (
-        <EmptyState title="Aucun avis" description="Aucun avis ne correspond a votre recherche." />
+        <EmptyState title="Aucun avis" description="Aucun avis ne correspond à votre recherche." />
       ) : (
         <>
           <div className="rounded-md border">

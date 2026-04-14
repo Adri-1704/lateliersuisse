@@ -19,9 +19,9 @@ export default async function EditRestaurantPage({
   if (!result.success || !result.data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Restaurant non trouve</h1>
+        <h1 className="text-2xl font-bold">Restaurant non trouvé</h1>
         <Button asChild>
-          <Link href="/admin/restaurants">Retour a la liste</Link>
+          <Link href="/admin/restaurants">Retour à la liste</Link>
         </Button>
       </div>
     );

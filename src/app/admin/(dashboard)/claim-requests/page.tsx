@@ -8,8 +8,8 @@ import {
 
 const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   pending: { label: "En attente", variant: "default" },
-  approved: { label: "Approuve", variant: "outline" },
-  rejected: { label: "Rejete", variant: "destructive" },
+  approved: { label: "Approuvé", variant: "outline" },
+  rejected: { label: "Rejeté", variant: "destructive" },
 };
 
 export default async function ClaimRequestsPage({
@@ -37,8 +37,8 @@ export default async function ClaimRequestsPage({
       <div className="flex gap-2">
         {[
           { value: "pending", label: "En attente" },
-          { value: "approved", label: "Approuvees" },
-          { value: "rejected", label: "Rejetees" },
+          { value: "approved", label: "Approuvées" },
+          { value: "rejected", label: "Rejetées" },
           { value: "all", label: "Toutes" },
         ].map((tab) => (
           <Link
@@ -58,7 +58,7 @@ export default async function ClaimRequestsPage({
       {claims.length === 0 ? (
         <EmptyState
           title="Aucune demande"
-          description="Aucune demande de claim ne correspond a ce filtre."
+          description="Aucune demande de claim ne correspond à ce filtre."
         />
       ) : (
         <div className="rounded-md border">
@@ -68,9 +68,9 @@ export default async function ClaimRequestsPage({
                 <TableHead>Date</TableHead>
                 <TableHead>Restaurant</TableHead>
                 <TableHead>Ville</TableHead>
-                <TableHead>Commercant</TableHead>
+                <TableHead>Commerçant</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Methode</TableHead>
+                <TableHead>Méthode</TableHead>
                 <TableHead>Statut</TableHead>
               </TableRow>
             </TableHeader>

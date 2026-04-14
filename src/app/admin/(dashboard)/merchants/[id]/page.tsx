@@ -18,7 +18,7 @@ const planLabels: Record<string, string> = {
   monthly: "Mensuel",
   semiannual: "Semestriel",
   annual: "Annuel",
-  lifetime: "A vie",
+  lifetime: "À vie",
 };
 
 export default async function MerchantDetailPage({
@@ -32,9 +32,9 @@ export default async function MerchantDetailPage({
   if (!result.success || !result.data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Commercant non trouve</h1>
+        <h1 className="text-2xl font-bold">Commerçant non trouvé</h1>
         <Button asChild>
-          <Link href="/admin/merchants">Retour a la liste</Link>
+          <Link href="/admin/merchants">Retour à la liste</Link>
         </Button>
       </div>
     );
@@ -101,7 +101,7 @@ export default async function MerchantDetailPage({
                 </div>
                 {sub.current_period_start && (
                   <p className="text-sm text-muted-foreground">
-                    Debut: {new Date(sub.current_period_start).toLocaleDateString("fr-CH")}
+                    Début : {new Date(sub.current_period_start).toLocaleDateString("fr-CH")}
                   </p>
                 )}
                 {sub.current_period_end && (
@@ -110,7 +110,7 @@ export default async function MerchantDetailPage({
                   </p>
                 )}
                 {sub.cancel_at_period_end && (
-                  <Badge variant="destructive">Annulation prevue</Badge>
+                  <Badge variant="destructive">Annulation prévue</Badge>
                 )}
               </>
             ) : (

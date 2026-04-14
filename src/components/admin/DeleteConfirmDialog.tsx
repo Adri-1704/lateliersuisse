@@ -22,7 +22,7 @@ interface DeleteConfirmDialogProps {
 
 export function DeleteConfirmDialog({
   title = "Confirmer la suppression",
-  description = "Cette action est irreversible. Voulez-vous vraiment supprimer cet element ?",
+  description = "Cette action est irréversible. Voulez-vous vraiment supprimer cet élément ?",
   onConfirm,
 }: DeleteConfirmDialogProps) {
   return (

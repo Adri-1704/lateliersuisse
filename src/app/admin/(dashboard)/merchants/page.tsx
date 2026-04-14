@@ -15,7 +15,7 @@ const planLabels: Record<string, string> = {
   monthly: "Mensuel",
   semiannual: "Semestriel",
   annual: "Annuel",
-  lifetime: "A vie",
+  lifetime: "À vie",
 };
 
 export default async function MerchantsPage({
@@ -34,14 +34,14 @@ export default async function MerchantsPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Commercants</h1>
-        <p className="text-muted-foreground">{total} commercant{total > 1 ? "s" : ""}</p>
+        <h1 className="text-2xl font-bold">Commerçants</h1>
+        <p className="text-muted-foreground">{total} commerçant{total > 1 ? "s" : ""}</p>
       </div>
 
       <SearchInput placeholder="Rechercher par nom, email..." />
 
       {merchants.length === 0 ? (
-        <EmptyState title="Aucun commercant" description="Aucun commercant inscrit pour le moment." />
+        <EmptyState title="Aucun commerçant" description="Aucun commerçant inscrit pour le moment." />
       ) : (
         <>
           <div className="rounded-md border">
@@ -50,7 +50,7 @@ export default async function MerchantsPage({
                 <TableRow>
                   <TableHead>Nom</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Telephone</TableHead>
+                  <TableHead>Téléphone</TableHead>
                   <TableHead>Plan</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead>Inscription</TableHead>

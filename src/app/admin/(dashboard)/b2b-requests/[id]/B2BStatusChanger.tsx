@@ -9,9 +9,9 @@ import type { B2BContactStatus } from "@/lib/supabase/types";
 
 const statuses: { value: B2BContactStatus; label: string; color: string }[] = [
   { value: "new", label: "Nouveau", color: "bg-blue-100 text-blue-700" },
-  { value: "contacted", label: "Contacte", color: "bg-yellow-100 text-yellow-700" },
+  { value: "contacted", label: "Contacté", color: "bg-yellow-100 text-yellow-700" },
   { value: "converted", label: "Converti", color: "bg-green-100 text-green-700" },
-  { value: "archived", label: "Archive", color: "bg-gray-100 text-gray-700" },
+  { value: "archived", label: "Archivé", color: "bg-gray-100 text-gray-700" },
 ];
 
 export function B2BStatusChanger({ id, currentStatus }: { id: string; currentStatus: string }) {
@@ -26,7 +26,7 @@ export function B2BStatusChanger({ id, currentStatus }: { id: string; currentSta
     const result = await updateB2BRequestStatus(id, newStatus);
     setSaving(false);
     if (result.success) {
-      setMessage("Statut mis a jour");
+      setMessage("Statut mis à jour");
       router.refresh();
     } else {
       setMessage(result.error || "Erreur");
@@ -52,7 +52,7 @@ export function B2BStatusChanger({ id, currentStatus }: { id: string; currentSta
       {saving && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-3 w-3 animate-spin" />
-          Mise a jour...
+          Mise à jour...
         </div>
       )}
       {message && !saving && (

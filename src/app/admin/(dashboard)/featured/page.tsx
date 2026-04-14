@@ -2,7 +2,7 @@ import { listFeatured } from "@/actions/admin/featured";
 import { FeaturedManager } from "@/components/admin/FeaturedManager";
 import { Star } from "lucide-react";
 
-const monthNames = ["", "Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"];
+const monthNames = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
 
 export default async function FeaturedPage({
   searchParams,
@@ -24,7 +24,7 @@ export default async function FeaturedPage({
         <h1 className="text-2xl font-bold">Restaurants du mois</h1>
         <p className="text-muted-foreground">
           <Star className="mr-1 inline h-4 w-4 fill-yellow-400 text-yellow-400" />
-          {monthNames[month]} {year} — {total} restaurant{total > 1 ? "s" : ""} selectionne{total > 1 ? "s" : ""}
+          {monthNames[month]} {year} — {total} restaurant{total > 1 ? "s" : ""} sélectionné{total > 1 ? "s" : ""}
         </p>
       </div>
 
