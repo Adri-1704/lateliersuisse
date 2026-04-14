@@ -42,12 +42,26 @@ export async function listFeaturedRestaurants(): Promise<{
   }
 }
 
+const MAX_FEATURED = 12;
+
 export async function toggleFeatured(
   restaurantId: string,
   isFeatured: boolean
 ): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
+
+    // Si on ajoute, vérifier la limite de 12
+    if (isFeatured) {
+      const { count } = await supabase
+        .from("restaurants")
+        .select("id", { count: "exact", head: true })
+        .eq("is_featured", true);
+      if ((count || 0) >= MAX_FEATURED) {
+        return { success: false, error: "Limite atteinte : maximum " + MAX_FEATURED + " restaurants du mois. Retirez-en un avant d'en ajouter." };
+      }
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase as any).from("restaurants").update({ is_featured: isFeatured }).eq("id", restaurantId);
 
