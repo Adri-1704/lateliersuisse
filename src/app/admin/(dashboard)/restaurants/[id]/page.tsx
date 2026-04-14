@@ -31,17 +31,17 @@ export default async function EditRestaurantPage({
 
   // Fetch merchant info if restaurant is claimed
   let merchant: { id: string; name: string; email: string } | null = null;
-  if ((r as Record<string, unknown>).merchant_id) {
+  if ((r as unknown as Record<string, unknown>).merchant_id) {
     const supabase = createAdminClient();
     const { data } = await supabase
       .from("merchants")
       .select("id, name, email")
-      .eq("id", (r as Record<string, unknown>).merchant_id)
+      .eq("id", (r as unknown as Record<string, unknown>).merchant_id)
       .single();
     merchant = data as { id: string; name: string; email: string } | null;
   }
 
-  const claimStatus = (r as Record<string, unknown>).claim_status as string || "unclaimed";
+  const claimStatus = (r as unknown as Record<string, unknown>).claim_status as string || "unclaimed";
 
   return (
     <div className="space-y-6">
