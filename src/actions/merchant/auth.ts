@@ -9,6 +9,7 @@ export interface MerchantSession {
   merchant: Merchant;
   subscription: Subscription | null;
   restaurant: DbRestaurant | null;
+  pendingClaim: { id: string; restaurant_id: string; created_at: string } | null;
 }
 
 /**
@@ -120,10 +121,27 @@ export async function getMerchantSession(): Promise<MerchantSession | null> {
       .limit(1)
       .single();
 
+    // If no restaurant linked, check for a pending claim request
+    let pendingClaim: { id: string; restaurant_id: string; created_at: string } | null = null;
+    if (!restaurant) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: claim } = await (admin.from("claim_requests") as any)
+        .select("id, restaurant_id, created_at")
+        .eq("merchant_id", merchant.id)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+      if (claim) {
+        pendingClaim = claim as { id: string; restaurant_id: string; created_at: string };
+      }
+    }
+
     return {
       merchant: merchant as Merchant,
       subscription: (subscription as Subscription) || null,
       restaurant: (restaurant as DbRestaurant) || null,
+      pendingClaim,
     };
   } catch {
     return null;

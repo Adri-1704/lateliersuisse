@@ -4,6 +4,7 @@ import type { Restaurant, Review } from "@/data/mock-restaurants";
 import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
 import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
+import { ClaimBanner } from "./ClaimBanner";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/supabase/types";
 import type { RestaurantPromotion } from "@/data/mock-restaurants";
@@ -75,7 +76,7 @@ function mapDbToReview(row: DbReview): Review {
   };
 }
 
-async function getRestaurant(slug: string): Promise<{ restaurant: Restaurant; index: number } | null> {
+async function getRestaurant(slug: string): Promise<{ restaurant: Restaurant; index: number; merchantId: string | null; claimStatus: string | null } | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("restaurants")
@@ -85,7 +86,13 @@ async function getRestaurant(slug: string): Promise<{ restaurant: Restaurant; in
     .single();
 
   if (error || !data) return null;
-  return { restaurant: mapDbToRestaurant(data as Record<string, unknown>, 0), index: 0 };
+  const row = data as Record<string, unknown>;
+  return {
+    restaurant: mapDbToRestaurant(row, 0),
+    index: 0,
+    merchantId: (row.merchant_id as string) || null,
+    claimStatus: (row.claim_status as string) || null,
+  };
 }
 
 async function getReviews(restaurantId: string): Promise<Review[]> {
@@ -213,7 +220,7 @@ export default async function RestaurantDetailPage({
     notFound();
   }
 
-  const { restaurant } = result;
+  const { restaurant, merchantId, claimStatus } = result;
 
   // Fetch reviews, menu items, and images in parallel
   const [reviews, menuItems, images, promotions] = await Promise.all([
@@ -351,6 +358,14 @@ export default async function RestaurantDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      {/* Bandeau revendication — affiché uniquement si restaurant non revendiqué et pas de claim pending */}
+      {!merchantId && claimStatus !== "pending" && (
+        <ClaimBanner
+          restaurantName={getLocalizedName(enrichedRestaurant, locale)}
+          restaurantSlug={slug}
+          locale={locale}
+        />
+      )}
       <RestaurantDetailClient
         restaurant={enrichedRestaurant}
         reviews={reviews}
