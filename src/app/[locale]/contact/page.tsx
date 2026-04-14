@@ -151,7 +151,7 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">{t("phone")}</h3>
-              <p className="mt-1 text-gray-600">+41 22 000 00 00</p>
+              <p className="mt-1 text-gray-600">079 451 74 96</p>
             </div>
           </div>
           <div className="flex items-start gap-4">
@@ -161,9 +161,11 @@ export default function ContactPage() {
             <div>
               <h3 className="font-semibold text-gray-900">{t("address")}</h3>
               <p className="mt-1 text-gray-600">
-                Rue du Marche 10
+                Just-Tag
                 <br />
-                1204 Geneve, Suisse
+                Route des Îles 88
+                <br />
+                1897 Le Bouveret, Suisse
               </p>
             </div>
           </div>
