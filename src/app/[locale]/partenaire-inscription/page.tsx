@@ -138,8 +138,24 @@ export default function MerchantSignupPage() {
   const stepParam = searchParams.get("step") as Step | null;
   const planParam = searchParams.get("plan");
   const canceled = searchParams.get("canceled");
+  const restaurantParam = searchParams.get("restaurant");
 
   const [currentStep, setCurrentStep] = useState<Step>(stepParam || "signup");
+
+  // Pre-selected restaurant from URL (?restaurant=slug)
+  const [preselectedRestaurant, setPreselectedRestaurant] = useState<{
+    slug: string;
+    name: string;
+    city: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!restaurantParam) return;
+    searchAvailableRestaurants(restaurantParam).then((results) => {
+      const match = results.find((r) => r.slug === restaurantParam);
+      if (match) setPreselectedRestaurant(match);
+    });
+  }, [restaurantParam]);
 
   // Signup state
   const [signupData, setSignupData] = useState<SignupData>({
@@ -255,6 +271,17 @@ export default function MerchantSignupPage() {
     }
 
     setSignupData((prev) => ({ ...prev, merchantId }));
+
+    // Si un restaurant est pré-sélectionné depuis l'URL, auto-sélectionner
+    if (preselectedRestaurant) {
+      setRestaurantChoice({
+        type: "existing",
+        slug: preselectedRestaurant.slug,
+        name: preselectedRestaurant.name,
+        city: preselectedRestaurant.city,
+      });
+    }
+
     goToStep("restaurant");
   }
 
@@ -365,6 +392,17 @@ export default function MerchantSignupPage() {
         <p className="mt-2 text-gray-500">
           Créez votre compte, associez votre restaurant et choisissez votre plan
         </p>
+        {preselectedRestaurant && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-3">
+            <span className="text-green-600 text-lg">🍽️</span>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-green-800">
+                Vous revendiquez : {preselectedRestaurant.name}
+              </p>
+              <p className="text-xs text-green-600">{preselectedRestaurant.city}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Step indicator */}
