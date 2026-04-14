@@ -259,7 +259,6 @@ export async function createClaimRequest(params: {
       const template = claimApprovedNotification({
         restaurantName: restaurant.name_fr,
         merchantName,
-        merchantEmail,
       });
       await sendEmail({
         to: merchantEmail,
