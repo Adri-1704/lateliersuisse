@@ -39,27 +39,41 @@ function buildCantonNormalizer(): (raw: string) => string {
 async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, number>; cuisineCounts: Record<string, number> }> {
   try {
     const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from("restaurants")
-      .select("canton, cuisine_type")
-      .eq("is_published", true)
-      .limit(50000);
+    const romandCantons = ["geneve", "vaud", "fribourg", "neuchatel", "valais", "jura", "berne"];
 
-    if (error || !data) return { cantonCounts: {}, cuisineCounts: {} };
-
-    const normalize = buildCantonNormalizer();
+    // Count per canton via individual queries (bypasses 1000 row limit)
     const cantonCounts: Record<string, number> = {};
-    const cuisineCounts: Record<string, number> = {};
+    await Promise.all(
+      romandCantons.map(async (canton) => {
+        const { count } = await supabase
+          .from("restaurants")
+          .select("id", { count: "exact", head: true })
+          .eq("is_published", true)
+          .eq("canton", canton);
+        cantonCounts[canton] = count || 0;
+      })
+    );
 
-    for (const row of data as { canton: string; cuisine_type: string | null }[]) {
-      if (row.canton) {
-        const slug = normalize(row.canton);
-        cantonCounts[slug] = (cantonCounts[slug] || 0) + 1;
-      }
-      if (row.cuisine_type) {
+    // Cuisine counts (use pagination to get all)
+    const cuisineCounts: Record<string, number> = {};
+    let offset = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data } = await supabase
+        .from("restaurants")
+        .select("cuisine_type")
+        .eq("is_published", true)
+        .not("cuisine_type", "is", null)
+        .neq("cuisine_type", "")
+        .range(offset, offset + pageSize - 1);
+      if (!data || data.length === 0) break;
+      for (const row of data as { cuisine_type: string }[]) {
         cuisineCounts[row.cuisine_type] = (cuisineCounts[row.cuisine_type] || 0) + 1;
       }
+      if (data.length < pageSize) break;
+      offset += pageSize;
     }
+
     return { cantonCounts, cuisineCounts };
   } catch {
     return { cantonCounts: {}, cuisineCounts: {} };
