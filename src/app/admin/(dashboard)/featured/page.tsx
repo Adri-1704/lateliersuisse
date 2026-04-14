@@ -1,21 +1,11 @@
-import { listFeatured } from "@/actions/admin/featured";
+import { listFeaturedRestaurants } from "@/actions/admin/featured";
 import { FeaturedManager } from "@/components/admin/FeaturedManager";
 import { Star } from "lucide-react";
 
-const monthNames = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+export default async function FeaturedPage() {
+  const result = await listFeaturedRestaurants();
 
-export default async function FeaturedPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ month?: string; year?: string }>;
-}) {
-  const params = await searchParams;
-  const now = new Date();
-  const month = parseInt(params.month || String(now.getMonth() + 1));
-  const year = parseInt(params.year || String(now.getFullYear()));
-  const result = await listFeatured({ month, year });
-
-  const featured = result.data?.featured || [];
+  const restaurants = result.data?.restaurants || [];
   const total = result.data?.total || 0;
 
   return (
@@ -24,11 +14,11 @@ export default async function FeaturedPage({
         <h1 className="text-2xl font-bold">Restaurants du mois</h1>
         <p className="text-muted-foreground">
           <Star className="mr-1 inline h-4 w-4 fill-yellow-400 text-yellow-400" />
-          {monthNames[month]} {year} — {total} restaurant{total > 1 ? "s" : ""} sélectionné{total > 1 ? "s" : ""}
+          {total} restaurant{total > 1 ? "s" : ""} sélectionné{total > 1 ? "s" : ""}
         </p>
       </div>
 
-      <FeaturedManager featured={featured} month={month} year={year} />
+      <FeaturedManager restaurants={restaurants} />
     </div>
   );
 }
