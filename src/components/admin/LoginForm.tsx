@@ -64,7 +64,7 @@ export function LoginForm() {
             />
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex flex-col gap-3">
           <Button
             type="submit"
             className="w-full bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)]"
@@ -79,6 +79,12 @@ export function LoginForm() {
               "Se connecter"
             )}
           </Button>
+          <a
+            href="/fr/mot-de-passe-oublie"
+            className="text-sm text-muted-foreground hover:text-[var(--color-just-tag)] transition-colors"
+          >
+            Mot de passe oublié ?
+          </a>
         </CardFooter>
       </form>
     </Card>
