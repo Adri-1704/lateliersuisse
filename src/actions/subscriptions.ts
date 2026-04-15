@@ -3,7 +3,7 @@
 import { getStripe, getPriceId, TRIAL_DAYS, EARLY_BIRD_LIMIT } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
-import { paymentConfirmation, merchantWelcome, freeTrialWelcome, freeTrialAdminNotification } from "@/lib/email-templates";
+import { paymentConfirmation, merchantWelcome, freeTrialWelcome, freeTrialAdminNotification, subscriptionPaymentAdminNotification } from "@/lib/email-templates";
 import { createServerClient } from "@supabase/ssr";
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -431,6 +431,49 @@ export async function handleSubscriptionWebhook(
         }
       } catch (err) {
         console.error("Email error in checkout.session.completed:", err);
+      }
+
+      // Notifier l'admin du paiement
+      try {
+        const metadata = data.metadata || {};
+        const isEarlyBird = metadata.is_early_bird === "true" || metadata.early_bird === "true";
+        const planType = metadata.plan_type || (data.mode === "payment" ? "lifetime" : "monthly");
+
+        // Récupérer les infos merchant (nouveau flow ou metadata legacy)
+        let merchantName = metadata.merchant_name || "";
+        const merchantEmail = data.customer_email || metadata.merchant_email || "";
+        const restaurantName = metadata.restaurant_name || "";
+        if (metadata.merchant_id && !merchantName) {
+          const supabase = createAdminClient();
+          const { data: m } = await supabase
+            .from("merchants")
+            .select("name")
+            .eq("id", metadata.merchant_id)
+            .single() as { data: { name: string } | null; error: unknown };
+          if (m) merchantName = m.name;
+        }
+
+        const amountFormatted = typeof data.amount_total === "number"
+          ? `${(data.amount_total / 100).toFixed(2)} ${(data.currency || "chf").toUpperCase()}`
+          : undefined;
+
+        const adminTemplate = subscriptionPaymentAdminNotification({
+          merchantName,
+          merchantEmail,
+          restaurantName,
+          planType,
+          isEarlyBird,
+          amount: amountFormatted,
+        });
+        const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
+        await sendEmail({
+          to: adminEmailAddress,
+          subject: adminTemplate.subject,
+          html: adminTemplate.html,
+          replyTo: merchantEmail || undefined,
+        });
+      } catch (err) {
+        console.error("Admin payment notification error:", err);
       }
 
       break;

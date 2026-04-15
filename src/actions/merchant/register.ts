@@ -2,7 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
-import { claimRequestAdminNotification, claimApprovedNotification } from "@/lib/email-templates";
+import { claimRequestAdminNotification, claimApprovedNotification, newSignupAdminNotification } from "@/lib/email-templates";
 
 interface RegisterParams {
   name: string;
@@ -140,6 +140,24 @@ export async function registerMerchant(params: RegisterParams): Promise<Register
   }
 
   // No restaurant selected — merchant created without claim
+  // Notifier l'admin de la nouvelle inscription
+  try {
+    const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";
+    const template = newSignupAdminNotification({
+      merchantName: name,
+      merchantEmail: email,
+      merchantPhone: phone || "Non renseigné",
+    });
+    await sendEmail({
+      to: adminEmailAddress,
+      subject: template.subject,
+      html: template.html,
+      replyTo: email,
+    });
+  } catch (emailErr) {
+    console.error("Failed to send signup admin notification:", emailErr);
+  }
+
   return { success: true, error: null };
 }
 

@@ -719,3 +719,78 @@ export function freeTrialAdminNotification(data: FreeTrialData): {
     html: emailLayout(content),
   };
 }
+
+// ---------------------------------------------------------------------------
+// 13. New Signup Admin Notification (always in French, sent on every signup)
+// ---------------------------------------------------------------------------
+export interface NewSignupAdminData {
+  merchantName: string;
+  merchantEmail: string;
+  merchantPhone: string;
+}
+
+export function newSignupAdminNotification(data: NewSignupAdminData): {
+  subject: string;
+  html: string;
+} {
+  const content = [
+    heading("🆕 Nouveau compte restaurateur"),
+    paragraph(
+      `Un restaurateur vient de créer un compte sur Just-Tag (sans revendication de fiche).`
+    ),
+    divider(),
+    label("Nom", data.merchantName),
+    label("Email", data.merchantEmail),
+    label("Téléphone", data.merchantPhone),
+    divider(),
+    paragraph(
+      `<a href="mailto:${data.merchantEmail}" style="color:${COLORS.red};font-weight:600;">Contacter par email</a>`
+    ),
+  ].join("");
+
+  return {
+    subject: `Nouveau compte — ${data.merchantName}`,
+    html: emailLayout(content),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 14. Subscription Payment Admin Notification (always in French)
+// ---------------------------------------------------------------------------
+export interface SubscriptionPaymentAdminData {
+  merchantName: string;
+  merchantEmail: string;
+  restaurantName: string;
+  planType: string;
+  isEarlyBird: boolean;
+  amount?: string;
+}
+
+export function subscriptionPaymentAdminNotification(data: SubscriptionPaymentAdminData): {
+  subject: string;
+  html: string;
+} {
+  const content = [
+    heading("💰 Nouveau paiement reçu"),
+    paragraph(
+      `Un restaurateur vient de s'abonner. Encaissement Stripe confirmé.`
+    ),
+    divider(),
+    label("Nom", data.merchantName || "—"),
+    label("Email", data.merchantEmail || "—"),
+    label("Restaurant", data.restaurantName || "—"),
+    label("Plan", data.planType || "—"),
+    label("Early Bird", data.isEarlyBird ? "Oui" : "Non"),
+    ...(data.amount ? [label("Montant", data.amount)] : []),
+    divider(),
+    button("https://dashboard.stripe.com/payments", "Voir sur Stripe"),
+    paragraph(
+      `<a href="mailto:${data.merchantEmail}" style="color:${COLORS.red};font-weight:600;">Contacter par email</a>`
+    ),
+  ].join("");
+
+  return {
+    subject: `💰 Paiement — ${data.merchantName || data.merchantEmail} (${data.planType})`,
+    html: emailLayout(content),
+  };
+}
