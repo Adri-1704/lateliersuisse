@@ -21,6 +21,19 @@ function getCantonLabel(canton: (typeof cantons)[number], locale: string): strin
   }
 }
 
+// "canton de Genève" / "canton du Valais" — gère les prépositions françaises et espagnoles
+function getCantonPhrase(canton: (typeof cantons)[number], locale: string): string {
+  const name = getCantonLabel(canton, locale);
+  switch (locale) {
+    case "fr": return `canton ${canton.prepositionFr} ${name}`;
+    case "es": return `cantón ${canton.prepositionEs} ${name}`;
+    case "pt": return `cantão de ${name}`;
+    case "de": return `Kanton ${name}`;
+    case "en": return `canton of ${name}`;
+    default: return `canton ${canton.prepositionFr} ${name}`;
+  }
+}
+
 function getLocalizedName(r: RestaurantListItem, locale: string): string {
   switch (locale) {
     case "de": return r.name_de || r.name_fr;
@@ -43,21 +56,22 @@ export async function generateMetadata({
   if (!cantonData) return {};
 
   const cantonLabel = getCantonLabel(cantonData, locale);
+  const cantonPhrase = getCantonPhrase(cantonData, locale);
 
   const titles: Record<string, string> = {
-    fr: `Restaurants dans le canton de ${cantonLabel} — Just-Tag`,
-    de: `Restaurants im Kanton ${cantonLabel} — Just-Tag`,
-    en: `Restaurants in the canton of ${cantonLabel} — Just-Tag`,
-    pt: `Restaurantes no cantão de ${cantonLabel} — Just-Tag`,
-    es: `Restaurantes en el cantón de ${cantonLabel} — Just-Tag`,
+    fr: `Restaurants dans le ${cantonPhrase} — Just-Tag`,
+    de: `Restaurants im ${cantonPhrase} — Just-Tag`,
+    en: `Restaurants in the ${cantonPhrase} — Just-Tag`,
+    pt: `Restaurantes no ${cantonPhrase} — Just-Tag`,
+    es: `Restaurantes en el ${cantonPhrase} — Just-Tag`,
   };
 
   const descriptions: Record<string, string> = {
-    fr: `Trouvez les meilleurs restaurants du canton de ${cantonLabel} : bistrots, gastronomique, pizzerias, terrasses. Avis clients vérifiés, menus, horaires et photos.`,
+    fr: `Trouvez les meilleurs restaurants du ${cantonPhrase} : bistrots, gastronomique, pizzerias, terrasses. Avis clients vérifiés, menus, horaires et photos.`,
     de: `Finden Sie die besten Restaurants im Kanton ${cantonLabel}: Bistros, Gourmet, Pizzerien, Terrassen. Verifizierte Kundenbewertungen, Menüs, Öffnungszeiten und Fotos.`,
     en: `Find the best restaurants in the canton of ${cantonLabel}: bistros, fine dining, pizzerias, terraces. Verified customer reviews, menus, opening hours and photos.`,
     pt: `Encontre os melhores restaurantes no cantão de ${cantonLabel}: bistrôs, gastronómicos, pizarias, terraços. Avaliações de clientes verificadas, menus, horários e fotos.`,
-    es: `Encuentre los mejores restaurantes en el cantón de ${cantonLabel}: bistrós, gastronómicos, pizzerías, terrazas. Reseñas de clientes verificadas, menús, horarios y fotos.`,
+    es: `Encuentre los mejores restaurantes en el cantón ${cantonData.prepositionEs} ${cantonLabel}: bistrós, gastronómicos, pizzerías, terrazas. Reseñas de clientes verificadas, menús, horarios y fotos.`,
   };
 
   return {
@@ -162,6 +176,7 @@ export default async function CantonRestaurantsPage({
   }
 
   const cantonLabel = getCantonLabel(cantonData, locale);
+  const cantonPhrase = getCantonPhrase(cantonData, locale);
 
   // Fetch 24 top-rated restaurants in the canton
   const { data: items, totalCount: total } = await fetchFilteredRestaurants(
@@ -175,11 +190,11 @@ export default async function CantonRestaurantsPage({
 
   // Localized intro / labels
   const intros: Record<string, string> = {
-    fr: `Découvrez ${total.toLocaleString("fr-CH")} restaurants dans le canton de ${cantonLabel} : menus, avis clients, horaires, photos et coordonnées. Trouvez votre prochaine adresse.`,
-    de: `Entdecken Sie ${total.toLocaleString("de-CH")} Restaurants im Kanton ${cantonLabel}: Menüs, Kundenbewertungen, Öffnungszeiten, Fotos und Kontaktdaten. Finden Sie Ihre nächste Adresse.`,
-    en: `Discover ${total.toLocaleString("en-CH")} restaurants in the canton of ${cantonLabel}: menus, customer reviews, opening hours, photos and contact details. Find your next spot.`,
-    pt: `Descubra ${total.toLocaleString("pt-PT")} restaurantes no cantão de ${cantonLabel}: menus, avaliações de clientes, horários, fotos e contactos. Encontre o seu próximo endereço.`,
-    es: `Descubra ${total.toLocaleString("es-ES")} restaurantes en el cantón de ${cantonLabel}: menús, reseñas de clientes, horarios, fotos y contactos. Encuentre su próximo sitio.`,
+    fr: `Découvrez ${total.toLocaleString("fr-CH")} restaurants dans le ${cantonPhrase} : menus, avis clients, horaires, photos et coordonnées. Trouvez votre prochaine adresse.`,
+    de: `Entdecken Sie ${total.toLocaleString("de-CH")} Restaurants im ${cantonPhrase}: Menüs, Kundenbewertungen, Öffnungszeiten, Fotos und Kontaktdaten. Finden Sie Ihre nächste Adresse.`,
+    en: `Discover ${total.toLocaleString("en-CH")} restaurants in the ${cantonPhrase}: menus, customer reviews, opening hours, photos and contact details. Find your next spot.`,
+    pt: `Descubra ${total.toLocaleString("pt-PT")} restaurantes no ${cantonPhrase}: menus, avaliações de clientes, horários, fotos e contactos. Encontre o seu próximo endereço.`,
+    es: `Descubra ${total.toLocaleString("es-ES")} restaurantes en el ${cantonPhrase}: menús, reseñas de clientes, horarios, fotos y contactos. Encuentre su próximo sitio.`,
   };
   const intro = intros[locale] || intros.fr;
 
@@ -246,11 +261,11 @@ export default async function CantonRestaurantsPage({
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-                {locale === "de" ? `Restaurants im Kanton ${cantonLabel}`
-                  : locale === "en" ? `Restaurants in the canton of ${cantonLabel}`
-                  : locale === "pt" ? `Restaurantes no cantão de ${cantonLabel}`
-                  : locale === "es" ? `Restaurantes en el cantón de ${cantonLabel}`
-                  : `Restaurants dans le canton de ${cantonLabel}`}
+                {locale === "de" ? `Restaurants im ${cantonPhrase}`
+                  : locale === "en" ? `Restaurants in the ${cantonPhrase}`
+                  : locale === "pt" ? `Restaurantes no ${cantonPhrase}`
+                  : locale === "es" ? `Restaurantes en el ${cantonPhrase}`
+                  : `Restaurants dans le ${cantonPhrase}`}
               </h1>
               <p className="mt-2 text-sm text-white/80">
                 {total.toLocaleString("fr-CH")} {locale === "de" || locale === "en" ? "restaurants" : locale === "pt" || locale === "es" ? "restaurantes" : "restaurants"}
