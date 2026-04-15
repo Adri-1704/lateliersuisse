@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
+import { cantons } from "@/data/cantons";
+import { collections } from "@/data/collections";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://just-tag.app";
@@ -49,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // B2B and info pages
-  const weeklyPages = ["pour-restaurateurs"];
+  const weeklyPages = ["pour-restaurateurs", "parrainage", "a-propos"];
   for (const page of weeklyPages) {
     for (const locale of locales) {
       entries.push({
@@ -58,6 +60,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "weekly",
         priority: 0.8,
         alternates: alternates(`/${page}`),
+      });
+    }
+  }
+
+  // Canton landing pages (SEO long-tail : "restaurants Genève", etc.)
+  for (const canton of cantons) {
+    for (const locale of locales) {
+      entries.push({
+        url: `${baseUrl}/${locale}/restaurants/canton/${canton.value}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.85,
+        alternates: alternates(`/restaurants/canton/${canton.value}`),
+      });
+    }
+  }
+
+  // Individual collection landing pages (terrasse, vue-sur-le-lac, etc.)
+  for (const collection of collections) {
+    for (const locale of locales) {
+      entries.push({
+        url: `${baseUrl}/${locale}/collections/${collection.slug}`,
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.75,
+        alternates: alternates(`/collections/${collection.slug}`),
       });
     }
   }
