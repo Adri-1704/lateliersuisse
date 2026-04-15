@@ -30,14 +30,6 @@ function getLocalizedName(r: RestaurantListItem, locale: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Pre-render all canton pages
-// ---------------------------------------------------------------------------
-
-export async function generateStaticParams() {
-  return cantons.map((c) => ({ canton: c.value }));
-}
-
-// ---------------------------------------------------------------------------
 // SEO metadata
 // ---------------------------------------------------------------------------
 
