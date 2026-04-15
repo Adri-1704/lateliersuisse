@@ -53,11 +53,11 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<string, string> = {
-    fr: `Trouvez les meilleurs restaurants du canton de ${cantonLabel} : bistrots, gastronomique, pizzerias, terrasses. Avis vérifiés, menus, horaires. Plateforme suisse sans commission.`,
-    de: `Finden Sie die besten Restaurants im Kanton ${cantonLabel}: Bistros, Gourmet, Pizzerien, Terrassen. Verifizierte Bewertungen, Menüs, Öffnungszeiten. Schweizer Plattform ohne Provision.`,
-    en: `Find the best restaurants in the canton of ${cantonLabel}: bistros, fine dining, pizzerias, terraces. Verified reviews, menus, opening hours. Swiss platform with zero commission.`,
-    pt: `Encontre os melhores restaurantes no cantão de ${cantonLabel}: bistrôs, gastronómicos, pizarias, terraços. Avaliações verificadas, menus, horários. Plataforma suíça sem comissão.`,
-    es: `Encuentre los mejores restaurantes en el cantón de ${cantonLabel}: bistrós, gastronómicos, pizzerías, terrazas. Reseñas verificadas, menús, horarios. Plataforma suiza sin comisión.`,
+    fr: `Trouvez les meilleurs restaurants du canton de ${cantonLabel} : bistrots, gastronomique, pizzerias, terrasses. Avis clients vérifiés, menus, horaires et photos.`,
+    de: `Finden Sie die besten Restaurants im Kanton ${cantonLabel}: Bistros, Gourmet, Pizzerien, Terrassen. Verifizierte Kundenbewertungen, Menüs, Öffnungszeiten und Fotos.`,
+    en: `Find the best restaurants in the canton of ${cantonLabel}: bistros, fine dining, pizzerias, terraces. Verified customer reviews, menus, opening hours and photos.`,
+    pt: `Encontre os melhores restaurantes no cantão de ${cantonLabel}: bistrôs, gastronómicos, pizarias, terraços. Avaliações de clientes verificadas, menus, horários e fotos.`,
+    es: `Encuentre los mejores restaurantes en el cantón de ${cantonLabel}: bistrós, gastronómicos, pizzerías, terrazas. Reseñas de clientes verificadas, menús, horarios y fotos.`,
   };
 
   return {
@@ -175,11 +175,11 @@ export default async function CantonRestaurantsPage({
 
   // Localized intro / labels
   const intros: Record<string, string> = {
-    fr: `Découvrez ${total.toLocaleString("fr-CH")} restaurants dans le canton de ${cantonLabel} : menus, avis, horaires, photos. Zéro commission, hébergé en Suisse.`,
-    de: `Entdecken Sie ${total.toLocaleString("de-CH")} Restaurants im Kanton ${cantonLabel}: Menüs, Bewertungen, Öffnungszeiten, Fotos. Keine Provision, in der Schweiz gehostet.`,
-    en: `Discover ${total.toLocaleString("en-CH")} restaurants in the canton of ${cantonLabel}: menus, reviews, opening hours, photos. Zero commission, Swiss-hosted.`,
-    pt: `Descubra ${total.toLocaleString("pt-PT")} restaurantes no cantão de ${cantonLabel}: menus, avaliações, horários, fotos. Sem comissões, alojado na Suíça.`,
-    es: `Descubra ${total.toLocaleString("es-ES")} restaurantes en el cantón de ${cantonLabel}: menús, reseñas, horarios, fotos. Sin comisiones, alojado en Suiza.`,
+    fr: `Découvrez ${total.toLocaleString("fr-CH")} restaurants dans le canton de ${cantonLabel} : menus, avis clients, horaires, photos et coordonnées. Trouvez votre prochaine adresse.`,
+    de: `Entdecken Sie ${total.toLocaleString("de-CH")} Restaurants im Kanton ${cantonLabel}: Menüs, Kundenbewertungen, Öffnungszeiten, Fotos und Kontaktdaten. Finden Sie Ihre nächste Adresse.`,
+    en: `Discover ${total.toLocaleString("en-CH")} restaurants in the canton of ${cantonLabel}: menus, customer reviews, opening hours, photos and contact details. Find your next spot.`,
+    pt: `Descubra ${total.toLocaleString("pt-PT")} restaurantes no cantão de ${cantonLabel}: menus, avaliações de clientes, horários, fotos e contactos. Encontre o seu próximo endereço.`,
+    es: `Descubra ${total.toLocaleString("es-ES")} restaurantes en el cantón de ${cantonLabel}: menús, reseñas de clientes, horarios, fotos y contactos. Encuentre su próximo sitio.`,
   };
   const intro = intros[locale] || intros.fr;
 

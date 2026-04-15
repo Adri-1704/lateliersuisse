@@ -27,11 +27,11 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<string, string> = {
-    fr: "Découvrez 11 265 restaurants en Suisse Romande : Genève, Vaud, Valais, Fribourg, Neuchâtel, Jura, Berne. Avis vérifiés, menus, horaires. Sans commission.",
-    de: "Entdecken Sie 11 265 Restaurants in der Westschweiz: Genf, Waadt, Wallis, Freiburg, Neuenburg, Jura, Bern. Verifizierte Bewertungen, Menüs, Öffnungszeiten.",
-    en: "Discover 11,265 restaurants in Western Switzerland: Geneva, Vaud, Valais, Fribourg, Neuchâtel, Jura, Bern. Verified reviews, menus, opening hours.",
-    pt: "Descubra 11 265 restaurantes na Suíça Romanda: Genebra, Vaud, Valais, Friburgo, Neuchâtel, Jura, Berna. Avaliações verificadas, menus, horários.",
-    es: "Descubra 11 265 restaurantes en la Suiza Romanda: Ginebra, Vaud, Valais, Friburgo, Neuchâtel, Jura, Berna. Reseñas verificadas, menús, horarios.",
+    fr: "Découvrez 11 265 restaurants en Suisse Romande : Genève, Vaud, Valais, Fribourg, Neuchâtel, Jura, Berne. Avis clients, menus, horaires, photos et coordonnées.",
+    de: "Entdecken Sie 11 265 Restaurants in der Westschweiz: Genf, Waadt, Wallis, Freiburg, Neuenburg, Jura, Bern. Kundenbewertungen, Menüs, Öffnungszeiten, Fotos.",
+    en: "Discover 11,265 restaurants in Western Switzerland: Geneva, Vaud, Valais, Fribourg, Neuchâtel, Jura, Bern. Customer reviews, menus, opening hours, photos.",
+    pt: "Descubra 11 265 restaurantes na Suíça Romanda: Genebra, Vaud, Valais, Friburgo, Neuchâtel, Jura, Berna. Avaliações de clientes, menus, horários, fotos.",
+    es: "Descubra 11 265 restaurantes en la Suiza Romanda: Ginebra, Vaud, Valais, Friburgo, Neuchâtel, Jura, Berna. Reseñas de clientes, menús, horarios, fotos.",
   };
 
   return {
