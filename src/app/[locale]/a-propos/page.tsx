@@ -1,11 +1,52 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "À propos - Just-Tag.app",
-  description:
-    "Découvrez Just-Tag.app, la plateforme de référence pour trouver les meilleurs restaurants de Suisse Romande.",
-};
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const titles: Record<string, string> = {
+    fr: "À propos — Just-Tag, l'annuaire des restaurants romands",
+    de: "Über uns — Just-Tag, das Verzeichnis der Westschweizer Restaurants",
+    en: "About — Just-Tag, the directory of Western Swiss restaurants",
+    pt: "Sobre — Just-Tag, o diretório dos restaurantes da Suíça Romanda",
+    es: "Sobre — Just-Tag, el directorio de restaurantes de la Suiza Romanda",
+  };
+
+  const descriptions: Record<string, string> = {
+    fr: "Just-Tag est une plateforme romande, conçue pour mettre en lumière la richesse gastronomique des 7 cantons de Suisse Romande. Découvrez notre mission.",
+    de: "Just-Tag ist eine Westschweizer Plattform, die den gastronomischen Reichtum der 7 Westschweizer Kantone sichtbar macht. Entdecken Sie unsere Mission.",
+    en: "Just-Tag is a Western Swiss platform showcasing the gastronomic richness of the 7 Romand cantons. Discover our mission.",
+    pt: "A Just-Tag é uma plataforma da Suíça Romanda que destaca a riqueza gastronómica dos 7 cantões romandos. Descubra a nossa missão.",
+    es: "Just-Tag es una plataforma de la Suiza Romanda que destaca la riqueza gastronómica de los 7 cantones romandos. Descubra nuestra misión.",
+  };
+
+  return {
+    title: titles[locale] || titles.fr,
+    description: descriptions[locale] || descriptions.fr,
+    alternates: {
+      canonical: `/${locale}/a-propos`,
+      languages: {
+        fr: "/fr/a-propos",
+        de: "/de/a-propos",
+        en: "/en/a-propos",
+        pt: "/pt/a-propos",
+        es: "/es/a-propos",
+      },
+    },
+    openGraph: {
+      title: titles[locale] || titles.fr,
+      description: descriptions[locale] || descriptions.fr,
+      url: `${baseUrl}/${locale}/a-propos`,
+      type: "website",
+    },
+  };
+}
 
 export default async function AboutPage({
   params,

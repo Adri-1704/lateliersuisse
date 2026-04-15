@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { RestaurantCardSkeletonGrid } from "@/components/restaurants/RestaurantCardSkeleton";
 import {
   fetchFilteredRestaurants,
@@ -7,6 +8,53 @@ import {
   type RestaurantFilters,
 } from "@/lib/restaurants/queries";
 import RestaurantsView from "./RestaurantsView";
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const titles: Record<string, string> = {
+    fr: "Tous les restaurants de Suisse Romande — 11 000+ adresses",
+    de: "Alle Restaurants der Westschweiz — über 11 000 Adressen",
+    en: "All Swiss restaurants in Romandie — 11,000+ places",
+    pt: "Todos os restaurantes da Suíça Romanda — 11 000+ endereços",
+    es: "Todos los restaurantes de la Suiza Romanda — 11 000+ direcciones",
+  };
+
+  const descriptions: Record<string, string> = {
+    fr: "Découvrez 11 265 restaurants en Suisse Romande : Genève, Vaud, Valais, Fribourg, Neuchâtel, Jura, Berne. Avis vérifiés, menus, horaires. Sans commission.",
+    de: "Entdecken Sie 11 265 Restaurants in der Westschweiz: Genf, Waadt, Wallis, Freiburg, Neuenburg, Jura, Bern. Verifizierte Bewertungen, Menüs, Öffnungszeiten.",
+    en: "Discover 11,265 restaurants in Western Switzerland: Geneva, Vaud, Valais, Fribourg, Neuchâtel, Jura, Bern. Verified reviews, menus, opening hours.",
+    pt: "Descubra 11 265 restaurantes na Suíça Romanda: Genebra, Vaud, Valais, Friburgo, Neuchâtel, Jura, Berna. Avaliações verificadas, menus, horários.",
+    es: "Descubra 11 265 restaurantes en la Suiza Romanda: Ginebra, Vaud, Valais, Friburgo, Neuchâtel, Jura, Berna. Reseñas verificadas, menús, horarios.",
+  };
+
+  return {
+    title: titles[locale] || titles.fr,
+    description: descriptions[locale] || descriptions.fr,
+    alternates: {
+      canonical: `/${locale}/restaurants`,
+      languages: {
+        fr: "/fr/restaurants",
+        de: "/de/restaurants",
+        en: "/en/restaurants",
+        pt: "/pt/restaurants",
+        es: "/es/restaurants",
+      },
+    },
+    openGraph: {
+      title: titles[locale] || titles.fr,
+      description: descriptions[locale] || descriptions.fr,
+      url: `${baseUrl}/${locale}/restaurants`,
+      type: "website",
+    },
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Server Component — reads searchParams, fetches from Supabase, passes to view

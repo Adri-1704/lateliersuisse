@@ -8,6 +8,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SwissTrustBanner } from "@/components/layout/SwissTrustBanner";
 import { PublicLayoutWrapper } from "@/components/layout/PublicLayoutWrapper";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 
 const outfit = Outfit({
@@ -156,6 +158,8 @@ export default async function LocaleLayout({
             {children}
           </PublicLayoutWrapper>
         </NextIntlClientProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -1,7 +1,55 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { collections, type Collection } from "@/data/collections";
 import { createAdminClient } from "@/lib/supabase/server";
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const titles: Record<string, string> = {
+    fr: "Collections thématiques — Terrasses, vue sur le lac, végétarien…",
+    de: "Thematische Sammlungen — Terrassen, Seeblick, vegetarisch…",
+    en: "Themed collections — Terraces, lake view, vegetarian…",
+    pt: "Coleções temáticas — Terraços, vista lago, vegetariano…",
+    es: "Colecciones temáticas — Terrazas, vista al lago, vegetariano…",
+  };
+
+  const descriptions: Record<string, string> = {
+    fr: "Nos sélections curées de restaurants romands : terrasses d'été, vue sur le lac, accès PMR, en famille, wifi gratuit, végétarien, gastronomique et plus.",
+    de: "Unsere kuratierten Auswahlen westschweizer Restaurants: Sommerterrassen, Seeblick, barrierefrei, familienfreundlich, Gratis-WLAN, vegetarisch und mehr.",
+    en: "Curated selections of Western Swiss restaurants: summer terraces, lake views, wheelchair accessible, family-friendly, free wifi, vegetarian and more.",
+    pt: "Seleções curadas de restaurantes da Suíça Romanda: terraços de verão, vista lago, acessíveis, para famílias, wifi grátis, vegetariano e mais.",
+    es: "Selecciones curadas de restaurantes de la Suiza Romanda: terrazas de verano, vistas al lago, accesibles, para familias, wifi gratis, vegetariano y más.",
+  };
+
+  return {
+    title: titles[locale] || titles.fr,
+    description: descriptions[locale] || descriptions.fr,
+    alternates: {
+      canonical: `/${locale}/collections`,
+      languages: {
+        fr: "/fr/collections",
+        de: "/de/collections",
+        en: "/en/collections",
+        pt: "/pt/collections",
+        es: "/es/collections",
+      },
+    },
+    openGraph: {
+      title: titles[locale] || titles.fr,
+      description: descriptions[locale] || descriptions.fr,
+      url: `${baseUrl}/${locale}/collections`,
+      type: "website",
+    },
+  };
+}
 
 async function getCollectionCount(collection: Collection): Promise<number> {
   const supabase = createAdminClient();

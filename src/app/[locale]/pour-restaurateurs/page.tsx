@@ -46,6 +46,8 @@ export async function generateMetadata({
         fr: "/fr/pour-restaurateurs",
         de: "/de/pour-restaurateurs",
         en: "/en/pour-restaurateurs",
+        pt: "/pt/pour-restaurateurs",
+        es: "/es/pour-restaurateurs",
       },
     },
     openGraph: {
