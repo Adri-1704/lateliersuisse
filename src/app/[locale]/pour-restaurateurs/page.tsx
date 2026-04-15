@@ -29,11 +29,11 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<string, string> = {
-    fr: "Rejoignez Just-Tag : 500+ restaurants romands, 1 488 avis vérifiés, zéro commission. À partir de CHF 24.90/mois avec 14 jours d'essai gratuit.",
-    de: "Treten Sie Just-Tag bei: 500+ Westschweizer Restaurants, 1 488 verifizierte Bewertungen, keine Provision. Ab CHF 24.90/Monat mit 14 Tagen Probezeit.",
-    en: "Join Just-Tag: 500+ Western Swiss restaurants, 1,488 verified reviews, zero commission. From CHF 24.90/month with 14-day free trial.",
-    pt: "Junte-se ao Just-Tag: 500+ restaurantes da Suica Romanda, 1 488 avaliacoes verificadas, zero comissao. A partir de CHF 24.90/mes com 14 dias gratis.",
-    es: "Unase a Just-Tag: 500+ restaurantes de la Suiza Romanda, 1 488 resenas verificadas, cero comision. Desde CHF 24.90/mes con 14 dias de prueba gratis.",
+    fr: "Rejoignez Just-Tag : 11 000+ restaurants romands, 11 700+ avis vérifiés, zéro commission. À partir de CHF 24.90/mois avec 14 jours d'essai gratuit.",
+    de: "Treten Sie Just-Tag bei: 11 000+ Westschweizer Restaurants, 11 700+ verifizierte Bewertungen, keine Provision. Ab CHF 24.90/Monat mit 14 Tagen Probezeit.",
+    en: "Join Just-Tag: 11,000+ Western Swiss restaurants, 11,700+ verified reviews, zero commission. From CHF 24.90/month with 14-day free trial.",
+    pt: "Junte-se ao Just-Tag: 11 000+ restaurantes da Suica Romanda, 11 700+ avaliacoes verificadas, zero comissao. A partir de CHF 24.90/mes com 14 dias gratis.",
+    es: "Unase a Just-Tag: 11 000+ restaurantes de la Suiza Romanda, 11 700+ resenas verificadas, cero comision. Desde CHF 24.90/mes con 14 dias de prueba gratis.",
   };
 
   return {
@@ -57,15 +57,20 @@ export async function generateMetadata({
 }
 
 export default async function PourRestaurateursPage() {
-  // Fetch real restaurant count
+  // Fetch real restaurant + review counts
   let totalRestaurants = 0;
+  let totalReviews = 0;
   try {
     const supabase = createAdminClient();
-    const { count } = await supabase
-      .from("restaurants")
-      .select("id", { count: "exact", head: true })
-      .eq("is_published", true);
-    totalRestaurants = count ?? 0;
+    const [{ count: restaurantsCount }, { count: reviewsCount }] = await Promise.all([
+      supabase
+        .from("restaurants")
+        .select("id", { count: "exact", head: true })
+        .eq("is_published", true),
+      supabase.from("reviews").select("id", { count: "exact", head: true }),
+    ]);
+    totalRestaurants = restaurantsCount ?? 0;
+    totalReviews = reviewsCount ?? 0;
   } catch {
     // Fallback to 0 if Supabase is unavailable
   }
@@ -106,7 +111,7 @@ export default async function PourRestaurateursPage() {
       />
       <B2BEarlyBirdBanner spotsRemaining={spotsRemaining} />
       <B2BHero totalRestaurants={totalRestaurants} />
-      <B2BTrustStats totalRestaurants={totalRestaurants} />
+      <B2BTrustStats totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <B2BProblemSolution />
       <B2BFeatures />
       <B2BPricing spotsRemaining={spotsRemaining} />

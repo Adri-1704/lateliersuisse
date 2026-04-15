@@ -5,15 +5,20 @@ import { useTranslations } from "next-intl";
 
 interface B2BTrustStatsProps {
   totalRestaurants: number;
+  totalReviews: number;
 }
 
-export function B2BTrustStats({ totalRestaurants }: B2BTrustStatsProps) {
+function formatCount(n: number): string {
+  return n.toLocaleString("fr-CH").replace(/\u202f|,/g, " ");
+}
+
+export function B2BTrustStats({ totalRestaurants, totalReviews }: B2BTrustStatsProps) {
   const t = useTranslations("b2bLanding.trustStats");
 
   const stats = [
-    { value: `${totalRestaurants}+`, label: t("restaurants"), icon: UtensilsCrossed },
+    { value: `${formatCount(totalRestaurants)}+`, label: t("restaurants"), icon: UtensilsCrossed },
     { value: "7", label: t("cantons"), icon: MapPin },
-    { value: "1 488+", label: t("reviews"), icon: Star },
+    { value: `${formatCount(totalReviews)}+`, label: t("reviews"), icon: Star },
     { value: "0%", label: t("commission"), icon: Ban },
   ];
 

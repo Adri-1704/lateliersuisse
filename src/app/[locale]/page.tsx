@@ -36,23 +36,26 @@ function buildCantonNormalizer(): (raw: string) => string {
   };
 }
 
-async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, number>; cuisineCounts: Record<string, number> }> {
+async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, number>; cuisineCounts: Record<string, number>; totalReviews: number }> {
   try {
     const supabase = createAdminClient();
     const romandCantons = ["geneve", "vaud", "fribourg", "neuchatel", "valais", "jura", "berne"];
 
     // Count per canton via individual queries (bypasses 1000 row limit)
     const cantonCounts: Record<string, number> = {};
-    await Promise.all(
-      romandCantons.map(async (canton) => {
-        const { count } = await supabase
-          .from("restaurants")
-          .select("id", { count: "exact", head: true })
-          .eq("is_published", true)
-          .eq("canton", canton);
-        cantonCounts[canton] = count || 0;
-      })
-    );
+    const [, { count: reviewsCount }] = await Promise.all([
+      Promise.all(
+        romandCantons.map(async (canton) => {
+          const { count } = await supabase
+            .from("restaurants")
+            .select("id", { count: "exact", head: true })
+            .eq("is_published", true)
+            .eq("canton", canton);
+          cantonCounts[canton] = count || 0;
+        })
+      ),
+      supabase.from("reviews").select("id", { count: "exact", head: true }),
+    ]);
 
     // Cuisine counts (use pagination to get all)
     const cuisineCounts: Record<string, number> = {};
@@ -74,14 +77,14 @@ async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, num
       offset += pageSize;
     }
 
-    return { cantonCounts, cuisineCounts };
+    return { cantonCounts, cuisineCounts, totalReviews: reviewsCount ?? 0 };
   } catch {
-    return { cantonCounts: {}, cuisineCounts: {} };
+    return { cantonCounts: {}, cuisineCounts: {}, totalReviews: 0 };
   }
 }
 
 export default async function HomePage() {
-  const { cantonCounts, cuisineCounts } = await getRestaurantCounts();
+  const { cantonCounts, cuisineCounts, totalReviews } = await getRestaurantCounts();
   const totalRestaurants = Object.values(cantonCounts).reduce((sum, n) => sum + n, 0);
 
   return (
@@ -91,7 +94,7 @@ export default async function HomePage() {
       <SwissCantonMap restaurantCounts={cantonCounts} />
       <CategoryGrid cuisineCounts={cuisineCounts} />
       <CollectionsSection />
-      <StatsSection totalRestaurants={totalRestaurants} />
+      <StatsSection totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <HowItWorks />
       <Testimonials />
       <FounderSection />
