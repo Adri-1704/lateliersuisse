@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
 import { cantons } from "@/data/cantons";
 import { collections } from "@/data/collections";
+import { slugifyCity, VALID_CANTONS } from "@/lib/city-slug";
+
+const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://just-tag.app";
@@ -75,6 +78,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         alternates: alternates(`/restaurants/canton/${canton.value}`),
       });
     }
+  }
+
+  // City landing pages (SEO long-tail : "restaurants Lausanne", "restaurants Sion", etc.)
+  try {
+    const supabase = createAdminClient();
+    const { data: cityData } = await supabase
+      .from("restaurants")
+      .select("city, canton")
+      .eq("is_published", true)
+      .not("city", "is", null)
+      .neq("city", "")
+      .in("canton", VALID_CANTONS as unknown as string[])
+      .limit(15000);
+
+    if (cityData) {
+      // Group and count cities
+      const cityCounts = new Map<string, number>();
+      for (const row of cityData as { city: string; canton: string }[]) {
+        const slug = slugifyCity(row.city);
+        if (!slug) continue;
+        cityCounts.set(slug, (cityCounts.get(slug) || 0) + 1);
+      }
+
+      for (const [slug, count] of cityCounts.entries()) {
+        if (count < MIN_RESTAURANTS_FOR_CITY_PAGE) continue;
+        for (const locale of locales) {
+          entries.push({
+            url: `${baseUrl}/${locale}/restaurants/ville/${slug}`,
+            lastModified: now,
+            changeFrequency: "weekly",
+            priority: 0.8,
+            alternates: alternates(`/restaurants/ville/${slug}`),
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching cities for sitemap:", error);
   }
 
   // Individual collection landing pages (terrasse, vue-sur-le-lac, etc.)

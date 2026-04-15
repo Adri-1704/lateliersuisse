@@ -3,7 +3,38 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cantons, type Canton } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
+import { createAdminClient } from "@/lib/supabase/server";
+import { slugifyCity } from "@/lib/city-slug";
 import { MapPin, Star } from "lucide-react";
+
+const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
+
+// Récupère les top villes du canton pour internal linking
+async function getTopCitiesInCanton(canton: string, limit = 10): Promise<{ slug: string; name: string; count: number }[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("restaurants")
+    .select("city")
+    .eq("is_published", true)
+    .eq("canton", canton)
+    .not("city", "is", null)
+    .neq("city", "")
+    .limit(5000);
+  if (!data) return [];
+  const cityCounts = new Map<string, { name: string; count: number }>();
+  for (const row of data as { city: string }[]) {
+    const slug = slugifyCity(row.city);
+    if (!slug) continue;
+    const existing = cityCounts.get(slug);
+    if (existing) existing.count++;
+    else cityCounts.set(slug, { name: row.city, count: 1 });
+  }
+  return Array.from(cityCounts.entries())
+    .filter(([, v]) => v.count >= MIN_RESTAURANTS_FOR_CITY_PAGE)
+    .sort(([, a], [, b]) => b.count - a.count)
+    .slice(0, limit)
+    .map(([slug, v]) => ({ slug, name: v.name, count: v.count }));
+}
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -178,15 +209,11 @@ export default async function CantonRestaurantsPage({
   const cantonLabel = getCantonLabel(cantonData, locale);
   const cantonPhrase = getCantonPhrase(cantonData, locale);
 
-  // Fetch 24 top-rated restaurants in the canton
-  const { data: items, totalCount: total } = await fetchFilteredRestaurants(
-    {
-      canton: canton as Canton,
-      sort: "rating",
-    },
-    1,
-    24
-  );
+  // Fetch 24 top-rated restaurants + top cities (parallèle pour perf)
+  const [{ data: items, totalCount: total }, topCities] = await Promise.all([
+    fetchFilteredRestaurants({ canton: canton as Canton, sort: "rating" }, 1, 24),
+    getTopCitiesInCanton(canton, 12),
+  ]);
 
   // Localized intro / labels
   const intros: Record<string, string> = {
@@ -212,6 +239,11 @@ export default async function CantonRestaurantsPage({
     fr: "Autres cantons :", de: "Andere Kantone:", en: "Other cantons:", pt: "Outros cantões:", es: "Otros cantones:",
   };
   const otherCantonsLabel = otherCantonsLabels[locale] || "Autres cantons :";
+
+  const citiesLabels: Record<string, string> = {
+    fr: "Par ville :", de: "Nach Stadt:", en: "By city:", pt: "Por cidade:", es: "Por ciudad:",
+  };
+  const citiesLabel = citiesLabels[locale] || "Par ville :";
 
   // JSON-LD
   const collectionJsonLd = {
@@ -298,6 +330,29 @@ export default async function CantonRestaurantsPage({
           </div>
         </div>
       </section>
+
+      {/* Cities in this canton */}
+      {topCities.length > 0 && (
+        <section className="border-b bg-white">
+          <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="mr-2 text-sm font-semibold text-gray-700">
+                {citiesLabel}
+              </span>
+              {topCities.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/${locale}/restaurants/ville/${c.slug}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-700 transition hover:border-[var(--color-just-tag)] hover:text-[var(--color-just-tag)]"
+                >
+                  {c.name}
+                  <span className="text-xs text-gray-400">({c.count})</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Restaurants grid */}
       <section className="bg-gray-50 py-12">
