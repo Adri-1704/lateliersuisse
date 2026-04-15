@@ -10,6 +10,7 @@ import { SwissTrustBanner } from "@/components/layout/SwissTrustBanner";
 import { PublicLayoutWrapper } from "@/components/layout/PublicLayoutWrapper";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 import "../globals.css";
 
 const outfit = Outfit({
@@ -160,6 +161,7 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
         <Analytics />
         <SpeedInsights />
+        <PageViewTracker />
       </body>
     </html>
   );

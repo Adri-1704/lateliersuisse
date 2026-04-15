@@ -26,11 +26,13 @@ import {
   Settings,
   ShieldCheck,
   BarChart3,
+  TrendingUp,
 } from "lucide-react";
 
 const navItems = [
   { title: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
   { title: "Statistiques", href: "/admin/stats", icon: BarChart3 },
+  { title: "Trafic", href: "/admin/traffic", icon: TrendingUp },
   { title: "Restaurants", href: "/admin/restaurants", icon: UtensilsCrossed },
   { title: "Commerçants", href: "/admin/merchants", icon: Store },
   { title: "Avis", href: "/admin/reviews", icon: MessageSquare },
