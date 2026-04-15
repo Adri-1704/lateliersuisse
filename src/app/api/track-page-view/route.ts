@@ -68,11 +68,29 @@ export async function POST(request: NextRequest) {
     const country = request.headers.get("x-vercel-ip-country") || null;
 
     const supabase = createAdminClient();
+
+    // Resolve restaurant_id from slug if restaurant detail page and no id provided
+    let resolvedRestaurantId: string | null = restaurantId || null;
+    if (!resolvedRestaurantId && page_type === "restaurant") {
+      const locales = ["fr", "de", "en", "pt", "es"];
+      const parts = path.split("/").filter(Boolean);
+      const slugIdx = locales.includes(parts[0]) ? 2 : 1;
+      const slug = parts[slugIdx];
+      if (slug && slug.length < 200) {
+        const { data: rest } = await supabase
+          .from("restaurants")
+          .select("id")
+          .eq("slug", slug)
+          .maybeSingle() as { data: { id: string } | null; error: unknown };
+        if (rest?.id) resolvedRestaurantId = rest.id;
+      }
+    }
+
     await (supabase.from("page_views") as ReturnType<typeof supabase.from>).insert({
       path: path.slice(0, 500),
       locale,
       page_type,
-      restaurant_id: restaurantId || null,
+      restaurant_id: resolvedRestaurantId,
       canton,
       referrer: referrer ? String(referrer).slice(0, 500) : null,
       country,

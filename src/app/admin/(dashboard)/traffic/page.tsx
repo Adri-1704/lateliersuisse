@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/server";
 import { TrafficCharts } from "./TrafficCharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Eye, TrendingUp, Globe, Activity } from "lucide-react";
+import { Users, Eye, TrendingUp, Globe, Activity, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -290,8 +291,14 @@ export default async function TrafficPage() {
 
         {/* Top restaurants */}
         <Card>
-          <CardHeader>
-            <CardTitle>Restaurants les plus vus (30j)</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle>Top 10 restaurants (30j)</CardTitle>
+            <Link
+              href="/admin/traffic/restaurants"
+              className="inline-flex items-center gap-1 text-xs font-medium text-[var(--color-just-tag)] hover:underline"
+            >
+              Voir tous les restaurants <ArrowRight className="h-3 w-3" />
+            </Link>
           </CardHeader>
           <CardContent>
             {stats.topRestaurants.length === 0 ? (
