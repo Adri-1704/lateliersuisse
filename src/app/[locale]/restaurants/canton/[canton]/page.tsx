@@ -3,9 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cantons, type Canton } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
-import { RestaurantCard } from "@/components/restaurants/RestaurantCard";
-import type { Restaurant } from "@/data/mock-restaurants";
-import { MapPin } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -23,86 +21,12 @@ function getCantonLabel(canton: (typeof cantons)[number], locale: string): strin
   }
 }
 
-function getIntroLabel(locale: string, cantonLabel: string, count: number): string {
+function getLocalizedName(r: RestaurantListItem, locale: string): string {
   switch (locale) {
-    case "de":
-      return `Entdecken Sie ${count.toLocaleString("de-CH")} Restaurants im Kanton ${cantonLabel}: Menüs, Bewertungen, Öffnungszeiten, Fotos. Keine Provision, in der Schweiz gehostet.`;
-    case "en":
-      return `Discover ${count.toLocaleString("en-CH")} restaurants in the canton of ${cantonLabel}: menus, reviews, opening hours, photos. Zero commission, Swiss-hosted.`;
-    case "pt":
-      return `Descubra ${count.toLocaleString("pt-PT")} restaurantes no cantão de ${cantonLabel}: menus, avaliações, horários, fotos. Sem comissões, alojado na Suíça.`;
-    case "es":
-      return `Descubra ${count.toLocaleString("es-ES")} restaurantes en el cantón de ${cantonLabel}: menús, reseñas, horarios, fotos. Sin comisiones, alojado en Suiza.`;
-    default:
-      return `Découvrez ${count.toLocaleString("fr-CH")} restaurants dans le canton de ${cantonLabel} : menus, avis, horaires, photos. Zéro commission, hébergé en Suisse.`;
+    case "de": return r.name_de || r.name_fr;
+    case "en": return r.name_en || r.name_fr;
+    default: return r.name_fr;
   }
-}
-
-function getSeeAllLabel(locale: string): string {
-  switch (locale) {
-    case "de": return "Alle anzeigen";
-    case "en": return "See all";
-    case "pt": return "Ver todos";
-    case "es": return "Ver todos";
-    default: return "Voir tous";
-  }
-}
-
-function getBreadcrumbLabel(locale: string): string {
-  switch (locale) {
-    case "de": return "Restaurants";
-    case "en": return "Restaurants";
-    case "pt": return "Restaurantes";
-    case "es": return "Restaurantes";
-    default: return "Restaurants";
-  }
-}
-
-function getRestaurantsLabel(locale: string, n: number): string {
-  switch (locale) {
-    case "de": return n === 1 ? "1 Restaurant" : `${n.toLocaleString("de-CH")} Restaurants`;
-    case "en": return n === 1 ? "1 restaurant" : `${n.toLocaleString("en-CH")} restaurants`;
-    case "pt": return n === 1 ? "1 restaurante" : `${n.toLocaleString("pt-PT")} restaurantes`;
-    case "es": return n === 1 ? "1 restaurante" : `${n.toLocaleString("es-ES")} restaurantes`;
-    default: return n === 1 ? "1 restaurant" : `${n.toLocaleString("fr-CH")} restaurants`;
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Mapper: RestaurantListItem → Restaurant (for card rendering)
-// ---------------------------------------------------------------------------
-
-function toRestaurant(item: RestaurantListItem): Restaurant {
-  return {
-    id: item.id,
-    slug: item.slug,
-    nameFr: item.name_fr,
-    nameDe: item.name_de,
-    nameEn: item.name_en,
-    descriptionFr: item.description_fr || "",
-    descriptionDe: item.description_de || "",
-    descriptionEn: item.description_en || "",
-    cuisineType: item.cuisine_type || "",
-    canton: item.canton,
-    city: item.city,
-    address: "",
-    postalCode: "",
-    latitude: item.latitude || 0,
-    longitude: item.longitude || 0,
-    phone: "",
-    email: "",
-    website: "",
-    priceRange: parseInt(item.price_range || "2") as 1 | 2 | 3 | 4,
-    avgRating: item.avg_rating || 0,
-    reviewCount: item.review_count || 0,
-    openingHours: (item.opening_hours as Record<string, { open: string; close: string }>) || {},
-    features: item.features || [],
-    coverImage: item.cover_image || "",
-    images: [],
-    isFeatured: item.is_featured || false,
-    isPublished: true,
-    menuItems: [],
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -167,6 +91,69 @@ export async function generateMetadata({
 }
 
 // ---------------------------------------------------------------------------
+// Simple server-safe restaurant card (no client hooks)
+// ---------------------------------------------------------------------------
+
+function SimpleRestaurantCard({
+  restaurant,
+  locale,
+}: {
+  restaurant: RestaurantListItem;
+  locale: string;
+}) {
+  const name = getLocalizedName(restaurant, locale);
+  return (
+    <Link
+      href={`/${locale}/restaurants/${restaurant.slug}`}
+      className="group block overflow-hidden rounded-xl border bg-white shadow-sm transition hover:shadow-lg hover:-translate-y-0.5"
+    >
+      <div className="relative flex h-40 items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black px-4">
+        <h3 className="z-10 line-clamp-3 text-center text-lg font-bold text-white">
+          {name}
+        </h3>
+        {restaurant.cuisine_type && (
+          <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
+            {restaurant.cuisine_type}
+          </span>
+        )}
+        <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-gray-800">
+          {restaurant.canton.slice(0, 2).toUpperCase()}
+        </span>
+      </div>
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <h4 className="line-clamp-1 text-base font-semibold text-gray-900 group-hover:text-[var(--color-just-tag)]">
+            {name}
+          </h4>
+          {restaurant.avg_rating ? (
+            <div className="flex shrink-0 items-center gap-1 rounded-lg bg-orange-50 px-2 py-0.5">
+              <Star className="h-3.5 w-3.5 fill-[var(--color-just-tag)] text-[var(--color-just-tag)]" />
+              <span className="text-sm font-bold text-[var(--color-just-tag)]">
+                {restaurant.avg_rating.toFixed(1)}
+              </span>
+            </div>
+          ) : null}
+        </div>
+        <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="line-clamp-1">
+            {restaurant.city}
+          </span>
+          {restaurant.review_count ? (
+            <>
+              <span className="text-gray-300">·</span>
+              <span className="text-xs text-gray-400">
+                {restaurant.review_count} avis
+              </span>
+            </>
+          ) : null}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
@@ -194,15 +181,32 @@ export default async function CantonRestaurantsPage({
     24
   );
 
-  const intro = getIntroLabel(locale, cantonLabel, total);
-  const seeAllLabel = getSeeAllLabel(locale);
-  const breadcrumbLabel = getBreadcrumbLabel(locale);
+  // Localized intro / labels
+  const intros: Record<string, string> = {
+    fr: `Découvrez ${total.toLocaleString("fr-CH")} restaurants dans le canton de ${cantonLabel} : menus, avis, horaires, photos. Zéro commission, hébergé en Suisse.`,
+    de: `Entdecken Sie ${total.toLocaleString("de-CH")} Restaurants im Kanton ${cantonLabel}: Menüs, Bewertungen, Öffnungszeiten, Fotos. Keine Provision, in der Schweiz gehostet.`,
+    en: `Discover ${total.toLocaleString("en-CH")} restaurants in the canton of ${cantonLabel}: menus, reviews, opening hours, photos. Zero commission, Swiss-hosted.`,
+    pt: `Descubra ${total.toLocaleString("pt-PT")} restaurantes no cantão de ${cantonLabel}: menus, avaliações, horários, fotos. Sem comissões, alojado na Suíça.`,
+    es: `Descubra ${total.toLocaleString("es-ES")} restaurantes en el cantón de ${cantonLabel}: menús, reseñas, horarios, fotos. Sin comisiones, alojado en Suiza.`,
+  };
+  const intro = intros[locale] || intros.fr;
 
-  // Build query string for "See all" link
-  const qs = new URLSearchParams();
-  qs.set("canton", canton);
+  const breadcrumbLabels: Record<string, string> = {
+    fr: "Restaurants", de: "Restaurants", en: "Restaurants", pt: "Restaurantes", es: "Restaurantes",
+  };
+  const breadcrumbLabel = breadcrumbLabels[locale] || "Restaurants";
 
-  // Structured data (CollectionPage + BreadcrumbList)
+  const seeAllLabels: Record<string, string> = {
+    fr: "Voir tous", de: "Alle anzeigen", en: "See all", pt: "Ver todos", es: "Ver todos",
+  };
+  const seeAllLabel = seeAllLabels[locale] || "Voir tous";
+
+  const otherCantonsLabels: Record<string, string> = {
+    fr: "Autres cantons :", de: "Andere Kantone:", en: "Other cantons:", pt: "Outros cantões:", es: "Otros cantones:",
+  };
+  const otherCantonsLabel = otherCantonsLabels[locale] || "Autres cantons :";
+
+  // JSON-LD
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -210,35 +214,15 @@ export default async function CantonRestaurantsPage({
     description: intro,
     url: `${baseUrl}/${locale}/restaurants/canton/${canton}`,
     numberOfItems: total,
-    isPartOf: {
-      "@type": "WebSite",
-      name: "Just-Tag",
-      url: baseUrl,
-    },
   };
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Just-Tag",
-        item: `${baseUrl}/${locale}`,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: breadcrumbLabel,
-        item: `${baseUrl}/${locale}/restaurants`,
-      },
-      {
-        "@type": "ListItem",
-        position: 3,
-        name: cantonLabel,
-        item: `${baseUrl}/${locale}/restaurants/canton/${canton}`,
-      },
+      { "@type": "ListItem", position: 1, name: "Just-Tag", item: `${baseUrl}/${locale}` },
+      { "@type": "ListItem", position: 2, name: breadcrumbLabel, item: `${baseUrl}/${locale}/restaurants` },
+      { "@type": "ListItem", position: 3, name: cantonLabel, item: `${baseUrl}/${locale}/restaurants/canton/${canton}` },
     ],
   };
 
@@ -256,15 +240,10 @@ export default async function CantonRestaurantsPage({
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-[var(--color-just-tag)]">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          {/* Breadcrumb */}
           <nav aria-label="Breadcrumb" className="mb-4 text-sm text-white/70">
-            <Link href={`/${locale}`} className="hover:text-white">
-              Just-Tag
-            </Link>
+            <Link href={`/${locale}`} className="hover:text-white">Just-Tag</Link>
             <span className="mx-2">›</span>
-            <Link href={`/${locale}/restaurants`} className="hover:text-white">
-              {breadcrumbLabel}
-            </Link>
+            <Link href={`/${locale}/restaurants`} className="hover:text-white">{breadcrumbLabel}</Link>
             <span className="mx-2">›</span>
             <span>{cantonLabel}</span>
           </nav>
@@ -275,18 +254,14 @@ export default async function CantonRestaurantsPage({
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-                {locale === "de"
-                  ? `Restaurants im Kanton ${cantonLabel}`
-                  : locale === "en"
-                  ? `Restaurants in the canton of ${cantonLabel}`
-                  : locale === "pt"
-                  ? `Restaurantes no cantão de ${cantonLabel}`
-                  : locale === "es"
-                  ? `Restaurantes en el cantón de ${cantonLabel}`
+                {locale === "de" ? `Restaurants im Kanton ${cantonLabel}`
+                  : locale === "en" ? `Restaurants in the canton of ${cantonLabel}`
+                  : locale === "pt" ? `Restaurantes no cantão de ${cantonLabel}`
+                  : locale === "es" ? `Restaurantes en el cantón de ${cantonLabel}`
                   : `Restaurants dans le canton de ${cantonLabel}`}
               </h1>
               <p className="mt-2 text-sm text-white/80">
-                {getRestaurantsLabel(locale, total)}
+                {total.toLocaleString("fr-CH")} {locale === "de" || locale === "en" ? "restaurants" : locale === "pt" || locale === "es" ? "restaurantes" : "restaurants"}
               </p>
             </div>
           </div>
@@ -298,17 +273,9 @@ export default async function CantonRestaurantsPage({
       {/* Other cantons navigation */}
       <section className="border-b bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="mr-2 text-sm font-semibold text-gray-600">
-              {locale === "de"
-                ? "Andere Kantone:"
-                : locale === "en"
-                ? "Other cantons:"
-                : locale === "pt"
-                ? "Outros cantões:"
-                : locale === "es"
-                ? "Otros cantones:"
-                : "Autres cantons :"}
+              {otherCantonsLabel}
             </span>
             {cantons
               .filter((c) => c.value !== canton)
@@ -330,28 +297,24 @@ export default async function CantonRestaurantsPage({
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {items.length === 0 ? (
             <p className="text-center text-gray-500">
-              {locale === "de"
-                ? "Keine Restaurants gefunden."
-                : locale === "en"
-                ? "No restaurants found."
-                : locale === "pt"
-                ? "Nenhum restaurante encontrado."
-                : locale === "es"
-                ? "No se encontraron restaurantes."
+              {locale === "de" ? "Keine Restaurants gefunden."
+                : locale === "en" ? "No restaurants found."
+                : locale === "pt" ? "Nenhum restaurante encontrado."
+                : locale === "es" ? "No se encontraron restaurantes."
                 : "Aucun restaurant trouvé."}
             </p>
           ) : (
             <>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((r) => (
-                  <RestaurantCard key={r.id} restaurant={toRestaurant(r)} />
+                  <SimpleRestaurantCard key={r.id} restaurant={r} locale={locale} />
                 ))}
               </div>
 
               {total > items.length && (
                 <div className="mt-10 text-center">
                   <Link
-                    href={`/${locale}/restaurants?${qs.toString()}`}
+                    href={`/${locale}/restaurants?canton=${canton}`}
                     className="inline-block rounded-xl bg-[var(--color-just-tag)] px-8 py-3 font-semibold text-white shadow-md transition hover:scale-105"
                   >
                     {seeAllLabel} ({total.toLocaleString("fr-CH")})
