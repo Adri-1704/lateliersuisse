@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
-import { X, Star } from "lucide-react";
+import { useCallback, useState } from "react";
+import { X, Star, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cantons } from "@/data/cantons";
@@ -23,11 +23,13 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const currentQuery = searchParams.get("q") || "";
   const currentCanton = searchParams.get("canton") || "";
   const currentCuisine = searchParams.get("cuisine") || "";
   const currentPrice = searchParams.get("price") || "";
   const currentRating = searchParams.get("rating") || "";
   const currentFeatures = searchParams.get("features")?.split(",").filter(Boolean) || [];
+  const [searchText, setSearchText] = useState(currentQuery);
 
   const getCantonLabelLocal = (c: { label: string; labelDe: string; labelEn: string; labelPt?: string; labelEs?: string }) => {
     return getLocalizedLabel(c, locale);
@@ -66,7 +68,12 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
     router.push(`/${locale}/restaurants`);
   };
 
-  const hasActiveFilters = currentCanton || currentCuisine || currentPrice || currentRating || currentFeatures.length > 0;
+  const hasActiveFilters = currentQuery || currentCanton || currentCuisine || currentPrice || currentRating || currentFeatures.length > 0;
+
+  const handleSearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    updateFilter("q", searchText.trim());
+  }, [searchText, updateFilter]);
 
   return (
     <div className="space-y-6">
@@ -79,6 +86,32 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
           </Button>
         )}
       </div>
+
+      {/* Search bar */}
+      <form onSubmit={handleSearch}>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          {t("searchLabel") || "Rechercher"}
+        </label>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder={t("searchPlaceholder") || "Nom, ville, cuisine..."}
+            className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
+          />
+          {searchText && (
+            <button
+              type="button"
+              onClick={() => { setSearchText(""); updateFilter("q", ""); }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </form>
 
       {/* Canton Filter */}
       <div>

@@ -11,7 +11,8 @@
     "faq": "FAQ",
     "forRestaurants": "Pour les restaurateurs",
     "pricing": "Tarifs",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "searchPlaceholder": "Nom, ville, cuisine..."
   },
   "hero": {
     "title": "La Romandie à table",
@@ -83,6 +84,8 @@
     "dietaryRestrictions": "Restrictions alimentaires",
     "ambiance": "Ambiance",
     "services": "Services et equipements",
+    "searchLabel": "Rechercher un restaurant",
+    "searchPlaceholder": "Nom, ville, cuisine...",
     "clearAll": "Effacer les filtres",
     "showMore": "Afficher plus",
     "map": "Voir sur la carte",

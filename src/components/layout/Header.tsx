@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Menu, X, Search, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,7 +15,20 @@ export function Header() {
   const t = useTranslations("nav");
   const params = useParams();
   const locale = params.locale as string;
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/${locale}/restaurants?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery("");
+    }
+  }
 
   const navLinks = [
     { href: `/${locale}`, label: t("home") },
@@ -51,16 +65,39 @@ export function Header() {
         {/* Right side */}
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
-          <Link href={`/${locale}/restaurants`}>
+          {searchOpen ? (
+            <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center gap-1">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("searchPlaceholder") || "Nom, ville, cuisine..."}
+                  autoFocus
+                  className="h-9 w-48 rounded-md border border-gray-200 bg-white pl-9 pr-8 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </form>
+          ) : (
             <Button
               variant="outline"
               size="sm"
               className="hidden sm:flex items-center gap-2"
+              onClick={() => { setSearchOpen(true); setTimeout(() => searchInputRef.current?.focus(), 50); }}
             >
               <Search className="h-4 w-4" />
               {t("search")}
             </Button>
-          </Link>
+          )}
           <Link href={`/${locale}/pour-restaurateurs`} className="hidden md:block">
             <Button
               size="sm"
