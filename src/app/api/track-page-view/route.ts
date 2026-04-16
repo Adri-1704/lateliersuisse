@@ -2,6 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import crypto from "crypto";
 
+// Filtrer les bots connus (Googlebot, Bing, etc.) pour ne tracker que les vrais humains
+const BOT_PATTERNS = [
+  /googlebot/i, /google-inspectiontool/i, /google-extended/i,
+  /bingbot/i, /msnbot/i,
+  /yandexbot/i, /baiduspider/i, /duckduckbot/i,
+  /slurp/i, /facebookexternalhit/i, /twitterbot/i, /linkedinbot/i,
+  /whatsapp/i, /telegrambot/i,
+  /semrushbot/i, /ahrefsbot/i, /dotbot/i, /petalbot/i, /mj12bot/i,
+  /bytespider/i, /gptbot/i, /claudebot/i, /anthropic-ai/i,
+  /headlesschrome/i, /phantomjs/i, /lighthouse/i, /pagespeed/i,
+  /uptimerobot/i, /pingdom/i, /site24x7/i,
+  /crawl/i, /spider/i, /bot\b/i,
+];
+
+function isBot(userAgent: string | null): boolean {
+  if (!userAgent) return true; // pas de UA = probablement un bot ou un script
+  return BOT_PATTERNS.some((pattern) => pattern.test(userAgent));
+}
+
 // Classifie le type de page à partir du pathname (pour agrégations rapides côté admin)
 function classifyPath(pathname: string): { page_type: string; locale: string | null; canton: string | null } {
   // Enlève le préfixe locale si présent
@@ -52,6 +71,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, skipped: "admin" });
     }
 
+    // Skip bots (Googlebot, Bing, etc.) — on ne veut que les vrais humains
+    const userAgent = request.headers.get("user-agent")?.slice(0, 200) || null;
+    if (isBot(userAgent)) {
+      return NextResponse.json({ ok: true, skipped: "bot" });
+    }
+
     const { page_type, locale, canton } = classifyPath(path);
 
     // Privacy : hash l'IP, jamais brute
@@ -64,7 +89,6 @@ export async function POST(request: NextRequest) {
       .digest("hex")
       .slice(0, 16);
 
-    const userAgent = request.headers.get("user-agent")?.slice(0, 200) || null;
     const country = request.headers.get("x-vercel-ip-country") || null;
 
     const supabase = createAdminClient();
