@@ -72,6 +72,7 @@ export default async function RestaurantsPage({
 
   // ---- Parse searchParams into RestaurantFilters ----
 
+  const establishmentType = typeof sp.type === "string" ? sp.type : undefined;
   const canton = typeof sp.canton === "string" ? sp.canton : undefined;
   const cuisine = typeof sp.cuisine === "string" ? sp.cuisine : undefined;
   const city = typeof sp.city === "string" ? sp.city : undefined;
@@ -98,6 +99,7 @@ export default async function RestaurantsPage({
   const viewIsMap = sp.view === "map";
 
   const filters: RestaurantFilters = {
+    establishmentType,
     canton,
     cuisine,
     city,

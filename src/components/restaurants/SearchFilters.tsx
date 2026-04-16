@@ -24,6 +24,7 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
   const searchParams = useSearchParams();
 
   const currentQuery = searchParams.get("q") || "";
+  const currentType = searchParams.get("type") || "";
   const currentCanton = searchParams.get("canton") || "";
   const currentCuisine = searchParams.get("cuisine") || "";
   const currentPrice = searchParams.get("price") || "";
@@ -68,7 +69,15 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
     router.push(`/${locale}/restaurants`);
   };
 
-  const hasActiveFilters = currentQuery || currentCanton || currentCuisine || currentPrice || currentRating || currentFeatures.length > 0;
+  const hasActiveFilters = currentQuery || currentType || currentCanton || currentCuisine || currentPrice || currentRating || currentFeatures.length > 0;
+
+  const establishmentTypes = [
+    { value: "", labelFr: "Tous les établissements", labelDe: "Alle Betriebe", labelEn: "All establishments", labelPt: "Todos", labelEs: "Todos" },
+    { value: "restaurant", labelFr: "Restaurants", labelDe: "Restaurants", labelEn: "Restaurants", labelPt: "Restaurantes", labelEs: "Restaurantes" },
+    { value: "bar", labelFr: "Bars & Pubs", labelDe: "Bars & Pubs", labelEn: "Bars & Pubs", labelPt: "Bares & Pubs", labelEs: "Bares & Pubs" },
+    { value: "cafe", labelFr: "Cafés & Tea-rooms", labelDe: "Cafés & Tea-Rooms", labelEn: "Cafés & Tea rooms", labelPt: "Cafés", labelEs: "Cafés" },
+    { value: "cave-a-vin", labelFr: "Caves à vin", labelDe: "Weinkeller", labelEn: "Wine cellars", labelPt: "Caves de vinhos", labelEs: "Bodegas" },
+  ];
 
   const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -112,6 +121,24 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
           )}
         </div>
       </form>
+
+      {/* Establishment Type Filter */}
+      <div>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          {locale === "de" ? "Art des Betriebs" : locale === "en" ? "Type" : locale === "pt" ? "Tipo" : locale === "es" ? "Tipo" : "Type d'établissement"}
+        </label>
+        <select
+          value={currentType}
+          onChange={(e) => updateFilter("type", e.target.value)}
+          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
+        >
+          {establishmentTypes.map((t) => (
+            <option key={t.value} value={t.value}>
+              {locale === "de" ? t.labelDe : locale === "en" ? t.labelEn : locale === "pt" ? t.labelPt : locale === "es" ? t.labelEs : t.labelFr}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Canton Filter */}
       <div>
