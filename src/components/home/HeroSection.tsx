@@ -13,10 +13,10 @@ import { cuisineCategories } from "@/data/mock-categories";
 import { getLocalizedLabel, getLocalizedName } from "@/lib/locale-helpers";
 
 const heroImages = [
-  { src: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=400&fit=crop", alt: "Restaurant interior" },
-  { src: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop", alt: "Fine dining" },
-  { src: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&h=400&fit=crop", alt: "Swiss cuisine" },
-  { src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=400&fit=crop", alt: "Restaurant terrace" },
+  { src: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop&q=75&fm=webp", alt: "Restaurant interior" },
+  { src: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop&q=75&fm=webp", alt: "Fine dining" },
+  { src: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop&q=75&fm=webp", alt: "Swiss cuisine" },
+  { src: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=300&fit=crop&q=75&fm=webp", alt: "Restaurant terrace" },
 ];
 
 const popularTags = [
@@ -183,6 +183,8 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                     fill
                     className="object-cover"
                     sizes="25vw"
+                    priority
+                    loading="eager"
                   />
                 </div>
                 <div className="relative h-56 overflow-hidden rounded-2xl">
@@ -192,6 +194,8 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                     fill
                     className="object-cover"
                     sizes="25vw"
+                    priority
+                    loading="eager"
                   />
                 </div>
               </div>
@@ -203,6 +207,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                     fill
                     className="object-cover"
                     sizes="25vw"
+                    loading="lazy"
                   />
                 </div>
                 <div className="relative h-48 overflow-hidden rounded-2xl">
@@ -212,6 +217,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                     fill
                     className="object-cover"
                     sizes="25vw"
+                    loading="lazy"
                   />
                 </div>
               </div>

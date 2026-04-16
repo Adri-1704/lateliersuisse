@@ -16,6 +16,8 @@ import "../globals.css";
 const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-geist-sans",
+  display: "swap",
+  preload: true,
 });
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
@@ -138,8 +140,13 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={outfit.variable}>
       <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-WMX94S9LR7" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="preconnect" href="https://odbkdijcmwqdxctukjmh.supabase.co" />
+        <link rel="dns-prefetch" href="https://odbkdijcmwqdxctukjmh.supabase.co" />
+        <script async defer src="https://www.googletagmanager.com/gtag/js?id=G-WMX94S9LR7" />
         <script
+          defer
           dangerouslySetInnerHTML={{
             __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WMX94S9LR7');`,
           }}

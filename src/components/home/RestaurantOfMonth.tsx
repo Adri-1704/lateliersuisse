@@ -23,11 +23,11 @@ interface DbReview {
 }
 
 const placeholderImages = [
-  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
-  "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&q=80",
-  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80",
-  "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=800&q=80",
-  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80",
+  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=75&fm=webp",
+  "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&q=75&fm=webp",
+  "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=75&fm=webp",
+  "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=600&q=75&fm=webp",
+  "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=75&fm=webp",
 ];
 
 function PriceRange({ range }: { range: number }) {
