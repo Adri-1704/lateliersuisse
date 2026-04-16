@@ -14,9 +14,9 @@
     "search": "Search"
   },
   "hero": {
-    "title": "Western Switzerland at the Table",
-    "subtitle": "From the Alps to the lakes, discover the finest restaurants in Western Switzerland",
-    "searchPlaceholder": "Restaurant name, cuisine...",
+    "title": "Taste Western Switzerland",
+    "subtitle": "Restaurants, bars and cafés — the best addresses in Western Switzerland",
+    "searchPlaceholder": "Name, city, cuisine...",
     "canton": "Canton",
     "allCantons": "All cantons",
     "cuisineType": "Cuisine type",

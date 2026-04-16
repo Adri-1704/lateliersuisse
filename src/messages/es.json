@@ -14,9 +14,9 @@
     "search": "Buscar"
   },
   "hero": {
-    "title": "La Suiza Romanda a la mesa",
-    "subtitle": "Descubre los mejores restaurantes de la Suiza occidental francofona, de canton en canton",
-    "searchPlaceholder": "Nombre del restaurante, cocina...",
+    "title": "Saborea la Suiza Romanda",
+    "subtitle": "Restaurantes, bares y cafés — las mejores direcciones de la Suiza Romanda",
+    "searchPlaceholder": "Nombre, ciudad, cocina...",
     "canton": "Canton",
     "allCantons": "Todos los cantones",
     "cuisineType": "Tipo de cocina",

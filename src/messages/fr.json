@@ -15,9 +15,9 @@
     "searchPlaceholder": "Nom, ville, cuisine..."
   },
   "hero": {
-    "title": "La Romandie à table",
-    "subtitle": "Des Alpes aux lacs, découvrez les meilleures tables de Suisse Romande",
-    "searchPlaceholder": "Nom de restaurant, cuisine...",
+    "title": "La Romandie se déguste",
+    "subtitle": "Restaurants, bars et cafés — les meilleures adresses de Suisse Romande",
+    "searchPlaceholder": "Nom, ville, cuisine...",
     "canton": "Canton",
     "allCantons": "Tous les cantons",
     "cuisineType": "Type de cuisine",

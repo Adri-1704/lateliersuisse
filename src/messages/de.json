@@ -14,9 +14,9 @@
     "search": "Suchen"
   },
   "hero": {
-    "title": "Die Romandie zu Tisch",
-    "subtitle": "Von den Alpen bis zu den Seen, entdecken Sie die besten Tische in der Westschweiz",
-    "searchPlaceholder": "Restaurantname, Küche...",
+    "title": "Die Romandie zum Geniessen",
+    "subtitle": "Restaurants, Bars und Cafés — die besten Adressen der Westschweiz",
+    "searchPlaceholder": "Name, Stadt, Küche...",
     "canton": "Kanton",
     "allCantons": "Alle Kantone",
     "cuisineType": "Küchenart",
