@@ -72,26 +72,32 @@ async function loadRestaurantTraffic(
       if (vDate >= today) stats.today++;
     }
 
-    // Sort restaurant IDs by the requested period
+    // Sort restaurant IDs by the requested period (viewed first, then 0-view restos)
     const sortKey = sort === "views_month" ? "month" : sort === "views_week" ? "week" : sort === "views_today" ? "today" : "all";
-    const sorted = Array.from(viewMap.entries())
-      .sort(([, a], [, b]) => b[sortKey] - a[sortKey]);
+    const viewedIds = Array.from(viewMap.entries())
+      .sort(([, a], [, b]) => b[sortKey] - a[sortKey])
+      .map(([id]) => id);
 
-    // Paginate the sorted list
+    // Get total restaurant count (for pagination)
+    let countQuery = supabase.from("restaurants").select("id", { count: "exact", head: true });
+    if (query) countQuery = countQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
+    if (canton) countQuery = countQuery.eq("canton", canton);
+    const { count: totalRestaurants } = await countQuery;
+
     const from = (page - 1) * pageSize;
-    const pageIds = sorted.slice(from, from + pageSize).map(([id]) => id);
-
-    // Fetch restaurant details for this page
     let rows: RestaurantRow[] = [];
-    if (pageIds.length > 0) {
+
+    if (from < viewedIds.length) {
+      // Page still has some viewed restaurants
+      const idsForPage = viewedIds.slice(from, from + pageSize);
+
       const { data: restos } = await supabase
         .from("restaurants")
         .select("id, slug, name_fr, city, canton, is_published")
-        .in("id", pageIds) as { data: { id: string; slug: string; name_fr: string; city: string; canton: string; is_published: boolean }[] | null };
+        .in("id", idsForPage) as { data: { id: string; slug: string; name_fr: string; city: string; canton: string; is_published: boolean }[] | null };
 
-      // Apply optional filters (query, canton) and merge with views
       const restoMap = new Map((restos || []).map((r) => [r.id, r]));
-      rows = pageIds
+      const viewedRows = idsForPage
         .filter((id) => restoMap.has(id))
         .map((id) => {
           const r = restoMap.get(id)!;
@@ -109,14 +115,52 @@ async function loadRestaurantTraffic(
           }
           return true;
         });
+
+      rows = viewedRows;
+
+      // Fill remaining slots with 0-view restaurants
+      const remaining = pageSize - rows.length;
+      if (remaining > 0) {
+        let fillQuery = supabase
+          .from("restaurants")
+          .select("id, slug, name_fr, city, canton, is_published")
+          .order("name_fr", { ascending: true })
+          .limit(remaining);
+        if (query) fillQuery = fillQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
+        if (canton) fillQuery = fillQuery.eq("canton", canton);
+        // Exclude already-viewed restaurants
+        if (viewedIds.length > 0 && viewedIds.length <= 100) {
+          fillQuery = fillQuery.not("id", "in", `(${viewedIds.join(",")})`);
+        }
+        const { data: fillRestos } = await fillQuery as { data: typeof restos };
+        for (const r of fillRestos || []) {
+          rows.push({
+            id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
+            viewsTotal: 0, viewsMonth: 0, viewsWeek: 0, viewsToday: 0, isPublished: r.is_published,
+          });
+        }
+      }
+    } else {
+      // Past the viewed restaurants — show 0-view restaurants alphabetically
+      const zeroViewOffset = from - viewedIds.length;
+      let fillQuery = supabase
+        .from("restaurants")
+        .select("id, slug, name_fr, city, canton, is_published")
+        .order("name_fr", { ascending: true })
+        .range(zeroViewOffset, zeroViewOffset + pageSize - 1);
+      if (query) fillQuery = fillQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
+      if (canton) fillQuery = fillQuery.eq("canton", canton);
+      if (viewedIds.length > 0 && viewedIds.length <= 100) {
+        fillQuery = fillQuery.not("id", "in", `(${viewedIds.join(",")})`);
+      }
+      const { data: fillRestos } = await fillQuery as { data: { id: string; slug: string; name_fr: string; city: string; canton: string; is_published: boolean }[] | null };
+      rows = (fillRestos || []).map((r) => ({
+        id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
+        viewsTotal: 0, viewsMonth: 0, viewsWeek: 0, viewsToday: 0, isPublished: r.is_published,
+      }));
     }
 
-    // Total count = restaurants with views (for pagination)
-    const filteredTotal = query || canton
-      ? rows.length // approximate when filtered
-      : sorted.length;
-
-    return { rows, totalCount: filteredTotal, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
+    return { rows, totalCount: totalRestaurants ?? 0, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
 
   } else {
     // Name sort: simple DB pagination
