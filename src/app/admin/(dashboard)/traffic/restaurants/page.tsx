@@ -42,110 +42,134 @@ async function loadRestaurantTraffic(
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  // Get all page_views matching restaurant pages with restaurant_id, grouped
-  // We paginate restaurants, then fetch views for each
-  let restaurantQuery = supabase
-    .from("restaurants")
-    .select("id, slug, name_fr, city, canton, is_published", { count: "exact" });
-
-  if (query && query.trim().length > 0) {
-    const term = query.trim();
-    restaurantQuery = restaurantQuery.or(`name_fr.ilike.%${term}%,city.ilike.%${term}%,slug.ilike.%${term}%`);
-  }
-  if (canton) {
-    restaurantQuery = restaurantQuery.eq("canton", canton);
-  }
-
-  // Default sort by name; we'll re-sort in memory for view-based sorts after merging
-  restaurantQuery = restaurantQuery.order("name_fr", { ascending: true });
-
-  // If sorting by name/city, use DB pagination. Otherwise fetch a bigger page and sort in memory.
   const viewSort = sort === "views_month" || sort === "views_week" || sort === "views_today" || sort === "views_all";
-  const fetchSize = viewSort ? 500 : pageSize;
-  const fetchOffset = viewSort ? 0 : (page - 1) * pageSize;
 
-  restaurantQuery = restaurantQuery.range(fetchOffset, fetchOffset + fetchSize - 1);
-
-  const { data: restaurants, count } = await restaurantQuery as {
-    data: { id: string; slug: string; name_fr: string; city: string; canton: string; is_published: boolean }[] | null;
-    count: number | null;
-  };
-
-  if (!restaurants) {
-    return { rows: [], totalCount: 0, grandTotals: { today: 0, week: 0, month: 0, all: 0 } };
-  }
-
-  // Fetch views for the restaurant ids we have
-  const ids = restaurants.map((r) => r.id);
-  const { data: viewsRaw } = await supabase
-    .from("page_views")
-    .select("restaurant_id, viewed_at")
-    .in("restaurant_id", ids) as { data: { restaurant_id: string; viewed_at: string }[] | null };
-
-  const viewMap = new Map<string, { today: number; week: number; month: number; all: number }>();
-  for (const id of ids) viewMap.set(id, { today: 0, week: 0, month: 0, all: 0 });
-
-  for (const v of viewsRaw || []) {
-    const stats = viewMap.get(v.restaurant_id);
-    if (!stats) continue;
-    const vDate = new Date(v.viewed_at);
-    stats.all++;
-    if (vDate >= monthAgo) stats.month++;
-    if (vDate >= weekAgo) stats.week++;
-    if (vDate >= today) stats.today++;
-  }
-
-  // Grand totals (across all restaurants, not just the page)
-  const { count: totalToday } = await supabase
-    .from("page_views").select("id", { count: "exact", head: true })
-    .gte("viewed_at", today.toISOString()).not("restaurant_id", "is", null);
-  const { count: totalWeek } = await supabase
-    .from("page_views").select("id", { count: "exact", head: true })
-    .gte("viewed_at", weekAgo.toISOString()).not("restaurant_id", "is", null);
-  const { count: totalMonth } = await supabase
-    .from("page_views").select("id", { count: "exact", head: true })
-    .gte("viewed_at", monthAgo.toISOString()).not("restaurant_id", "is", null);
-  const { count: totalAll } = await supabase
-    .from("page_views").select("id", { count: "exact", head: true })
-    .not("restaurant_id", "is", null);
-
-  let rows: RestaurantRow[] = restaurants.map((r) => {
-    const s = viewMap.get(r.id) || { today: 0, week: 0, month: 0, all: 0 };
-    return {
-      id: r.id,
-      slug: r.slug,
-      name: r.name_fr,
-      city: r.city || "",
-      canton: r.canton || "",
-      viewsTotal: s.all,
-      viewsMonth: s.month,
-      viewsWeek: s.week,
-      viewsToday: s.today,
-      isPublished: r.is_published,
-    };
-  });
+  // Grand totals
+  const [{ count: totalToday }, { count: totalWeek }, { count: totalMonth }, { count: totalAll }] = await Promise.all([
+    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("viewed_at", today.toISOString()).not("restaurant_id", "is", null),
+    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("viewed_at", weekAgo.toISOString()).not("restaurant_id", "is", null),
+    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("viewed_at", monthAgo.toISOString()).not("restaurant_id", "is", null),
+    supabase.from("page_views").select("id", { count: "exact", head: true }).not("restaurant_id", "is", null),
+  ]);
 
   if (viewSort) {
-    const key = sort === "views_month" ? "viewsMonth"
-      : sort === "views_week" ? "viewsWeek"
-      : sort === "views_today" ? "viewsToday"
-      : "viewsTotal";
-    rows.sort((a, b) => b[key] - a[key]);
-    // Apply pagination AFTER sort
-    const from = (page - 1) * pageSize;
-    rows = rows.slice(from, from + pageSize);
-  }
+    // Strategy: get ALL page_views with restaurant_id, count per restaurant, sort, then fetch restaurant details
+    const { data: allViews } = await supabase
+      .from("page_views")
+      .select("restaurant_id, viewed_at")
+      .not("restaurant_id", "is", null)
+      .limit(50000) as { data: { restaurant_id: string; viewed_at: string }[] | null };
 
-  return {
-    rows,
-    totalCount: count ?? 0,
-    grandTotals: {
-      today: totalToday ?? 0,
-      week: totalWeek ?? 0,
-      month: totalMonth ?? 0,
-      all: totalAll ?? 0,
-    },
-  };
+    // Count views per restaurant by period
+    const viewMap = new Map<string, { today: number; week: number; month: number; all: number }>();
+    for (const v of allViews || []) {
+      let stats = viewMap.get(v.restaurant_id);
+      if (!stats) { stats = { today: 0, week: 0, month: 0, all: 0 }; viewMap.set(v.restaurant_id, stats); }
+      const vDate = new Date(v.viewed_at);
+      stats.all++;
+      if (vDate >= monthAgo) stats.month++;
+      if (vDate >= weekAgo) stats.week++;
+      if (vDate >= today) stats.today++;
+    }
+
+    // Sort restaurant IDs by the requested period
+    const sortKey = sort === "views_month" ? "month" : sort === "views_week" ? "week" : sort === "views_today" ? "today" : "all";
+    const sorted = Array.from(viewMap.entries())
+      .sort(([, a], [, b]) => b[sortKey] - a[sortKey]);
+
+    // Paginate the sorted list
+    const from = (page - 1) * pageSize;
+    const pageIds = sorted.slice(from, from + pageSize).map(([id]) => id);
+
+    // Fetch restaurant details for this page
+    let rows: RestaurantRow[] = [];
+    if (pageIds.length > 0) {
+      const { data: restos } = await supabase
+        .from("restaurants")
+        .select("id, slug, name_fr, city, canton, is_published")
+        .in("id", pageIds) as { data: { id: string; slug: string; name_fr: string; city: string; canton: string; is_published: boolean }[] | null };
+
+      // Apply optional filters (query, canton) and merge with views
+      const restoMap = new Map((restos || []).map((r) => [r.id, r]));
+      rows = pageIds
+        .filter((id) => restoMap.has(id))
+        .map((id) => {
+          const r = restoMap.get(id)!;
+          const s = viewMap.get(id) || { today: 0, week: 0, month: 0, all: 0 };
+          return {
+            id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
+            viewsTotal: s.all, viewsMonth: s.month, viewsWeek: s.week, viewsToday: s.today, isPublished: r.is_published,
+          };
+        })
+        .filter((r) => {
+          if (canton && r.canton !== canton) return false;
+          if (query) {
+            const q = query.toLowerCase();
+            return r.name.toLowerCase().includes(q) || r.city.toLowerCase().includes(q) || r.slug.toLowerCase().includes(q);
+          }
+          return true;
+        });
+    }
+
+    // Total count = restaurants with views (for pagination)
+    const filteredTotal = query || canton
+      ? rows.length // approximate when filtered
+      : sorted.length;
+
+    return { rows, totalCount: filteredTotal, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
+
+  } else {
+    // Name sort: simple DB pagination
+    let restaurantQuery = supabase
+      .from("restaurants")
+      .select("id, slug, name_fr, city, canton, is_published", { count: "exact" });
+
+    if (query && query.trim().length > 0) {
+      const term = query.trim();
+      restaurantQuery = restaurantQuery.or(`name_fr.ilike.%${term}%,city.ilike.%${term}%,slug.ilike.%${term}%`);
+    }
+    if (canton) restaurantQuery = restaurantQuery.eq("canton", canton);
+
+    restaurantQuery = restaurantQuery.order("name_fr", { ascending: true });
+    const offset = (page - 1) * pageSize;
+    restaurantQuery = restaurantQuery.range(offset, offset + pageSize - 1);
+
+    const { data: restaurants, count } = await restaurantQuery as {
+      data: { id: string; slug: string; name_fr: string; city: string; canton: string; is_published: boolean }[] | null;
+      count: number | null;
+    };
+
+    if (!restaurants) return { rows: [], totalCount: 0, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
+
+    // Fetch views for these restaurants
+    const ids = restaurants.map((r) => r.id);
+    const { data: viewsRaw } = await supabase
+      .from("page_views")
+      .select("restaurant_id, viewed_at")
+      .in("restaurant_id", ids) as { data: { restaurant_id: string; viewed_at: string }[] | null };
+
+    const viewMap = new Map<string, { today: number; week: number; month: number; all: number }>();
+    for (const id of ids) viewMap.set(id, { today: 0, week: 0, month: 0, all: 0 });
+    for (const v of viewsRaw || []) {
+      const stats = viewMap.get(v.restaurant_id);
+      if (!stats) continue;
+      const vDate = new Date(v.viewed_at);
+      stats.all++;
+      if (vDate >= monthAgo) stats.month++;
+      if (vDate >= weekAgo) stats.week++;
+      if (vDate >= today) stats.today++;
+    }
+
+    const rows = restaurants.map((r) => {
+      const s = viewMap.get(r.id) || { today: 0, week: 0, month: 0, all: 0 };
+      return {
+        id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
+        viewsTotal: s.all, viewsMonth: s.month, viewsWeek: s.week, viewsToday: s.today, isPublished: r.is_published,
+      };
+    });
+
+    return { rows, totalCount: count ?? 0, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
+  }
 }
 
 export default async function RestaurantsTrafficPage({
@@ -261,6 +285,7 @@ export default async function RestaurantsTrafficPage({
               <select
                 name="canton"
                 defaultValue={canton}
+                data-autosubmit
                 className="h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
               >
                 {cantons.map((c) => (
@@ -273,6 +298,7 @@ export default async function RestaurantsTrafficPage({
               <select
                 name="sort"
                 defaultValue={sort}
+                data-autosubmit
                 className="h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
               >
                 {sortOptions.map((s) => (
@@ -280,14 +306,16 @@ export default async function RestaurantsTrafficPage({
                 ))}
               </select>
             </div>
-            <div className="sm:col-span-4">
+            <div className="sm:col-span-4 flex items-center gap-3">
               <button
                 type="submit"
                 className="rounded-md bg-[var(--color-just-tag)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
                 Filtrer
               </button>
+              <span className="text-xs text-gray-400">Le tri et le canton s&apos;appliquent automatiquement.</span>
             </div>
+            <script dangerouslySetInnerHTML={{ __html: `document.querySelectorAll('[data-autosubmit]').forEach(function(s){s.addEventListener('change',function(){s.form.submit()})})` }} />
           </form>
         </CardContent>
       </Card>
