@@ -12,18 +12,18 @@ import { DistinctionBadges } from "@/components/restaurants/DistinctionBadges";
 import { PromotionBadge } from "@/components/restaurants/PromotionBadge";
 import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
 
-function isOpenNow(openingHours: Restaurant["openingHours"]): boolean {
+function isOpenNow(openingHours: Restaurant["openingHours"]): boolean | null {
+  if (!openingHours) return null;
   const now = new Date();
   const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
   const today = days[now.getDay()];
   const hours = openingHours[today];
-  if (!hours || !("open" in hours) || !("close" in hours)) return false;
+  if (!hours || typeof hours.open !== "string" || typeof hours.close !== "string" || hours.open === "undefined" || hours.close === "undefined") return null;
   const currentTime = now.getHours() * 100 + now.getMinutes();
   const [openH, openM] = hours.open.split(":").map(Number);
   const [closeH, closeM] = hours.close.split(":").map(Number);
-  const openTime = openH * 100 + openM;
-  const closeTime = closeH * 100 + closeM;
-  return currentTime >= openTime && currentTime <= closeTime;
+  if (isNaN(openH) || isNaN(openM) || isNaN(closeH) || isNaN(closeM)) return null;
+  return currentTime >= openH * 100 + openM && currentTime <= closeH * 100 + closeM;
 }
 
 export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
@@ -70,15 +70,17 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
             <Badge className="bg-white/90 text-gray-800 border-0 backdrop-blur-sm text-xs font-semibold">
               {restaurant.canton.slice(0, 2).toUpperCase()}
             </Badge>
-            {/* Open/Closed indicator */}
-            <Badge className={`border-0 backdrop-blur-sm text-xs ${
-              open
-                ? "bg-green-500/90 text-white"
-                : "bg-gray-500/80 text-white"
-            }`}>
-              <Clock className="mr-1 h-3 w-3" />
-              {open ? tR("open") : tR("closed")}
-            </Badge>
+            {/* Open/Closed indicator — hidden if hours unknown */}
+            {open !== null && (
+              <Badge className={`border-0 backdrop-blur-sm text-xs ${
+                open
+                  ? "bg-green-500/90 text-white"
+                  : "bg-gray-500/80 text-white"
+              }`}>
+                <Clock className="mr-1 h-3 w-3" />
+                {open ? tR("open") : tR("closed")}
+              </Badge>
+            )}
           </div>
 
           {/* Bottom right: Price range */}

@@ -63,15 +63,17 @@ function PriceRange({ range }: { range: number }) {
   );
 }
 
-function isOpenNow(openingHours: Record<string, { open: string; close: string } | null>): boolean {
+function isOpenNow(openingHours: Record<string, { open: string; close: string } | null>): boolean | null {
+  if (!openingHours) return null;
   const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
   const now = new Date();
   const dayName = days[now.getDay()];
   const hours = openingHours[dayName];
-  if (!hours || !("open" in hours) || !("close" in hours)) return false;
+  if (!hours || typeof hours.open !== "string" || typeof hours.close !== "string" || hours.open === "undefined" || hours.close === "undefined") return null;
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const [openH, openM] = hours.open.split(":").map(Number);
   const [closeH, closeM] = hours.close.split(":").map(Number);
+  if (isNaN(openH) || isNaN(openM) || isNaN(closeH) || isNaN(closeM)) return null;
   return currentMinutes >= openH * 60 + openM && currentMinutes <= closeH * 60 + closeM;
 }
 
@@ -455,13 +457,17 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 <MapPin className="h-3.5 w-3.5" />
                 {restaurant.city}
               </span>
-              <span className="text-gray-300">|</span>
-              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                open ? "bg-green-100 text-green-700" : "bg-red-50 text-red-600"
-              }`}>
-                <Clock className="h-3 w-3" />
-                {open ? t("open") : t("closed")}
-              </span>
+              {open !== null && (
+                <>
+                  <span className="text-gray-300">|</span>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    open ? "bg-green-100 text-green-700" : "bg-red-50 text-red-600"
+                  }`}>
+                    <Clock className="h-3 w-3" />
+                    {open ? t("open") : t("closed")}
+                  </span>
+                </>
+              )}
             </div>
           </div>
 
@@ -853,6 +859,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               <div className="rounded-lg border">
                 {dayKeys.map((day) => {
                   const hours = restaurant.openingHours[day];
+                  const hasValidHours = hours && typeof hours.open === "string" && typeof hours.close === "string" && hours.open !== "undefined" && hours.close !== "undefined";
                   const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
                   const todayName = days[new Date().getDay()];
                   const isToday = day === todayName;
@@ -866,8 +873,8 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                       <span className={`font-medium capitalize ${isToday ? "text-[var(--color-just-tag)]" : "text-gray-700"}`}>
                         {t(day)} {isToday && "•"}
                       </span>
-                      <span className={hours ? (isToday ? "text-[var(--color-just-tag)] font-medium" : "text-gray-900") : "text-red-500"}>
-                        {hours ? `${hours.open} - ${hours.close}` : t("closed")}
+                      <span className={hasValidHours ? (isToday ? "text-[var(--color-just-tag)] font-medium" : "text-gray-900") : "text-gray-400"}>
+                        {hasValidHours ? `${hours.open} – ${hours.close}` : "—"}
                       </span>
                     </div>
                   );
