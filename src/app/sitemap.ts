@@ -53,6 +53,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
+  // Blog index
+  for (const locale of locales) {
+    entries.push({
+      url: `${baseUrl}/${locale}/blog`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+      alternates: alternates("/blog"),
+    });
+  }
+
+  // Blog articles (from DB)
+  try {
+    const supabase = createAdminClient();
+    const { data: blogPosts } = await supabase
+      .from("blog_posts")
+      .select("slug, updated_at, published_at")
+      .eq("is_published", true)
+      .not("published_at", "is", null);
+
+    if (blogPosts) {
+      for (const post of blogPosts as { slug: string; updated_at: string | null; published_at: string | null }[]) {
+        for (const locale of locales) {
+          entries.push({
+            url: `${baseUrl}/${locale}/blog/${post.slug}`,
+            lastModified: post.updated_at ? new Date(post.updated_at) : now,
+            changeFrequency: "weekly",
+            priority: 0.7,
+            alternates: alternates(`/blog/${post.slug}`),
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching blog posts for sitemap:", error);
+  }
+
   // B2B and info pages
   const weeklyPages = ["pour-restaurateurs", "parrainage", "a-propos"];
   for (const page of weeklyPages) {
