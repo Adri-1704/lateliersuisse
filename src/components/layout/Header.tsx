@@ -20,8 +20,8 @@ export function Header() {
     { href: `/${locale}`, label: t("home") },
     { href: `/${locale}/restaurants`, label: t("restaurants") },
     { href: `/${locale}/collections`, label: "Ambiances" },
-{ href: `/${locale}/contact`, label: t("contact") },
-    { href: `/${locale}/faq`, label: t("faq") },
+    { href: `/${locale}/blog`, label: "Blog" },
+    { href: `/${locale}/contact`, label: t("contact") },
   ];
 
   return (
