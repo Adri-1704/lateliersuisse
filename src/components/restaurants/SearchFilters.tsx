@@ -76,7 +76,6 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
     { value: "restaurant", labelFr: "Restaurants", labelDe: "Restaurants", labelEn: "Restaurants", labelPt: "Restaurantes", labelEs: "Restaurantes" },
     { value: "bar", labelFr: "Bars & Pubs", labelDe: "Bars & Pubs", labelEn: "Bars & Pubs", labelPt: "Bares & Pubs", labelEs: "Bares & Pubs" },
     { value: "cafe", labelFr: "Cafés & Tea-rooms", labelDe: "Cafés & Tea-Rooms", labelEn: "Cafés & Tea rooms", labelPt: "Cafés", labelEs: "Cafés" },
-    { value: "cave-a-vin", labelFr: "Caves à vin", labelDe: "Weinkeller", labelEn: "Wine cellars", labelPt: "Caves de vinhos", labelEs: "Bodegas" },
   ];
 
   const handleSearch = useCallback((e: React.FormEvent) => {

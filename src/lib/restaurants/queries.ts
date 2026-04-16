@@ -44,11 +44,10 @@ export interface RestaurantMapItem {
 }
 
 /** Filters accepted by `fetchFilteredRestaurants`. */
-/** Cuisine types that are NOT restaurants (bars, cafés, caves) */
+/** Cuisine types that are NOT restaurants (bars, cafés) */
 const BAR_TYPES = ["bar"];
 const CAFE_TYPES = ["cafe", "tea-room"];
-const CAVE_TYPES = ["cave-a-vin", "bar-a-vin"];
-const NON_RESTAURANT_TYPES = [...BAR_TYPES, ...CAFE_TYPES, ...CAVE_TYPES];
+const NON_RESTAURANT_TYPES = [...BAR_TYPES, ...CAFE_TYPES];
 
 export type RestaurantFilters = {
   /** "restaurant" | "bar" | "cafe" | "cave-a-vin" — filters by establishment type */
@@ -125,8 +124,6 @@ function applyFilters(query: any, filters: RestaurantFilters) {
     q = q.in("cuisine_type", BAR_TYPES);
   } else if (filters.establishmentType === "cafe") {
     q = q.in("cuisine_type", CAFE_TYPES);
-  } else if (filters.establishmentType === "cave-a-vin") {
-    q = q.in("cuisine_type", CAVE_TYPES);
   }
 
   if (filters.canton) {

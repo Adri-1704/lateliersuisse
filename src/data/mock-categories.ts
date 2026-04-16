@@ -55,7 +55,6 @@ export const cuisineCategories: CuisineCategory[] = [
   { slug: "tibetain", nameFr: "Tibetain", nameDe: "Tibetisch", nameEn: "Tibetan", namePt: "Tibetano", nameEs: "Tibetano", icon: "🥟", count: 5 },
   { slug: "bar", nameFr: "Bar & Pub", nameDe: "Bar & Pub", nameEn: "Bar & Pub", namePt: "Bar & Pub", nameEs: "Bar & Pub", icon: "🍸", count: 0 },
   { slug: "bar-a-vin", nameFr: "Bar a vin", nameDe: "Weinbar", nameEn: "Wine bar", namePt: "Bar de vinhos", nameEs: "Bar de vinos", icon: "🍷", count: 30 },
-  { slug: "cave-a-vin", nameFr: "Cave a vin", nameDe: "Weinkeller", nameEn: "Wine cellar", namePt: "Cave de vinhos", nameEs: "Bodega", icon: "🏺", count: 0 },
   { slug: "tea-room", nameFr: "Tea-room", nameDe: "Tea-Room", nameEn: "Tea room", namePt: "Sala de chá", nameEs: "Salón de té", icon: "🫖", count: 0 },
   { slug: "cafe", nameFr: "Cafe", nameDe: "Cafe", nameEn: "Cafe", namePt: "Café", nameEs: "Café", icon: "☕", count: 55 },
   { slug: "glaces", nameFr: "Glaces", nameDe: "Eisdiele", nameEn: "Ice cream", namePt: "Sorvete", nameEs: "Helados", icon: "🍦", count: 18 },
