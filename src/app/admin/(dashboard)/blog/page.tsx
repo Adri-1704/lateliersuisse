@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Eye } from "lucide-react";
+import { PublishButton } from "./PublishButton";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +78,9 @@ export default async function AdminBlogPage() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {!post.is_published && (
+                          <PublishButton postId={post.id} />
+                        )}
                         <Link
                           href={`/admin/blog/${post.id}`}
                           className="inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs hover:bg-gray-50"
