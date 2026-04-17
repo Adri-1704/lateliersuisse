@@ -11,6 +11,7 @@ import { PublicLayoutWrapper } from "@/components/layout/PublicLayoutWrapper";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
+import { AffiliateTracker } from "@/components/analytics/AffiliateTracker";
 import "../globals.css";
 
 const outfit = Outfit({
@@ -169,6 +170,7 @@ export default async function LocaleLayout({
         <Analytics />
         <SpeedInsights />
         <PageViewTracker />
+        <AffiliateTracker />
       </body>
     </html>
   );

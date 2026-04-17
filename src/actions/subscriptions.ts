@@ -40,6 +40,8 @@ interface CreateCheckoutParams {
   merchantId: string;
   locale: string;
   restaurantId?: string;
+  /** Affiliate referral code (from cookie jt_ref) */
+  affiliateRef?: string;
 }
 
 interface CheckoutResult {
@@ -56,7 +58,7 @@ interface CheckoutResult {
 export async function createCheckoutSession(
   params: CreateCheckoutParams
 ): Promise<CheckoutResult> {
-  const { planType, merchantId, locale, restaurantId } = params;
+  const { planType, merchantId, locale, restaurantId, affiliateRef } = params;
 
   try {
     // If Stripe is not configured, return placeholder
@@ -109,6 +111,9 @@ export async function createCheckoutSession(
     };
     if (restaurantId) {
       metadata.restaurant_id = restaurantId;
+    }
+    if (affiliateRef) {
+      metadata.affiliate_ref = affiliateRef;
     }
 
     const stripeLocale =
@@ -366,6 +371,8 @@ export async function handleSubscriptionWebhook(
           .eq("stripe_checkout_session_id", checkoutSessionId)
           .maybeSingle();
 
+        const affiliateRef = metadata.affiliate_ref || null;
+
         if (existingSub) {
           console.log(`[Webhook] Subscription for checkout ${checkoutSessionId} already exists — skipping (idempotent).`);
         } else if (isLifetime) {
@@ -380,6 +387,7 @@ export async function handleSubscriptionWebhook(
             is_early_bird: isEarlyBird,
             current_period_start: new Date().toISOString(),
             current_period_end: "2099-12-31T23:59:59.000Z",
+            affiliate_ref: affiliateRef,
           });
         } else {
           // Subscription mode
@@ -391,6 +399,7 @@ export async function handleSubscriptionWebhook(
             plan_type: planType,
             status: "active",
             is_early_bird: isEarlyBird,
+            affiliate_ref: affiliateRef,
             current_period_start: new Date().toISOString(),
           });
         }
