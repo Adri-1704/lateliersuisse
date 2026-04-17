@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
-import { X, Star, Search } from "lucide-react";
+import { X, Star, Search, Navigation } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cantons } from "@/data/cantons";
@@ -120,6 +121,15 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
           )}
         </div>
       </form>
+
+      {/* Nearby button */}
+      <Link
+        href={`/${locale}/autour-de-moi`}
+        className="flex items-center justify-center gap-2 rounded-lg bg-[var(--color-just-tag)] px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+      >
+        <Navigation className="h-4 w-4" />
+        {locale === "de" ? "In meiner Nähe" : locale === "en" ? "Near me" : "Autour de moi"}
+      </Link>
 
       {/* Establishment Type Filter */}
       <div>

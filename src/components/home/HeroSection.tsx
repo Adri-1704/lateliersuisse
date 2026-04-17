@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Navigation } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -146,6 +147,17 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                     </Button>
                   </div>
                 </div>
+              </div>
+
+              {/* Autour de moi button */}
+              <div className="mt-4">
+                <Link
+                  href={`/${locale}/autour-de-moi`}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/20 hover:border-white/40"
+                >
+                  <Navigation className="h-4 w-4" />
+                  {locale === "de" ? "Restaurants in meiner Nähe" : locale === "en" ? "Restaurants near me" : "Restaurants autour de moi"}
+                </Link>
               </div>
 
               {/* Popular search tags */}
