@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MapPin, Star, Navigation, Loader2, AlertCircle } from "lucide-react";
 
@@ -99,10 +99,11 @@ export function NearbyRestaurants({ locale }: { locale: string }) {
   const t = i18n[locale] || i18n.fr;
 
   const [restaurants, setRestaurants] = useState<NearbyRestaurant[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start loading immediately
   const [error, setError] = useState<string | null>(null);
   const [located, setLocated] = useState(false);
   const [radius, setRadius] = useState(20);
+  const autoStarted = useRef(false);
 
   const findNearby = useCallback(async (maxDistance = 20) => {
     setLoading(true);
@@ -146,6 +147,14 @@ export function NearbyRestaurants({ locale }: { locale: string }) {
     );
   }, [t]);
 
+  // Auto-start geolocation on page load
+  useEffect(() => {
+    if (!autoStarted.current) {
+      autoStarted.current = true;
+      findNearby(20);
+    }
+  }, [findNearby]);
+
   return (
     <>
       {/* Hero */}
@@ -170,21 +179,6 @@ export function NearbyRestaurants({ locale }: { locale: string }) {
               <p className="mt-2 text-sm text-white/80">{t.subtitle}</p>
             </div>
           </div>
-
-          {!located && !loading && (
-            <div className="mt-8">
-              <button
-                onClick={() => findNearby(20)}
-                className="inline-flex items-center gap-3 rounded-xl bg-white px-8 py-4 text-base font-bold text-[var(--color-just-tag)] shadow-lg transition hover:scale-105"
-              >
-                <MapPin className="h-5 w-5" />
-                {t.button}
-              </button>
-              <p className="mt-3 text-xs text-white/60">
-                {locale === "fr" ? "Votre position n'est jamais stockée ni partagée." : "Your location is never stored or shared."}
-              </p>
-            </div>
-          )}
 
           {loading && (
             <div className="mt-8 flex items-center gap-3 text-white">
