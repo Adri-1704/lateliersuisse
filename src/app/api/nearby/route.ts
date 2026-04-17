@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createAdminClient();
 
-    const { data, error } = await supabase.rpc("nearby_restaurants", {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.rpc as any)("nearby_restaurants", {
       user_lat: lat,
       user_lon: lon,
       max_distance_km: Math.min(radius, 100),
