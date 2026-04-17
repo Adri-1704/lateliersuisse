@@ -83,6 +83,21 @@ export function Footer({ locale }: { locale: string }) {
                   {nav("forRestaurants")}
                 </Link>
               </li>
+              <li>
+                <Link href={`/${locale}/affiliation`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  Affiliation
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${locale}/parrainage`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  Parrainage
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${locale}/blog`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
 
