@@ -30,19 +30,19 @@ export async function generateMetadata({
     title: titles[locale] || titles.fr,
     description: descriptions[locale] || descriptions.fr,
     alternates: {
-      canonical: `/${locale}/restaurants/autour-de-moi`,
+      canonical: `/${locale}/autour-de-moi`,
       languages: {
-        fr: "/fr/restaurants/autour-de-moi",
-        de: "/de/restaurants/autour-de-moi",
-        en: "/en/restaurants/autour-de-moi",
-        pt: "/pt/restaurants/autour-de-moi",
-        es: "/es/restaurants/autour-de-moi",
+        fr: "/fr/autour-de-moi",
+        de: "/de/autour-de-moi",
+        en: "/en/autour-de-moi",
+        pt: "/pt/autour-de-moi",
+        es: "/es/autour-de-moi",
       },
     },
     openGraph: {
       title: titles[locale] || titles.fr,
       description: descriptions[locale] || descriptions.fr,
-      url: `${baseUrl}/${locale}/restaurants/autour-de-moi`,
+      url: `${baseUrl}/${locale}/autour-de-moi`,
       type: "website",
     },
   };

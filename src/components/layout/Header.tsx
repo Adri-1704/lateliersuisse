@@ -33,7 +33,7 @@ export function Header() {
   const navLinks = [
     { href: `/${locale}`, label: t("home") },
     { href: `/${locale}/restaurants`, label: t("restaurants") },
-    { href: `/${locale}/restaurants/autour-de-moi`, label: locale === "de" ? "In meiner Nähe" : locale === "en" ? "Near me" : "Autour de moi" },
+    { href: `/${locale}/autour-de-moi`, label: locale === "de" ? "In meiner Nähe" : locale === "en" ? "Near me" : "Autour de moi" },
     { href: `/${locale}/collections`, label: "Ambiances" },
     { href: `/${locale}/blog`, label: "Blog" },
     { href: `/${locale}/contact`, label: t("contact") },
