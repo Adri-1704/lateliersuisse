@@ -28,6 +28,7 @@ import {
   BarChart3,
   TrendingUp,
   FileText,
+  Link2,
 } from "lucide-react";
 
 const navItems = [
@@ -35,6 +36,7 @@ const navItems = [
   { title: "Statistiques", href: "/admin/stats", icon: BarChart3 },
   { title: "Trafic", href: "/admin/traffic", icon: TrendingUp },
   { title: "Blog", href: "/admin/blog", icon: FileText },
+  { title: "Affiliations", href: "/admin/affiliations", icon: Link2 },
   { title: "Restaurants", href: "/admin/restaurants", icon: UtensilsCrossed },
   { title: "Commerçants", href: "/admin/merchants", icon: Store },
   { title: "Avis", href: "/admin/reviews", icon: MessageSquare },
