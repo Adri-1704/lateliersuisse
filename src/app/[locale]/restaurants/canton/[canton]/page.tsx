@@ -9,6 +9,11 @@ import { MapPin, Star } from "lucide-react";
 
 const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
 
+// SEO Quick Win: ISR (30 min) sur les pages cantons — pages SEO critiques.
+export const dynamic = "force-static";
+export const revalidate = 1800;
+export const dynamicParams = true;
+
 // Récupère les top villes du canton pour internal linking
 async function getTopCitiesInCanton(canton: string, limit = 10): Promise<{ slug: string; name: string; count: number }[]> {
   const supabase = createAdminClient();

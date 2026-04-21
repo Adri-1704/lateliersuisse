@@ -206,7 +206,12 @@ export async function generateMetadata({
   };
 }
 
-export const dynamic = "force-dynamic";
+// SEO Quick Win: ISR (1h) sur les fiches resto afin que Google les voie comme
+// statiques/rapides et accepte de les indexer. `dynamicParams = true` permet aux
+// nouveaux restos non pré-rendus d'être générés à la demande.
+export const dynamic = "force-static";
+export const revalidate = 3600;
+export const dynamicParams = true;
 
 export default async function RestaurantDetailPage({
   params,

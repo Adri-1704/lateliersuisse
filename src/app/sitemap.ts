@@ -8,15 +8,19 @@ const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://just-tag.app";
-  const locales = ["fr", "de", "en", "pt", "es"];
+  // SEO Quick Win: seules les URLs FR sont soumises dans le sitemap pour éviter
+  // le signal "trop d'URLs similaires" envoyé à Google sur un site jeune. Les pages
+  // DE/EN/PT/ES restent accessibles et référencées via hreflang (voir `alternates`).
+  const locales = ["fr"];
+  const alternateLocales = ["fr", "de", "en", "pt", "es"];
   const now = new Date();
 
   const entries: MetadataRoute.Sitemap = [];
 
-  // Helper to generate alternates for a given path
+  // Helper to generate alternates for a given path (hreflang : 5 locales)
   const alternates = (path: string) => ({
     languages: Object.fromEntries(
-      locales.map((l) => [l, `${baseUrl}/${l}${path}`])
+      alternateLocales.map((l) => [l, `${baseUrl}/${l}${path}`])
     ),
   });
 

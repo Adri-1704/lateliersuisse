@@ -10,6 +10,11 @@ import { MapPin, Star } from "lucide-react";
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
 
+// SEO Quick Win: ISR (30 min) sur les pages villes — pages SEO critiques.
+export const dynamic = "force-static";
+export const revalidate = 1800;
+export const dynamicParams = true;
+
 // ---------------------------------------------------------------------------
 // Resolve city slug → actual city name from DB
 // ---------------------------------------------------------------------------
