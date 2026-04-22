@@ -93,6 +93,7 @@ export async function createBillingPortalSession(locale: string = "fr"): Promise
     const session = await stripe.billingPortal.sessions.create({
       customer: merchant.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app"}/${locale}/espace-client/abonnement`,
+      locale: (locale === "fr" || locale === "de" || locale === "en" || locale === "pt" || locale === "es" ? locale : "fr") as "fr" | "de" | "en" | "pt" | "es",
     });
 
     return { url: session.url, error: null };
