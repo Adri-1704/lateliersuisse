@@ -13,7 +13,8 @@ export async function POST(request: NextRequest) {
         published_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       } as Record<string, unknown>)
-      .eq("id", id);
+      .eq("id", id)
+      .eq("site", "just-tag");
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ ok: true });

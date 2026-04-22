@@ -29,6 +29,7 @@ export async function getPublishedPosts(limit = 20, offset = 0): Promise<{ posts
   const { data, count } = await supabase
     .from("blog_posts")
     .select("*", { count: "exact" })
+    .eq("site", "just-tag")
     .eq("is_published", true)
     .not("published_at", "is", null)
     .order("published_at", { ascending: false })
@@ -42,6 +43,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
+    .eq("site", "just-tag")
     .eq("is_published", true)
     .single() as { data: BlogPost | null };
   return data;
@@ -56,6 +58,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
   const { data } = await supabase
     .from("blog_posts")
     .select("*")
+    .eq("site", "just-tag")
     .order("created_at", { ascending: false }) as { data: BlogPost[] | null };
   return data || [];
 }
@@ -66,6 +69,7 @@ export async function getPostById(id: string): Promise<BlogPost | null> {
     .from("blog_posts")
     .select("*")
     .eq("id", id)
+    .eq("site", "just-tag")
     .single() as { data: BlogPost | null };
   return data;
 }
@@ -109,6 +113,7 @@ export async function createPost(formData: FormData): Promise<{ success: boolean
       meta_title: meta_title || null,
       meta_description: meta_description || null,
       is_published,
+      site: "just-tag",
       published_at: is_published ? new Date().toISOString() : null,
     } as Record<string, unknown>)
     .select("id")
@@ -136,7 +141,7 @@ export async function updatePost(id: string, formData: FormData): Promise<{ succ
   const supabase = createAdminClient();
 
   // Check current publish state to set published_at on first publish
-  const { data: current } = await supabase.from("blog_posts").select("is_published, published_at").eq("id", id).single() as { data: { is_published: boolean; published_at: string | null } | null };
+  const { data: current } = await supabase.from("blog_posts").select("is_published, published_at").eq("id", id).eq("site", "just-tag").single() as { data: { is_published: boolean; published_at: string | null } | null };
   const published_at = is_published && !current?.published_at ? new Date().toISOString() : current?.published_at || null;
 
   const { error } = await (supabase.from("blog_posts") as ReturnType<typeof supabase.from>)
@@ -153,7 +158,8 @@ export async function updatePost(id: string, formData: FormData): Promise<{ succ
       published_at,
       updated_at: new Date().toISOString(),
     } as Record<string, unknown>)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("site", "just-tag");
 
   if (error) return { success: false, error: error.message };
   return { success: true };
@@ -161,7 +167,11 @@ export async function updatePost(id: string, formData: FormData): Promise<{ succ
 
 export async function deletePost(id: string): Promise<{ success: boolean; error?: string }> {
   const supabase = createAdminClient();
-  const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+  const { error } = await supabase
+    .from("blog_posts")
+    .delete()
+    .eq("id", id)
+    .eq("site", "just-tag");
   if (error) return { success: false, error: error.message };
   return { success: true };
 }

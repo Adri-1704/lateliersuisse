@@ -74,6 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data: blogPosts } = await supabase
       .from("blog_posts")
       .select("slug, updated_at, published_at")
+      .eq("site", "just-tag")
       .eq("is_published", true)
       .not("published_at", "is", null);
 
