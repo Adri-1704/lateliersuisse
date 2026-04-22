@@ -5,6 +5,8 @@ import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers"
 import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { ClaimBanner } from "./ClaimBanner";
+import { HappyHourBanner } from "@/components/restaurant-detail/HappyHourBanner";
+import { getActiveHappyHoursForRestaurant } from "@/actions/happy-hours";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/supabase/types";
 import type { RestaurantPromotion } from "@/data/mock-restaurants";
@@ -228,12 +230,21 @@ export default async function RestaurantDetailPage({
   const { restaurant, merchantId, claimStatus } = result;
 
   // Fetch reviews, menu items, and images in parallel
-  const [reviews, menuItems, images, promotions] = await Promise.all([
+  const [reviews, menuItems, images, promotions, happyHours] = await Promise.all([
     getReviews(restaurant.id),
     getMenuItems(restaurant.id),
     getRestaurantImages(restaurant.id),
     getRestaurantPromotions(restaurant.id),
+    getActiveHappyHoursForRestaurant(restaurant.id),
   ]);
+
+  // Happy Hour prioritaire : en cours maintenant, sinon la plus proche dans le temps
+  // eslint-disable-next-line react-hooks/purity
+  const nowTs = Date.now();
+  const featuredHappyHour =
+    happyHours.find(
+      (hh) => new Date(hh.starts_at).getTime() <= nowTs && new Date(hh.ends_at).getTime() > nowTs,
+    ) || happyHours[0] || null;
 
   // Enrich restaurant with menu items and images
   const enrichedRestaurant: Restaurant = {
@@ -368,6 +379,21 @@ export default async function RestaurantDetailPage({
         <ClaimBanner
           restaurantName={getLocalizedName(enrichedRestaurant, locale)}
           restaurantSlug={slug}
+          locale={locale}
+        />
+      )}
+      {featuredHappyHour && (
+        <HappyHourBanner
+          id={featuredHappyHour.id}
+          title={featuredHappyHour.title}
+          description={featuredHappyHour.description}
+          promoType={featuredHappyHour.promo_type}
+          promoValue={featuredHappyHour.promo_value}
+          startsAt={featuredHappyHour.starts_at}
+          endsAt={featuredHappyHour.ends_at}
+          restaurantSlug={slug}
+          restaurantName={getLocalizedName(enrichedRestaurant, locale)}
+          restaurantPhone={enrichedRestaurant.phone || null}
           locale={locale}
         />
       )}

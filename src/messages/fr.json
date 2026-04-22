@@ -698,6 +698,71 @@
     "successMessage": "Merci de nous avoir contactés. Notre équipe vous répondra dans les plus brefs délais.",
     "error": "Une erreur est survenue. Veuillez réessayer."
   },
+  "happyHours": {
+    "title": "Happy Hours",
+    "subtitle": "Les offres flash des restaurants de Suisse Romande, en direct",
+    "filters": {
+      "now": "Maintenant",
+      "today": "Ce soir",
+      "week": "Cette semaine",
+      "canton": "Canton",
+      "allCantons": "Tous les cantons"
+    },
+    "badge": {
+      "ongoing": "En cours",
+      "upcoming": "Bientot"
+    },
+    "actions": {
+      "share": "Partager",
+      "shareWhatsapp": "Partager sur WhatsApp",
+      "copyLink": "Copier le lien",
+      "copied": "Copie",
+      "book": "Reserver",
+      "viewAll": "Voir toutes les Happy Hours"
+    },
+    "empty": {
+      "title": "Aucune Happy Hour pour cette selection",
+      "subtitle": "Essayez un autre filtre ou revenez plus tard."
+    },
+    "merchant": {
+      "title": "Happy Hours",
+      "subtitle": "Creez des offres flash pour remplir vos creneaux creux.",
+      "create": "Creer une Happy Hour",
+      "newTitle": "Nouvelle Happy Hour",
+      "editTitle": "Modifier la Happy Hour",
+      "form": {
+        "title": "Titre",
+        "description": "Description",
+        "promoType": "Type de promotion",
+        "promoValue": "Valeur affichee",
+        "startsAt": "Debut",
+        "endsAt": "Fin",
+        "placesLimited": "Places limitees",
+        "placesTotal": "Nombre de places",
+        "publish": "Publier",
+        "save": "Publier la Happy Hour",
+        "update": "Mettre a jour",
+        "delete": "Supprimer",
+        "cancel": "Annuler"
+      },
+      "stats": {
+        "views": "Vues",
+        "clicks": "Clics"
+      },
+      "qr": {
+        "title": "QR Code pour vos tables",
+        "subtitle": "Imprimez ce QR et posez-le sur vos tables : les clients scannent et arrivent directement sur votre fiche.",
+        "download": "Telecharger HD",
+        "copyLink": "Copier le lien"
+      },
+      "status": {
+        "active": "En cours",
+        "upcoming": "A venir",
+        "past": "Passees",
+        "disabled": "Desactivee"
+      }
+    }
+  },
   "merchantPortal": {
     "login": {
       "title": "Connexion Espace Partenaire",

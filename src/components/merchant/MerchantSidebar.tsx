@@ -24,6 +24,7 @@ import {
   CreditCard,
   Tag,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 
 export function MerchantSidebar() {
@@ -40,6 +41,7 @@ export function MerchantSidebar() {
     { title: t("sidebar.menu"), href: `${basePath}/carte`, icon: BookOpen },
     { title: t("sidebar.photos"), href: `${basePath}/photos`, icon: ImageIcon },
     { title: "Offres du moment", href: `${basePath}/offres`, icon: Tag },
+    { title: "Happy Hours", href: `${basePath}/happy-hours`, icon: Sparkles },
     { title: t("sidebar.reviews"), href: `${basePath}/avis`, icon: MessageSquare },
     { title: "Statistiques", href: `${basePath}/statistiques`, icon: BarChart3 },
     { title: t("sidebar.subscription"), href: `${basePath}/abonnement`, icon: CreditCard },

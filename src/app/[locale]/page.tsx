@@ -8,6 +8,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 import { FounderSection } from "@/components/home/FounderSection";
 import { CollectionsSection } from "@/components/home/CollectionsSection";
+import { HappyHoursSection } from "@/components/home/HappyHoursSection";
 import { createAdminClient } from "@/lib/supabase/server";
 import { cantons } from "@/data/cantons";
 
@@ -83,7 +84,8 @@ async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, num
   }
 }
 
-export default async function HomePage() {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const { cantonCounts, cuisineCounts, totalReviews } = await getRestaurantCounts();
   const totalRestaurants = Object.values(cantonCounts).reduce((sum, n) => sum + n, 0);
 
@@ -91,6 +93,7 @@ export default async function HomePage() {
     <>
       <HeroSection totalRestaurants={totalRestaurants} cuisineCounts={cuisineCounts} />
       <RestaurantOfMonth />
+      <HappyHoursSection locale={locale} />
       <SwissCantonMap restaurantCounts={cantonCounts} />
       <CategoryGrid cuisineCounts={cuisineCounts} />
       <CollectionsSection />

@@ -189,6 +189,33 @@ export interface DbPromotion {
 }
 
 // ============================================
+// Happy Hours
+// ============================================
+
+export type HappyHourPromoType =
+  | "percentage"
+  | "fixed_amount"
+  | "free_item"
+  | "special_menu";
+
+export interface HappyHour {
+  id: string;
+  restaurant_id: string;
+  title: string;
+  description: string | null;
+  promo_type: HappyHourPromoType;
+  promo_value: string | null;
+  starts_at: string;
+  ends_at: string;
+  places_total: number | null;
+  is_active: boolean;
+  views_count: number;
+  clicks_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================
 // Claim Requests
 // ============================================
 
@@ -305,6 +332,16 @@ export interface Database {
           notes?: string | null;
         };
         Update: Partial<Omit<B2BContactRequest, "id">>;
+        Relationships: [];
+      };
+      happy_hours: {
+        Row: HappyHour;
+        Insert: Omit<HappyHour, "id" | "created_at" | "updated_at" | "views_count" | "clicks_count"> & {
+          id?: string;
+          views_count?: number;
+          clicks_count?: number;
+        };
+        Update: Partial<Omit<HappyHour, "id">>;
         Relationships: [];
       };
     };

@@ -94,6 +94,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Error fetching blog posts for sitemap:", error);
   }
 
+  // Happy Hours listing page
+  for (const locale of locales) {
+    entries.push({
+      url: `${baseUrl}/${locale}/happy-hours`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+      alternates: alternates("/happy-hours"),
+    });
+  }
+
   // B2B and info pages
   const weeklyPages = ["pour-restaurateurs", "parrainage", "a-propos"];
   for (const page of weeklyPages) {
