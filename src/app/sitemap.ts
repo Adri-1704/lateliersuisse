@@ -205,26 +205,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   // Individual restaurant pages from Supabase
+  // Supabase limite .select() à 1000 lignes par défaut, on pagine par batchs
+  // pour récupérer tous les restaurants publiés (~11k et plus à terme).
   try {
     const supabase = createAdminClient();
-    const { data: restaurants } = await supabase
-      .from("restaurants")
-      .select("slug, updated_at")
-      .eq("is_published", true);
+    const allRestaurants: { slug: string; updated_at: string | null }[] = [];
+    const pageSize = 1000;
+    let from = 0;
 
-    if (restaurants) {
-      for (const r of restaurants as { slug: string; updated_at: string | null }[]) {
-        for (const locale of locales) {
-          entries.push({
-            url: `${baseUrl}/${locale}/restaurants/${r.slug}`,
-            lastModified: r.updated_at
-              ? new Date(r.updated_at)
-              : now,
-            changeFrequency: "weekly",
-            priority: 0.8,
-            alternates: alternates(`/restaurants/${r.slug}`),
-          });
-        }
+    while (true) {
+      const { data, error } = await supabase
+        .from("restaurants")
+        .select("slug, updated_at")
+        .eq("is_published", true)
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error("Error fetching restaurants batch for sitemap:", error);
+        break;
+      }
+      if (!data || data.length === 0) break;
+
+      allRestaurants.push(...(data as { slug: string; updated_at: string | null }[]));
+
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+
+    for (const r of allRestaurants) {
+      for (const locale of locales) {
+        entries.push({
+          url: `${baseUrl}/${locale}/restaurants/${r.slug}`,
+          lastModified: r.updated_at
+            ? new Date(r.updated_at)
+            : now,
+          changeFrequency: "weekly",
+          priority: 0.8,
+          alternates: alternates(`/restaurants/${r.slug}`),
+        });
       }
     }
   } catch (error) {
