@@ -2,20 +2,21 @@ import { getMerchantSession } from "@/actions/merchant/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail } from "lucide-react";
+import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { AffiliateProgramCard } from "@/components/merchant/AffiliateProgramCard";
 
 const planLabels: Record<string, string> = {
   monthly: "Mensuel",
   semiannual: "Semestriel",
   annual: "Annuel",
-  lifetime: "A vie",
+  lifetime: "À vie",
 };
 
 const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
   active: { label: "Actif", variant: "default" },
   past_due: { label: "Paiement en retard", variant: "destructive" },
-  canceled: { label: "Annule", variant: "secondary" },
+  canceled: { label: "Annulé", variant: "secondary" },
   incomplete: { label: "Incomplet", variant: "secondary" },
   trialing: { label: "Essai", variant: "default" },
 };
@@ -35,11 +36,21 @@ export default async function MerchantDashboardPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        <p className="text-muted-foreground">
-          Bienvenue{merchant ? `, ${merchant.name}` : ""} !
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Tableau de bord</h1>
+          <p className="text-muted-foreground">
+            Bienvenue{merchant ? `, ${merchant.name}` : ""} !
+          </p>
+        </div>
+        {restaurant?.slug && (
+          <Button asChild className="bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)] text-white">
+            <a href={`/${locale}/restaurants/${restaurant.slug}`} target="_blank" rel="noopener noreferrer">
+              Voir mon restaurant
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </a>
+          </Button>
+        )}
       </div>
 
       {/* Bandeau claim pending — remplace le contenu principal */}
@@ -97,7 +108,7 @@ export default async function MerchantDashboardPage({
               </CardHeader>
               <CardContent>
                 <Badge variant={restaurant?.is_published ? "default" : "secondary"}>
-                  {restaurant?.is_published ? "Publie" : "Brouillon"}
+                  {restaurant?.is_published ? "Publié" : "Brouillon"}
                 </Badge>
               </CardContent>
             </Card>
@@ -196,6 +207,12 @@ export default async function MerchantDashboardPage({
               </CardContent>
             </Card>
           )}
+
+          {/* Programme d'affiliation — partage code unique + gain commission */}
+          <AffiliateProgramCard
+            refCode={(merchant as { ref_code?: string | null } | undefined)?.ref_code ?? null}
+            locale={locale}
+          />
         </>
       )}
     </div>

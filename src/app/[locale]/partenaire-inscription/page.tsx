@@ -30,6 +30,7 @@ import {
   createCheckoutSession,
   getEarlyBirdSeatsAvailable,
 } from "@/actions/subscriptions";
+import { getAffiliateRef } from "@/components/analytics/AffiliateTracker";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types
@@ -345,11 +346,14 @@ export default function MerchantSignupPage() {
       | "annual"
       | "lifetime";
 
+    const affiliateRef = getAffiliateRef() || undefined;
+
     const result = await createCheckoutSession({
       planType,
       merchantId: signupData.merchantId,
       locale,
       restaurantId: restaurantChoice?.restaurantId,
+      affiliateRef,
     });
 
     if (result.url) {
