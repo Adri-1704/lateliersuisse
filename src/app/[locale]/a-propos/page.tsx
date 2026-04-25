@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+export const revalidate = 86400;
+
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
 export async function generateMetadata({

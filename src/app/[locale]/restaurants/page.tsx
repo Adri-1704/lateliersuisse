@@ -9,6 +9,8 @@ import {
 } from "@/lib/restaurants/queries";
 import RestaurantsView from "./RestaurantsView";
 
+export const revalidate = 1800;
+
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
 export async function generateMetadata({

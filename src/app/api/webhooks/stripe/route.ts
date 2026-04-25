@@ -28,7 +28,9 @@ export async function POST(request: NextRequest) {
   try {
     let event;
 
-    // Verify Stripe signature in production, fallback to JSON.parse in dev
+    // Verify Stripe signature. In production we REQUIRE the secret to prevent
+    // forged webhook payloads from creating fake subscriptions. The unsafe
+    // JSON.parse fallback is only allowed in development.
     if (process.env.STRIPE_WEBHOOK_SECRET && process.env.STRIPE_SECRET_KEY) {
       const { getStripe } = await import("@/lib/stripe");
       const stripe = getStripe();
@@ -37,9 +39,17 @@ export async function POST(request: NextRequest) {
         sig,
         process.env.STRIPE_WEBHOOK_SECRET
       );
+    } else if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[Stripe Webhook] STRIPE_WEBHOOK_SECRET missing in production — refusing webhook"
+      );
+      return NextResponse.json(
+        { error: "Webhook signature verification unavailable" },
+        { status: 500 }
+      );
     } else {
       console.warn(
-        "[Stripe Webhook] No STRIPE_WEBHOOK_SECRET configured, skipping signature verification"
+        "[Stripe Webhook] No STRIPE_WEBHOOK_SECRET configured (dev only), skipping signature verification"
       );
       event = JSON.parse(body);
     }

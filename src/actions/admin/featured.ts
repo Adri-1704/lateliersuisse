@@ -51,7 +51,7 @@ export async function toggleFeatured(
   try {
     const supabase = createAdminClient();
 
-    // Si on ajoute, vérifier la limite de 12
+    // Pre-check rapide (fast-fail UX) : si on ajoute, vérifier la limite
     if (isFeatured) {
       const { count } = await supabase
         .from("restaurants")
@@ -66,6 +66,23 @@ export async function toggleFeatured(
     const { error } = await (supabase as any).from("restaurants").update({ is_featured: isFeatured }).eq("id", restaurantId);
 
     if (error) throw error;
+
+    // Post-check anti race-condition : si après update on dépasse la limite
+    // (deux admins simultanés), on revert immédiatement.
+    if (isFeatured) {
+      const { count: postCount } = await supabase
+        .from("restaurants")
+        .select("id", { count: "exact", head: true })
+        .eq("is_featured", true);
+      if ((postCount || 0) > MAX_FEATURED) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).from("restaurants").update({ is_featured: false }).eq("id", restaurantId);
+        return {
+          success: false,
+          error: `Limite atteinte : un autre admin a ajouté un restaurant en même temps. Maximum ${MAX_FEATURED}. Retirez-en un avant de réessayer.`,
+        };
+      }
+    }
 
     revalidatePath("/admin/featured");
     revalidatePath("/");
