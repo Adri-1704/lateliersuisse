@@ -34,6 +34,13 @@ export async function generateMetadata({
   const title = t("title");
   const description = t("description");
 
+  // SEO : seules les pages FR sont indexées. DE/EN/PT/ES restent accessibles
+  // (hreflang signalé dans alternates) mais ne doivent pas apparaître dans Google
+  // tant que les fiches resto ne sont pas réellement traduites — sinon Google
+  // les détecte comme doublons de la version FR (cf. Search Console : 7415 pages
+  // "Google n'a pas choisi le même canonical").
+  const indexable = locale === "fr";
+
   return {
     title: {
       default: title,
@@ -74,10 +81,10 @@ export async function generateMetadata({
       images: [`${baseUrl}/og-image.png`],
     },
     robots: {
-      index: true,
+      index: indexable,
       follow: true,
       googleBot: {
-        index: true,
+        index: indexable,
         follow: true,
         "max-video-preview": -1,
         "max-image-preview": "large",
