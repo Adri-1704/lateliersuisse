@@ -127,7 +127,7 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
           </div>
           <p className="text-base sm:text-lg font-semibold">
             {spotsRemaining > 0
-              ? <>Offre de lancement : -40% pour les 100 premiers abonnés. Plus que <strong>{spotsRemaining}</strong> places. Ces tarifs ne reviendront pas.</>
+              ? <>Offre de lancement : -40% pour les 100 premiers abonnés. Ces tarifs ne reviendront pas.</>
               : <>Offre Early Bird bientôt terminée. Inscrivez-vous avant qu&apos;il ne soit trop tard.</>}
           </p>
         </div>
