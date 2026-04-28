@@ -6,7 +6,6 @@ import { B2BHero } from "@/components/b2b/B2BHero";
 import { B2BTrustStats } from "@/components/b2b/B2BTrustStats";
 import { B2BProblemSolution } from "@/components/b2b/B2BProblemSolution";
 import { B2BFeatures } from "@/components/b2b/B2BFeatures";
-import { B2BFounding50 } from "@/components/b2b/B2BFounding50";
 import { B2BPricing } from "@/components/b2b/B2BPricing";
 import { B2BFindRestaurant } from "@/components/b2b/B2BFindRestaurant";
 import { B2BFAQ } from "@/components/b2b/B2BFAQ";
@@ -116,7 +115,6 @@ export default async function PourRestaurateursPage() {
       <B2BHero totalRestaurants={totalRestaurants} />
       <B2BTrustStats totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <B2BProblemSolution />
-      <B2BFounding50 spotsRemaining={spotsRemaining} />
       <B2BFeatures />
       <B2BPricing spotsRemaining={spotsRemaining} />
       <B2BFindRestaurant />
