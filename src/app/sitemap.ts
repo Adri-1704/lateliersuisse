@@ -4,7 +4,10 @@ import { cantons } from "@/data/cantons";
 import { collections } from "@/data/collections";
 import { slugifyCity, VALID_CANTONS } from "@/lib/city-slug";
 
-const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
+// SEO long-tail : abaissé de 5 à 1 pour rendre indexables toutes les villes
+// avec au moins 1 resto. Évite les 404 quand Google découvre une ville via
+// un lien interne (canton page → liste villes) qui était sous le seuil.
+const MIN_RESTAURANTS_FOR_CITY_PAGE = 1;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://just-tag.app";
