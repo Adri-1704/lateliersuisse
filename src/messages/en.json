@@ -534,7 +534,7 @@
       "contactNote": "Have a question? Write to us at"
     },
     "earlyBirdBanner": {
-      "active": "Early Bird offer: only {count}/100 spots left at -40%. After that, it's over.",
+      "active": "Early Bird offer: -40% for the first 100 subscribers. Only {count} spots left.",
       "expired": "Early Bird offer ending soon"
     },
     "findRestaurant": {
