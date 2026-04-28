@@ -63,8 +63,24 @@ export function WhatsAppSubscribe({ restaurantId, restaurantName, restaurantSlug
           <MessageCircle className="h-5 w-5 text-white" />
         </div>
         <div>
-          <h3 className="font-bold text-gray-900 text-sm">Actus du restaurant par WhatsApp</h3>
-          <p className="text-xs text-gray-500">Plats du jour, offres et nouveautés</p>
+          <h3 className="font-bold text-gray-900 text-sm">Actus de {restaurantName} sur WhatsApp</h3>
+          <p className="text-xs text-gray-500">Gratuit · sans spam · désabonnement 1 clic</p>
+        </div>
+      </div>
+
+      {/* Benefits */}
+      <div className="mb-4 grid grid-cols-3 gap-2">
+        <div className="flex flex-col items-center gap-1 rounded-lg bg-white/70 p-2 text-center shadow-sm">
+          <span className="text-xl" aria-hidden>🍴</span>
+          <span className="text-[11px] font-semibold leading-tight text-gray-800">Plat du jour</span>
+        </div>
+        <div className="flex flex-col items-center gap-1 rounded-lg bg-white/70 p-2 text-center shadow-sm">
+          <span className="text-xl" aria-hidden>🎁</span>
+          <span className="text-[11px] font-semibold leading-tight text-gray-800">Offres exclusives</span>
+        </div>
+        <div className="flex flex-col items-center gap-1 rounded-lg bg-white/70 p-2 text-center shadow-sm">
+          <span className="text-xl" aria-hidden>📣</span>
+          <span className="text-[11px] font-semibold leading-tight text-gray-800">Événements</span>
         </div>
       </div>
 
