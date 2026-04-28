@@ -2,15 +2,19 @@ import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ExternalLink, Eye, TrendingUp, ArrowUpDown } from "lucide-react";
+import { ExternalLink, Eye, ArrowUpDown } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
+type PeriodKey = "1d" | "7d" | "30d" | "90d" | "365d" | "all" | "custom";
 
 interface SearchParams {
   q?: string;
   sort?: string;
   period?: string;
+  from?: string;
+  to?: string;
   page?: string;
   canton?: string;
 }
@@ -22,63 +26,79 @@ interface RestaurantRow {
   city: string;
   canton: string;
   viewsTotal: number;
-  viewsMonth: number;
-  viewsWeek: number;
-  viewsToday: number;
+  viewsPeriod: number;
   isPublished: boolean;
+}
+
+const PERIOD_OPTIONS: { value: PeriodKey; label: string }[] = [
+  { value: "1d", label: "24 heures" },
+  { value: "7d", label: "7 jours" },
+  { value: "30d", label: "30 jours" },
+  { value: "90d", label: "90 jours" },
+  { value: "365d", label: "12 mois" },
+  { value: "all", label: "Tout" },
+  { value: "custom", label: "Personnalisé" },
+];
+
+function resolvePeriod(period: PeriodKey, from?: string, to?: string): { start: Date; end: Date; label: string } {
+  const now = new Date();
+  if (period === "custom") {
+    const start = from ? new Date(from + "T00:00:00") : new Date(now.getTime() - 30 * 86400000);
+    const end = to ? new Date(to + "T23:59:59") : now;
+    return { start, end, label: `${from || "?"} → ${to || "?"}` };
+  }
+  if (period === "all") return { start: new Date(0), end: now, label: "Tout" };
+  const days = period === "1d" ? 1 : period === "7d" ? 7 : period === "30d" ? 30 : period === "90d" ? 90 : 365;
+  return { start: new Date(now.getTime() - days * 86400000), end: now, label: PERIOD_OPTIONS.find((p) => p.value === period)?.label ?? "" };
 }
 
 async function loadRestaurantTraffic(
   query: string,
   sort: string,
   canton: string | undefined,
+  periodStart: Date,
+  periodEnd: Date,
   page: number,
   pageSize = 50
-): Promise<{ rows: RestaurantRow[]; totalCount: number; grandTotals: { today: number; week: number; month: number; all: number } }> {
+): Promise<{ rows: RestaurantRow[]; totalCount: number; grandTotals: { period: number; all: number } }> {
   const supabase = createAdminClient();
 
-  const now = new Date();
-  const today = new Date(now); today.setHours(0, 0, 0, 0);
-  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-  const viewSort = sort === "views_month" || sort === "views_week" || sort === "views_today" || sort === "views_all";
-
-  // Grand totals
-  const [{ count: totalToday }, { count: totalWeek }, { count: totalMonth }, { count: totalAll }] = await Promise.all([
-    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("viewed_at", today.toISOString()).not("restaurant_id", "is", null),
-    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("viewed_at", weekAgo.toISOString()).not("restaurant_id", "is", null),
-    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("viewed_at", monthAgo.toISOString()).not("restaurant_id", "is", null),
-    supabase.from("page_views").select("id", { count: "exact", head: true }).not("restaurant_id", "is", null),
+  const [{ count: totalPeriod }, { count: totalAll }] = await Promise.all([
+    supabase
+      .from("page_views")
+      .select("id", { count: "exact", head: true })
+      .gte("viewed_at", periodStart.toISOString())
+      .lte("viewed_at", periodEnd.toISOString())
+      .not("restaurant_id", "is", null),
+    supabase
+      .from("page_views")
+      .select("id", { count: "exact", head: true })
+      .not("restaurant_id", "is", null),
   ]);
 
+  const viewSort = sort === "views_period" || sort === "views_all";
+
   if (viewSort) {
-    // Strategy: get ALL page_views with restaurant_id, count per restaurant, sort, then fetch restaurant details
     const { data: allViews } = await supabase
       .from("page_views")
       .select("restaurant_id, viewed_at")
       .not("restaurant_id", "is", null)
       .limit(50000) as { data: { restaurant_id: string; viewed_at: string }[] | null };
 
-    // Count views per restaurant by period
-    const viewMap = new Map<string, { today: number; week: number; month: number; all: number }>();
+    const viewMap = new Map<string, { period: number; all: number }>();
     for (const v of allViews || []) {
       let stats = viewMap.get(v.restaurant_id);
-      if (!stats) { stats = { today: 0, week: 0, month: 0, all: 0 }; viewMap.set(v.restaurant_id, stats); }
+      if (!stats) { stats = { period: 0, all: 0 }; viewMap.set(v.restaurant_id, stats); }
       const vDate = new Date(v.viewed_at);
       stats.all++;
-      if (vDate >= monthAgo) stats.month++;
-      if (vDate >= weekAgo) stats.week++;
-      if (vDate >= today) stats.today++;
+      if (vDate >= periodStart && vDate <= periodEnd) stats.period++;
     }
 
-    // Sort restaurant IDs by the requested period (viewed first, then 0-view restos)
-    const sortKey = sort === "views_month" ? "month" : sort === "views_week" ? "week" : sort === "views_today" ? "today" : "all";
+    const sortKey = sort === "views_all" ? "all" : "period";
     const viewedIds = Array.from(viewMap.entries())
       .sort(([, a], [, b]) => b[sortKey] - a[sortKey])
       .map(([id]) => id);
 
-    // Get total restaurant count (for pagination)
     let countQuery = supabase.from("restaurants").select("id", { count: "exact", head: true });
     if (query) countQuery = countQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
     if (canton) countQuery = countQuery.eq("canton", canton);
@@ -88,7 +108,6 @@ async function loadRestaurantTraffic(
     let rows: RestaurantRow[] = [];
 
     if (from < viewedIds.length) {
-      // Page still has some viewed restaurants
       const idsForPage = viewedIds.slice(from, from + pageSize);
 
       const { data: restos } = await supabase
@@ -101,10 +120,10 @@ async function loadRestaurantTraffic(
         .filter((id) => restoMap.has(id))
         .map((id) => {
           const r = restoMap.get(id)!;
-          const s = viewMap.get(id) || { today: 0, week: 0, month: 0, all: 0 };
+          const s = viewMap.get(id) || { period: 0, all: 0 };
           return {
             id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
-            viewsTotal: s.all, viewsMonth: s.month, viewsWeek: s.week, viewsToday: s.today, isPublished: r.is_published,
+            viewsTotal: s.all, viewsPeriod: s.period, isPublished: r.is_published,
           };
         })
         .filter((r) => {
@@ -118,7 +137,6 @@ async function loadRestaurantTraffic(
 
       rows = viewedRows;
 
-      // Fill remaining slots with 0-view restaurants
       const remaining = pageSize - rows.length;
       if (remaining > 0) {
         let fillQuery = supabase
@@ -128,7 +146,6 @@ async function loadRestaurantTraffic(
           .limit(remaining);
         if (query) fillQuery = fillQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
         if (canton) fillQuery = fillQuery.eq("canton", canton);
-        // Exclude already-viewed restaurants
         if (viewedIds.length > 0 && viewedIds.length <= 100) {
           fillQuery = fillQuery.not("id", "in", `(${viewedIds.join(",")})`);
         }
@@ -136,12 +153,11 @@ async function loadRestaurantTraffic(
         for (const r of fillRestos || []) {
           rows.push({
             id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
-            viewsTotal: 0, viewsMonth: 0, viewsWeek: 0, viewsToday: 0, isPublished: r.is_published,
+            viewsTotal: 0, viewsPeriod: 0, isPublished: r.is_published,
           });
         }
       }
     } else {
-      // Past the viewed restaurants — show 0-view restaurants alphabetically
       const zeroViewOffset = from - viewedIds.length;
       let fillQuery = supabase
         .from("restaurants")
@@ -156,14 +172,13 @@ async function loadRestaurantTraffic(
       const { data: fillRestos } = await fillQuery as { data: { id: string; slug: string; name_fr: string; city: string; canton: string; is_published: boolean }[] | null };
       rows = (fillRestos || []).map((r) => ({
         id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
-        viewsTotal: 0, viewsMonth: 0, viewsWeek: 0, viewsToday: 0, isPublished: r.is_published,
+        viewsTotal: 0, viewsPeriod: 0, isPublished: r.is_published,
       }));
     }
 
-    return { rows, totalCount: totalRestaurants ?? 0, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
+    return { rows, totalCount: totalRestaurants ?? 0, grandTotals: { period: totalPeriod ?? 0, all: totalAll ?? 0 } };
 
   } else {
-    // Name sort: simple DB pagination
     let restaurantQuery = supabase
       .from("restaurants")
       .select("id, slug, name_fr, city, canton, is_published", { count: "exact" });
@@ -183,37 +198,38 @@ async function loadRestaurantTraffic(
       count: number | null;
     };
 
-    if (!restaurants) return { rows: [], totalCount: 0, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
+    if (!restaurants) return { rows: [], totalCount: 0, grandTotals: { period: totalPeriod ?? 0, all: totalAll ?? 0 } };
 
-    // Fetch views for these restaurants
     const ids = restaurants.map((r) => r.id);
     const { data: viewsRaw } = await supabase
       .from("page_views")
       .select("restaurant_id, viewed_at")
       .in("restaurant_id", ids) as { data: { restaurant_id: string; viewed_at: string }[] | null };
 
-    const viewMap = new Map<string, { today: number; week: number; month: number; all: number }>();
-    for (const id of ids) viewMap.set(id, { today: 0, week: 0, month: 0, all: 0 });
+    const viewMap = new Map<string, { period: number; all: number }>();
+    for (const id of ids) viewMap.set(id, { period: 0, all: 0 });
     for (const v of viewsRaw || []) {
       const stats = viewMap.get(v.restaurant_id);
       if (!stats) continue;
       const vDate = new Date(v.viewed_at);
       stats.all++;
-      if (vDate >= monthAgo) stats.month++;
-      if (vDate >= weekAgo) stats.week++;
-      if (vDate >= today) stats.today++;
+      if (vDate >= periodStart && vDate <= periodEnd) stats.period++;
     }
 
     const rows = restaurants.map((r) => {
-      const s = viewMap.get(r.id) || { today: 0, week: 0, month: 0, all: 0 };
+      const s = viewMap.get(r.id) || { period: 0, all: 0 };
       return {
         id: r.id, slug: r.slug, name: r.name_fr, city: r.city || "", canton: r.canton || "",
-        viewsTotal: s.all, viewsMonth: s.month, viewsWeek: s.week, viewsToday: s.today, isPublished: r.is_published,
+        viewsTotal: s.all, viewsPeriod: s.period, isPublished: r.is_published,
       };
     });
 
-    return { rows, totalCount: count ?? 0, grandTotals: { today: totalToday ?? 0, week: totalWeek ?? 0, month: totalMonth ?? 0, all: totalAll ?? 0 } };
+    return { rows, totalCount: count ?? 0, grandTotals: { period: totalPeriod ?? 0, all: totalAll ?? 0 } };
   }
+}
+
+function isoDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
 }
 
 export default async function RestaurantsTrafficPage({
@@ -223,12 +239,16 @@ export default async function RestaurantsTrafficPage({
 }) {
   const sp = await searchParams;
   const query = sp.q || "";
-  const sort = sp.sort || "views_month";
+  const sort = sp.sort || "views_period";
   const canton = sp.canton || "";
-  const page = Math.max(1, parseInt(sp.page || "1", 10) || 1);
+  const periodKey = (sp.period || "30d") as PeriodKey;
+  const fromParam = sp.from || "";
+  const toParam = sp.to || "";
+  const pageNum = Math.max(1, parseInt(sp.page || "1", 10) || 1);
   const pageSize = 50;
 
-  const { rows, totalCount, grandTotals } = await loadRestaurantTraffic(query, sort, canton || undefined, page, pageSize);
+  const { start: periodStart, end: periodEnd, label: periodLabel } = resolvePeriod(periodKey, fromParam, toParam);
+  const { rows, totalCount, grandTotals } = await loadRestaurantTraffic(query, sort, canton || undefined, periodStart, periodEnd, pageNum, pageSize);
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   const cantons = [
@@ -243,12 +263,29 @@ export default async function RestaurantsTrafficPage({
   ];
 
   const sortOptions = [
-    { value: "views_month", label: "Vues 30j ↓" },
-    { value: "views_week", label: "Vues 7j ↓" },
-    { value: "views_today", label: "Vues aujourd'hui ↓" },
+    { value: "views_period", label: "Vues période ↓" },
     { value: "views_all", label: "Total ↓" },
     { value: "name", label: "Nom A-Z" },
   ];
+
+  // Defaults pour les inputs date custom (30 derniers jours si rien)
+  const customFromDefault = fromParam || isoDate(new Date(Date.now() - 30 * 86400000));
+  const customToDefault = toParam || isoDate(new Date());
+
+  // Préserver les params dans la pagination
+  const buildPageHref = (p: number) => {
+    const qs = new URLSearchParams();
+    if (query) qs.set("q", query);
+    if (sort) qs.set("sort", sort);
+    if (canton) qs.set("canton", canton);
+    if (periodKey) qs.set("period", periodKey);
+    if (periodKey === "custom") {
+      if (fromParam) qs.set("from", fromParam);
+      if (toParam) qs.set("to", toParam);
+    }
+    qs.set("page", String(p));
+    return `?${qs.toString()}`;
+  };
 
   return (
     <div className="space-y-6">
@@ -267,46 +304,26 @@ export default async function RestaurantsTrafficPage({
         </Link>
       </div>
 
-      {/* Grand totals */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      {/* Grand totals : 2 cards (période + total) */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-600">
-              <Eye className="h-4 w-4" /> Aujourd&apos;hui
+              <Eye className="h-4 w-4" /> Vues sur la période · {periodLabel}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-900">{grandTotals.today.toLocaleString("fr-CH")}</p>
+            <p className="text-3xl font-bold text-[var(--color-just-tag)]">{grandTotals.period.toLocaleString("fr-CH")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-600">
-              <Eye className="h-4 w-4" /> 7 jours
+              <ArrowUpDown className="h-4 w-4" /> Total (depuis le début)
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-gray-900">{grandTotals.week.toLocaleString("fr-CH")}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-600">
-              <TrendingUp className="h-4 w-4" /> 30 jours
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-[var(--color-just-tag)]">{grandTotals.month.toLocaleString("fr-CH")}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-xs font-medium text-gray-600">
-              <ArrowUpDown className="h-4 w-4" /> Total
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-gray-900">{grandTotals.all.toLocaleString("fr-CH")}</p>
+            <p className="text-3xl font-bold text-gray-900">{grandTotals.all.toLocaleString("fr-CH")}</p>
           </CardContent>
         </Card>
       </div>
@@ -325,6 +342,19 @@ export default async function RestaurantsTrafficPage({
               />
             </div>
             <div>
+              <label className="mb-1 block text-xs font-medium text-gray-600">Période</label>
+              <select
+                name="period"
+                defaultValue={periodKey}
+                data-autosubmit
+                className="h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
+              >
+                {PERIOD_OPTIONS.map((p) => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="mb-1 block text-xs font-medium text-gray-600">Canton</label>
               <select
                 name="canton"
@@ -337,6 +367,32 @@ export default async function RestaurantsTrafficPage({
                 ))}
               </select>
             </div>
+
+            {/* Date pickers : visibles uniquement si period=custom */}
+            {periodKey === "custom" && (
+              <>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">Du</label>
+                  <input
+                    type="date"
+                    name="from"
+                    defaultValue={customFromDefault}
+                    className="h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-gray-600">Au</label>
+                  <input
+                    type="date"
+                    name="to"
+                    defaultValue={customToDefault}
+                    className="h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="hidden sm:col-span-2 sm:block" />
+              </>
+            )}
+
             <div>
               <label className="mb-1 block text-xs font-medium text-gray-600">Tri</label>
               <select
@@ -357,7 +413,11 @@ export default async function RestaurantsTrafficPage({
               >
                 Filtrer
               </button>
-              <span className="text-xs text-gray-400">Le tri et le canton s&apos;appliquent automatiquement.</span>
+              <span className="text-xs text-gray-400">
+                {periodKey === "custom"
+                  ? "Clique sur Filtrer après avoir choisi les dates."
+                  : "La période, le canton et le tri s'appliquent automatiquement."}
+              </span>
             </div>
             <script dangerouslySetInnerHTML={{ __html: `document.querySelectorAll('[data-autosubmit]').forEach(function(s){s.addEventListener('change',function(){s.form.submit()})})` }} />
           </form>
@@ -369,7 +429,7 @@ export default async function RestaurantsTrafficPage({
         <CardHeader>
           <CardTitle>
             {totalCount.toLocaleString("fr-CH")} restaurants
-            {query ? ` pour &ldquo;${query}&rdquo;` : ""}
+            {query ? ` pour « ${query} »` : ""}
           </CardTitle>
         </CardHeader>
         <CardContent className="px-0">
@@ -379,9 +439,7 @@ export default async function RestaurantsTrafficPage({
                 <tr>
                   <th className="px-4 py-3">Restaurant</th>
                   <th className="px-4 py-3">Canton</th>
-                  <th className="px-4 py-3 text-right">Aujourd&apos;hui</th>
-                  <th className="px-4 py-3 text-right">7j</th>
-                  <th className="px-4 py-3 text-right">30j</th>
+                  <th className="px-4 py-3 text-right">Vues période</th>
                   <th className="px-4 py-3 text-right">Total</th>
                   <th className="px-4 py-3 text-right">Lien</th>
                 </tr>
@@ -389,7 +447,7 @@ export default async function RestaurantsTrafficPage({
               <tbody>
                 {rows.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
                       Aucun restaurant trouvé.
                     </td>
                   </tr>
@@ -403,12 +461,10 @@ export default async function RestaurantsTrafficPage({
                         </div>
                       </td>
                       <td className="px-4 py-3 text-gray-600 capitalize">{r.canton}</td>
-                      <td className="px-4 py-3 text-right font-mono">{r.viewsToday || "—"}</td>
-                      <td className="px-4 py-3 text-right font-mono">{r.viewsWeek || "—"}</td>
-                      <td className="px-4 py-3 text-right font-mono font-semibold text-gray-900">
-                        {r.viewsMonth || "—"}
+                      <td className="px-4 py-3 text-right font-mono font-semibold text-[var(--color-just-tag)]">
+                        {r.viewsPeriod || "—"}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono font-bold text-[var(--color-just-tag)]">
+                      <td className="px-4 py-3 text-right font-mono font-bold text-gray-900">
                         {r.viewsTotal || "—"}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -433,20 +489,20 @@ export default async function RestaurantsTrafficPage({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Page {page} / {totalPages} · {totalCount.toLocaleString("fr-CH")} restaurants
+            Page {pageNum} / {totalPages} · {totalCount.toLocaleString("fr-CH")} restaurants
           </p>
           <div className="flex gap-2">
-            {page > 1 && (
+            {pageNum > 1 && (
               <Link
-                href={`?q=${encodeURIComponent(query)}&sort=${sort}&canton=${canton}&page=${page - 1}`}
+                href={buildPageHref(pageNum - 1)}
                 className="rounded-md border bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
               >
                 ← Précédent
               </Link>
             )}
-            {page < totalPages && (
+            {pageNum < totalPages && (
               <Link
-                href={`?q=${encodeURIComponent(query)}&sort=${sort}&canton=${canton}&page=${page + 1}`}
+                href={buildPageHref(pageNum + 1)}
                 className="rounded-md border bg-white px-3 py-1.5 text-sm hover:bg-gray-50"
               >
                 Suivant →
@@ -458,8 +514,8 @@ export default async function RestaurantsTrafficPage({
 
       <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
         <p>
-          <strong>💡 Usage prospection B2B :</strong> trie par &ldquo;Vues 30j ↓&rdquo;, prends les 10 premiers restos non-inscrits,
-          appelle-les avec l&apos;argument &ldquo;votre fiche a été consultée X fois ce mois&rdquo;.
+          <strong>💡 Usage prospection B2B :</strong> choisis la période qui parle au resto (30j ou 90j),
+          trie par &ldquo;Vues période ↓&rdquo; et appelle les non-inscrits avec &ldquo;votre fiche a été consultée X fois&rdquo;.
         </p>
       </div>
     </div>
