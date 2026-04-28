@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { Check, Gift, Zap, ShieldCheck, Store, Camera, UtensilsCrossed, MapPin, Clock, Video, MessageCircle, ChevronDown } from "lucide-react";
+import { Check, Gift, Zap, ShieldCheck, Store, Camera, UtensilsCrossed, MapPin, Clock, Video, MessageCircle, ChefHat, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -11,7 +11,8 @@ const includedFeatures = [
   { key: "presence", icon: Store },
   { key: "photoHighlight", icon: Camera },
   { key: "menuDisplay", icon: UtensilsCrossed },
-  { key: "platDuJour", icon: MessageCircle },
+  { key: "platDuJour", icon: ChefHat },
+  { key: "whatsappSignup", icon: MessageCircle },
   { key: "addressContact", icon: MapPin },
   { key: "openingHours", icon: Clock },
   { key: "videoPresentation", icon: Video },
