@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SwissCrossIcon } from "@/components/ui/swiss-cross";
 import { SimilarRestaurants } from "@/components/restaurants/SimilarRestaurants";
 import { PlatDuJour } from "@/components/restaurants/PlatDuJour";
+import { WhatsAppSubscribe } from "@/components/restaurants/WhatsAppSubscribe";
 import { ShareButtons } from "@/components/restaurants/ShareButtons";
 import { DistinctionBadges } from "@/components/restaurants/DistinctionBadges";
 import { PromotionBanner } from "@/components/restaurants/PromotionBadge";
@@ -1019,9 +1020,14 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
       {/* Similar Restaurants - always at the bottom */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-8">
-        {/* Plat du jour — affiché uniquement si le restaurant en a posté un aujourd'hui */}
-        <div className="mb-8">
+        {/* Plat du jour + WhatsApp subscribe */}
+        <div className="mb-8 grid gap-6 sm:grid-cols-2">
           <PlatDuJour restaurantId={restaurant.id} />
+          <WhatsAppSubscribe
+            restaurantId={restaurant.id}
+            restaurantName={restaurant.nameFr}
+            restaurantSlug={restaurant.slug}
+          />
         </div>
 
         <SimilarRestaurants restaurant={restaurant} />
