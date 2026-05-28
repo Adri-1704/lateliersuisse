@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { collections } from "@/data/collections";
@@ -39,23 +38,11 @@ export function CollectionsSection() {
               <Link
                 key={collection.slug}
                 href={`/${locale}/collections/${collection.slug}`}
-                className="group relative overflow-hidden rounded-xl"
+                className="group flex flex-col rounded-xl border bg-white p-5 transition-all hover:shadow-md hover:-translate-y-1"
               >
-                <div className="relative h-48">
-                  <Image
-                    src={collection.coverImage}
-                    alt={title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <span className="text-2xl">{collection.icon}</span>
-                    <h3 className="mt-1 text-lg font-bold text-white">{title}</h3>
-                    <p className="mt-0.5 text-sm text-white/80 line-clamp-1">{desc}</p>
-                  </div>
-                </div>
+                <span className="text-4xl leading-none" aria-hidden="true">{collection.icon}</span>
+                <h3 className="mt-3 text-lg font-bold text-gray-900">{title}</h3>
+                <p className="mt-1 text-sm text-gray-600 line-clamp-2">{desc}</p>
               </Link>
             );
           })}
