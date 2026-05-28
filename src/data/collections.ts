@@ -30,7 +30,7 @@ export const collections: Collection[] = [
     descriptionPt: "Os mais belos terraços para aproveitar o sol",
     descriptionEs: "Las más hermosas terrazas para disfrutar del sol",
     icon: "☀️",
-    coverImage: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=800&q=80",
     filterFeature: "terrace",
   },
   {
@@ -46,7 +46,7 @@ export const collections: Collection[] = [
     descriptionPt: "Restaurantes com vista deslumbrante para os lagos suíços",
     descriptionEs: "Restaurantes con vistas impresionantes a los lagos suizos",
     icon: "🏔️",
-    coverImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=800&q=80",
     filterFeature: "lake-view",
   },
   {
@@ -62,7 +62,7 @@ export const collections: Collection[] = [
     descriptionPt: "Restaurantes adaptados para crianças e refeições em família",
     descriptionEs: "Restaurantes adaptados para niños y comidas familiares",
     icon: "👨‍👩‍👧‍👦",
-    coverImage: "https://images.unsplash.com/photo-1536640712-4d4c36ff0e4e?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80",
     filterFeature: "kids-friendly",
   },
   {
@@ -78,7 +78,7 @@ export const collections: Collection[] = [
     descriptionPt: "Restaurantes acessíveis a pessoas com mobilidade reduzida",
     descriptionEs: "Restaurantes accesibles para personas con movilidad reducida",
     icon: "♿",
-    coverImage: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
     filterFeature: "accessible",
   },
   {
@@ -142,7 +142,7 @@ export const collections: Collection[] = [
     descriptionPt: "Jante com música ao vivo nestes restaurantes com concertos",
     descriptionEs: "Cene con música en vivo en estos restaurantes con conciertos",
     icon: "🎵",
-    coverImage: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&q=80",
     filterFeature: "live-music",
   },
   {
@@ -174,7 +174,7 @@ export const collections: Collection[] = [
     descriptionPt: "Restaurantes onde pode estacionar facilmente",
     descriptionEs: "Restaurantes donde puede aparcar fácilmente",
     icon: "🅿️",
-    coverImage: "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1452827073306-6e6e661baf57?w=800&q=80",
     filterFeature: "parking",
   },
   {
@@ -190,7 +190,7 @@ export const collections: Collection[] = [
     descriptionPt: "Para os seus eventos, aniversários e jantares de negócios em privacidade",
     descriptionEs: "Para sus eventos, cumpleaños y cenas de negocios en privacidad",
     icon: "🚪",
-    coverImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
+    coverImage: "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?w=800&q=80",
     filterFeature: "private-dining",
   },
   {
