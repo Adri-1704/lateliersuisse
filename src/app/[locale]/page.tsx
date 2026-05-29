@@ -99,7 +99,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <CollectionsSection />
       <StatsSection totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <HowItWorks />
-      <Testimonials />
+      <Testimonials locale={locale} />
       <FounderSection />
       <NewsletterSection />
     </>
