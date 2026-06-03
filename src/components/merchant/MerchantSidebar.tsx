@@ -25,6 +25,7 @@ import {
   Tag,
   BarChart3,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 
 export function MerchantSidebar() {
@@ -45,6 +46,7 @@ export function MerchantSidebar() {
     { title: t("sidebar.reviews"), href: `${basePath}/avis`, icon: MessageSquare },
     { title: "Statistiques", href: `${basePath}/statistiques`, icon: BarChart3 },
     { title: t("sidebar.subscription"), href: `${basePath}/abonnement`, icon: CreditCard },
+    { title: "Sécurité", href: `${basePath}/securite`, icon: ShieldCheck },
   ];
 
   return (

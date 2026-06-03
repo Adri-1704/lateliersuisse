@@ -95,7 +95,8 @@ export async function middleware(request: NextRequest) {
     // Connexion and password reset pages are public
     if (
       pathname.endsWith("/espace-client/connexion") ||
-      pathname.endsWith("/espace-client/mot-de-passe-oublie")
+      pathname.endsWith("/espace-client/mot-de-passe-oublie") ||
+      pathname.endsWith("/espace-client/reset-mot-de-passe")
     ) {
       return intlMiddleware(request);
     }
