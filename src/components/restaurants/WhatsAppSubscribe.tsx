@@ -1,19 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle, Check, QrCode } from "lucide-react";
+import { MessageCircle, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface WhatsAppSubscribeProps {
   restaurantId: string;
   restaurantName: string;
-  restaurantSlug: string;
 }
 
-export function WhatsAppSubscribe({ restaurantId, restaurantName, restaurantSlug }: WhatsAppSubscribeProps) {
+export function WhatsAppSubscribe({ restaurantId, restaurantName }: WhatsAppSubscribeProps) {
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [showQR, setShowQR] = useState(false);
   const [consent, setConsent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -36,10 +34,6 @@ export function WhatsAppSubscribe({ restaurantId, restaurantName, restaurantSlug
       setStatus("error");
     }
   }
-
-  // QR code URL using Google Charts API (free, no dependency)
-  const qrData = `https://just-tag.app/wa/${restaurantSlug}`;
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
 
   if (status === "success") {
     return (
@@ -121,33 +115,6 @@ export function WhatsAppSubscribe({ restaurantId, restaurantName, restaurantSlug
           <p className="text-xs text-red-500 text-center">Une erreur est survenue. Réessayez.</p>
         )}
       </form>
-
-      {/* QR Code toggle */}
-      <div className="mt-4 border-t border-green-200 pt-3">
-        <button
-          type="button"
-          onClick={() => setShowQR(!showQR)}
-          className="flex w-full items-center justify-center gap-2 text-xs font-medium text-green-700 hover:text-green-800"
-        >
-          <QrCode className="h-4 w-4" />
-          {showQR ? "Masquer le QR code" : "Afficher le QR code pour vos clients"}
-        </button>
-
-        {showQR && (
-          <div className="mt-3 flex flex-col items-center gap-2">
-            <img
-              src={qrUrl}
-              alt={`QR code pour s'abonner aux plats du jour de ${restaurantName}`}
-              width={160}
-              height={160}
-              className="rounded-lg border border-green-200"
-            />
-            <p className="text-xs text-gray-500 text-center max-w-[200px]">
-              Scannez pour recevoir les plats du jour par WhatsApp
-            </p>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
