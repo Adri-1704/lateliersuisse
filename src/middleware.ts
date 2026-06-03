@@ -24,6 +24,12 @@ const intlMiddleware = createIntlMiddleware(routing);
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // QR code landing /wa/{slug} — bypass next-intl locale prefix to avoid
+  // /wa/{slug} → /fr/wa/{slug} which would 404.
+  if (pathname.startsWith("/wa/")) {
+    return NextResponse.next();
+  }
+
   // Admin routes - handle auth protection
   if (pathname.startsWith("/admin")) {
     // Login page is public
