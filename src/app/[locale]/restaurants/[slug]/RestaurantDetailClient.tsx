@@ -1026,7 +1026,6 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
           <WhatsAppSubscribe
             restaurantId={restaurant.id}
             restaurantName={restaurant.nameFr}
-            restaurantSlug={restaurant.slug}
           />
         </div>
 
