@@ -40,10 +40,10 @@ export function B2BWhatsAppStats() {
         <div className="mb-10 grid grid-cols-1 overflow-hidden rounded-2xl border border-gray-200 sm:grid-cols-3 sm:divide-x sm:divide-gray-100">
           {[
             {
-              number: "60–98",
+              number: "98",
               unit: "%",
               label: "Taux d'ouverture",
-              desc: "Contre 15–25% pour un email. Jusqu'à 6× plus de clients qui voient votre message.",
+              desc: "Contre 20% pour un email. 5× plus de clients qui voient votre message.",
             },
             {
               number: "5",
@@ -77,8 +77,8 @@ export function B2BWhatsAppStats() {
           {[
             {
               label: "WhatsApp",
-              pct: "~80%",
-              width: "80%",
+              pct: "98%",
+              width: "98%",
               barClass: "bg-[#25D366]",
               textClass: "text-green-600 font-bold",
             },
