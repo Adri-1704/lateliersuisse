@@ -50,6 +50,7 @@ html, body {
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  --font-condensed: var(--font-barlow), 'Barlow Condensed', sans-serif;
   --color-just-tag: #ff3c48;
   --color-just-tag-dark: #CC1119;
   --color-just-tag-light: #fff0f0;

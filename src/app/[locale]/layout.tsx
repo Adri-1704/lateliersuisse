@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { Outfit } from "next/font/google";
+import { Outfit, Barlow_Condensed } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -19,6 +19,13 @@ const outfit = Outfit({
   variable: "--font-geist-sans",
   display: "swap",
   preload: true,
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["700", "800", "900"],
+  variable: "--font-barlow",
+  display: "swap",
 });
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
@@ -139,7 +146,7 @@ export default async function LocaleLayout({
   };
 
   return (
-    <html lang={locale} className={outfit.variable}>
+    <html lang={locale} className={`${outfit.variable} ${barlowCondensed.variable}`}>
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />

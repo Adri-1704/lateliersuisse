@@ -41,8 +41,11 @@ export function B2BHero({ totalRestaurants }: B2BHeroProps) {
             {t("badge")}
           </div>
 
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl animate-fade-in-up">
-            {t("headline")}
+          <h1 className="font-condensed text-5xl font-black leading-[0.93] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl animate-fade-in-up">
+            {t("headlineLine1")}
+            <br />
+            {t("headlineLine2")}{" "}
+            <em className="not-italic text-[#25D366]">{t("headlineHighlight")}</em>
           </h1>
           <p className="mt-6 text-lg text-gray-300 animate-fade-in-up animate-delay-100">
             {t("subheadline", { count: totalRestaurants })}
