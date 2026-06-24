@@ -1,18 +1,16 @@
 /**
- * WhatsApp broadcast via Twilio REST API.
+ * WhatsApp broadcast via Meta Cloud API.
  *
  * Sends a message to all active subscribers of a restaurant.
  * Returns the number of successfully sent messages.
  *
  * Required env vars:
- *   TWILIO_ACCOUNT_SID
- *   TWILIO_AUTH_TOKEN
- *   TWILIO_WHATSAPP_FROM  — e.g. "whatsapp:+14155238886" (Twilio sandbox)
- *                           or your approved WhatsApp Business number
+ *   META_WHATSAPP_TOKEN       — access token from Meta Developer Console
+ *   META_WHATSAPP_PHONE_ID    — phone number ID (e.g. 1180493548484374)
+ *   META_WHATSAPP_TEMPLATE_NAME — template name approved by Meta (e.g. "plat_du_jour")
  *
- * Production note: Meta requires approved message templates for business-initiated
- * messages outside a 24h session window. Configure templates in Twilio Console and
- * use twilio.messages.create({ contentSid: "...", ... }) instead of Body.
+ * Note: business-initiated messages require an approved Meta template.
+ * The test token expires after 24h — replace with a permanent system user token for production.
  */
 
 import { createAdminClient } from "@/lib/supabase/server";
@@ -30,18 +28,17 @@ export async function sendWhatsAppBroadcast({
   message,
   imageUrl,
 }: BroadcastOptions): Promise<number> {
-  const twilioSid = process.env.TWILIO_ACCOUNT_SID;
-  const twilioAuth = process.env.TWILIO_AUTH_TOKEN;
-  const fromNumber = process.env.TWILIO_WHATSAPP_FROM;
+  const token = process.env.META_WHATSAPP_TOKEN;
+  const phoneId = process.env.META_WHATSAPP_PHONE_ID;
+  const templateName = process.env.META_WHATSAPP_TEMPLATE_NAME || "plat_du_jour";
 
-  if (!twilioSid || !twilioAuth || !fromNumber) {
-    console.warn("WhatsApp broadcast skipped: missing Twilio env vars");
+  if (!token || !phoneId) {
+    console.warn("WhatsApp broadcast skipped: missing META_WHATSAPP_TOKEN or META_WHATSAPP_PHONE_ID");
     return 0;
   }
 
   const supabase = createAdminClient();
 
-  // Fetch active subscribers for this restaurant
   const { data: subscribers, error } = await (supabase
     .from("whatsapp_subscribers") as ReturnType<typeof supabase.from>)
     .select("phone")
@@ -52,15 +49,11 @@ export async function sendWhatsAppBroadcast({
     return 0;
   }
 
-  const auth = Buffer.from(`${twilioSid}:${twilioAuth}`).toString("base64");
-  const apiUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`;
+  const apiUrl = `https://graph.facebook.com/v19.0/${phoneId}/messages`;
 
-  const broadcastMessage = formatBroadcastMessage(restaurantName, message);
-
-  // Send to all subscribers in parallel, tolerating individual failures
   const results = await Promise.allSettled(
     subscribers.map(({ phone }) =>
-      sendSingleMessage({ apiUrl, auth, from: fromNumber, to: `whatsapp:${phone}`, body: broadcastMessage, mediaUrl: imageUrl ?? undefined })
+      sendMetaMessage({ apiUrl, token, to: phone, restaurantName, message, imageUrl, templateName })
     )
   );
 
@@ -68,47 +61,89 @@ export async function sendWhatsAppBroadcast({
   const failed = results.length - sent;
 
   if (failed > 0) {
-    console.error(`WhatsApp broadcast: ${failed}/${results.length} messages failed for restaurant ${restaurantId}`);
+    console.error(`WhatsApp broadcast: ${failed}/${results.length} failed for restaurant ${restaurantId}`);
   }
 
   return sent;
 }
 
-function formatBroadcastMessage(restaurantName: string, message: string): string {
-  return `🍽️ *${restaurantName}*\n\n${message}\n\n_Répondre STOP pour se désabonner_`;
-}
-
-async function sendSingleMessage({
+async function sendMetaMessage({
   apiUrl,
-  auth,
-  from,
+  token,
   to,
-  body,
-  mediaUrl,
+  restaurantName,
+  message,
+  imageUrl,
+  templateName,
 }: {
   apiUrl: string;
-  auth: string;
-  from: string;
+  token: string;
   to: string;
-  body: string;
-  mediaUrl?: string;
+  restaurantName: string;
+  message: string;
+  imageUrl?: string | null;
+  templateName: string;
 }): Promise<void> {
-  const params = new URLSearchParams({ From: from, To: to, Body: body });
-  if (mediaUrl) {
-    params.append("MediaUrl", mediaUrl);
-  }
+  // Strip non-digits and leading + for Meta API format
+  const toClean = to.replace(/[^0-9]/g, "");
+
+  const body = buildTemplatePayload({ to: toClean, restaurantName, message, imageUrl, templateName });
 
   const res = await fetch(apiUrl, {
     method: "POST",
     headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
-    body: params.toString(),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Twilio error ${res.status}: ${text}`);
+    throw new Error(`Meta API error ${res.status}: ${text}`);
   }
+}
+
+function buildTemplatePayload({
+  to,
+  restaurantName,
+  message,
+  imageUrl,
+  templateName,
+}: {
+  to: string;
+  restaurantName: string;
+  message: string;
+  imageUrl?: string | null;
+  templateName: string;
+}) {
+  const components: object[] = [];
+
+  // Header with image if available
+  if (imageUrl) {
+    components.push({
+      type: "header",
+      parameters: [{ type: "image", image: { link: imageUrl } }],
+    });
+  }
+
+  // Body with restaurant name + message
+  components.push({
+    type: "body",
+    parameters: [
+      { type: "text", text: restaurantName },
+      { type: "text", text: message.slice(0, 1024) },
+    ],
+  });
+
+  return {
+    messaging_product: "whatsapp",
+    to,
+    type: "template",
+    template: {
+      name: templateName,
+      language: { code: "fr" },
+      components,
+    },
+  };
 }
