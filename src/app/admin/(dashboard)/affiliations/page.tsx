@@ -9,6 +9,9 @@ const COMMISSION_RATE = 0.10; // 10%
 
 interface AffiliateStats {
   ref: string;
+  /** Si le ref code correspond à un merchant interne, son nom (ex: parrain restaurateur) */
+  parrainName: string | null;
+  parrainEmail: string | null;
   totalSubscriptions: number;
   activeSubscriptions: number;
   totalRevenue: number;
@@ -33,7 +36,7 @@ async function getAffiliateStats(): Promise<{
     return { affiliates: [], totals: { subscriptions: 0, revenue: 0, commission: 0 } };
   }
 
-  // Get merchant details
+  // Get merchant details (filleuls)
   const merchantIds = [...new Set(subs.map((s) => s.merchant_id))];
   const { data: merchants } = await supabase
     .from("merchants")
@@ -41,6 +44,17 @@ async function getAffiliateStats(): Promise<{
     .in("id", merchantIds) as { data: { id: string; name: string; email: string }[] | null };
 
   const merchantMap = new Map((merchants || []).map((m) => [m.id, m]));
+
+  // Match each unique affiliate_ref against merchants.ref_code (parrains)
+  const uniqueRefs = [...new Set(subs.map((s) => s.affiliate_ref))];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: parrains } = await (supabase.from("merchants") as any)
+    .select("ref_code, name, email")
+    .in("ref_code", uniqueRefs) as { data: { ref_code: string; name: string; email: string }[] | null };
+
+  const parrainMap = new Map(
+    (parrains || []).map((p) => [p.ref_code, { name: p.name, email: p.email }])
+  );
 
   // Price mapping
   function getPrice(plan: string, isEarlyBird: boolean): number {
@@ -56,8 +70,11 @@ async function getAffiliateStats(): Promise<{
   for (const sub of subs) {
     const ref = sub.affiliate_ref;
     if (!affiliateMap.has(ref)) {
+      const parrain = parrainMap.get(ref);
       affiliateMap.set(ref, {
         ref,
+        parrainName: parrain?.name || null,
+        parrainEmail: parrain?.email || null,
         totalSubscriptions: 0,
         activeSubscriptions: 0,
         totalRevenue: 0,
@@ -173,11 +190,19 @@ export default async function AffiliationsAdminPage() {
                 <CardTitle className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-just-tag)]/10 font-bold text-[var(--color-just-tag)]">
-                      {aff.ref.slice(0, 2).toUpperCase()}
+                      {(aff.parrainName || aff.ref).slice(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <p className="text-lg font-bold text-gray-900">{aff.ref}</p>
+                      <p className="text-lg font-bold text-gray-900">
+                        {aff.parrainName || aff.ref}
+                        {aff.parrainName && (
+                          <span className="ml-2 text-xs font-normal text-gray-500">
+                            (code {aff.ref})
+                          </span>
+                        )}
+                      </p>
                       <p className="text-xs text-gray-500">
+                        {aff.parrainEmail ? `${aff.parrainEmail} · ` : ""}
                         Lien : just-tag.app/fr/pour-restaurateurs?ref={aff.ref}
                       </p>
                     </div>

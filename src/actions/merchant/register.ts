@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { claimRequestAdminNotification, claimApprovedNotification, newSignupAdminNotification } from "@/lib/email-templates";
+import { logConversionEvent } from "@/lib/analytics/conversion-events";
 
 interface RegisterParams {
   name: string;
@@ -76,6 +77,13 @@ export async function registerMerchant(params: RegisterParams): Promise<Register
   }
 
   const merchantId = (merchant as Record<string, unknown>).id as string;
+
+  // Log signup_completed event (non-blocking)
+  void logConversionEvent({
+    eventType: "signup_completed",
+    merchantId,
+    metadata: { has_restaurant_claim: !!restaurantSlug },
+  });
 
   // 4. If restaurant selected, create a claim request (manual validation by admin)
   if (restaurantSlug) {
@@ -229,7 +237,7 @@ export async function createClaimRequest(params: {
   }
 
   if (restaurant.merchant_id) {
-    return { success: false, error: "Ce restaurant est deja revendique par un autre compte" };
+    return { success: false, error: "Ce restaurant est déjà revendiqué par un autre compte" };
   }
 
   // Auto-approve si l'email du merchant correspond à l'email du restaurant en base
@@ -264,11 +272,13 @@ export async function createClaimRequest(params: {
 
   if (emailMatch) {
     // Auto-approve : lier le restaurant au merchant immédiatement
+    const normalizedPhone = merchantPhone ? merchantPhone.replace(/[^0-9+]/g, "") : null;
     await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
       .update({
         merchant_id: merchantId,
         claim_status: "claimed",
         claimed_at: new Date().toISOString(),
+        whatsapp_phone: normalizedPhone,
       } as Record<string, unknown>)
       .eq("id", restaurant.id);
 
@@ -362,25 +372,34 @@ export async function createRestaurantForMerchant(params: {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
+  // Get merchant phone for WhatsApp
+  const { data: merchantData } = await supabase
+    .from("merchants")
+    .select("phone")
+    .eq("id", merchantId)
+    .single() as { data: { phone: string | null } | null; error: unknown };
+  const whatsappPhone = merchantData?.phone ? merchantData.phone.replace(/[^0-9+]/g, "") : null;
+
   const { data: restaurant, error } = await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
     .insert({
       merchant_id: merchantId,
       name_fr: name,
       name_de: name,
       name_en: name,
-      slug: `${slug}-${Date.now().toString(36)}`, // Append timestamp hash to avoid slug conflicts
+      slug: `${slug}-${Date.now().toString(36)}`,
       cuisine_type: cuisine || null,
-      canton: "", // Will be filled in later by the merchant
+      canton: "",
       city,
       is_published: false,
       claim_status: "claimed",
+      whatsapp_phone: whatsappPhone,
     } as Record<string, unknown>)
     .select("id")
     .single();
 
   if (error) {
     console.error("Create restaurant error:", error);
-    return { success: false, error: "Erreur lors de la creation du restaurant" };
+    return { success: false, error: "Erreur lors de la création du restaurant" };
   }
 
   const restaurantId = restaurant ? (restaurant as Record<string, unknown>).id as string : undefined;

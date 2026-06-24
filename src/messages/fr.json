@@ -325,7 +325,6 @@
         "presence": "Présence de votre établissement",
         "photoHighlight": "Mise en avant photos",
         "menuDisplay": "Affichage du menu",
-        "platDuJour": "Envoi du menu du jour sur la fiche par WhatsApp",
         "addressContact": "Adresse, contact et plan",
         "openingHours": "Horaires d'ouverture",
         "videoPresentation": "Présentation vidéo"
@@ -388,13 +387,16 @@
     "hero": {
       "badge": "100% Suisse",
       "headline": "Remplissez vos tables sans payer de commission",
-      "subheadline": "Votre restaurant est déjà sur Just-Tag avec {count}+ établissements romands. Prenez le contrôle de votre fiche et attirez de nouveaux clients.",
-      "benefit1": "Zéro commission sur vos réservations et contacts",
-      "benefit2": "Votre fiche complète : menu, photos, horaires, avis vérifiés",
-      "benefit3": "Visible en 5 langues pour toucher aussi les touristes",
+      "subheadline": "Envoyez vos plats du jour directement sur le téléphone de vos clients. {count}+ restaurants romands déjà sur la plateforme.",
+      "benefit1": "WhatsApp inclus — vos clients lisent votre message en 5 minutes",
+      "benefit2": "Zéro commission sur vos réservations et contacts",
+      "benefit3": "Fiche complète visible en 5 langues pour les touristes",
       "socialProof": "{count} restaurants romands déjà sur la plateforme",
       "cta": "Essayer 14 jours gratuitement",
-      "ctaSecondary": "Voir une fiche exemple"
+      "ctaSecondary": "Voir une fiche exemple",
+      "headlineLine1": "Vos menus,",
+      "headlineLine2": "dans leur",
+      "headlineHighlight": "WhatsApp."
     },
     "trustStats": {
       "restaurants": "Restaurants inscrits",
@@ -497,36 +499,36 @@
       "title": "Vos questions, nos réponses",
       "items": {
         "q1": {
-          "question": "Combien ça me rapporte concrètement ?",
-          "answer": "Difficile de promettre un chiffre exact — ça dépend de votre emplacement, votre type de cuisine et votre prix moyen. Ce qu'on sait : les restaurants avec une fiche complète (photos, menu, horaires à jour) sur Just-Tag reçoivent en moyenne plus de visites que ceux sans fiche. À CHF 24.90/mois, il suffit d'un seul client supplémentaire par mois pour rentabiliser votre abonnement. (Estimation basée sur un panier moyen de CHF 30-40 en restauration romande.)"
+          "question": "Comment fonctionne l'envoi WhatsApp ?",
+          "answer": "Vos clients s'abonnent depuis votre fiche Just-Tag en un clic. Une fois leur accord donné, vous leur envoyez vos menus, plats du jour et offres directement depuis votre tableau de bord. Tout est géré automatiquement, en conformité avec les règles Meta et le RGPD."
         },
         "q2": {
-          "question": "Comment vous vérifiez que je suis bien le propriétaire ?",
-          "answer": "Lors de votre inscription, vous renseignez le nom et la ville de votre restaurant. Notre équipe vérifie ensuite manuellement que les informations correspondent avant d'activer votre accès au tableau de bord. Si votre restaurant est déjà dans notre base, vous pourrez le réclamer directement."
+          "question": "Combien de messages puis-je envoyer par semaine ?",
+          "answer": "Chaque plan inclut jusqu'à 2 envois par semaine. Vous choisissez librement quand envoyer — menu du lundi, offre spéciale du jeudi, promotion de fin de semaine. C'est vous qui décidez, dans la limite de 2 messages par semaine pour ne pas saturer vos abonnés."
         },
         "q3": {
+          "question": "Puis-je changer de plan ou augmenter mes abonnés à tout moment ?",
+          "answer": "Oui. Vous pouvez upgrader depuis votre espace client à tout moment. Le changement prend effet au prochain cycle de facturation. Vous gardez toujours votre tarif de lancement si vous en bénéficiez."
+        },
+        "q4": {
+          "question": "Que se passe-t-il après les 14 jours gratuits ?",
+          "answer": "Aucun prélèvement n'est effectué pendant les 14 jours d'essai. Si vous n'êtes pas convaincu, annulez depuis votre espace client sans frais ni justification. Si vous continuez, votre abonnement démarre automatiquement."
+        },
+        "q5": {
+          "question": "Qu'est-ce que le prix de lancement ?",
+          "answer": "Les 100 premiers restaurateurs à s'inscrire bénéficient d'un tarif réduit garanti à vie. Une fois la centième inscription atteinte, les nouveaux inscrits paient le prix catalogue. Vos anciens abonnés conservent leur tarif lancement définitivement."
+        },
+        "q6": {
           "question": "Je peux annuler quand je veux ?",
           "answer": "Oui. Le plan mensuel est sans engagement. Vous annulez depuis votre espace client, sans justification, et ça prend effet à la fin du mois en cours. Les plans semestriel et annuel sont facturés en une fois ; en cas d'annulation, votre accès reste actif jusqu'à la fin de la période payée."
         },
-        "q4": {
+        "q7": {
           "question": "Vous prenez une commission sur mes réservations ?",
           "answer": "Non. Zéro commission, zéro frais de transaction. Les clients vous contactent directement (téléphone, email). Vous ne payez que votre abonnement mensuel, semestriel ou annuel. C'est tout."
         },
-        "q5": {
-          "question": "Mes données appartiennent à qui ?",
-          "answer": "À vous. Vos photos, votre menu, vos textes restent votre propriété. Si vous résiliez, on supprime votre fiche et vos données. L'hébergement est en Suisse, conforme à la loi fédérale sur la protection des données (LPD) et au RGPD."
-        },
-        "q6": {
-          "question": "Quelle différence avec les plateformes à commission ou les annuaires génériques ?",
-          "answer": "Les annuaires génériques offrent une fiche basique : pas de menu lisible, photos mal mises en valeur, avis non modérés. Les plateformes à commission prélèvent un pourcentage sur chaque réservation. Just-Tag combine une fiche professionnelle complète, des avis vérifiés, zéro commission, et un positionnement SEO local en 5 langues. Le tout pour un prix fixe prévisible."
-        },
-        "q7": {
-          "question": "Je peux essayer gratuitement ?",
-          "answer": "Oui. Tous les plans incluent 14 jours d'essai gratuit. Vous renseignez vos coordonnées bancaires à l'inscription (c'est Stripe, c'est sécurisé), mais vous n'êtes débité qu'au 15e jour. Si vous annulez avant, zéro frais."
-        },
         "q8": {
-          "question": "Que se passe-t-il après les 14 jours ?",
-          "answer": "Votre abonnement démarre automatiquement. Vous recevez un email de confirmation avec votre facture. Si vous avez choisi le plan mensuel, vous pouvez toujours annuler à tout moment. Si vous avez choisi semestriel ou annuel, vous bénéficiez du tarif réduit pour toute la période."
+          "question": "Mes données appartiennent à qui ?",
+          "answer": "À vous. Vos photos, votre menu, vos textes restent votre propriété. Vos abonnés WhatsApp sont les vôtres, pas les nôtres. L'hébergement est en Suisse, conforme à la LPD et au RGPD."
         }
       }
     },
@@ -538,7 +540,7 @@
       "contactNote": "Vous avez une question ? Écrivez-nous à"
     },
     "earlyBirdBanner": {
-      "active": "Offre Early Bird : -40% pour les 100 premiers abonnés.",
+      "active": "Offre Early Bird : plus que {count}/100 places à -40%. Après, c'est fini.",
       "expired": "Offre Early Bird bientôt terminée"
     },
     "findRestaurant": {

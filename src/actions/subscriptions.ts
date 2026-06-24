@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { paymentConfirmation, merchantWelcome, freeTrialWelcome, freeTrialAdminNotification, subscriptionPaymentAdminNotification } from "@/lib/email-templates";
 import { createServerClient } from "@supabase/ssr";
+import { logConversionEvent } from "@/lib/analytics/conversion-events";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Early Bird seats counter (used by signup flow + landing page)
@@ -144,6 +145,15 @@ export async function createCheckoutSession(
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
+
+    // Log checkout_initiated event (non-blocking)
+    void logConversionEvent({
+      eventType: "checkout_initiated",
+      merchantId,
+      affiliateRef: affiliateRef || null,
+      planType,
+      metadata: { is_early_bird: isEarlyBird, restaurant_id: restaurantId || null },
+    });
 
     return { url: session.url, error: null };
   } catch (error) {
@@ -389,6 +399,26 @@ export async function handleSubscriptionWebhook(
             current_period_end: "2099-12-31T23:59:59.000Z",
             affiliate_ref: affiliateRef,
           });
+
+          // Log payment + affiliate recruit events
+          const amount = data.amount_total ? data.amount_total / 100 : null;
+          void logConversionEvent({
+            eventType: "payment_success",
+            merchantId: merchant.id,
+            affiliateRef,
+            planType: "lifetime",
+            amountChf: amount,
+            metadata: { is_early_bird: isEarlyBird, mode: "lifetime" },
+          });
+          if (affiliateRef) {
+            void logConversionEvent({
+              eventType: "affiliate_recruit",
+              merchantId: merchant.id,
+              affiliateRef,
+              planType: "lifetime",
+              amountChf: amount,
+            });
+          }
         } else {
           // Subscription mode
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -402,6 +432,26 @@ export async function handleSubscriptionWebhook(
             affiliate_ref: affiliateRef,
             current_period_start: new Date().toISOString(),
           });
+
+          // Log payment + affiliate recruit events
+          const amount = data.amount_total ? data.amount_total / 100 : null;
+          void logConversionEvent({
+            eventType: "payment_success",
+            merchantId: merchant.id,
+            affiliateRef,
+            planType,
+            amountChf: amount,
+            metadata: { is_early_bird: isEarlyBird, mode: "subscription" },
+          });
+          if (affiliateRef) {
+            void logConversionEvent({
+              eventType: "affiliate_recruit",
+              merchantId: merchant.id,
+              affiliateRef,
+              planType,
+              amountChf: amount,
+            });
+          }
         }
       } catch (err) {
         console.error("Supabase error in checkout.session.completed:", err);
@@ -551,6 +601,8 @@ export async function createFreeTrial(params: {
   restaurantName: string;
   city: string;
   locale?: string;
+  /** Affiliate referral code (from cookie jt_ref) */
+  affiliateRef?: string;
 }): Promise<{ success: boolean; error: string | null }> {
   try {
     const supabase = createAdminClient();
@@ -569,6 +621,7 @@ export async function createFreeTrial(params: {
       status: "trialing",
       current_period_start: now.toISOString(),
       current_period_end: trialEnd.toISOString(),
+      affiliate_ref: params.affiliateRef || null,
     });
     if (subError) throw subError;
 
