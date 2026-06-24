@@ -8,7 +8,9 @@ import { slugifyCity, VALID_CANTONS } from "@/lib/city-slug";
 import { MapPin, Star } from "lucide-react";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
-const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
+// Aligné avec sitemap.ts : seuil à 1 pour rendre indexables toutes les villes
+// avec au moins 1 resto (évite les 404 sur les liens internes canton → ville).
+const MIN_RESTAURANTS_FOR_CITY_PAGE = 1;
 
 // SEO Quick Win: ISR (30 min) sur les pages villes — pages SEO critiques.
 export const dynamic = "force-static";

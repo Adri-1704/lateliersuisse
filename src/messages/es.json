@@ -322,6 +322,7 @@
         "presence": "Ficha de tu establecimiento",
         "photoHighlight": "Galeria de fotos",
         "menuDisplay": "Presentacion de la carta",
+        "platDuJour": "Envío del menú del día en la ficha por WhatsApp",
         "addressContact": "Direccion, contacto y mapa",
         "openingHours": "Horarios de apertura",
         "videoPresentation": "Presentacion en video"
@@ -514,7 +515,7 @@
         },
         "q6": {
           "question": "¿Cuál es la diferencia con las plataformas con comisión o los directorios genéricos?",
-          "answer": "Los directorios genéricos ofrecen una ficha básica: sin carta legible, fotos mal presentadas, reseñas sin moderar. Las plataformas con comisión cobran de 2 a 5 EUR por cubierto reservado. Just-Tag combina una ficha profesional completa, reseñas verificadas, cero comisión y posicionamiento SEO local en 5 idiomas. Todo por un precio fijo predecible."
+          "answer": "Los directorios genéricos ofrecen una ficha básica: sin carta legible, fotos mal presentadas, reseñas sin moderar. Las plataformas con comisión cobran un porcentaje por cada reserva. Just-Tag combina una ficha profesional completa, reseñas verificadas, cero comisión y posicionamiento SEO local en 5 idiomas. Todo por un precio fijo predecible."
         },
         "q7": {
           "question": "¿Puedo probar gratis?",
@@ -534,7 +535,7 @@
       "contactNote": "¿Tiene alguna pregunta? Escríbanos a"
     },
     "earlyBirdBanner": {
-      "active": "Oferta Early Bird: solo quedan {count}/100 plazas con -40%. Después, se acabó.",
+      "active": "Oferta Early Bird: -40% para los primeros 100 suscriptores.",
       "expired": "Oferta Early Bird a punto de terminar"
     },
     "findRestaurant": {

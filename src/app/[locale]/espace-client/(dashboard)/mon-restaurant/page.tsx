@@ -12,6 +12,7 @@ import { getMerchantRestaurant, updateMerchantRestaurant, createMerchantRestaura
 import type { DbRestaurant, CuisineType } from "@/lib/supabase/types";
 import { featuresOptions } from "@/data/mock-restaurants";
 import { collections } from "@/data/collections";
+import { WhatsAppQrCodeCard } from "@/components/merchant/WhatsAppQrCodeCard";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 const DAY_LABELS: Record<string, string> = {
@@ -195,6 +196,13 @@ export default function MyRestaurantPage() {
           </div>
         )}
       </div>
+
+      {restaurant && restaurant.slug && (
+        <WhatsAppQrCodeCard
+          slug={restaurant.slug}
+          restaurantName={restaurant.name_fr || restaurant.slug}
+        />
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (

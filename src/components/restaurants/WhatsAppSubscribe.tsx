@@ -1,0 +1,120 @@
+"use client";
+
+import { useState } from "react";
+import { MessageCircle, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface WhatsAppSubscribeProps {
+  restaurantId: string;
+  restaurantName: string;
+}
+
+export function WhatsAppSubscribe({ restaurantId, restaurantName }: WhatsAppSubscribeProps) {
+  const [phone, setPhone] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [consent, setConsent] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!phone.trim() || !consent) return;
+
+    setStatus("loading");
+    try {
+      const res = await fetch("/api/whatsapp-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ restaurant_id: restaurantId, phone: phone.trim(), source: "website" }),
+      });
+      if (res.ok) {
+        setStatus("success");
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-5 text-center">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+          <Check className="h-6 w-6 text-green-600" />
+        </div>
+        <p className="font-semibold text-green-800">Inscrit !</p>
+        <p className="mt-1 text-sm text-green-600">
+          Vous recevrez les actualités de {restaurantName} par WhatsApp.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500">
+          <MessageCircle className="h-5 w-5 text-white" />
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-900 text-sm">Actus de {restaurantName} sur WhatsApp</h3>
+          <p className="text-xs text-gray-500">Gratuit · sans spam · désabonnement 1 clic</p>
+        </div>
+      </div>
+
+      {/* Benefits */}
+      <div className="mb-4 grid grid-cols-3 gap-2">
+        <div className="flex flex-col items-center gap-1 rounded-lg bg-white/70 p-2 text-center shadow-sm">
+          <span className="text-xl" aria-hidden>🍴</span>
+          <span className="text-[11px] font-semibold leading-tight text-gray-800">Plat du jour</span>
+        </div>
+        <div className="flex flex-col items-center gap-1 rounded-lg bg-white/70 p-2 text-center shadow-sm">
+          <span className="text-xl" aria-hidden>🎁</span>
+          <span className="text-[11px] font-semibold leading-tight text-gray-800">Offres exclusives</span>
+        </div>
+        <div className="flex flex-col items-center gap-1 rounded-lg bg-white/70 p-2 text-center shadow-sm">
+          <span className="text-xl" aria-hidden>📣</span>
+          <span className="text-[11px] font-semibold leading-tight text-gray-800">Événements</span>
+        </div>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+41 79 123 45 67"
+            className="w-full rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/30"
+          />
+        </div>
+
+        {/* Consent */}
+        <label className="flex items-start gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+          />
+          <span className="text-xs text-gray-500 leading-relaxed">
+            J&apos;accepte de recevoir les actualités de {restaurantName} par WhatsApp (plats du jour, offres). Désabonnement possible à tout moment.
+          </span>
+        </label>
+
+        <Button
+          type="submit"
+          disabled={!phone.trim() || !consent || status === "loading"}
+          className="w-full bg-green-500 hover:bg-green-600 text-white disabled:opacity-50"
+        >
+          {status === "loading" ? "Inscription..." : "S'abonner"}
+        </Button>
+
+        {status === "error" && (
+          <p className="text-xs text-red-500 text-center">Une erreur est survenue. Réessayez.</p>
+        )}
+      </form>
+    </div>
+  );
+}

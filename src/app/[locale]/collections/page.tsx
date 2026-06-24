@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { collections, type Collection } from "@/data/collections";
 import { createAdminClient } from "@/lib/supabase/server";
 
@@ -105,26 +104,16 @@ export default async function CollectionsPage({
             <Link
               key={collection.slug}
               href={`/${locale}/collections/${collection.slug}`}
-              className="group overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
+              className="group flex flex-col rounded-xl border bg-white p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
             >
-              <div className="relative h-52">
-                <Image
-                  src={collection.coverImage}
-                  alt={title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <span className="text-3xl">{collection.icon}</span>
-                  <h2 className="mt-1 text-xl font-bold text-white">{title}</h2>
-                  <p className="mt-0.5 text-xs font-medium text-white/80">{restaurantsLabel(count)}</p>
-                </div>
+              <div className="flex items-start justify-between">
+                <span className="text-5xl leading-none" aria-hidden="true">{collection.icon}</span>
+                <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+                  {restaurantsLabel(count)}
+                </span>
               </div>
-              <div className="p-4">
-                <p className="text-sm text-gray-600">{desc}</p>
-              </div>
+              <h2 className="mt-5 text-xl font-bold text-gray-900">{title}</h2>
+              <p className="mt-2 text-sm text-gray-600">{desc}</p>
             </Link>
           );
         })}

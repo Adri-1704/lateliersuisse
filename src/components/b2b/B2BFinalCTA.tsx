@@ -4,11 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
-interface B2BFinalCTAProps {
-  spotsRemaining: number;
-}
-
-export function B2BFinalCTA({ spotsRemaining }: B2BFinalCTAProps) {
+export function B2BFinalCTA() {
   const t = useTranslations("b2bLanding.finalCta");
 
   const scrollToPricing = () => {
@@ -29,9 +25,7 @@ export function B2BFinalCTA({ spotsRemaining }: B2BFinalCTAProps) {
 
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
-          {spotsRemaining > 0
-            ? t("spotsLeft", { count: spotsRemaining })
-            : t("joinNow")}
+          {t("joinNow")}
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-lg text-gray-300">
           {t("subtitle")}
