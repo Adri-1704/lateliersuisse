@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ChevronDown, CheckCircle2, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { SwissCrossIcon } from "@/components/ui/swiss-cross";
@@ -82,15 +82,6 @@ export function B2BHero({ totalRestaurants }: B2BHeroProps) {
             >
               {t("cta")}
               <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="bg-transparent border-white/30 px-8 py-6 text-base font-semibold text-white hover:bg-white/10"
-              onClick={() => scrollTo("b2b-find-restaurant")}
-            >
-              {t("ctaSecondary")}
-              <ChevronDown className="ml-2 h-5 w-5" />
             </Button>
           </div>
         </div>

@@ -176,7 +176,7 @@
     }
   },
   "footer": {
-    "description": "La plateforme de référence pour découvrir les meilleurs restaurants de Suisse Romande.",
+    "description": "Envoyez vos menus et offres directement dans le WhatsApp de vos abonnés. La plateforme des restaurants romands.",
     "quickLinks": "Liens rapides",
     "legal": "Informations légales",
     "privacy": "Politique de confidentialité",
@@ -186,8 +186,8 @@
     "copyright": "Tous droits réservés.",
     "swissMade": "Conçu en Suisse",
     "secureData": "Données sécurisées en Suisse",
-    "ctaTitle": "Vous êtes restaurateur ?",
-    "ctaSubtitle": "Inscrivez votre restaurant et attirez de nouveaux clients"
+    "ctaTitle": "Envoyez vos menus sur WhatsApp",
+    "ctaSubtitle": "Vos abonnés reçoivent vos offres directement sur leur téléphone — 98% de taux d'ouverture"
   },
   "b2b": {
     "hero": {
