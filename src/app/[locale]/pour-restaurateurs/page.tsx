@@ -119,7 +119,7 @@ export default async function PourRestaurateursPage() {
       <B2BPricing spotsRemaining={spotsRemaining} />
       <B2BFindRestaurant />
       <B2BFAQ />
-      <B2BFinalCTA spotsRemaining={spotsRemaining} />
+      <B2BFinalCTA />
     </>
   );
 }
