@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Check, Zap, ShieldCheck, MessageCircle } from "lucide-react";
+import { Check, ShieldCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const PRICES = {
@@ -37,11 +37,7 @@ const FEATURES = [
   "Opt-in géré pour vous",
 ];
 
-interface B2BPricingProps {
-  spotsRemaining?: number;
-}
-
-export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
+export function B2BPricing() {
   const params = useParams();
   const locale = params.locale as string;
   const router = useRouter();
@@ -71,22 +67,6 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
             14 jours d&apos;essai gratuit — satisfait ou remboursé
           </div>
         </div>
-
-        {/* Early Bird banner */}
-        {spotsRemaining > 0 && (
-          <div className="mt-8 rounded-2xl bg-gray-900 p-5 text-center text-white shadow-lg sm:p-6">
-            <div className="mb-1 flex items-center justify-center gap-2">
-              <Zap className="h-4 w-4 text-[var(--color-just-tag)]" />
-              <span className="text-xs font-bold uppercase tracking-widest text-[var(--color-just-tag)]">
-                Prix de lancement
-              </span>
-            </div>
-            <p className="text-sm font-semibold sm:text-base">
-              Tarif réduit garanti à vie pour les 100 premiers inscrits. Plus que{" "}
-              <strong>{spotsRemaining}</strong> places. Ces tarifs ne reviendront pas.
-            </p>
-          </div>
-        )}
 
         {/* Controls */}
         <div className="mt-10 flex flex-col items-center gap-5">
@@ -142,11 +122,6 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
             >
               Prix catalogue
             </span>
-            {isLaunch && (
-              <span className="text-xs font-bold uppercase tracking-wide text-[var(--color-just-tag)]">
-                — 100 premiers inscrits
-              </span>
-            )}
           </div>
         </div>
 
@@ -281,7 +256,7 @@ export function B2BPricing({ spotsRemaining = 100 }: B2BPricingProps) {
         <p className="mt-10 text-center text-xs leading-relaxed text-gray-400">
           Tous les prix sont en CHF · TVA 8.1% non incluse
           <br />
-          Prix de lancement garantis à vie pour les 100 premiers inscrits · Au-delà des abonnés inclus, paliers supplémentaires disponibles sur demande
+          Au-delà des abonnés inclus, paliers supplémentaires disponibles sur demande
         </p>
 
         <div className="mt-6 text-center">

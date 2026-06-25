@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
-import { getEarlyBirdSpotsRemaining } from "@/lib/subscriptions/queries";
-import { B2BEarlyBirdBanner } from "@/components/b2b/B2BEarlyBirdBanner";
 import { B2BHero } from "@/components/b2b/B2BHero";
 import { B2BTrustStats } from "@/components/b2b/B2BTrustStats";
 import { B2BWhatsAppStats } from "@/components/b2b/B2BWhatsAppStats";
@@ -77,9 +75,6 @@ export default async function PourRestaurateursPage() {
     // Fallback to 0 if Supabase is unavailable
   }
 
-  // Fetch Early Bird spots remaining
-  const spotsRemaining = await getEarlyBirdSpotsRemaining();
-
   // FAQ structured data (Schema.org)
   const faqItems = [
     { q: "Combien ça me rapporte concrètement ?", a: "À CHF 24.90/mois, il suffit d'un seul client supplémentaire par mois pour rentabiliser votre abonnement." },
@@ -111,12 +106,11 @@ export default async function PourRestaurateursPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <B2BEarlyBirdBanner spotsRemaining={spotsRemaining} />
       <B2BHero totalRestaurants={totalRestaurants} />
       <B2BTrustStats totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <B2BWhatsAppStats />
       <B2BFeatures />
-      <B2BPricing spotsRemaining={spotsRemaining} />
+      <B2BPricing />
       <B2BFindRestaurant />
       <B2BFAQ />
       <B2BFinalCTA />
