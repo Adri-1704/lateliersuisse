@@ -1,0 +1,251 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
+import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount } from "@/actions/merchant/whatsapp-broadcast";
+
+interface Broadcast {
+  id: string;
+  message: string;
+  image_url: string | null;
+  sent_count: number;
+  created_at: string;
+}
+
+const MAX_CHARS = 1024;
+
+export default function WhatsAppPage() {
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
+  const [history, setHistory] = useState<Broadcast[]>([]);
+  const [message, setMessage] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [result, setResult] = useState<{ sent: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const restResult = await getMerchantRestaurant();
+        if (restResult.success && restResult.data) {
+          const id = restResult.data.id;
+          setRestaurantId(id);
+          const [count, hist] = await Promise.all([
+            getWhatsAppSubscriberCount(id),
+            getBroadcastHistory(id),
+          ]);
+          setSubscriberCount(count);
+          setHistory(hist);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
+
+  function removeImage() {
+    setImage(null);
+    setImagePreview(null);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  async function handleSend() {
+    if (!message.trim() || !restaurantId) return;
+    setSending(true);
+    setError(null);
+    setResult(null);
+
+    const fd = new FormData();
+    fd.append("message", message);
+    if (image) fd.append("image", image);
+
+    const res = await broadcastWhatsApp(fd);
+
+    if (res.success) {
+      setResult({ sent: res.sent });
+      setMessage("");
+      removeImage();
+      // Refresh history
+      const hist = await getBroadcastHistory(restaurantId);
+      setHistory(hist);
+    } else {
+      setError(res.error);
+    }
+    setSending(false);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="flex items-center gap-2 text-2xl font-bold">
+          <MessageCircle className="h-6 w-6 text-[#25D366]" />
+          WhatsApp
+        </h1>
+        <p className="text-muted-foreground">
+          Envoyez votre plat du jour ou une offre directement dans le WhatsApp de vos abonnés
+        </p>
+      </div>
+
+      {/* Subscriber count */}
+      <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+        <Users className="h-5 w-5 text-green-600" />
+        <div>
+          <span className="font-semibold text-green-800">
+            {subscriberCount ?? "—"} abonné{subscriberCount !== 1 ? "s" : ""}
+          </span>
+          <span className="ml-1 text-sm text-green-700">recevront votre message</span>
+        </div>
+        {subscriberCount === 0 && (
+          <span className="ml-auto text-xs text-green-600">
+            Vos clients s&apos;abonnent en scannant votre QR code
+          </span>
+        )}
+      </div>
+
+      {/* Compose */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Nouveau message</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Image preview */}
+          {imagePreview && (
+            <div className="relative w-32">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imagePreview}
+                alt="Aperçu"
+                className="h-32 w-32 rounded-lg object-cover border border-gray-200"
+              />
+              <button
+                onClick={removeImage}
+                className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-600"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
+          {/* Textarea */}
+          <div className="space-y-1">
+            <Textarea
+              placeholder="Plat du jour : Entrecôte sauce béarnaise CHF 28, frites maison. À midi seulement !"
+              rows={4}
+              maxLength={MAX_CHARS}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="resize-none"
+            />
+            <p className="text-right text-xs text-muted-foreground">
+              {message.length}/{MAX_CHARS}
+            </p>
+          </div>
+
+          {/* Feedback */}
+          {error && (
+            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+          {result && (
+            <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
+              <CheckCircle2 className="h-4 w-4" />
+              Message envoyé à <strong>{result.sent}</strong> abonné{result.sent !== 1 ? "s" : ""}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center gap-3">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileRef.current?.click()}
+            >
+              <ImagePlus className="mr-2 h-4 w-4" />
+              {image ? "Changer la photo" : "Ajouter une photo"}
+            </Button>
+
+            <Button
+              className="ml-auto bg-[#25D366] hover:bg-[#1ebe59] text-white"
+              disabled={!message.trim() || sending}
+              onClick={handleSend}
+            >
+              {sending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4" />
+              )}
+              {sending ? "Envoi…" : `Envoyer à ${subscriberCount ?? "…"} abonnés`}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* History */}
+      {history.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Clock className="h-4 w-4" />
+              Messages récents
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="divide-y">
+            {history.map((item) => (
+              <div key={item.id} className="flex gap-3 py-4 first:pt-0 last:pb-0">
+                {item.image_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.image_url}
+                    alt=""
+                    className="h-14 w-14 shrink-0 rounded-lg object-cover"
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-sm text-gray-800">{item.message}</p>
+                  <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>{new Date(item.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                    <span className="text-green-600 font-medium">✓ {item.sent_count} envoyés</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
