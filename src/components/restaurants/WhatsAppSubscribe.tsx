@@ -11,6 +11,7 @@ interface WhatsAppSubscribeProps {
 
 export function WhatsAppSubscribe({ restaurantId, restaurantName }: WhatsAppSubscribeProps) {
   const [phone, setPhone] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [consent, setConsent] = useState(false);
 
@@ -23,7 +24,7 @@ export function WhatsAppSubscribe({ restaurantId, restaurantName }: WhatsAppSubs
       const res = await fetch("/api/whatsapp-subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ restaurant_id: restaurantId, phone: phone.trim(), source: "website" }),
+        body: JSON.stringify({ restaurant_id: restaurantId, phone: phone.trim(), first_name: firstName.trim() || null, source: "website" }),
       });
       if (res.ok) {
         setStatus("success");
@@ -80,13 +81,22 @@ export function WhatsAppSubscribe({ restaurantId, restaurantName }: WhatsAppSubs
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-3">
-        <div>
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Prénom (optionnel)"
+            maxLength={50}
+            className="rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/30"
+          />
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+41 79 123 45 67"
-            className="w-full rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/30"
+            required
+            className="rounded-lg border border-green-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500/30"
           />
         </div>
 

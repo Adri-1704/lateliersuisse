@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { restaurant_id, phone, source } = await request.json();
+    const { restaurant_id, phone, source, first_name } = await request.json();
 
     if (!restaurant_id || !phone) {
       return NextResponse.json({ error: "restaurant_id et phone requis" }, { status: 400 });
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         phone: normalizedPhone,
         source: source || "website",
         is_active: true,
+        first_name: first_name || null,
       } as Record<string, unknown>,
       { onConflict: "restaurant_id,phone" }
     );

@@ -20,6 +20,7 @@ interface Broadcast {
 interface Subscriber {
   id: string;
   phone: string;
+  first_name: string | null;
   subscribed_at: string;
   is_active: boolean;
   source: string | null;
@@ -284,7 +285,10 @@ export default function WhatsAppPage() {
               {subscribers.map((sub) => (
                 <div key={sub.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div>
-                    <p className="font-mono text-sm font-medium text-gray-800">{sub.phone}</p>
+                    <p className="text-sm font-medium text-gray-800">
+                      {sub.first_name && <span className="mr-1">{sub.first_name}</span>}
+                      <span className="font-mono text-gray-500">{sub.phone}</span>
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       Abonné le {new Date(sub.subscribed_at).toLocaleDateString("fr-CH", { day: "numeric", month: "short", year: "numeric" })}
                       {sub.source && sub.source !== "website" && (

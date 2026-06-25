@@ -98,6 +98,7 @@ export async function getWhatsAppSubscriberCount(restaurantId: string): Promise<
 export async function getSubscribers(restaurantId: string): Promise<{
   id: string;
   phone: string;
+  first_name: string | null;
   subscribed_at: string;
   is_active: boolean;
   source: string | null;
@@ -105,10 +106,10 @@ export async function getSubscribers(restaurantId: string): Promise<{
   try {
     const admin = createAdminClient();
     const { data } = await (admin.from("whatsapp_subscribers") as ReturnType<typeof admin.from>)
-      .select("id, phone, subscribed_at, is_active, source")
+      .select("id, phone, first_name, subscribed_at, is_active, source")
       .eq("restaurant_id", restaurantId)
       .order("subscribed_at", { ascending: false }) as {
-        data: { id: string; phone: string; subscribed_at: string; is_active: boolean; source: string | null }[] | null
+        data: { id: string; phone: string; first_name: string | null; subscribed_at: string; is_active: boolean; source: string | null }[] | null
       };
     return data || [];
   } catch {
