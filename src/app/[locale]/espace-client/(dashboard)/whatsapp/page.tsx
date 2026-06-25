@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2, ArrowUpCircle } from "lucide-react";
+import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2, ArrowUpCircle, Trash2 } from "lucide-react";
 import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
 import { getMerchantSession } from "@/actions/merchant/auth";
-import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount, getWhatsAppPlanTier } from "@/actions/merchant/whatsapp-broadcast";
+import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount, getWhatsAppPlanTier, getSubscribers, deleteSubscriber } from "@/actions/merchant/whatsapp-broadcast";
 
 interface Broadcast {
   id: string;
@@ -17,6 +17,14 @@ interface Broadcast {
   created_at: string;
 }
 
+interface Subscriber {
+  id: string;
+  phone: string;
+  subscribed_at: string;
+  is_active: boolean;
+  source: string | null;
+}
+
 const MAX_CHARS = 1024;
 
 export default function WhatsAppPage() {
@@ -24,6 +32,8 @@ export default function WhatsAppPage() {
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [planTier, setPlanTier] = useState<50 | 100 | 200 | null>(null);
   const [history, setHistory] = useState<Broadcast[]>([]);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -43,14 +53,16 @@ export default function WhatsAppPage() {
         if (restResult.success && restResult.data) {
           const id = restResult.data.id;
           setRestaurantId(id);
-          const [count, hist, tier] = await Promise.all([
+          const [count, hist, tier, subs] = await Promise.all([
             getWhatsAppSubscriberCount(id),
             getBroadcastHistory(id),
             session?.merchant?.id ? getWhatsAppPlanTier(session.merchant.id) : Promise.resolve(null),
+            getSubscribers(id),
           ]);
           setSubscriberCount(count);
           setHistory(hist);
           setPlanTier(tier);
+          setSubscribers(subs);
         }
       } finally {
         setLoading(false);
@@ -70,6 +82,16 @@ export default function WhatsAppPage() {
     setImage(null);
     setImagePreview(null);
     if (fileRef.current) fileRef.current.value = "";
+  }
+
+  async function handleDeleteSubscriber(id: string) {
+    setDeletingId(id);
+    const res = await deleteSubscriber(id);
+    if (res.success) {
+      setSubscribers((prev) => prev.filter((s) => s.id !== id));
+      setSubscriberCount((prev) => (prev !== null ? Math.max(0, prev - 1) : null));
+    }
+    setDeletingId(null);
   }
 
   async function handleSend() {
@@ -241,6 +263,51 @@ export default function WhatsAppPage() {
               {sending ? "Envoi…" : `Envoyer à ${subscriberCount ?? "…"} abonnés`}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Subscribers list */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="h-4 w-4" />
+            Abonnés ({subscribers.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {subscribers.length === 0 ? (
+            <p className="py-4 text-center text-sm text-muted-foreground">
+              Aucun abonné pour l&apos;instant
+            </p>
+          ) : (
+            <div className="divide-y">
+              {subscribers.map((sub) => (
+                <div key={sub.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                  <div>
+                    <p className="font-mono text-sm font-medium text-gray-800">{sub.phone}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Abonné le {new Date(sub.subscribed_at).toLocaleDateString("fr-CH", { day: "numeric", month: "short", year: "numeric" })}
+                      {sub.source && sub.source !== "website" && (
+                        <span className="ml-1 text-gray-400">· {sub.source}</span>
+                      )}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    disabled={deletingId === sub.id}
+                    onClick={() => handleDeleteSubscriber(sub.id)}
+                  >
+                    {deletingId === sub.id
+                      ? <Loader2 className="h-4 w-4 animate-spin" />
+                      : <Trash2 className="h-4 w-4" />
+                    }
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

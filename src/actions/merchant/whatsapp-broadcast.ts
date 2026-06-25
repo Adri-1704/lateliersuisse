@@ -95,6 +95,45 @@ export async function getWhatsAppSubscriberCount(restaurantId: string): Promise<
   }
 }
 
+export async function getSubscribers(restaurantId: string): Promise<{
+  id: string;
+  phone: string;
+  subscribed_at: string;
+  is_active: boolean;
+  source: string | null;
+}[]> {
+  try {
+    const admin = createAdminClient();
+    const { data } = await (admin.from("whatsapp_subscribers") as ReturnType<typeof admin.from>)
+      .select("id, phone, subscribed_at, is_active, source")
+      .eq("restaurant_id", restaurantId)
+      .order("subscribed_at", { ascending: false }) as {
+        data: { id: string; phone: string; subscribed_at: string; is_active: boolean; source: string | null }[] | null
+      };
+    return data || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function deleteSubscriber(subscriberId: string): Promise<{ success: boolean }> {
+  try {
+    const session = await getMerchantSession();
+    if (!session?.restaurant) return { success: false };
+
+    const admin = createAdminClient();
+    // Verify the subscriber belongs to this restaurant
+    const { error } = await (admin.from("whatsapp_subscribers") as ReturnType<typeof admin.from>)
+      .delete()
+      .eq("id", subscriberId)
+      .eq("restaurant_id", session.restaurant.id);
+
+    return { success: !error };
+  } catch {
+    return { success: false };
+  }
+}
+
 export async function getWhatsAppPlanTier(merchantId: string): Promise<50 | 100 | 200 | null> {
   try {
     const admin = createAdminClient();
