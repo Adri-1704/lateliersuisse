@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2, ArrowUpCircle } from "lucide-react";
 import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
-import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount } from "@/actions/merchant/whatsapp-broadcast";
+import { getMerchantSession } from "@/actions/merchant/auth";
+import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount, getWhatsAppPlanTier } from "@/actions/merchant/whatsapp-broadcast";
 
 interface Broadcast {
   id: string;
@@ -21,6 +22,7 @@ const MAX_CHARS = 1024;
 export default function WhatsAppPage() {
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
+  const [planTier, setPlanTier] = useState<50 | 100 | 200 | null>(null);
   const [history, setHistory] = useState<Broadcast[]>([]);
   const [message, setMessage] = useState("");
   const [image, setImage] = useState<File | null>(null);
@@ -34,16 +36,21 @@ export default function WhatsAppPage() {
   useEffect(() => {
     async function load() {
       try {
-        const restResult = await getMerchantRestaurant();
+        const [restResult, session] = await Promise.all([
+          getMerchantRestaurant(),
+          getMerchantSession(),
+        ]);
         if (restResult.success && restResult.data) {
           const id = restResult.data.id;
           setRestaurantId(id);
-          const [count, hist] = await Promise.all([
+          const [count, hist, tier] = await Promise.all([
             getWhatsAppSubscriberCount(id),
             getBroadcastHistory(id),
+            session?.merchant?.id ? getWhatsAppPlanTier(session.merchant.id) : Promise.resolve(null),
           ]);
           setSubscriberCount(count);
           setHistory(hist);
+          setPlanTier(tier);
         }
       } finally {
         setLoading(false);
@@ -126,6 +133,28 @@ export default function WhatsAppPage() {
           </span>
         )}
       </div>
+
+      {/* Upsell banner — shown when subscriber count exceeds plan tier */}
+      {planTier !== null && subscriberCount !== null && subscriberCount > planTier && (
+        <div className="flex items-start gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3">
+          <ArrowUpCircle className="mt-0.5 h-5 w-5 shrink-0 text-orange-500" />
+          <div className="flex-1">
+            <p className="font-semibold text-orange-800">
+              Vous avez {subscriberCount} abonnés — votre plan est limité à {planTier}
+            </p>
+            <p className="mt-0.5 text-sm text-orange-700">
+              {subscriberCount - planTier} abonné{subscriberCount - planTier > 1 ? "s" : ""} ne recevront pas vos messages.
+              Passez au plan {planTier === 50 ? "100" : "200"} abonnés pour les inclure.
+            </p>
+          </div>
+          <a
+            href="../abonnement"
+            className="shrink-0 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-600"
+          >
+            Mettre à jour
+          </a>
+        </div>
+      )}
 
       {/* Compose */}
       <Card>

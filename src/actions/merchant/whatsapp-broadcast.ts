@@ -94,3 +94,21 @@ export async function getWhatsAppSubscriberCount(restaurantId: string): Promise<
     return 0;
   }
 }
+
+export async function getWhatsAppPlanTier(merchantId: string): Promise<50 | 100 | 200 | null> {
+  try {
+    const admin = createAdminClient();
+    const { data } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
+      .select("whatsapp_tier")
+      .eq("merchant_id", merchantId)
+      .in("status", ["active", "trialing"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single() as { data: { whatsapp_tier: number | null } | null };
+    const tier = data?.whatsapp_tier;
+    if (tier === 50 || tier === 100 || tier === 200) return tier;
+    return 100; // default
+  } catch {
+    return null;
+  }
+}

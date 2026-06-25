@@ -111,6 +111,7 @@ export async function createCheckoutSession(
       plan_type: planType,
       locale: locale,
       is_early_bird: isEarlyBird ? "true" : "false",
+      whatsapp_tier: String(whatsappTier),
     };
     if (restaurantId) {
       metadata.restaurant_id = restaurantId;
@@ -432,6 +433,7 @@ export async function handleSubscriptionWebhook(
             status: "active",
             is_early_bird: isEarlyBird,
             affiliate_ref: affiliateRef,
+            whatsapp_tier: metadata.whatsapp_tier ? Number(metadata.whatsapp_tier) : 100,
             current_period_start: new Date().toISOString(),
           });
 
