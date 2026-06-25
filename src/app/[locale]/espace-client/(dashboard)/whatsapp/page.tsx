@@ -185,6 +185,7 @@ export default function WhatsAppPage() {
               ref={fileRef}
               type="file"
               accept="image/*"
+              capture="environment"
               className="hidden"
               onChange={handleImageChange}
             />
