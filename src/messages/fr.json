@@ -245,11 +245,11 @@
         "point3": "Répondez aux avis pour fidéliser vos clients"
       },
       "marketing": {
-        "title": "Outils marketing puissants",
-        "desc": "Profitez d'outils exclusifs pour mettre en avant votre établissement et attirer de nouveaux clients.",
-        "point1": "Badge vérifié pour renforcer la confiance",
-        "point2": "Possibilité d'être sélectionné Restaurant du mois",
-        "point3": "Mise en avant dans les résultats de recherche"
+        "title": "WhatsApp : 98% de taux d'ouverture",
+        "desc": "Envoyez votre plat du jour, votre menu de la semaine ou une offre spéciale directement dans le WhatsApp de vos abonnés. 98% le lisent — contre 20% pour un email.",
+        "point1": "Broadcast automatique à tous vos abonnés en 1 message",
+        "point2": "Lu en moyenne dans les 5 minutes après envoi",
+        "point3": "4× plus efficace qu'une publication sur les réseaux sociaux"
       },
       "simplicity": {
         "title": "Simple et efficace",
@@ -387,8 +387,8 @@
     "hero": {
       "badge": "100% Suisse",
       "headline": "Remplissez vos tables sans payer de commission",
-      "subheadline": "Envoyez vos plats du jour directement sur le téléphone de vos clients. {count}+ restaurants romands déjà sur la plateforme.",
-      "benefit1": "WhatsApp inclus — vos clients lisent votre message en 5 minutes",
+      "subheadline": "98% de taux d'ouverture. Vos plats du jour et offres lus en 5 minutes par vos abonnés. {count}+ restaurants romands déjà sur la plateforme.",
+      "benefit1": "WhatsApp inclus — 98% de taux d'ouverture, lu en 5 minutes",
       "benefit2": "Zéro commission sur vos réservations et contacts",
       "benefit3": "Fiche complète visible en 5 langues pour les touristes",
       "socialProof": "{count} restaurants romands déjà sur la plateforme",
