@@ -138,6 +138,7 @@ export default function MerchantSignupPage() {
   // Determine initial step from query params
   const stepParam = searchParams.get("step") as Step | null;
   const planParam = searchParams.get("plan");
+  const subsParam = searchParams.get("subs");
   const canceled = searchParams.get("canceled");
   const restaurantParam = searchParams.get("restaurant");
 
@@ -185,6 +186,9 @@ export default function MerchantSignupPage() {
   const [earlyBirdSeats, setEarlyBirdSeats] = useState<number | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(
     planParam || null
+  );
+  const [selectedWhatsAppTier, setSelectedWhatsAppTier] = useState<50 | 100 | 200>(
+    subsParam === "200" ? 200 : subsParam === "50" ? 50 : 100
   );
 
   // UI state
@@ -353,6 +357,7 @@ export default function MerchantSignupPage() {
       merchantId: signupData.merchantId,
       locale,
       restaurantId: restaurantChoice?.restaurantId,
+      whatsappTier: selectedWhatsAppTier,
       affiliateRef,
     });
 

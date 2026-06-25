@@ -22,54 +22,64 @@ export function getStripe(): Stripe {
 }
 
 /**
- * Stripe Price IDs - Standard pricing (after first 100 customers)
+ * Stripe Price IDs — new tiered model (3 billing × 3 subscriber tiers × 2 phases)
+ * Phase "launch" = early bird (first 100 restaurants), "catalogue" = standard
  */
-export const PLAN_PRICES: Record<string, string> = {
-  monthly: process.env.STRIPE_PRICE_MONTHLY || "",
-  semiannual: process.env.STRIPE_PRICE_SEMIANNUAL || "",
-  annual: process.env.STRIPE_PRICE_ANNUAL || "",
+const TIER_PRICES: Record<string, Record<number, Record<string, string>>> = {
+  monthly: {
+    50:  { launch: process.env.STRIPE_PRICE_MONTHLY_50_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_MONTHLY_50_CATALOGUE || "" },
+    100: { launch: process.env.STRIPE_PRICE_MONTHLY_100_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_MONTHLY_100_CATALOGUE || "" },
+    200: { launch: process.env.STRIPE_PRICE_MONTHLY_200_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_MONTHLY_200_CATALOGUE || "" },
+  },
+  semiannual: {
+    50:  { launch: process.env.STRIPE_PRICE_SEMIANNUAL_50_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_SEMIANNUAL_50_CATALOGUE || "" },
+    100: { launch: process.env.STRIPE_PRICE_SEMIANNUAL_100_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_SEMIANNUAL_100_CATALOGUE || "" },
+    200: { launch: process.env.STRIPE_PRICE_SEMIANNUAL_200_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_SEMIANNUAL_200_CATALOGUE || "" },
+  },
+  annual: {
+    50:  { launch: process.env.STRIPE_PRICE_ANNUAL_50_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_ANNUAL_50_CATALOGUE || "" },
+    100: { launch: process.env.STRIPE_PRICE_ANNUAL_100_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_ANNUAL_100_CATALOGUE || "" },
+    200: { launch: process.env.STRIPE_PRICE_ANNUAL_200_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_ANNUAL_200_CATALOGUE || "" },
+  },
 };
 
-/**
- * Stripe Price IDs - Early Bird pricing (first 100 customers)
- */
-export const PLAN_PRICES_EARLY: Record<string, string> = {
-  monthly: process.env.STRIPE_PRICE_MONTHLY_EARLY || "",
-  semiannual: process.env.STRIPE_PRICE_SEMIANNUAL_EARLY || "",
-  annual: process.env.STRIPE_PRICE_ANNUAL_EARLY || "",
-};
-
-/**
- * Stripe Price IDs - Lifetime (one-time payment)
- */
 export const LIFETIME_PRICE_ID = process.env.STRIPE_PRICE_LIFETIME || "";
 export const LIFETIME_PRICE_EARLY_ID = process.env.STRIPE_PRICE_LIFETIME_EARLY || "";
 
+// Used by admin dashboard for MRR/ARR estimates (based on 100-subscriber tier)
 export const PLAN_DETAILS = {
-  monthly: { price: 49.95, priceEarly: 29.95, interval: "month" as const, label: "Mensuel" },
-  semiannual: { price: 269, priceEarly: 159, interval: "6 months" as const, label: "Semestriel" },
-  annual: { price: 499, priceEarly: 299, interval: "year" as const, label: "Annuel" },
-  lifetime: { price: 1495, priceEarly: 1495, interval: "one-time" as const, label: "Lifetime" },
+  monthly:    { price: 79.95, priceEarly: 59.95, interval: "month" as const,     label: "Mensuel" },
+  semiannual: { price: 71.90, priceEarly: 53.90, interval: "6 months" as const,  label: "Semestriel" },
+  annual:     { price: 66.90, priceEarly: 49.90, interval: "year" as const,       label: "Annuel" },
+  lifetime:   { price: 1495,  priceEarly: 1495,  interval: "one-time" as const,   label: "Lifetime" },
 };
 
 export const EARLY_BIRD_LIMIT = 100;
 export const TRIAL_DAYS = 14;
 
+export type WhatsAppTier = 50 | 100 | 200;
+
 /**
- * Returns the right price ID based on plan type and Early Bird availability.
+ * Returns the Stripe price ID for a given plan/tier/early-bird combination.
+ * - planType: billing period (monthly/semiannual/annual/lifetime)
+ * - whatsappTier: subscriber count chosen by restaurant (50/100/200)
+ * - earlyBirdCount: number of existing early-bird subscriptions (determines launch vs catalogue)
  */
-export function getPriceId(planType: "monthly" | "semiannual" | "annual" | "lifetime", subscriberCount: number): string {
+export function getPriceId(
+  planType: "monthly" | "semiannual" | "annual" | "lifetime",
+  earlyBirdCount: number,
+  whatsappTier: WhatsAppTier = 100,
+): string {
   if (planType === "lifetime") {
-    // Use early bird lifetime price if available and under limit, else standard lifetime
-    if (subscriberCount < EARLY_BIRD_LIMIT && LIFETIME_PRICE_EARLY_ID) {
+    if (earlyBirdCount < EARLY_BIRD_LIMIT && LIFETIME_PRICE_EARLY_ID) {
       return LIFETIME_PRICE_EARLY_ID;
     }
     return LIFETIME_PRICE_ID;
   }
-  if (subscriberCount < EARLY_BIRD_LIMIT) {
-    return PLAN_PRICES_EARLY[planType];
-  }
-  return PLAN_PRICES[planType];
+
+  const phase = earlyBirdCount < EARLY_BIRD_LIMIT ? "launch" : "catalogue";
+  const tier = TIER_PRICES[planType]?.[whatsappTier];
+  return tier?.[phase] || "";
 }
 
 export function isEarlyBirdAvailable(subscriberCount: number): boolean {

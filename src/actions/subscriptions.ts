@@ -1,6 +1,6 @@
 "use server";
 
-import { getStripe, getPriceId, TRIAL_DAYS, EARLY_BIRD_LIMIT } from "@/lib/stripe";
+import { getStripe, getPriceId, TRIAL_DAYS, EARLY_BIRD_LIMIT, type WhatsAppTier } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { paymentConfirmation, merchantWelcome, freeTrialWelcome, freeTrialAdminNotification, subscriptionPaymentAdminNotification } from "@/lib/email-templates";
@@ -41,6 +41,8 @@ interface CreateCheckoutParams {
   merchantId: string;
   locale: string;
   restaurantId?: string;
+  /** WhatsApp subscriber tier chosen by the restaurant (50 / 100 / 200) */
+  whatsappTier?: WhatsAppTier;
   /** Affiliate referral code (from cookie jt_ref) */
   affiliateRef?: string;
 }
@@ -59,7 +61,7 @@ interface CheckoutResult {
 export async function createCheckoutSession(
   params: CreateCheckoutParams
 ): Promise<CheckoutResult> {
-  const { planType, merchantId, locale, restaurantId, affiliateRef } = params;
+  const { planType, merchantId, locale, restaurantId, whatsappTier = 100, affiliateRef } = params;
 
   try {
     // If Stripe is not configured, return placeholder
@@ -96,7 +98,7 @@ export async function createCheckoutSession(
 
     const subscriberCount = count || 0;
     const isEarlyBird = subscriberCount < EARLY_BIRD_LIMIT;
-    const priceId = getPriceId(planType, subscriberCount);
+    const priceId = getPriceId(planType, subscriberCount, whatsappTier);
 
     if (!priceId) {
       return { url: null, error: "Plan invalide ou prix Stripe non configuré" };
