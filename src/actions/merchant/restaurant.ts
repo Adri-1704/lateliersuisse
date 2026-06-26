@@ -171,6 +171,16 @@ export async function createMerchantRestaurant(data: {
       .replace(/(^-|-$)/g, "");
 
     const admin = createAdminClient();
+
+    // Pull merchant phone to pre-fill whatsapp_phone
+    const { data: merchantData } = await (admin.from("merchants") as any)
+      .select("phone")
+      .eq("id", merchantId)
+      .single();
+    const whatsappPhone = merchantData?.phone
+      ? merchantData.phone.replace(/[^0-9+]/g, "")
+      : null;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (admin.from("restaurants") as any).insert({
       merchant_id: merchantId,
@@ -189,6 +199,7 @@ export async function createMerchantRestaurant(data: {
       price_range: data.price_range || "2",
       description_fr: data.description_fr || null,
       is_published: false,
+      whatsapp_phone: whatsappPhone,
     });
 
     if (error) return { success: false, error: error.message };
