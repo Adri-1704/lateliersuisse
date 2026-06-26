@@ -259,7 +259,7 @@ export default function MerchantSignupPage() {
                 i < stepIndex
                   ? "bg-green-500 text-white"
                   : i === stepIndex
-                    ? "bg-[var(--color-just-tag)] text-white"
+                    ? "border-2 border-[var(--color-just-tag)] bg-white text-[var(--color-just-tag)]"
                     : "bg-gray-200 text-gray-500"
               }`}
             >
@@ -399,24 +399,6 @@ export default function MerchantSignupPage() {
             {signupData.passwordConfirm && signupData.passwordConfirm !== signupData.password && (
               <p className="mt-1 text-xs text-red-600">Les mots de passe ne correspondent pas</p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Numéro WhatsApp du restaurant <span className="font-normal text-gray-400">(optionnel)</span>
-            </label>
-            <input
-              type="tel"
-              value={signupData.phone}
-              onChange={(e) =>
-                setSignupData((p) => ({ ...p, phone: e.target.value }))
-              }
-              placeholder="+41 79 123 45 67"
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              Activez le plat du jour WhatsApp plus tard depuis votre tableau de bord. Vous pourrez l&apos;ajouter quand vous voudrez.
-            </p>
           </div>
 
           <Button
