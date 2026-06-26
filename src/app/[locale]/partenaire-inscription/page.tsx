@@ -7,24 +7,19 @@ import { SwissCross } from "@/components/ui/swiss-cross";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Search,
-  CheckCircle,
   Loader2,
-  ArrowLeft,
   ArrowRight,
   CreditCard,
   Gift,
   Star,
   Crown,
   Check,
-  Plus,
   ShieldCheck,
   Eye,
   EyeOff,
 } from "lucide-react";
 import {
   registerMerchant,
-  searchAvailableRestaurants,
 } from "@/actions/merchant/register";
 import {
   createCheckoutSession,
@@ -37,7 +32,7 @@ import { getAffiliateRef } from "@/components/analytics/AffiliateTracker";
 // Types
 // ────────────────────────────────────────────────────────────────────────────
 
-type Step = "signup" | "restaurant" | "plan" | "redirecting";
+type Step = "plan" | "signup" | "redirecting";
 
 interface SignupData {
   name: string;
@@ -45,14 +40,6 @@ interface SignupData {
   password: string;
   phone: string;
   merchantId: string | null;
-}
-
-interface RestaurantChoice {
-  type: "existing" | "new" | "skip";
-  slug?: string;
-  name?: string;
-  city?: string;
-  restaurantId?: string;
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -102,24 +89,13 @@ export default function MerchantSignupPage() {
   const planParam = searchParams.get("plan");
   const subsParam = searchParams.get("subs");
   const canceled = searchParams.get("canceled");
-  const restaurantParam = searchParams.get("restaurant");
 
-  const [currentStep, setCurrentStep] = useState<Step>(stepParam || "signup");
+  // If plan pre-selected from URL, go straight to signup; otherwise show plan picker
+  const initialStep: Step = stepParam === "plan" ? "plan"
+    : planParam ? "signup"
+    : "plan";
 
-  // Pre-selected restaurant from URL (?restaurant=slug)
-  const [preselectedRestaurant, setPreselectedRestaurant] = useState<{
-    slug: string;
-    name: string;
-    city: string;
-  } | null>(null);
-
-  useEffect(() => {
-    if (!restaurantParam) return;
-    searchAvailableRestaurants(restaurantParam).then((results) => {
-      const match = results.find((r) => r.slug === restaurantParam);
-      if (match) setPreselectedRestaurant(match);
-    });
-  }, [restaurantParam]);
+  const [currentStep, setCurrentStep] = useState<Step>(initialStep);
 
   // Signup state
   const [signupData, setSignupData] = useState<SignupData>({
@@ -129,19 +105,6 @@ export default function MerchantSignupPage() {
     phone: "",
     merchantId: null,
   });
-
-  // Restaurant state
-  const [restaurantChoice, setRestaurantChoice] =
-    useState<RestaurantChoice | null>(null);
-  const [restaurantQuery, setRestaurantQuery] = useState("");
-  const [restaurantResults, setRestaurantResults] = useState<
-    { slug: string; name: string; city: string }[]
-  >([]);
-  const [searching, setSearching] = useState(false);
-  const [showNewForm, setShowNewForm] = useState(false);
-  const [newRestaurantName, setNewRestaurantName] = useState("");
-  const [newRestaurantCity, setNewRestaurantCity] = useState("");
-  const [newRestaurantCuisine, setNewRestaurantCuisine] = useState("");
 
   // Plan state
   const [earlyBirdSeats, setEarlyBirdSeats] = useState<number | null>(null);
@@ -175,21 +138,6 @@ export default function MerchantSignupPage() {
     });
   }, []);
 
-  // ── Restaurant search debounce ──
-  useEffect(() => {
-    if (restaurantQuery.length < 2) {
-      setRestaurantResults([]);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      setSearching(true);
-      const results = await searchAvailableRestaurants(restaurantQuery);
-      setRestaurantResults(results);
-      setSearching(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [restaurantQuery]);
-
   // ── Navigation helpers ──
   const goToStep = useCallback(
     (step: Step) => {
@@ -204,10 +152,10 @@ export default function MerchantSignupPage() {
 
   // ── If returning from canceled checkout ──
   useEffect(() => {
-    if (canceled === "1" && stepParam === "plan") {
+    if (canceled === "1") {
       setError("Paiement annulé. Vous pouvez choisir un autre plan ou réessayer.");
     }
-  }, [canceled, stepParam]);
+  }, [canceled]);
 
   // ────────────────────────────────────────────────────────────────────────
   // Step 1: Signup
@@ -216,6 +164,10 @@ export default function MerchantSignupPage() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (!selectedPlanId) {
+      setError("Veuillez sélectionner un plan.");
+      return;
+    }
     setLoading(true);
 
     const result = await registerMerchant({
@@ -223,129 +175,39 @@ export default function MerchantSignupPage() {
       email: signupData.email,
       password: signupData.password,
       phone: signupData.phone,
-      restaurantSlug: null, // Restaurant selection is now a separate step
+      restaurantSlug: null,
     });
-
-    setLoading(false);
 
     if (!result.success) {
       setError(result.error || "Erreur inconnue");
+      setLoading(false);
       return;
     }
 
-    // registerMerchant returns success but doesn't expose merchantId directly.
-    // We need the merchantId for checkout. Let's fetch it by email.
     const merchantId = await fetchMerchantIdByEmail(signupData.email);
     if (!merchantId) {
-      setError(
-        "Compte créé mais impossible de récupérer l'identifiant. Veuillez contacter le support."
-      );
+      setError("Compte créé mais impossible de récupérer l'identifiant. Veuillez contacter le support.");
+      setLoading(false);
       return;
     }
 
-    setSignupData((prev) => ({ ...prev, merchantId }));
     sessionStorage.setItem("jt_merchant_id", merchantId);
 
-    // Si un restaurant est pré-sélectionné depuis l'URL, auto-sélectionner
-    if (preselectedRestaurant) {
-      setRestaurantChoice({
-        type: "existing",
-        slug: preselectedRestaurant.slug,
-        name: preselectedRestaurant.name,
-        city: preselectedRestaurant.city,
-      });
-    }
+    // Redirect directly to Stripe — no intermediate steps
+    const affiliateRef = getAffiliateRef() || undefined;
+    const checkoutResult = await createCheckoutSession({
+      planType: selectedPlanId as "monthly" | "semiannual" | "annual",
+      merchantId,
+      locale,
+      whatsappTier: selectedWhatsAppTier,
+      affiliateRef,
+    });
 
-    goToStep("restaurant");
-  }
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Step 2: Restaurant selection
-  // ────────────────────────────────────────────────────────────────────────
-
-  async function handleRestaurantClaim() {
-    if (!restaurantChoice || !signupData.merchantId) return;
-    setError("");
-    setLoading(true);
-
-    if (restaurantChoice.type === "existing" && restaurantChoice.slug) {
-      // Re-run registerMerchant to create the claim request
-      // Actually, we already created the merchant. We need a separate claim action.
-      // Let's call a dedicated claim action.
-      const claimResult = await createClaimForExistingMerchant(
-        signupData.merchantId,
-        signupData.name,
-        signupData.email,
-        signupData.phone,
-        restaurantChoice.slug
-      );
-      if (!claimResult.success) {
-        setError(claimResult.error || "Erreur lors de la revendication");
-        setLoading(false);
-        return;
-      }
-    } else if (restaurantChoice.type === "new") {
-      // Create a new restaurant linked to merchant (unpublished)
-      const createResult = await createNewRestaurantForMerchant(
-        signupData.merchantId,
-        newRestaurantName,
-        newRestaurantCity,
-        newRestaurantCuisine
-      );
-      if (!createResult.success) {
-        setError(createResult.error || "Erreur lors de la création");
-        setLoading(false);
-        return;
-      }
-    }
-    // type === "skip" → just move on
-
-    setLoading(false);
-    goToStep("plan");
-  }
-
-  // ────────────────────────────────────────────────────────────────────────
-  // Step 3: Plan selection + checkout
-  // ────────────────────────────────────────────────────────────────────────
-
-  async function handleCheckout() {
-    if (!selectedPlanId) {
-      setError("Veuillez sélectionner un plan.");
-      return;
-    }
-    if (!signupData.merchantId) {
-      setError("Session expirée. Veuillez recommencer depuis le début.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-
-    try {
-      const planType = selectedPlanId as
-        | "monthly"
-        | "semiannual"
-        | "annual";
-
-      const affiliateRef = getAffiliateRef() || undefined;
-
-      const result = await createCheckoutSession({
-        planType,
-        merchantId: signupData.merchantId,
-        locale,
-        restaurantId: restaurantChoice?.restaurantId,
-        whatsappTier: selectedWhatsAppTier,
-        affiliateRef,
-      });
-
-      if (result.url) {
-        setCurrentStep("redirecting");
-        window.location.href = result.url;
-      } else {
-        setError(result.error || "Erreur lors de la création du paiement");
-        setLoading(false);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur inattendue");
+    if (checkoutResult.url) {
+      setCurrentStep("redirecting");
+      window.location.href = checkoutResult.url;
+    } else {
+      setError(checkoutResult.error || "Erreur lors de la création du paiement");
       setLoading(false);
     }
   }
@@ -355,9 +217,8 @@ export default function MerchantSignupPage() {
   // ────────────────────────────────────────────────────────────────────────
 
   const steps = [
-    { key: "signup", label: "Compte" },
-    { key: "restaurant", label: "Restaurant" },
-    { key: "plan", label: "Plan & Paiement" },
+    { key: "plan", label: "Plan" },
+    { key: "signup", label: "Compte & Paiement" },
   ];
 
   const stepIndex = steps.findIndex((s) => s.key === currentStep);
@@ -379,19 +240,8 @@ export default function MerchantSignupPage() {
           Devenir partenaire
         </h1>
         <p className="mt-2 text-gray-500">
-          Créez votre compte, associez votre restaurant et choisissez votre plan
+          14 jours d&apos;essai gratuit · Aucun débit pendant l&apos;essai
         </p>
-        {preselectedRestaurant && (
-          <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-4 py-3">
-            <span className="text-green-600 text-lg">🍽️</span>
-            <div className="text-left">
-              <p className="text-sm font-semibold text-green-800">
-                Vous revendiquez : {preselectedRestaurant.name}
-              </p>
-              <p className="text-xs text-green-600">{preselectedRestaurant.city}</p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Step indicator */}
@@ -549,12 +399,12 @@ export default function MerchantSignupPage() {
             {loading ? (
               <span className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Création en cours...
+                Création du compte et redirection...
               </span>
             ) : (
               <span className="flex items-center gap-2">
-                Créer mon compte
-                <ArrowRight className="h-4 w-4" />
+                <CreditCard className="h-4 w-4" />
+                Créer mon compte et payer
               </span>
             )}
           </Button>
@@ -572,252 +422,14 @@ export default function MerchantSignupPage() {
       )}
 
       {/* ════════════════════════════════════════════════════════════════════ */}
-      {/* STEP 2: Restaurant */}
-      {/* ════════════════════════════════════════════════════════════════════ */}
-      {currentStep === "restaurant" && (
-        <div className="mt-8 space-y-6">
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4" />
-              <span>
-                Compte créé avec succès ! Associez maintenant votre restaurant.
-              </span>
-            </div>
-          </div>
-
-          {/* Option 1: Search existing restaurant */}
-          {!showNewForm && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Rechercher votre restaurant
-              </label>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Trouvez votre restaurant dans notre base de données
-              </p>
-
-              {restaurantChoice?.type === "existing" ? (
-                <div className="mt-2 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-900">
-                      {restaurantChoice.name}
-                    </span>
-                    <span className="text-xs text-green-600">
-                      ({restaurantChoice.city})
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRestaurantChoice(null);
-                      setRestaurantQuery("");
-                    }}
-                    className="text-xs text-green-600 hover:underline"
-                  >
-                    Changer
-                  </button>
-                </div>
-              ) : (
-                <div className="relative mt-2">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    value={restaurantQuery}
-                    onChange={(e) => setRestaurantQuery(e.target.value)}
-                    placeholder="Tapez le nom de votre restaurant..."
-                    className="block w-full rounded-lg border border-gray-300 pl-10 pr-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-                  />
-                  {searching && (
-                    <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-gray-400" />
-                  )}
-
-                  {restaurantResults.length > 0 && (
-                    <div className="absolute z-10 mt-1 w-full rounded-lg border bg-white shadow-lg max-h-48 overflow-y-auto">
-                      {restaurantResults.map((r) => (
-                        <button
-                          key={r.slug}
-                          type="button"
-                          onClick={() => {
-                            setRestaurantChoice({
-                              type: "existing",
-                              slug: r.slug,
-                              name: r.name,
-                              city: r.city,
-                            });
-                            setRestaurantQuery("");
-                            setRestaurantResults([]);
-                          }}
-                          className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center justify-between"
-                        >
-                          <span className="font-medium text-gray-900">
-                            {r.name}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {r.city}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {restaurantQuery.length >= 2 &&
-                    restaurantResults.length === 0 &&
-                    !searching && (
-                      <div className="absolute z-10 mt-1 w-full rounded-lg border bg-white shadow-lg p-4 text-center">
-                        <p className="text-sm text-gray-500">
-                          Aucun restaurant trouvé
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Vous pouvez créer votre fiche ci-dessous
-                        </p>
-                      </div>
-                    )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Separator */}
-          {!showNewForm && !restaurantChoice && (
-            <div className="flex items-center gap-4">
-              <div className="h-px flex-1 bg-gray-200" />
-              <span className="text-sm text-gray-400">ou</span>
-              <div className="h-px flex-1 bg-gray-200" />
-            </div>
-          )}
-
-          {/* Option 2: Create new restaurant */}
-          {!restaurantChoice && (
-            <>
-              {!showNewForm ? (
-                <Button
-                  variant="outline"
-                  className="w-full border-dashed"
-                  onClick={() => {
-                    setShowNewForm(true);
-                    setRestaurantChoice({ type: "new" });
-                  }}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Mon restaurant n&apos;est pas dans la liste
-                </Button>
-              ) : (
-                <div className="rounded-lg border border-gray-200 p-4 space-y-4">
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Créer une nouvelle fiche restaurant
-                  </h3>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Nom du restaurant *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={newRestaurantName}
-                      onChange={(e) => setNewRestaurantName(e.target.value)}
-                      placeholder="Le Petit Prince"
-                      className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Ville *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={newRestaurantCity}
-                      onChange={(e) => setNewRestaurantCity(e.target.value)}
-                      placeholder="Genève"
-                      className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Type de cuisine
-                    </label>
-                    <input
-                      type="text"
-                      value={newRestaurantCuisine}
-                      onChange={(e) => setNewRestaurantCuisine(e.target.value)}
-                      placeholder="Française, Italienne, Suisse..."
-                      className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-                    />
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setShowNewForm(false);
-                      setRestaurantChoice(null);
-                    }}
-                  >
-                    <ArrowLeft className="mr-1 h-3 w-3" />
-                    Annuler
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Actions */}
-          <div className="flex flex-col gap-3 pt-2">
-            <Button
-              disabled={
-                loading ||
-                (!restaurantChoice ||
-                  (restaurantChoice.type === "existing" && !restaurantChoice.slug) ||
-                  (restaurantChoice.type === "new" &&
-                    (!newRestaurantName || !newRestaurantCity)))
-              }
-              onClick={handleRestaurantClaim}
-              className="w-full bg-[var(--color-just-tag)] text-white hover:opacity-90"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  En cours...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  Continuer
-                  <ArrowRight className="h-4 w-4" />
-                </span>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setRestaurantChoice({ type: "skip" });
-                goToStep("plan");
-              }}
-              className="w-full text-gray-600"
-            >
-              Passer cette étape — associer mon restaurant plus tard
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* ════════════════════════════════════════════════════════════════════ */}
-      {/* STEP 3: Plan selection */}
+      {/* STEP 1: Plan selection */}
       {/* ════════════════════════════════════════════════════════════════════ */}
       {currentStep === "plan" && (
         <div className="mt-8 space-y-6">
-          {/* Trial info */}
-          <div className="flex items-center justify-center gap-2 text-sm text-green-700">
-            <ShieldCheck className="h-4 w-4" />
-            <span>
-              14 jours d&apos;essai gratuit sur les abonnements. Sans engagement.
-            </span>
-          </div>
-
-          {/* Launch offer notice */}
           {isEarlyBird && (
             <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5 text-sm text-amber-800">
               <span className="text-base">🎁</span>
-              <span>Tarif de lancement — le prix barré est le tarif normal appliqué après les 100 premiers restaurants.</span>
+              <span>Tarif de lancement — offre limitée aux 100 premiers restaurants.</span>
             </div>
           )}
 
@@ -842,7 +454,7 @@ export default function MerchantSignupPage() {
             </div>
           </div>
 
-          {/* Subscription plans */}
+          {/* Plan cards */}
           <div className="grid gap-4 sm:grid-cols-3">
             {plans.map((plan) => {
               const isSelected = selectedPlanId === plan.id;
@@ -867,28 +479,18 @@ export default function MerchantSignupPage() {
                   <div className="flex items-center gap-2 mb-3">
                     <PlanIcon className="h-4 w-4 text-[var(--color-just-tag)]" />
                     <span className="text-sm font-semibold text-gray-900 capitalize">
-                      {plan.id === "monthly"
-                        ? "Mensuel"
-                        : plan.id === "semiannual"
-                          ? "Semestriel"
-                          : "Annuel"}
+                      {plan.id === "monthly" ? "Mensuel" : plan.id === "semiannual" ? "Semestriel" : "Annuel"}
                     </span>
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-[var(--color-just-tag)]">
-                      CHF {plan.pricePerMonth}
-                    </span>
+                    <span className="text-2xl font-bold text-[var(--color-just-tag)]">CHF {plan.pricePerMonth}</span>
                     <span className="text-xs text-gray-500">/mois</span>
                   </div>
                   {plan.cataloguePrice && (
-                    <p className="mt-0.5 text-xs text-gray-400 line-through">
-                      CHF {plan.cataloguePrice}/mois
-                    </p>
+                    <p className="mt-0.5 text-xs text-gray-400 line-through">CHF {plan.cataloguePrice}/mois</p>
                   )}
                   {plan.totalPrice && (
-                    <p className="mt-0.5 text-xs text-gray-500">
-                      Soit CHF {plan.totalPrice} {plan.periodLabel}
-                    </p>
+                    <p className="mt-0.5 text-xs text-gray-500">Soit CHF {plan.totalPrice} {plan.periodLabel}</p>
                   )}
                   <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
                     <Gift className="h-3 w-3" />
@@ -899,33 +501,14 @@ export default function MerchantSignupPage() {
             })}
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => goToStep("restaurant")}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
-            </Button>
-            <Button
-              disabled={loading || !selectedPlanId}
-              onClick={handleCheckout}
-              className="flex-1 bg-[var(--color-just-tag)] text-white hover:opacity-90 py-3"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Redirection vers le paiement...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" />
-                  {"Commencer l'essai gratuit (14j)"}
-                </span>
-              )}
-            </Button>
-          </div>
+          <Button
+            disabled={!selectedPlanId}
+            onClick={() => goToStep("signup")}
+            className="w-full bg-[var(--color-just-tag)] text-white hover:opacity-90 py-3"
+          >
+            Continuer
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       )}
 
@@ -961,38 +544,3 @@ async function fetchMerchantIdByEmail(
   return getMerchantIdByEmail(email);
 }
 
-async function createClaimForExistingMerchant(
-  merchantId: string,
-  merchantName: string,
-  merchantEmail: string,
-  merchantPhone: string,
-  restaurantSlug: string
-): Promise<{ success: boolean; error: string | null }> {
-  const { createClaimRequest } = await import(
-    "@/actions/merchant/register"
-  );
-  return createClaimRequest({
-    merchantId,
-    merchantName,
-    merchantEmail,
-    merchantPhone,
-    restaurantSlug,
-  });
-}
-
-async function createNewRestaurantForMerchant(
-  merchantId: string,
-  name: string,
-  city: string,
-  cuisine: string
-): Promise<{ success: boolean; error: string | null }> {
-  const { createRestaurantForMerchant } = await import(
-    "@/actions/merchant/register"
-  );
-  return createRestaurantForMerchant({
-    merchantId,
-    name,
-    city,
-    cuisine,
-  });
-}
