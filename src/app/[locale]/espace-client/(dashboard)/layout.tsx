@@ -1,12 +1,8 @@
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { getMerchantSession } from "@/actions/merchant/auth";
-import { getMerchantSubscription } from "@/actions/merchant/subscription";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { MerchantSidebar } from "@/components/merchant/MerchantSidebar";
 import { MerchantHeader } from "@/components/merchant/MerchantHeader";
-
-const ACTIVE_STATUSES = ["active", "trialing", "past_due"];
 
 export default async function MerchantDashboardLayout({
   children,
@@ -18,45 +14,21 @@ export default async function MerchantDashboardLayout({
   const { locale } = await params;
   let email = "marchand@just-tag.app";
   let restaurantName: string | undefined;
+  let isAuthenticated = false;
 
-  // Auth check
   try {
     const session = await getMerchantSession();
     if (session) {
       email = session.merchant.email;
       restaurantName = session.restaurant?.name_fr || undefined;
-    } else if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      redirect(`/${locale}/espace-client/connexion`);
+      isAuthenticated = true;
     }
   } catch {
     // Supabase error — continue in demo mode
   }
 
-  // Subscription gate — redirect() must be called OUTSIDE try/catch
-  // because Next.js redirect() works by throwing a special error
-  let needsSubscription = false;
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    const headersList = await headers();
-    const pathname = headersList.get("x-pathname") || "";
-    const isAbonnementPage = pathname.endsWith("/abonnement");
-
-    if (!isAbonnementPage) {
-      try {
-        const sub = await getMerchantSubscription();
-        const hasAccess =
-          sub.success &&
-          sub.data &&
-          ACTIVE_STATUSES.includes(sub.data.subscription.status);
-        if (!hasAccess) needsSubscription = true;
-      } catch {
-        // Subscription check failed — block access to be safe
-        needsSubscription = true;
-      }
-    }
-  }
-
-  if (needsSubscription) {
-    redirect(`/${locale}/espace-client/abonnement`);
+  if (!isAuthenticated && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    redirect(`/${locale}/espace-client/connexion`);
   }
 
   return (
