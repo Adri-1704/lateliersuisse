@@ -19,6 +19,7 @@ export default async function MerchantDashboardLayout({
   let email = "marchand@just-tag.app";
   let restaurantName: string | undefined;
 
+  // Auth check
   try {
     const session = await getMerchantSession();
     if (session) {
@@ -31,25 +32,31 @@ export default async function MerchantDashboardLayout({
     // Supabase error — continue in demo mode
   }
 
-  // Subscription gate — skip on the abonnement page itself to avoid redirect loop
-  try {
+  // Subscription gate — redirect() must be called OUTSIDE try/catch
+  // because Next.js redirect() works by throwing a special error
+  let needsSubscription = false;
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const headersList = await headers();
     const pathname = headersList.get("x-pathname") || "";
     const isAbonnementPage = pathname.endsWith("/abonnement");
 
-    if (!isAbonnementPage && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      const sub = await getMerchantSubscription();
-      const hasAccess =
-        sub.success &&
-        sub.data &&
-        ACTIVE_STATUSES.includes(sub.data.subscription.status);
-
-      if (!hasAccess) {
-        redirect(`/${locale}/espace-client/abonnement`);
+    if (!isAbonnementPage) {
+      try {
+        const sub = await getMerchantSubscription();
+        const hasAccess =
+          sub.success &&
+          sub.data &&
+          ACTIVE_STATUSES.includes(sub.data.subscription.status);
+        if (!hasAccess) needsSubscription = true;
+      } catch {
+        // Subscription check failed — block access to be safe
+        needsSubscription = true;
       }
     }
-  } catch {
-    // Subscription check error — allow access rather than locking out
+  }
+
+  if (needsSubscription) {
+    redirect(`/${locale}/espace-client/abonnement`);
   }
 
   return (
