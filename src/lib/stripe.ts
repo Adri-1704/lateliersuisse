@@ -25,21 +25,23 @@ export function getStripe(): Stripe {
  * Stripe Price IDs — new tiered model (3 billing × 3 subscriber tiers × 2 phases)
  * Phase "launch" = early bird (first 100 restaurants), "catalogue" = standard
  */
+const e = (key: string) => (process.env[key] || "").trim();
+
 const TIER_PRICES: Record<string, Record<number, Record<string, string>>> = {
   monthly: {
-    50:  { launch: process.env.STRIPE_PRICE_MONTHLY_50_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_MONTHLY_50_CATALOGUE || "" },
-    100: { launch: process.env.STRIPE_PRICE_MONTHLY_100_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_MONTHLY_100_CATALOGUE || "" },
-    200: { launch: process.env.STRIPE_PRICE_MONTHLY_200_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_MONTHLY_200_CATALOGUE || "" },
+    50:  { launch: e("STRIPE_PRICE_MONTHLY_50_LAUNCH"),    catalogue: e("STRIPE_PRICE_MONTHLY_50_CATALOGUE") },
+    100: { launch: e("STRIPE_PRICE_MONTHLY_100_LAUNCH"),   catalogue: e("STRIPE_PRICE_MONTHLY_100_CATALOGUE") },
+    200: { launch: e("STRIPE_PRICE_MONTHLY_200_LAUNCH"),   catalogue: e("STRIPE_PRICE_MONTHLY_200_CATALOGUE") },
   },
   semiannual: {
-    50:  { launch: process.env.STRIPE_PRICE_SEMIANNUAL_50_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_SEMIANNUAL_50_CATALOGUE || "" },
-    100: { launch: process.env.STRIPE_PRICE_SEMIANNUAL_100_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_SEMIANNUAL_100_CATALOGUE || "" },
-    200: { launch: process.env.STRIPE_PRICE_SEMIANNUAL_200_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_SEMIANNUAL_200_CATALOGUE || "" },
+    50:  { launch: e("STRIPE_PRICE_SEMIANNUAL_50_LAUNCH"),  catalogue: e("STRIPE_PRICE_SEMIANNUAL_50_CATALOGUE") },
+    100: { launch: e("STRIPE_PRICE_SEMIANNUAL_100_LAUNCH"), catalogue: e("STRIPE_PRICE_SEMIANNUAL_100_CATALOGUE") },
+    200: { launch: e("STRIPE_PRICE_SEMIANNUAL_200_LAUNCH"), catalogue: e("STRIPE_PRICE_SEMIANNUAL_200_CATALOGUE") },
   },
   annual: {
-    50:  { launch: process.env.STRIPE_PRICE_ANNUAL_50_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_ANNUAL_50_CATALOGUE || "" },
-    100: { launch: process.env.STRIPE_PRICE_ANNUAL_100_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_ANNUAL_100_CATALOGUE || "" },
-    200: { launch: process.env.STRIPE_PRICE_ANNUAL_200_LAUNCH || "", catalogue: process.env.STRIPE_PRICE_ANNUAL_200_CATALOGUE || "" },
+    50:  { launch: e("STRIPE_PRICE_ANNUAL_50_LAUNCH"),    catalogue: e("STRIPE_PRICE_ANNUAL_50_CATALOGUE") },
+    100: { launch: e("STRIPE_PRICE_ANNUAL_100_LAUNCH"),   catalogue: e("STRIPE_PRICE_ANNUAL_100_CATALOGUE") },
+    200: { launch: e("STRIPE_PRICE_ANNUAL_200_LAUNCH"),   catalogue: e("STRIPE_PRICE_ANNUAL_200_CATALOGUE") },
   },
 };
 

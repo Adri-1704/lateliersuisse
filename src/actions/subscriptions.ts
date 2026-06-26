@@ -147,6 +147,16 @@ export async function createCheckoutSession(
       };
     }
 
+    // Reassurance messages on the Stripe checkout page
+    sessionParams.custom_text = {
+      submit: {
+        message: "Aucun débit pendant les 14 jours d'essai. Annulable à tout moment depuis votre espace client, sans justification.",
+      },
+      after_submit: {
+        message: "Vous recevrez un email de confirmation. En cas de question : contact@just-tag.app",
+      },
+    };
+
     const session = await stripe.checkout.sessions.create(sessionParams);
 
     // Log checkout_initiated event (non-blocking)

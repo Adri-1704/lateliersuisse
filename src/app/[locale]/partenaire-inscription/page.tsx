@@ -15,12 +15,12 @@ import {
   CreditCard,
   Gift,
   Star,
-  Zap,
   Crown,
-  Infinity,
   Check,
   Plus,
   ShieldCheck,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import {
   registerMerchant,
@@ -30,6 +30,7 @@ import {
   createCheckoutSession,
   getEarlyBirdSeatsAvailable,
 } from "@/actions/subscriptions";
+import { getMerchantSession } from "@/actions/merchant/auth";
 import { getAffiliateRef } from "@/components/analytics/AffiliateTracker";
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -42,7 +43,6 @@ interface SignupData {
   name: string;
   email: string;
   password: string;
-  passwordConfirm: string;
   phone: string;
   merchantId: string | null;
 }
@@ -56,74 +56,36 @@ interface RestaurantChoice {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Plan data
+// Plan data — prices per WhatsApp subscriber tier
 // ────────────────────────────────────────────────────────────────────────────
 
-const earlyBirdPlans = [
-  {
-    id: "monthly" as const,
-    pricePerMonth: "29.95",
-    totalPrice: null,
-    periodLabel: "/mois",
-    standardPrice: "49.95",
-    icon: Star,
-    highlighted: false,
-    badgeText: null,
+const TIER_DISPLAY_PRICES: Record<50 | 100 | 200, {
+  launch: { monthly: string; semi: string; semiTotal: string; annual: string; annualTotal: string };
+  catalogue: { monthly: string; semi: string; semiTotal: string; annual: string; annualTotal: string };
+}> = {
+  50: {
+    launch:    { monthly: "49.95", semi: "44.90", semiTotal: "269.40", annual: "41.90", annualTotal: "502.80" },
+    catalogue: { monthly: "69.95", semi: "62.90", semiTotal: "377.40", annual: "58.90", annualTotal: "706.80" },
   },
-  {
-    id: "semiannual" as const,
-    pricePerMonth: "26.50",
-    totalPrice: "159",
-    periodLabel: "/semestre",
-    standardPrice: "44.80",
-    icon: Zap,
-    highlighted: false,
-    badgeText: null,
+  100: {
+    launch:    { monthly: "59.95", semi: "53.90", semiTotal: "323.40", annual: "49.90", annualTotal: "598.80" },
+    catalogue: { monthly: "79.95", semi: "71.90", semiTotal: "431.40", annual: "66.90", annualTotal: "802.80" },
   },
-  {
-    id: "annual" as const,
-    pricePerMonth: "24.90",
-    totalPrice: "299",
-    periodLabel: "/an",
-    standardPrice: "41.60",
-    icon: Crown,
-    highlighted: true,
-    badgeText: "Meilleur rapport",
+  200: {
+    launch:    { monthly: "99.95", semi: "89.90", semiTotal: "539.40", annual: "83.90", annualTotal: "1006.80" },
+    catalogue: { monthly: "119.95", semi: "107.90", semiTotal: "647.40", annual: "99.90", annualTotal: "1198.80" },
   },
-];
+};
 
-const standardPlans = [
-  {
-    id: "monthly" as const,
-    pricePerMonth: "49.95",
-    totalPrice: null,
-    periodLabel: "/mois",
-    standardPrice: null,
-    icon: Star,
-    highlighted: false,
-    badgeText: null,
-  },
-  {
-    id: "semiannual" as const,
-    pricePerMonth: "44.80",
-    totalPrice: "269",
-    periodLabel: "/semestre",
-    standardPrice: null,
-    icon: Zap,
-    highlighted: false,
-    badgeText: null,
-  },
-  {
-    id: "annual" as const,
-    pricePerMonth: "41.60",
-    totalPrice: "499",
-    periodLabel: "/an",
-    standardPrice: null,
-    icon: Crown,
-    highlighted: true,
-    badgeText: "Meilleur rapport",
-  },
-];
+function getPlans(tier: 50 | 100 | 200, isEarlyBird: boolean) {
+  const p = TIER_DISPLAY_PRICES[tier][isEarlyBird ? "launch" : "catalogue"];
+  const cat = TIER_DISPLAY_PRICES[tier]["catalogue"];
+  return [
+    { id: "monthly" as const,    pricePerMonth: p.monthly, totalPrice: null,          cataloguePrice: isEarlyBird ? cat.monthly : null,  periodLabel: "/mois",     icon: Star,  highlighted: false, badgeText: null },
+    { id: "semiannual" as const, pricePerMonth: p.semi,    totalPrice: p.semiTotal,   cataloguePrice: isEarlyBird ? cat.semi : null,     periodLabel: "/semestre", icon: Star,  highlighted: false, badgeText: null },
+    { id: "annual" as const,     pricePerMonth: p.annual,  totalPrice: p.annualTotal, cataloguePrice: isEarlyBird ? cat.annual : null,   periodLabel: "/an",       icon: Crown, highlighted: true,  badgeText: "Meilleur rapport" },
+  ];
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // Main component
@@ -164,7 +126,6 @@ export default function MerchantSignupPage() {
     name: "",
     email: "",
     password: "",
-    passwordConfirm: "",
     phone: "",
     merchantId: null,
   });
@@ -194,10 +155,24 @@ export default function MerchantSignupPage() {
   // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  // ── Load Early Bird count on mount ──
+  // ── Load Early Bird count on mount + restore merchantId ──
   useEffect(() => {
     getEarlyBirdSeatsAvailable().then(setEarlyBirdSeats);
+
+    // 1. Try sessionStorage first (set during this signup flow)
+    const savedMerchantId = sessionStorage.getItem("jt_merchant_id");
+    if (savedMerchantId) {
+      setSignupData((prev) => ({ ...prev, merchantId: savedMerchantId }));
+      return;
+    }
+    // 2. Fallback: fetch from active Supabase auth session (page reload case)
+    getMerchantSession().then((session) => {
+      if (session?.merchant?.id) {
+        setSignupData((prev) => ({ ...prev, merchantId: session.merchant.id }));
+      }
+    });
   }, []);
 
   // ── Restaurant search debounce ──
@@ -241,13 +216,6 @@ export default function MerchantSignupPage() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-
-    // Vérification que les deux mots de passe correspondent
-    if (signupData.password !== signupData.passwordConfirm) {
-      setError("Les mots de passe ne correspondent pas.");
-      return;
-    }
-
     setLoading(true);
 
     const result = await registerMerchant({
@@ -276,6 +244,7 @@ export default function MerchantSignupPage() {
     }
 
     setSignupData((prev) => ({ ...prev, merchantId }));
+    sessionStorage.setItem("jt_merchant_id", merchantId);
 
     // Si un restaurant est pré-sélectionné depuis l'URL, auto-sélectionner
     if (preselectedRestaurant) {
@@ -340,32 +309,43 @@ export default function MerchantSignupPage() {
   // ────────────────────────────────────────────────────────────────────────
 
   async function handleCheckout() {
-    if (!selectedPlanId || !signupData.merchantId) return;
+    if (!selectedPlanId) {
+      setError("Veuillez sélectionner un plan.");
+      return;
+    }
+    if (!signupData.merchantId) {
+      setError("Session expirée. Veuillez recommencer depuis le début.");
+      return;
+    }
     setError("");
     setLoading(true);
 
-    const planType = selectedPlanId as
-      | "monthly"
-      | "semiannual"
-      | "annual"
-      | "lifetime";
+    try {
+      const planType = selectedPlanId as
+        | "monthly"
+        | "semiannual"
+        | "annual";
 
-    const affiliateRef = getAffiliateRef() || undefined;
+      const affiliateRef = getAffiliateRef() || undefined;
 
-    const result = await createCheckoutSession({
-      planType,
-      merchantId: signupData.merchantId,
-      locale,
-      restaurantId: restaurantChoice?.restaurantId,
-      whatsappTier: selectedWhatsAppTier,
-      affiliateRef,
-    });
+      const result = await createCheckoutSession({
+        planType,
+        merchantId: signupData.merchantId,
+        locale,
+        restaurantId: restaurantChoice?.restaurantId,
+        whatsappTier: selectedWhatsAppTier,
+        affiliateRef,
+      });
 
-    if (result.url) {
-      setCurrentStep("redirecting");
-      window.location.href = result.url;
-    } else {
-      setError(result.error || "Erreur lors de la création du paiement");
+      if (result.url) {
+        setCurrentStep("redirecting");
+        window.location.href = result.url;
+      } else {
+        setError(result.error || "Erreur lors de la création du paiement");
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur inattendue");
       setLoading(false);
     }
   }
@@ -383,7 +363,7 @@ export default function MerchantSignupPage() {
   const stepIndex = steps.findIndex((s) => s.key === currentStep);
 
   const isEarlyBird = earlyBirdSeats !== null && earlyBirdSeats > 0;
-  const plans = isEarlyBird ? earlyBirdPlans : standardPlans;
+  const plans = getPlans(selectedWhatsAppTier, isEarlyBird);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
@@ -465,6 +445,26 @@ export default function MerchantSignupPage() {
       {/* ════════════════════════════════════════════════════════════════════ */}
       {currentStep === "signup" && (
         <form onSubmit={handleSignup} className="mt-8 space-y-5">
+          {/* Plan summary recap */}
+          {planParam && subsParam && (
+            <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-semibold text-green-800">
+                    {planParam === "monthly" ? "Mensuel" : planParam === "semiannual" ? "Semestriel" : "Annuel"}
+                    {" · "}{subsParam} abonnés WhatsApp
+                    {" · "}CHF {
+                      TIER_DISPLAY_PRICES[Number(subsParam) as 50 | 100 | 200]?.launch[
+                        planParam === "monthly" ? "monthly" : planParam === "semiannual" ? "semi" : "annual"
+                      ]
+                    }/mois
+                  </span>
+                </div>
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">14j gratuits</span>
+              </div>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Nom complet *
@@ -501,45 +501,26 @@ export default function MerchantSignupPage() {
             <label className="block text-sm font-medium text-gray-700">
               Mot de passe *
             </label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={signupData.password}
-              onChange={(e) =>
-                setSignupData((p) => ({ ...p, password: e.target.value }))
-              }
-              placeholder="Minimum 6 caractères"
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Confirmer le mot de passe *
-            </label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              value={signupData.passwordConfirm}
-              onChange={(e) =>
-                setSignupData((p) => ({ ...p, passwordConfirm: e.target.value }))
-              }
-              placeholder="Retapez votre mot de passe"
-              className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:ring-1 ${
-                signupData.passwordConfirm &&
-                signupData.passwordConfirm !== signupData.password
-                  ? "border-red-400 focus:border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:border-[var(--color-just-tag)] focus:ring-[var(--color-just-tag)]"
-              }`}
-            />
-            {signupData.passwordConfirm &&
-              signupData.passwordConfirm !== signupData.password && (
-                <p className="mt-1 text-xs text-red-600">
-                  Les mots de passe ne correspondent pas
-                </p>
-              )}
+            <div className="relative mt-1">
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={6}
+                value={signupData.password}
+                onChange={(e) =>
+                  setSignupData((p) => ({ ...p, password: e.target.value }))
+                }
+                placeholder="Minimum 6 caractères"
+                className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-11 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
 
           <div>
@@ -780,17 +761,7 @@ export default function MerchantSignupPage() {
           )}
 
           {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setRestaurantChoice({ type: "skip" });
-                goToStep("plan");
-              }}
-              className="flex-1"
-            >
-              Passer cette étape
-            </Button>
+          <div className="flex flex-col gap-3 pt-2">
             <Button
               disabled={
                 loading ||
@@ -800,7 +771,7 @@ export default function MerchantSignupPage() {
                     (!newRestaurantName || !newRestaurantCity)))
               }
               onClick={handleRestaurantClaim}
-              className="flex-1 bg-[var(--color-just-tag)] text-white hover:opacity-90"
+              className="w-full bg-[var(--color-just-tag)] text-white hover:opacity-90"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -814,6 +785,17 @@ export default function MerchantSignupPage() {
                 </span>
               )}
             </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setRestaurantChoice({ type: "skip" });
+                goToStep("plan");
+              }}
+              className="w-full text-gray-600"
+            >
+              Passer cette étape — associer mon restaurant plus tard
+            </Button>
           </div>
         </div>
       )}
@@ -823,34 +805,41 @@ export default function MerchantSignupPage() {
       {/* ════════════════════════════════════════════════════════════════════ */}
       {currentStep === "plan" && (
         <div className="mt-8 space-y-6">
-          {/* Early Bird banner */}
-          {isEarlyBird && (
-            <div className="rounded-2xl bg-gradient-to-r from-[var(--color-just-tag)] to-[var(--color-just-tag-dark,#cc3038)] p-4 text-center text-white shadow-lg">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <Zap className="h-4 w-4" />
-                <span className="text-sm font-bold uppercase tracking-wider">
-                  Offre Early Bird
-                </span>
-                <Badge className="bg-white text-[var(--color-just-tag)] border-0 font-bold text-xs">
-                  -40%
-                </Badge>
-              </div>
-              <p className="text-sm">
-                Plus que{" "}
-                <strong>
-                  {earlyBirdSeats} place{earlyBirdSeats !== 1 ? "s" : ""}
-                </strong>{" "}
-                au tarif préférentiel !
-              </p>
-            </div>
-          )}
-
           {/* Trial info */}
           <div className="flex items-center justify-center gap-2 text-sm text-green-700">
             <ShieldCheck className="h-4 w-4" />
             <span>
               14 jours d&apos;essai gratuit sur les abonnements. Sans engagement.
             </span>
+          </div>
+
+          {/* Launch offer notice */}
+          {isEarlyBird && (
+            <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5 text-sm text-amber-800">
+              <span className="text-base">🎁</span>
+              <span>Tarif de lancement — le prix barré est le tarif normal appliqué après les 100 premiers restaurants.</span>
+            </div>
+          )}
+
+          {/* WhatsApp subscriber tier selector */}
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+            <p className="mb-3 text-sm font-semibold text-gray-700">Nombre d&apos;abonnés WhatsApp</p>
+            <div className="grid grid-cols-3 gap-2">
+              {([50, 100, 200] as const).map((tier) => (
+                <button
+                  key={tier}
+                  type="button"
+                  onClick={() => setSelectedWhatsAppTier(tier)}
+                  className={`rounded-lg border-2 px-3 py-2 text-sm font-semibold transition-all ${
+                    selectedWhatsAppTier === tier
+                      ? "border-[var(--color-just-tag)] bg-white text-[var(--color-just-tag)] shadow-sm"
+                      : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                  }`}
+                >
+                  {tier} abonnés
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Subscription plans */}
@@ -866,7 +855,7 @@ export default function MerchantSignupPage() {
                     isSelected
                       ? "border-[var(--color-just-tag)] ring-2 ring-[var(--color-just-tag)]/20 shadow-lg"
                       : plan.highlighted
-                        ? "border-[var(--color-just-tag)] shadow-md hover:shadow-lg"
+                        ? "border-gray-300 shadow-md hover:shadow-lg"
                         : "border-gray-200 hover:shadow-md"
                   }`}
                 >
@@ -891,9 +880,9 @@ export default function MerchantSignupPage() {
                     </span>
                     <span className="text-xs text-gray-500">/mois</span>
                   </div>
-                  {plan.standardPrice && (
+                  {plan.cataloguePrice && (
                     <p className="mt-0.5 text-xs text-gray-400 line-through">
-                      CHF {plan.standardPrice}/mois
+                      CHF {plan.cataloguePrice}/mois
                     </p>
                   )}
                   {plan.totalPrice && (
@@ -908,39 +897,6 @@ export default function MerchantSignupPage() {
                 </div>
               );
             })}
-          </div>
-
-          {/* Lifetime plan */}
-          <div
-            onClick={() => setSelectedPlanId("lifetime")}
-            className={`cursor-pointer rounded-xl border-2 bg-gray-900 p-5 text-white transition-all ${
-              selectedPlanId === "lifetime"
-                ? "border-[var(--color-just-tag)] ring-2 ring-[var(--color-just-tag)]/20"
-                : "border-gray-700 hover:border-gray-500"
-            }`}
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Infinity className="h-5 w-5 text-[var(--color-just-tag)]" />
-                  <span className="text-lg font-bold">Lifetime</span>
-                  <Badge className="bg-[var(--color-just-tag)] text-white border-0 text-xs">
-                    Exclusif
-                  </Badge>
-                </div>
-                <p className="mt-1 text-sm text-gray-400">
-                  Paiement unique, accès à vie. Aucun abonnement récurrent.
-                </p>
-              </div>
-              <div className="text-right shrink-0">
-                <div className="text-2xl font-bold sm:text-3xl">
-                  CHF 1 495
-                </div>
-                <span className="text-xs text-gray-400">
-                  Paiement unique
-                </span>
-              </div>
-            </div>
           </div>
 
           {/* Actions */}
@@ -965,9 +921,7 @@ export default function MerchantSignupPage() {
               ) : (
                 <span className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4" />
-                  {selectedPlanId === "lifetime"
-                    ? "Payer CHF 1 495"
-                    : "Commencer l'essai gratuit (14j)"}
+                  {"Commencer l'essai gratuit (14j)"}
                 </span>
               )}
             </Button>

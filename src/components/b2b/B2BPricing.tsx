@@ -42,9 +42,8 @@ export function B2BPricing() {
   const locale = params.locale as string;
   const router = useRouter();
   const [billing, setBilling] = useState<Billing>("monthly");
-  const [isLaunch, setIsLaunch] = useState(true);
 
-  const phaseIdx = isLaunch ? 0 : 1;
+  const phaseIdx = 0;
 
   function handleCTA(tier: Tier) {
     router.push(`/${locale}/partenaire-inscription?plan=${billing}&subs=${tier}`);
@@ -92,36 +91,9 @@ export function B2BPricing() {
             ))}
           </div>
 
-          {/* Launch / catalogue toggle */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <span
-              className={`text-sm transition-colors ${
-                isLaunch ? "font-semibold text-gray-900" : "text-gray-400"
-              }`}
-            >
-              Prix lancement
-            </span>
-            <button
-              role="switch"
-              aria-checked={!isLaunch}
-              onClick={() => setIsLaunch((v) => !v)}
-              className={`relative h-6 w-11 rounded-full transition-colors ${
-                isLaunch ? "bg-[var(--color-just-tag)]" : "bg-gray-400"
-              }`}
-            >
-              <span
-                className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-300 ${
-                  isLaunch ? "" : "translate-x-5"
-                }`}
-              />
-            </button>
-            <span
-              className={`text-sm transition-colors ${
-                !isLaunch ? "font-semibold text-gray-900" : "text-gray-400"
-              }`}
-            >
-              Prix catalogue
-            </span>
+          {/* Launch offer badge */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-200 px-4 py-1.5 text-sm font-medium text-amber-800">
+            🚀 Prix de lancement — offre limitée aux 100 premiers restaurants
           </div>
         </div>
 

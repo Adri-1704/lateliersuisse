@@ -2,6 +2,7 @@
 
 import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { SwissCrossIcon } from "@/components/ui/swiss-cross";
 
@@ -11,6 +12,8 @@ interface B2BHeroProps {
 
 export function B2BHero({ totalRestaurants }: B2BHeroProps) {
   const t = useTranslations("b2bLanding.hero");
+  const params = useParams();
+  const locale = params.locale as string;
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -74,7 +77,7 @@ export function B2BHero({ totalRestaurants }: B2BHeroProps) {
           </div>
 
           {/* CTAs */}
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row animate-fade-in-up animate-delay-300">
+          <div className="mt-10 flex flex-col items-start gap-3 animate-fade-in-up animate-delay-300">
             <Button
               size="lg"
               className="bg-[var(--color-just-tag)] px-8 py-6 text-base font-semibold hover:bg-[var(--color-just-tag-dark)]"
@@ -83,6 +86,12 @@ export function B2BHero({ totalRestaurants }: B2BHeroProps) {
               {t("cta")}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            <a
+              href={`/${locale}/espace-client/connexion`}
+              className="text-sm font-medium text-gray-300 hover:text-white underline underline-offset-4 transition-colors"
+            >
+              Déjà partenaire ? Se connecter →
+            </a>
           </div>
         </div>
       </div>
