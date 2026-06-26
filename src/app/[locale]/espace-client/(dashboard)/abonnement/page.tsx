@@ -142,6 +142,13 @@ export default function SubscriptionPage() {
             <CreditCard className="h-12 w-12 text-muted-foreground/40" />
             <h3 className="mt-4 font-semibold">{t("subscription.noSubscription")}</h3>
             <p className="mt-1 text-sm text-muted-foreground">{t("subscription.noSubscriptionDescription")}</p>
+            <a
+              href={`/${locale}/partenaire-inscription?step=plan`}
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-just-tag)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+            >
+              Commencer l&apos;essai gratuit 14 jours →
+            </a>
+            <p className="mt-2 text-xs text-muted-foreground">Aucun débit pendant l&apos;essai · Annulable à tout moment</p>
           </CardContent>
         </Card>
       )}
