@@ -432,7 +432,7 @@ export default function MerchantSignupPage() {
             ) : (
               <span className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
-                Créer mon compte et payer
+                Créer mon compte et tester gratuitement 14 jours
               </span>
             )}
           </Button>
