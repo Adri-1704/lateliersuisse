@@ -154,7 +154,7 @@ export default function SubscriptionPage() {
       )}
 
       {/* Manage billing */}
-      {subscription && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+      {subscription && (
         <Card>
           <CardContent className="flex items-center justify-between pt-6">
             <div>
