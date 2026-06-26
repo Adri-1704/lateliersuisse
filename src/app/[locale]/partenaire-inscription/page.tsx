@@ -401,6 +401,21 @@ export default function MerchantSignupPage() {
             )}
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Numéro WhatsApp du restaurant <span className="font-normal text-gray-400">(optionnel)</span>
+            </label>
+            <input
+              type="tel"
+              value={signupData.phone}
+              onChange={(e) =>
+                setSignupData((p) => ({ ...p, phone: e.target.value }))
+              }
+              placeholder="+41 79 123 45 67"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
+            />
+          </div>
+
           <Button
             type="submit"
             disabled={loading}
