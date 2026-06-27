@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2, ArrowUpCircle, Trash2 } from "lucide-react";
 import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
 import { getMerchantSession } from "@/actions/merchant/auth";
-import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount, getWhatsAppPlanTier, getSubscribers, deleteSubscriber } from "@/actions/merchant/whatsapp-broadcast";
+import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount, getWhatsAppPlanTier, getSubscribers, deleteSubscriber, getMonthlyBroadcastUsage } from "@/actions/merchant/whatsapp-broadcast";
 
 interface Broadcast {
   id: string;
@@ -32,6 +32,8 @@ export default function WhatsAppPage() {
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [planTier, setPlanTier] = useState<50 | 100 | 200 | null>(null);
+  const [quotaUsed, setQuotaUsed] = useState<number>(0);
+  const [quotaMax] = useState<number>(8);
   const [history, setHistory] = useState<Broadcast[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -54,16 +56,18 @@ export default function WhatsAppPage() {
         if (restResult.success && restResult.data) {
           const id = restResult.data.id;
           setRestaurantId(id);
-          const [count, hist, tier, subs] = await Promise.all([
+          const [count, hist, tier, subs, usage] = await Promise.all([
             getWhatsAppSubscriberCount(id),
             getBroadcastHistory(id),
             session?.merchant?.id ? getWhatsAppPlanTier(session.merchant.id) : Promise.resolve(null),
             getSubscribers(id),
+            getMonthlyBroadcastUsage(id),
           ]);
           setSubscriberCount(count);
           setHistory(hist);
           setPlanTier(tier);
           setSubscribers(subs);
+          setQuotaUsed(usage);
         }
       } finally {
         setLoading(false);
@@ -109,13 +113,14 @@ export default function WhatsAppPage() {
 
     if (res.success) {
       setResult({ sent: res.sent });
+      if (res.quotaUsed !== undefined) setQuotaUsed(res.quotaUsed);
       setMessage("");
       removeImage();
-      // Refresh history
       const hist = await getBroadcastHistory(restaurantId);
       setHistory(hist);
     } else {
       setError(res.error);
+      if (res.quotaUsed !== undefined) setQuotaUsed(res.quotaUsed);
     }
     setSending(false);
   }
@@ -155,6 +160,36 @@ export default function WhatsAppPage() {
             Vos clients s&apos;abonnent en scannant votre QR code
           </span>
         )}
+      </div>
+
+      {/* Quota mensuel */}
+      <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${
+        quotaUsed >= quotaMax
+          ? "border-red-200 bg-red-50"
+          : quotaUsed >= quotaMax - 2
+          ? "border-orange-200 bg-orange-50"
+          : "border-gray-200 bg-gray-50"
+      }`}>
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <span className={`text-sm font-medium ${
+              quotaUsed >= quotaMax ? "text-red-700" : quotaUsed >= quotaMax - 2 ? "text-orange-700" : "text-gray-700"
+            }`}>
+              {quotaUsed >= quotaMax
+                ? "Quota mensuel atteint — renouvellement le 1er du mois"
+                : `${quotaUsed} / ${quotaMax} messages envoyés ce mois`}
+            </span>
+            <span className="text-xs text-gray-500">{quotaMax - quotaUsed} restant{quotaMax - quotaUsed > 1 ? "s" : ""}</span>
+          </div>
+          <div className="mt-2 h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all ${
+                quotaUsed >= quotaMax ? "bg-red-500" : quotaUsed >= quotaMax - 2 ? "bg-orange-400" : "bg-[#25D366]"
+              }`}
+              style={{ width: `${Math.min(100, (quotaUsed / quotaMax) * 100)}%` }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Upsell banner — shown when subscriber count exceeds plan tier */}
@@ -253,7 +288,7 @@ export default function WhatsAppPage() {
 
             <Button
               className="ml-auto bg-[#25D366] hover:bg-[#1ebe59] text-white"
-              disabled={!message.trim() || sending}
+              disabled={!message.trim() || sending || quotaUsed >= quotaMax}
               onClick={handleSend}
             >
               {sending ? (
@@ -261,7 +296,7 @@ export default function WhatsAppPage() {
               ) : (
                 <Send className="mr-2 h-4 w-4" />
               )}
-              {sending ? "Envoi…" : `Envoyer à ${subscriberCount ?? "…"} abonnés`}
+              {sending ? "Envoi…" : quotaUsed >= quotaMax ? "Quota atteint" : `Envoyer à ${subscriberCount ?? "…"} abonnés`}
             </Button>
           </div>
         </CardContent>

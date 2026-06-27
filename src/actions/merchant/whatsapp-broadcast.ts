@@ -4,10 +4,30 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { sendWhatsAppBroadcast } from "@/lib/whatsapp/broadcast";
 
+const MONTHLY_BROADCAST_QUOTA = 4;
+
+export async function getMonthlyBroadcastUsage(restaurantId: string): Promise<number> {
+  try {
+    const admin = createAdminClient();
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const { count } = await (admin.from("whatsapp_broadcasts") as ReturnType<typeof admin.from>)
+      .select("id", { count: "exact", head: true })
+      .eq("restaurant_id", restaurantId)
+      .gte("created_at", startOfMonth.toISOString()) as { count: number | null };
+    return count || 0;
+  } catch {
+    return 0;
+  }
+}
+
 export async function broadcastWhatsApp(formData: FormData): Promise<{
   success: boolean;
   sent: number;
   error: string | null;
+  quotaUsed?: number;
+  quotaMax?: number;
 }> {
   try {
     const session = await getMerchantSession();
@@ -16,6 +36,17 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
     const message = (formData.get("message") as string)?.trim();
     if (!message) return { success: false, sent: 0, error: "Message vide" };
     if (message.length > 1024) return { success: false, sent: 0, error: "Message trop long (max 1024 caractères)" };
+
+    const used = await getMonthlyBroadcastUsage(session.restaurant.id);
+    if (used >= MONTHLY_BROADCAST_QUOTA) {
+      return {
+        success: false,
+        sent: 0,
+        error: `Quota mensuel atteint (${MONTHLY_BROADCAST_QUOTA} messages/mois). Renouvellement le 1er du mois prochain.`,
+        quotaUsed: used,
+        quotaMax: MONTHLY_BROADCAST_QUOTA,
+      };
+    }
 
     const imageFile = formData.get("image") as File | null;
     let imageUrl: string | null = null;
@@ -55,7 +86,7 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
       // Table not created yet — broadcast still succeeded
     }
 
-    return { success: true, sent, error: null };
+    return { success: true, sent, error: null, quotaUsed: used + 1, quotaMax: MONTHLY_BROADCAST_QUOTA };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Erreur inattendue";
     return { success: false, sent: 0, error: msg };
