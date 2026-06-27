@@ -301,7 +301,7 @@ export default function SubscriptionPage() {
                 ✦ 4 messages WhatsApp inclus par mois · Renouvellement le 1er de chaque mois
               </p>
               <p className="text-xs text-gray-400">
-                Prix HT · TVA 8.1% en sus · Facturation en CHF · Annulable à tout moment
+                Prix TTC · Facturation en CHF · Annulable à tout moment
               </p>
             </CardContent>
           </Card>

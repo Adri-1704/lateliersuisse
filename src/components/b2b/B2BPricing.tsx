@@ -226,7 +226,7 @@ export function B2BPricing() {
 
         {/* Footnote */}
         <p className="mt-10 text-center text-xs leading-relaxed text-gray-400">
-          Tous les prix sont en CHF · TVA 8.1% non incluse
+          Tous les prix sont en CHF · TTC · Aucune commission
           <br />
           Au-delà des abonnés inclus, paliers supplémentaires disponibles sur demande
         </p>
