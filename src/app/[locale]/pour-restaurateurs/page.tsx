@@ -27,8 +27,8 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<string, string> = {
-    fr: "Rejoignez Just-Tag : 11 000+ restaurants romands, 11 700+ avis vérifiés, zéro commission. À partir de CHF 24.90/mois avec 14 jours d'essai gratuit.",
-    de: "Treten Sie Just-Tag bei: 11 000+ Westschweizer Restaurants, 11 700+ verifizierte Bewertungen, keine Provision. Ab CHF 24.90/Monat mit 14 Tagen Probezeit.",
+    fr: "Rejoignez Just-Tag : 11 000+ restaurants romands, 11 700+ avis vérifiés, zéro commission. À partir de CHF 59.95/mois avec 14 jours d'essai gratuit.",
+    de: "Treten Sie Just-Tag bei: 11 000+ Westschweizer Restaurants, 11 700+ verifizierte Bewertungen, keine Provision. Ab CHF 59.95/Monat mit 14 Tagen Probezeit.",
     en: "Join Just-Tag: 11,000+ Western Swiss restaurants, 11,700+ verified reviews, zero commission. From CHF 24.90/month with 14-day free trial.",
     pt: "Junte-se ao Just-Tag: 11 000+ restaurantes da Suica Romanda, 11 700+ avaliacoes verificadas, zero comissao. A partir de CHF 24.90/mes com 14 dias gratis.",
     es: "Unase a Just-Tag: 11 000+ restaurantes de la Suiza Romanda, 11 700+ resenas verificadas, cero comision. Desde CHF 24.90/mes con 14 dias de prueba gratis.",
@@ -77,7 +77,7 @@ export default async function PourRestaurateursPage() {
 
   // FAQ structured data (Schema.org)
   const faqItems = [
-    { q: "Combien ça me rapporte concrètement ?", a: "À CHF 24.90/mois, il suffit d'un seul client supplémentaire par mois pour rentabiliser votre abonnement." },
+    { q: "Combien ça me rapporte concrètement ?", a: "À partir de CHF 59.95/mois, il suffit d'un ou deux clients supplémentaires par mois pour rentabiliser votre abonnement." },
     { q: "Comment vous vérifiez que je suis bien le propriétaire ?", a: "Notre équipe vérifie manuellement que les informations correspondent avant d'activer votre accès." },
     { q: "Je peux annuler quand je veux ?", a: "Oui. Le plan mensuel est sans engagement. Vous annulez depuis votre espace client." },
     { q: "Vous prenez une commission sur mes réservations ?", a: "Non. Zéro commission, zéro frais de transaction." },

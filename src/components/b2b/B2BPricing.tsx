@@ -6,9 +6,9 @@ import { Check, ShieldCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const PRICES = {
-  monthly:    { 50: [49.95, 69.95] as const, 100: [59.95, 79.95] as const, 200: [99.95, 119.95] as const },
-  semiannual: { 50: [44.90, 62.90] as const, 100: [53.90, 71.90] as const, 200: [89.90, 107.90] as const },
-  annual:     { 50: [41.90, 58.90] as const, 100: [49.90, 66.90] as const, 200: [83.90, 99.90] as const },
+  monthly:    { 50: [59.95,  89.95] as const, 100: [89.95,  149.95] as const, 200: [149.95, 249.95] as const },
+  semiannual: { 50: [52.95,  79.95] as const, 100: [79.95,  132.95] as const, 200: [132.95, 219.95] as const },
+  annual:     { 50: [49.95,  74.95] as const, 100: [74.95,  124.95] as const, 200: [124.95, 204.95] as const },
 } as const;
 
 type Billing = keyof typeof PRICES;
@@ -33,7 +33,7 @@ const FEATURES = [
   "Adresse, contact & plan",
   "Horaires d'ouverture",
   "Offres du moment",
-  "Envoi WhatsApp 1–2×/semaine",
+  "Envoi WhatsApp 4×/mois inclus",
   "Opt-in géré pour vous",
 ];
 
@@ -59,7 +59,7 @@ export function B2BPricing() {
             Des prix clairs, WhatsApp inclus
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            Choisissez votre plan selon le nombre de clients à qui vous souhaitez envoyer vos menus et offres.
+            Choisissez votre plan selon le nombre de clients à qui vous souhaitez envoyer vos menus et offres. 4 messages WhatsApp/mois inclus.
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ShieldCheck className="h-4 w-4" />
@@ -178,7 +178,7 @@ export function B2BPricing() {
                     <div>
                       <p className="text-xs font-semibold text-green-800">WhatsApp inclus</p>
                       <p className="text-xs text-green-700">
-                        Jusqu&apos;à {count} abonnés · 1 à 2× par semaine
+                        Jusqu&apos;à {count} abonnés · 4 messages/mois
                       </p>
                     </div>
                   </div>
