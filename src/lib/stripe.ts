@@ -50,10 +50,10 @@ export const LIFETIME_PRICE_EARLY_ID = process.env.STRIPE_PRICE_LIFETIME_EARLY |
 
 // Used by admin dashboard for MRR/ARR estimates (based on 100-subscriber tier)
 export const PLAN_DETAILS = {
-  monthly:    { price: 79.95, priceEarly: 59.95, interval: "month" as const,     label: "Mensuel" },
-  semiannual: { price: 71.90, priceEarly: 53.90, interval: "6 months" as const,  label: "Semestriel" },
-  annual:     { price: 66.90, priceEarly: 49.90, interval: "year" as const,       label: "Annuel" },
-  lifetime:   { price: 1495,  priceEarly: 1495,  interval: "one-time" as const,   label: "Lifetime" },
+  monthly:    { price: 149.95, priceEarly: 89.95,  interval: "month" as const,     label: "Mensuel" },
+  semiannual: { price: 132.95, priceEarly: 79.95,  interval: "6 months" as const,  label: "Semestriel" },
+  annual:     { price: 124.95, priceEarly: 74.95,  interval: "year" as const,       label: "Annuel" },
+  lifetime:   { price: 1495,   priceEarly: 1495,   interval: "one-time" as const,   label: "Lifetime" },
 };
 
 export const EARLY_BIRD_LIMIT = 100;
