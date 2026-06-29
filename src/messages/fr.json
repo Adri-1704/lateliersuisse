@@ -1,4 +1,18 @@
 {
+  "joinPage": {
+    "subtitle": "Recevez les offres, plats du jour et menus de ce restaurant directement sur WhatsApp.",
+    "firstName": "Prénom (optionnel)",
+    "firstNamePlaceholder": "Votre prénom",
+    "phone": "Numéro WhatsApp",
+    "phonePlaceholder": "+41 79 000 00 00",
+    "consent": "J'accepte de recevoir des messages WhatsApp de {restaurant} concernant ses offres et menus. Je peux me désabonner à tout moment en répondant STOP.",
+    "submit": "Recevoir les offres",
+    "submitting": "Inscription en cours…",
+    "successTitle": "Vous êtes inscrit !",
+    "successMessage": "Vous recevrez les prochaines offres et menus de ce restaurant directement sur WhatsApp.",
+    "errorInvalid": "Numéro de téléphone invalide.",
+    "errorServer": "Une erreur est survenue, veuillez réessayer."
+  },
   "metadata": {
     "title": "Just-Tag | Les meilleurs restaurants de Suisse Romande",
     "description": "Découvrez les meilleurs restaurants de Suisse Romande. Recherchez par canton, cuisine et budget pour trouver votre restaurant idéal."
@@ -388,7 +402,7 @@
       "badge": "100% Suisse",
       "headline": "Remplissez vos tables sans payer de commission",
       "subheadline": "98% de taux d'ouverture. Vos plats du jour et offres lus en 5 minutes par vos abonnés. {count}+ restaurants romands déjà sur la plateforme.",
-      "benefit1": "WhatsApp inclus — 98% de taux d'ouverture, lu en 5 minutes",
+      "benefit1": "200 à 800 messages WhatsApp/mois inclus — 98% d'ouverture, lu en 5 minutes",
       "benefit2": "Zéro commission sur vos réservations et contacts",
       "benefit3": "Fiche complète visible en 5 langues pour les touristes",
       "socialProof": "{count} restaurants romands déjà sur la plateforme",

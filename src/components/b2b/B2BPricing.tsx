@@ -33,7 +33,7 @@ const FEATURES = [
   "Adresse, contact & plan",
   "Horaires d'ouverture",
   "Offres du moment",
-  "Envoi WhatsApp 4×/mois inclus",
+  "4 envois WhatsApp/mois inclus",
   "Opt-in géré pour vous",
 ];
 
@@ -59,7 +59,7 @@ export function B2BPricing() {
             Des prix clairs, WhatsApp inclus
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            Choisissez votre plan selon le nombre de clients à qui vous souhaitez envoyer vos menus et offres. 4 messages WhatsApp/mois inclus.
+            Choisissez votre plan selon la taille de votre restaurant. Jusqu&apos;à 800 messages WhatsApp/mois inclus.
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ShieldCheck className="h-4 w-4" />
@@ -100,10 +100,10 @@ export function B2BPricing() {
         {/* Section subtitle */}
         <div className="mt-8 text-center">
           <p className="text-base font-semibold text-gray-900">
-            WhatsApp inclus · 1 à 2× par semaine
+            200, 400 ou 800 messages WhatsApp par mois inclus
           </p>
           <p className="mt-1 text-sm text-gray-500">
-            Choisissez le nombre d&apos;abonnés selon la taille de votre restaurant
+            Choisissez votre plan selon le volume de messages à envoyer chaque mois
           </p>
         </div>
 
@@ -144,13 +144,13 @@ export function B2BPricing() {
                         : "bg-gray-100 text-gray-500"
                     }`}
                   >
-                    {count} abonnés
+                    {count * 4} messages/mois
                   </div>
                   <div className="font-condensed text-5xl font-black leading-none text-gray-900">
-                    {count}
-                    <span className="text-xl font-semibold text-gray-400"> abonnés</span>
+                    {count * 4}
+                    <span className="text-xl font-semibold text-gray-400"> msg/mois</span>
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">{desc}</p>
+                  <p className="mt-1 text-xs text-gray-500">{desc} · jusqu&apos;à {count} abonnés</p>
                 </div>
 
                 {/* Price */}
@@ -178,7 +178,7 @@ export function B2BPricing() {
                     <div>
                       <p className="text-xs font-semibold text-green-800">WhatsApp inclus</p>
                       <p className="text-xs text-green-700">
-                        Jusqu&apos;à {count} abonnés · 4 messages/mois
+                        {count * 4} messages/mois · jusqu&apos;à {count} abonnés
                       </p>
                     </div>
                   </div>
@@ -228,7 +228,7 @@ export function B2BPricing() {
         <p className="mt-10 text-center text-xs leading-relaxed text-gray-400">
           Tous les prix sont en CHF · TTC · Aucune commission
           <br />
-          Au-delà des abonnés inclus, paliers supplémentaires disponibles sur demande
+          Au-delà des messages inclus, paliers supplémentaires disponibles sur demande
         </p>
 
         <div className="mt-6 text-center">

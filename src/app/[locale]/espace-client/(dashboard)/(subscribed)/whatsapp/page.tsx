@@ -33,7 +33,7 @@ export default function WhatsAppPage() {
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [planTier, setPlanTier] = useState<50 | 100 | 200 | null>(null);
   const [quotaUsed, setQuotaUsed] = useState<number>(0);
-  const [quotaMax] = useState<number>(8);
+  const [quotaMax] = useState<number>(4);
   const [history, setHistory] = useState<Broadcast[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -177,7 +177,7 @@ export default function WhatsAppPage() {
             }`}>
               {quotaUsed >= quotaMax
                 ? "Quota mensuel atteint — renouvellement le 1er du mois"
-                : `${quotaUsed} / ${quotaMax} messages envoyés ce mois`}
+                : `${quotaUsed} / ${quotaMax} envois ce mois${planTier ? ` · jusqu'à ${planTier * 4} messages` : ""}`}
             </span>
             <span className="text-xs text-gray-500">{quotaMax - quotaUsed} restant{quotaMax - quotaUsed > 1 ? "s" : ""}</span>
           </div>
@@ -296,7 +296,7 @@ export default function WhatsAppPage() {
               ) : (
                 <Send className="mr-2 h-4 w-4" />
               )}
-              {sending ? "Envoi…" : quotaUsed >= quotaMax ? "Quota atteint" : `Envoyer à ${subscriberCount ?? "…"} abonnés`}
+              {sending ? "Envoi…" : quotaUsed >= quotaMax ? "Quota atteint" : `Envoyer à ${subscriberCount ?? "…"} abonné${(subscriberCount ?? 0) > 1 ? "s" : ""}`}
             </Button>
           </div>
         </CardContent>

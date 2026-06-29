@@ -309,7 +309,7 @@ export default function MerchantSignupPage() {
                   <ShieldCheck className="h-4 w-4 text-green-600" />
                   <span className="text-sm font-semibold text-green-800">
                     {planParam === "monthly" ? "Mensuel" : planParam === "semiannual" ? "Semestriel" : "Annuel"}
-                    {" · "}{subsParam} abonnés WhatsApp
+                    {" · "}{Number(subsParam) * 4} messages/mois WhatsApp
                     {" · "}CHF {
                       TIER_DISPLAY_PRICES[Number(subsParam) as 50 | 100 | 200]?.launch[
                         planParam === "monthly" ? "monthly" : planParam === "semiannual" ? "semi" : "annual"
@@ -460,7 +460,7 @@ export default function MerchantSignupPage() {
 
           {/* WhatsApp subscriber tier selector */}
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-            <p className="mb-3 text-sm font-semibold text-gray-700">Nombre d&apos;abonnés WhatsApp</p>
+            <p className="mb-3 text-sm font-semibold text-gray-700">Messages WhatsApp par mois</p>
             <div className="grid grid-cols-3 gap-2">
               {([50, 100, 200] as const).map((tier) => (
                 <button
@@ -473,7 +473,7 @@ export default function MerchantSignupPage() {
                       : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                   }`}
                 >
-                  {tier} abonnés
+                  {tier * 4} msg/mois
                 </button>
               ))}
             </div>
