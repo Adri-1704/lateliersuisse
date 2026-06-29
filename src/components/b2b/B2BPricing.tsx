@@ -63,7 +63,7 @@ export function B2BPricing() {
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ShieldCheck className="h-4 w-4" />
-            14 jours d&apos;essai gratuit — satisfait ou remboursé
+            14 jours d&apos;essai gratuit
           </div>
         </div>
 
