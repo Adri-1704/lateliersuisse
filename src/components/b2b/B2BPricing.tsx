@@ -155,7 +155,7 @@ export function B2BPricing() {
 
                 {/* Price */}
                 <div className="px-6">
-                  <div className="flex items-baseline gap-1">
+                  <div className="flex items-baseline gap-1 whitespace-nowrap">
                     <span className="font-condensed text-lg font-bold text-[var(--color-just-tag)]">CHF</span>
                     <span className="font-condensed text-5xl font-black leading-none text-gray-900">
                       {price.toFixed(2)}
