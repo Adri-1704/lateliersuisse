@@ -156,7 +156,7 @@ export function B2BPricing() {
                 {/* Price */}
                 <div className="px-6">
                   <p className="whitespace-nowrap leading-none">
-                    <span className="font-condensed text-xl font-bold text-[var(--color-just-tag)] align-top">CHF </span><span className="font-condensed text-5xl font-black leading-none text-gray-900">{price.toFixed(2)}</span>
+                    <span className="font-condensed text-lg font-bold text-[var(--color-just-tag)] align-baseline">CHF </span><span className="font-condensed text-5xl font-black leading-none text-gray-900">{price.toFixed(2)}</span>
                   </p>
                   <p className="mt-1 text-xs text-gray-500">/mois · tout inclus</p>
                   {showTotal && (
