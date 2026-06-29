@@ -146,11 +146,9 @@ export function B2BPricing() {
                   >
                     {count * 4} messages/mois
                   </div>
-                  <div className="font-condensed text-5xl font-black leading-none text-gray-900">
-                    {count * 4}
-                    <span className="text-xl font-semibold text-gray-400"> msg/mois</span>
-                  </div>
-                  <p className="mt-1 text-xs text-gray-500">{desc} · jusqu&apos;à {count} abonnés</p>
+                  <div className="font-condensed text-5xl font-black leading-none text-gray-900">{count * 4}</div>
+                  <p className="mt-0.5 text-sm font-semibold text-gray-400">messages / mois</p>
+                  <p className="mt-1 text-xs text-gray-500">{desc}</p>
                 </div>
 
                 {/* Price */}
