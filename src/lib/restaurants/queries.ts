@@ -145,10 +145,14 @@ function applyFilters(query: any, filters: RestaurantFilters) {
     q = q.contains("features", filters.features);
   }
   if (filters.query && filters.query.trim().length > 0) {
-    const term = filters.query.trim();
-    q = q.or(
-      `name_fr.ilike.%${term}%,name_de.ilike.%${term}%,name_en.ilike.%${term}%,city.ilike.%${term}%`
-    );
+    // name_search is a generated column: lower(unaccent(name_fr || name_de || name_en || city))
+    // Normalize the search term the same way so accent-free input matches accented names
+    const normalized = filters.query
+      .trim()
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase();
+    q = q.ilike("name_search", `%${normalized}%`);
   }
 
   return q;
