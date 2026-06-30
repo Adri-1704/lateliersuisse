@@ -92,11 +92,18 @@ export function Header() {
             <Button
               variant="outline"
               size="sm"
-              className="hidden sm:flex items-center gap-2"
-              onClick={() => { setSearchOpen(true); setTimeout(() => searchInputRef.current?.focus(), 50); }}
+              className="flex items-center gap-2"
+              onClick={() => {
+                if (window.innerWidth < 640) {
+                  router.push(`/${locale}/restaurants`);
+                } else {
+                  setSearchOpen(true);
+                  setTimeout(() => searchInputRef.current?.focus(), 50);
+                }
+              }}
             >
               <Search className="h-4 w-4" />
-              {t("search")}
+              <span className="hidden sm:inline">{t("search")}</span>
             </Button>
           )}
           <Link href={`/${locale}/pour-restaurateurs`} className="hidden md:block">
