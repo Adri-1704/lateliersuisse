@@ -146,10 +146,9 @@ function applyFilters(query: any, filters: RestaurantFilters) {
   }
   if (filters.query && filters.query.trim().length > 0) {
     const term = filters.query.trim();
-    q = q.textSearch("search_vector", term, {
-      type: "websearch",
-      config: "french",
-    });
+    q = q.or(
+      `name_fr.ilike.%${term}%,name_de.ilike.%${term}%,name_en.ilike.%${term}%,city.ilike.%${term}%`
+    );
   }
 
   return q;
