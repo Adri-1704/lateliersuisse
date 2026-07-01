@@ -63,30 +63,38 @@ const FEATURES = [
   },
 ];
 
-const PLANS = [
+const PRICES = {
+  early: {
+    monthly:    { 50: 59.95,  100: 89.95,  200: 149.95 },
+    semiannual: { 50: 52.95,  100: 79.95,  200: 132.95 },
+    annual:     { 50: 49.95,  100: 74.95,  200: 124.95 },
+  },
+  standard: {
+    monthly:    { 50: 89.95,  100: 149.95, 200: 249.95 },
+    semiannual: { 50: 79.95,  100: 132.95, 200: 219.95 },
+    annual:     { 50: 74.95,  100: 124.95, 200: 204.95 },
+  },
+} as const;
+
+type Phase  = keyof typeof PRICES;
+type Period = keyof (typeof PRICES)["early"];
+type Tier   = 50 | 100 | 200;
+
+const TIERS: { contacts: Tier; msgs: number; desc: string; highlight: boolean; features: string[] }[] = [
   {
-    name: "Starter",
-    price: 29,
-    msgs: 200,
-    contacts: 50,
-    highlight: false,
+    contacts: 50, msgs: 200, highlight: false,
+    desc: "Petits commerces, indépendants",
     features: ["200 messages / mois", "Jusqu'à 50 contacts", "QR code d'abonnement", "Support email"],
   },
   {
-    name: "Business",
-    price: 59,
-    msgs: 500,
-    contacts: 125,
-    highlight: true,
-    features: ["500 messages / mois", "Jusqu'à 125 contacts", "QR code d'abonnement", "Templates prêts à l'emploi", "Support prioritaire"],
+    contacts: 100, msgs: 400, highlight: true,
+    desc: "Commerces en croissance",
+    features: ["400 messages / mois", "Jusqu'à 100 contacts", "QR code d'abonnement", "Templates prêts à l'emploi", "Support prioritaire"],
   },
   {
-    name: "Pro",
-    price: 99,
-    msgs: 1000,
-    contacts: 250,
-    highlight: false,
-    features: ["1 000 messages / mois", "Jusqu'à 250 contacts", "QR code d'abonnement", "Templates prêts à l'emploi", "Envois programmés", "Support dédié"],
+    contacts: 200, msgs: 800, highlight: false,
+    desc: "Grandes enseignes, franchises",
+    features: ["800 messages / mois", "Jusqu'à 200 contacts", "QR code d'abonnement", "Templates prêts à l'emploi", "Envois programmés", "Support dédié"],
   },
 ];
 
@@ -123,19 +131,22 @@ function Pill<T extends string | number>({
 
 // ─── ROI Simulator ────────────────────────────────────────────────────────────
 function Simulator() {
-  const [plan, setPlan]         = useState<0 | 1 | 2>(1);
+  const [phase, setPhase]       = useState<Phase>("early");
+  const [period, setPeriod]     = useState<Period>("monthly");
+  const [tier, setTier]         = useState<Tier>(100);
   const [convRate, setConvRate] = useState(12);
   const [basket, setBasket]     = useState(60);
 
   const r = useMemo(() => {
-    const p        = PLANS[plan];
-    const visits   = p.contacts * (convRate / 100);
-    const revenue  = visits * basket;
-    const net      = revenue - p.price;
-    const roi      = (net / p.price) * 100;
-    const breakeven = p.price / basket;
-    return { price: p.price, msgs: p.msgs, contacts: p.contacts, visits, revenue, net, roi, breakeven };
-  }, [plan, convRate, basket]);
+    const price     = PRICES[phase][period][tier];
+    const msgs      = tier * 4;
+    const visits    = tier * (convRate / 100);
+    const revenue   = visits * basket;
+    const net       = revenue - price;
+    const roi       = (net / price) * 100;
+    const breakeven = price / basket;
+    return { price, msgs, contacts: tier, visits, revenue, net, roi, breakeven };
+  }, [phase, period, tier, convRate, basket]);
 
   const fmt = (n: number) => n.toLocaleString("fr-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtInt = (n: number) => Math.round(n).toLocaleString("fr-CH");
@@ -153,14 +164,41 @@ function Simulator() {
           {/* Controls */}
           <div className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div>
-              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Votre plan</p>
-              <Pill<0 | 1 | 2>
-                options={PLANS.map((p, i) => ({ label: `${p.name} — CHF ${p.price}/mois`, value: i as 0 | 1 | 2 }))}
-                value={plan}
-                onChange={setPlan}
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Tarif</p>
+              <Pill<Phase>
+                options={[
+                  { label: "🚀 Early Bird", value: "early" },
+                  { label: "Standard", value: "standard" },
+                ]}
+                value={phase}
+                onChange={setPhase}
               />
-              <p className="mt-2 text-xs text-gray-400 font-medium" style={{ color: WA_GREEN }}>
-                {r.msgs} messages/mois · jusqu'à {r.contacts} contacts
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Durée</p>
+              <Pill<Period>
+                options={[
+                  { label: "Mensuel", value: "monthly" },
+                  { label: "Semestriel −11%", value: "semiannual" },
+                  { label: "Annuel −17%", value: "annual" },
+                ]}
+                value={period}
+                onChange={setPeriod}
+              />
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Contacts WhatsApp</p>
+              <Pill<Tier>
+                options={[
+                  { label: "50 contacts", value: 50 },
+                  { label: "100 contacts", value: 100 },
+                  { label: "200 contacts", value: 200 },
+                ]}
+                value={tier}
+                onChange={setTier}
+              />
+              <p className="mt-2 text-xs font-medium" style={{ color: WA_GREEN }}>
+                {r.msgs} messages/mois · 4 envois × {tier} contacts
               </p>
             </div>
 
@@ -223,6 +261,147 @@ function Simulator() {
             </div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Pricing ─────────────────────────────────────────────────────────────────
+function PricingSection() {
+  const [phase, setPhase]   = useState<Phase>("early");
+  const [period, setPeriod] = useState<Period>("monthly");
+
+  const fmt = (n: number) => n.toLocaleString("fr-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  return (
+    <section id="pricing" className="bg-white py-16 sm:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Des prix clairs, sans surprise</h2>
+          <p className="mt-3 text-gray-500">14 jours gratuits · Aucune commission · Annulable à tout moment</p>
+        </div>
+
+        {/* Controls */}
+        <div className="mb-8 flex flex-col items-center gap-4">
+          {/* Phase */}
+          <div className="flex gap-1 rounded-full bg-gray-100 p-1">
+            {([["early", "🚀 Early Bird"], ["standard", "Standard"]] as [Phase, string][]).map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setPhase(val)}
+                className="rounded-full px-5 py-2 text-sm font-medium transition-all"
+                style={phase === val ? { background: WA_GREEN, color: "#fff", fontWeight: 700 } : { color: "#6b7280" }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {/* Period */}
+          <div className="flex gap-1 rounded-full bg-gray-100 p-1">
+            {([["monthly", "Mensuel"], ["semiannual", "Semestriel −11%"], ["annual", "Annuel −17%"]] as [Period, string][]).map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setPeriod(val)}
+                className="rounded-full px-4 py-1.5 text-sm font-medium transition-all"
+                style={period === val ? { background: "#fff", color: CHARCOAL, fontWeight: 700, boxShadow: "0 1px 3px rgba(0,0,0,0.1)" } : { color: "#6b7280" }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {phase === "early" && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800">
+              🚀 Prix de lancement — offre limitée aux 100 premiers commerces
+            </div>
+          )}
+        </div>
+
+        {/* Cards */}
+        <div className="grid gap-6 sm:grid-cols-3">
+          {TIERS.map((t) => {
+            const price = PRICES[phase][period][t.contacts];
+            const showTotal = period !== "monthly";
+            const totalAmount = period === "semiannual" ? fmt(price * 6) : fmt(price * 12);
+            const totalPeriod = period === "semiannual" ? "/ 6 mois" : "/ an";
+
+            return (
+              <div
+                key={t.contacts}
+                className={`relative flex flex-col overflow-hidden rounded-2xl ${t.highlight ? "border-2 shadow-xl" : "border border-gray-200"}`}
+                style={t.highlight ? { borderColor: WA_GREEN } : {}}
+              >
+                {t.highlight && (
+                  <div className="absolute inset-x-0 top-0 flex justify-center">
+                    <span className="rounded-b-lg px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-white" style={{ background: WA_GREEN }}>
+                      ⭐ Le plus populaire
+                    </span>
+                  </div>
+                )}
+
+                <div className="p-6 pt-8">
+                  {/* Badge messages */}
+                  <div
+                    className="mb-3 inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest"
+                    style={t.highlight ? { background: `${WA_GREEN}20`, color: WA_DARK } : { background: "#f3f4f6", color: "#6b7280" }}
+                  >
+                    {t.msgs} messages/mois
+                  </div>
+
+                  {/* Big number */}
+                  <div className="text-5xl font-black leading-none text-gray-900">{t.msgs}</div>
+                  <p className="mt-0.5 text-sm font-semibold text-gray-400">messages / mois</p>
+                  <p className="mt-1 text-xs text-gray-500">{t.desc}</p>
+
+                  {/* Price */}
+                  <p className="mt-4 whitespace-nowrap leading-none">
+                    <span className="text-lg font-bold" style={{ color: WA_GREEN }}>CHF </span>
+                    <span className="text-5xl font-black text-gray-900">{fmt(price)}</span>
+                    <span className="ml-1 text-xs text-gray-500"> /mois · tout inclus</span>
+                  </p>
+                  {showTotal && (
+                    <p className="mt-1 text-xs text-gray-400">
+                      soit <span className="font-semibold text-gray-600">CHF {totalAmount}</span> {totalPeriod}
+                    </p>
+                  )}
+
+                  {/* WhatsApp badge */}
+                  <div className="mx-0 mt-4 rounded-xl border border-green-200 bg-green-50 px-3 py-2.5">
+                    <div className="flex items-start gap-2">
+                      <MessageCircle className="mt-0.5 h-4 w-4 shrink-0" style={{ color: WA_GREEN }} />
+                      <div>
+                        <p className="text-xs font-semibold text-green-800">WhatsApp inclus</p>
+                        <p className="text-xs text-green-700">{t.msgs} messages/mois · jusqu'à {t.contacts} contacts</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <ul className="mt-4 space-y-2">
+                    {t.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-xs text-gray-600">
+                        <Check className="h-3.5 w-3.5 shrink-0" style={{ color: WA_GREEN }} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mt-auto px-5 pb-5 pt-2">
+                  <button
+                    className="w-full rounded-xl py-3 text-sm font-bold transition-opacity hover:opacity-90"
+                    style={t.highlight ? { background: WA_GREEN, color: "#fff" } : { background: "#f3f4f6", color: CHARCOAL }}
+                  >
+                    Essayer 14 jours gratuits
+                  </button>
+                  <p className="mt-2 text-center text-[10px] text-gray-400">Aucun débit · Annulable à tout moment</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <p className="mt-8 text-center text-xs text-gray-400">
+          Tous les prix sont en CHF · TTC · Aucune commission
+        </p>
       </div>
     </section>
   );
@@ -396,76 +575,7 @@ export default function WhatsUpPage() {
       <Simulator />
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="bg-white py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">Des prix clairs, sans surprise</h2>
-            <p className="mt-3 text-gray-500">14 jours gratuits sur tous les plans · Aucune commission · Annulable à tout moment</p>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-3">
-            {PLANS.map((p) => (
-              <div
-                key={p.name}
-                className={`relative flex flex-col overflow-hidden rounded-2xl ${
-                  p.highlight
-                    ? "border-2 shadow-xl"
-                    : "border border-gray-200"
-                }`}
-                style={p.highlight ? { borderColor: WA_GREEN } : {}}
-              >
-                {p.highlight && (
-                  <div className="absolute inset-x-0 top-0 flex justify-center">
-                    <span className="rounded-b-lg px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-white" style={{ background: WA_GREEN }}>
-                      ⭐ Le plus populaire
-                    </span>
-                  </div>
-                )}
-
-                <div className="p-6 pt-8">
-                  <p className="text-sm font-bold uppercase tracking-widest text-gray-400">{p.name}</p>
-                  <div className="mt-3 flex items-baseline gap-1">
-                    <span className="text-sm font-bold text-gray-400">CHF</span>
-                    <span className="text-5xl font-black text-gray-900">{p.price}</span>
-                    <span className="text-sm text-gray-400">/mois</span>
-                  </div>
-
-                  <div className="mt-4 rounded-xl border border-green-100 bg-green-50 px-4 py-2.5">
-                    <p className="text-sm font-semibold text-green-800">
-                      <MessageCircle className="mr-1 inline h-3.5 w-3.5" style={{ color: WA_GREEN }} />
-                      {p.msgs} messages/mois
-                    </p>
-                    <p className="text-xs text-green-600">jusqu'à {p.contacts} contacts</p>
-                  </div>
-
-                  <ul className="mt-5 space-y-2.5">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                        <Check className="h-4 w-4 shrink-0" style={{ color: WA_GREEN }} />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="mt-auto px-6 pb-6">
-                  <button
-                    className="w-full rounded-xl py-3 text-sm font-bold transition-opacity hover:opacity-90"
-                    style={
-                      p.highlight
-                        ? { background: WA_GREEN, color: "#fff" }
-                        : { background: "#f3f4f6", color: CHARCOAL }
-                    }
-                  >
-                    Essayer 14 jours gratuits
-                  </button>
-                  <p className="mt-2 text-center text-[10px] text-gray-400">Aucun débit · Annulable à tout moment</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* ── FAQ ── */}
       <FAQ />
