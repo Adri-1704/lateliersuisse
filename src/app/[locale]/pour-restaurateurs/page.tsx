@@ -5,6 +5,7 @@ import { B2BTrustStats } from "@/components/b2b/B2BTrustStats";
 import { B2BWhatsAppStats } from "@/components/b2b/B2BWhatsAppStats";
 import { B2BFeatures } from "@/components/b2b/B2BFeatures";
 import { B2BPricing } from "@/components/b2b/B2BPricing";
+import { B2BSimulator } from "@/components/b2b/B2BSimulator";
 import { B2BFindRestaurant } from "@/components/b2b/B2BFindRestaurant";
 import { B2BFAQ } from "@/components/b2b/B2BFAQ";
 import { B2BFinalCTA } from "@/components/b2b/B2BFinalCTA";
@@ -111,6 +112,7 @@ export default async function PourRestaurateursPage() {
       <B2BWhatsAppStats />
       <B2BFeatures />
       <B2BPricing />
+      <B2BSimulator />
       <B2BFindRestaurant />
       <B2BFAQ />
       <B2BFinalCTA />
