@@ -195,8 +195,8 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
       if (sub.is_early_bird) earlyBirdCount++;
       else standardCount++;
 
-      // Only count paying subscriptions in MRR (trialing = not yet charged)
-      if (sub.status === "active") {
+      // Only count subscriptions with a confirmed Stripe payment in MRR
+      if (sub.status === "active" && sub.stripe_subscription_id) {
         mrr += computeMonthlyRevenue(sub.plan_type, sub.is_early_bird);
       }
     }
