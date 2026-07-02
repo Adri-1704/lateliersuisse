@@ -27,6 +27,8 @@ import {
   BarChart3,
   Sparkles,
   ShieldCheck,
+  QrCode,
+  Lightbulb,
 } from "lucide-react";
 
 export function MerchantSidebar() {
@@ -45,6 +47,8 @@ export function MerchantSidebar() {
     { title: "Offres du moment", href: `${basePath}/offres`, icon: Tag },
     { title: "Happy Hours", href: `${basePath}/happy-hours`, icon: Sparkles },
     { title: "WhatsApp", href: `${basePath}/whatsapp`, icon: MessageCircle },
+    { title: "Inspiration", href: `${basePath}/inspiration`, icon: Lightbulb },
+    { title: "QR Code", href: `${basePath}/qr-code`, icon: QrCode },
     { title: t("sidebar.reviews"), href: `${basePath}/avis`, icon: MessageSquare },
     { title: "Statistiques", href: `${basePath}/statistiques`, icon: BarChart3 },
     { title: t("sidebar.subscription"), href: `${basePath}/abonnement`, icon: CreditCard },
