@@ -1,4 +1,4 @@
-import { getWhatsAppCosts, META_MARKETING_PRICE_USD } from "@/actions/admin/whatsapp-costs";
+import { getWhatsAppCosts } from "@/actions/admin/whatsapp-costs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, DollarSign, Send, Calendar, Info } from "lucide-react";
@@ -44,9 +44,9 @@ export default async function WhatsAppCostsPage() {
       <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />
         <span>
-          Tarif appliqué : <strong>{fmtUsd(META_MARKETING_PRICE_USD)} USD / conversation marketing</strong> (Suisse / Europe de l&apos;Ouest).
+          Tarif appliqué : <strong>{fmtUsd(data.pricePerMessageUsd)} USD / message marketing</strong> (Suisse / Europe de l&apos;Ouest).
           Chaque message envoyé à un abonné = 1 conversation. Mettre à jour la constante{" "}
-          <code className="rounded bg-blue-100 px-1 font-mono text-xs">META_MARKETING_PRICE_USD</code>{" "}
+          <code className="rounded bg-blue-100 px-1 font-mono text-xs">META_MARKETING_PRICE_USD</code> ({fmtUsd(data.pricePerMessageUsd)}){" "}
           dans <code className="rounded bg-blue-100 px-1 font-mono text-xs">src/actions/admin/whatsapp-costs.ts</code>{" "}
           si Meta change ses tarifs.
         </span>

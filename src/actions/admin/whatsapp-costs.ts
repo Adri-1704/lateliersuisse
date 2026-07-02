@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 // Model: per-message (since July 1, 2025 — replaced per-conversation billing)
 // Source: plivo.com/whatsapp-message/pricing/ch/ → $0.0651/message
 // Verify in Meta Business Manager → Paramètres → Facturation → Détail des transactions
-export const META_MARKETING_PRICE_USD = 0.0651;
+const META_MARKETING_PRICE_USD = 0.0651;
 
 export interface RestaurantCost {
   id: string;
@@ -33,6 +33,7 @@ export interface WhatsAppCostsData {
   allTimeCostUsd: number;
   thisMonthMessages: number;
   thisMonthCostUsd: number;
+  pricePerMessageUsd: number;
 }
 
 interface BroadcastRow {
@@ -58,6 +59,7 @@ export async function getWhatsAppCosts(): Promise<WhatsAppCostsData> {
     allTimeCostUsd: 0,
     thisMonthMessages: 0,
     thisMonthCostUsd: 0,
+    pricePerMessageUsd: META_MARKETING_PRICE_USD,
   };
 
   // whatsapp_broadcasts is not in generated types — cast explicitly
@@ -139,5 +141,6 @@ export async function getWhatsAppCosts(): Promise<WhatsAppCostsData> {
     allTimeCostUsd: +(allTimeMessages * META_MARKETING_PRICE_USD).toFixed(4),
     thisMonthMessages,
     thisMonthCostUsd: +(thisMonthMessages * META_MARKETING_PRICE_USD).toFixed(4),
+    pricePerMessageUsd: META_MARKETING_PRICE_USD,
   };
 }
