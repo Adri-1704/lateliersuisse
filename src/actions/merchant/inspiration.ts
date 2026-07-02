@@ -22,7 +22,7 @@ export async function generateRecipeIdeas(
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return { ideas: [], error: "Service IA non configuré." };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ideas: [], error: "Non authentifié." };
 
