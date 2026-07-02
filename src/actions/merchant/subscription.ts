@@ -71,6 +71,31 @@ export async function getMerchantSubscription(): Promise<{
   }
 }
 
+export async function createPlanChangeSession(
+  planType: "monthly" | "semiannual" | "annual",
+  whatsappTier: 50 | 100 | 200,
+  locale: string = "fr"
+): Promise<{ url: string | null; error: string | null }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { url: null, error: "Non authentifié" };
+
+    const merchant = await findMerchant(supabase, user.id, user.email || "");
+    if (!merchant) return { url: null, error: "Marchand non trouvé" };
+
+    const { createCheckoutSession } = await import("@/actions/subscriptions");
+    return createCheckoutSession({
+      planType,
+      merchantId: merchant.id,
+      locale,
+      whatsappTier,
+    });
+  } catch {
+    return { url: null, error: "Erreur lors de la création de la session" };
+  }
+}
+
 export async function createBillingPortalSession(locale: string = "fr"): Promise<{
   url: string | null;
   error: string | null;
