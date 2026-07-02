@@ -29,12 +29,14 @@ import {
   TrendingUp,
   FileText,
   Link2,
+  MessageCircle,
 } from "lucide-react";
 
 const navItems = [
   { title: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
   { title: "Statistiques", href: "/admin/stats", icon: BarChart3 },
   { title: "Trafic", href: "/admin/traffic", icon: TrendingUp },
+  { title: "Coûts Meta WhatsApp", href: "/admin/whatsapp-costs", icon: MessageCircle },
   { title: "Blog", href: "/admin/blog", icon: FileText },
   { title: "Affiliations", href: "/admin/affiliations", icon: Link2 },
   { title: "Restaurants", href: "/admin/restaurants", icon: UtensilsCrossed },
