@@ -1,8 +1,7 @@
 "use server";
 
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-// v2
 
 export interface RecipeIdea {
   name: string;
@@ -20,8 +19,7 @@ export async function generateRecipeIdeas(
 
   const validCount = [3, 5, 10].includes(count) ? count : 5;
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  console.log("[inspiration] OPENAI_API_KEY present:", !!apiKey, "length:", apiKey?.length ?? 0);
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return { ideas: [], error: "Service IA non configuré." };
 
   const supabase = await createClient();
@@ -62,28 +60,29 @@ export async function generateRecipeIdeas(
     ? `\nPlats récemment publiés (éviter la répétition) : ${recentPlats.map((p) => p.text).join(" | ")}`
     : "";
 
-  const openai = new OpenAI({ apiKey });
+  const anthropic = new Anthropic({ apiKey });
 
   const prompt = `Tu es un chef cuisinier expert en ${cuisineType}. Tu aides le restaurant "${restaurantName}" à trouver des idées de plats du jour créatifs et cohérents avec leur identité culinaire.
 
 Ingrédients disponibles aujourd'hui : ${ingredients}${recentContext}
 
-Propose exactement ${validCount} idées de plats. Retourne un objet JSON avec une clé "idees" contenant un tableau d'objets, chacun avec :
+Propose exactement ${validCount} idées de plats. Retourne uniquement un objet JSON valide avec une clé "idees" contenant un tableau d'objets, chacun avec :
 - "name" : nom court et accrocheur du plat (max 6 mots)
 - "description" : description appétissante pour le menu (max 25 mots)
-- "tip" : astuce de préparation ou de présentation (max 15 mots)`;
+- "tip" : astuce de préparation ou de présentation (max 15 mots)
+
+Réponds uniquement avec le JSON, sans texte autour.`;
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+    const response = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1024,
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.85,
-      max_tokens: 1000,
-      response_format: { type: "json_object" },
     });
 
-    const content = response.choices[0]?.message?.content || "{}";
-    const parsed = JSON.parse(content);
+    const text = response.content[0]?.type === "text" ? response.content[0].text : "{}";
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const parsed = JSON.parse(jsonMatch?.[0] || "{}");
     const raw: Record<string, string>[] = Array.isArray(parsed)
       ? parsed
       : (parsed.idees || parsed.ideas || []);
@@ -96,7 +95,7 @@ Propose exactement ${validCount} idées de plats. Retourne un objet JSON avec un
 
     return { ideas, error: null };
   } catch (err) {
-    console.error("OpenAI inspiration error:", err);
+    console.error("Anthropic inspiration error:", err);
     return { ideas: [], error: "Erreur lors de la génération. Réessayez dans un moment." };
   }
 }
