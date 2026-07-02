@@ -185,8 +185,8 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
     let trialingCount = 0;
 
     for (const sub of subs) {
-      const monthlyRev = computeMonthlyRevenue(sub.plan_type, sub.is_early_bird);
-      mrr += monthlyRev;
+      if (sub.status === "active") activeCount++;
+      if (sub.status === "trialing") trialingCount++;
 
       if (sub.plan_type in byPlan) {
         byPlan[sub.plan_type as keyof typeof byPlan]++;
@@ -195,8 +195,10 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
       if (sub.is_early_bird) earlyBirdCount++;
       else standardCount++;
 
-      if (sub.status === "active") activeCount++;
-      if (sub.status === "trialing") trialingCount++;
+      // Only count paying subscriptions in MRR (trialing = not yet charged)
+      if (sub.status === "active") {
+        mrr += computeMonthlyRevenue(sub.plan_type, sub.is_early_bird);
+      }
     }
 
     const activeSubscribers = activeCount + trialingCount;
