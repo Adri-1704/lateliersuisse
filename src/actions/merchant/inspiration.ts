@@ -21,6 +21,7 @@ export async function generateRecipeIdeas(
   const validCount = [3, 5, 10].includes(count) ? count : 5;
 
   const apiKey = process.env.OPENAI_API_KEY;
+  console.log("[inspiration] OPENAI_API_KEY present:", !!apiKey, "length:", apiKey?.length ?? 0);
   if (!apiKey) return { ideas: [], error: "Service IA non configuré." };
 
   const supabase = await createClient();
