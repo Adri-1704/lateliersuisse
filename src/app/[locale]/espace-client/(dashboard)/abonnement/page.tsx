@@ -57,6 +57,7 @@ export default function SubscriptionPage() {
   const [redirecting, setRedirecting] = useState(false);
   const [changingPlan, setChangingPlan] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>("monthly");
+  const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -229,15 +230,23 @@ export default function SubscriptionPage() {
                   const key = `${selectedPeriod}-${tier.value}`;
                   const isChanging = changingPlan === key;
 
+                  const isSelected = selectedTier === tier.value;
+                  const showTotal = selectedPeriod !== "monthly";
+                  const totalAmount = selectedPeriod === "semiannual" ? (price * 6).toFixed(2) : (price * 12).toFixed(2);
+                  const totalPeriod = selectedPeriod === "semiannual" ? "/ 6 mois" : "/ an";
+
                   return (
                     <div
                       key={tier.value}
-                      className={`relative rounded-xl border-2 p-5 flex flex-col gap-3 transition-all ${
+                      onClick={() => setSelectedTier(tier.value)}
+                      className={`relative rounded-xl border-2 p-5 flex flex-col gap-3 transition-all cursor-pointer ${
                         isCurrent
                           ? "border-[#e85d26] bg-orange-50"
+                          : isSelected
+                          ? "border-[#e85d26] bg-white shadow-md"
                           : tier.popular
-                          ? "border-gray-900 bg-white"
-                          : "border-gray-200 bg-white"
+                          ? "border-gray-900 bg-white hover:shadow-md"
+                          : "border-gray-200 bg-white hover:border-gray-400 hover:shadow-sm"
                       }`}
                     >
                       {tier.popular && !isCurrent && (
@@ -262,6 +271,11 @@ export default function SubscriptionPage() {
                       <div>
                         <span className="text-3xl font-bold text-gray-900">{price.toFixed(2)}</span>
                         <span className="text-sm text-gray-500 ml-1">CHF / mois</span>
+                        {showTotal && (
+                          <p className="mt-0.5 text-xs text-gray-400">
+                            soit <span className="font-semibold text-gray-600">CHF {totalAmount}</span> {totalPeriod}
+                          </p>
+                        )}
                       </div>
 
                       {isCurrent ? (
@@ -272,12 +286,12 @@ export default function SubscriptionPage() {
                       ) : (
                         <Button
                           size="sm"
-                          onClick={() => handleChangePlan(selectedPeriod, tier.value)}
+                          onClick={(e) => { e.stopPropagation(); handleChangePlan(selectedPeriod, tier.value); }}
                           disabled={!!changingPlan}
                           className={`mt-auto ${
-                            tier.popular
-                              ? "bg-gray-900 hover:bg-gray-700 text-white"
-                              : "bg-[#e85d26] hover:bg-[#d04e1e] text-white"
+                            isSelected || tier.popular
+                              ? "bg-[#e85d26] hover:bg-[#d04e1e] text-white"
+                              : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                           }`}
                         >
                           {isChanging ? (
@@ -298,7 +312,7 @@ export default function SubscriptionPage() {
                 </p>
               )}
               <p className="text-xs text-gray-500">
-                ✦ 4 messages WhatsApp inclus par mois · Renouvellement le 1er de chaque mois
+                ✦ Jusqu&apos;à {(selectedTier ?? currentTier) * 4} messages WhatsApp par mois · Renouvellement le 1er de chaque mois
               </p>
               <p className="text-xs text-gray-400">
                 Prix TTC · Facturation en CHF · Annulable à tout moment
