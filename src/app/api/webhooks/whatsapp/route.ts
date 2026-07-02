@@ -1,27 +1,44 @@
+import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendWhatsAppBroadcast } from "@/lib/whatsapp/broadcast";
 
-/**
- * WhatsApp Webhook — receives messages from Twilio
- *
- * Two flows:
- * 1. Subscriber sends "STOP" → deactivated from all restaurant lists
- * 2. Restaurant sends photo + text → creates plat du jour + broadcasts to subscribers
- *
- * Twilio form-encoded data:
- * - From: whatsapp:+41XXXXXXXXX
- * - Body: "Filet de perche, frites maison 22 CHF"
- * - MediaUrl0: https://api.twilio.com/...
- * - NumMedia: "1"
- */
+function validateTwilioSignature(
+  url: string,
+  rawBody: string,
+  signature: string,
+  authToken: string
+): boolean {
+  const params = new URLSearchParams(rawBody);
+  const sortedKeys = [...params.keys()].sort();
+  let signingString = url;
+  for (const key of sortedKeys) {
+    signingString += key + (params.get(key) ?? "");
+  }
+  const expected = crypto.createHmac("sha1", authToken).update(signingString).digest("base64");
+  try {
+    return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const from = (formData.get("From") as string || "").replace("whatsapp:", "");
-    const body = formData.get("Body") as string || "";
-    const numMedia = parseInt(formData.get("NumMedia") as string || "0", 10);
-    const mediaUrl = numMedia > 0 ? (formData.get("MediaUrl0") as string || null) : null;
+    const rawBody = await request.text();
+
+    // Validate Twilio signature to reject spoofed requests
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const signature = request.headers.get("x-twilio-signature") ?? "";
+    if (!authToken || !validateTwilioSignature(request.url, rawBody, signature, authToken)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const formParams = new URLSearchParams(rawBody);
+    const from = (formParams.get("From") || "").replace("whatsapp:", "");
+    const body = formParams.get("Body") || "";
+    const numMedia = parseInt(formParams.get("NumMedia") || "0", 10);
+    const mediaUrl = numMedia > 0 ? (formParams.get("MediaUrl0") || null) : null;
 
     if (!from || !body) {
       return twimlResponse("❌ Message vide. Envoyez une photo + description de votre plat du jour.");

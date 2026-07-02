@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       .eq("id", id)
       .eq("site", "just-tag");
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return NextResponse.json({ error: "Publication failed" }, { status: 500 });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed" }, { status: 500 });

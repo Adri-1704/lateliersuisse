@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     // Single restaurant
     const { data } = await supabase
       .from("plat_du_jour")
-      .select("*")
+      .select("id, restaurant_id, text, image_url, price, posted_at, is_active")
       .eq("restaurant_id", restaurantId)
       .eq("is_active", true)
       .order("posted_at", { ascending: false })
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
   const { data } = await supabase
     .from("plat_du_jour")
-    .select("*, restaurants(name_fr, slug, city, canton, cuisine_type)")
+    .select("id, restaurant_id, text, image_url, price, posted_at, is_active, restaurants(name_fr, slug, city, canton, cuisine_type)")
     .eq("is_active", true)
     .gte("posted_at", today.toISOString())
     .order("posted_at", { ascending: false })

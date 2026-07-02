@@ -37,8 +37,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // If Supabase is not configured, allow access (dev/demo mode)
+    // If Supabase is not configured: block in production, allow in dev/demo
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.redirect(new URL("/admin/login", request.url));
+      }
       return NextResponse.next();
     }
 
@@ -101,11 +104,14 @@ export async function middleware(request: NextRequest) {
       return intlMiddleware(request);
     }
 
-    // If Supabase is not configured, allow access (dev/demo mode)
+    // If Supabase is not configured: block in production, allow in dev/demo
     if (
       !process.env.NEXT_PUBLIC_SUPABASE_URL ||
       !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     ) {
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.redirect(new URL(`/${locale}/espace-client/connexion`, request.url));
+      }
       return intlMiddleware(request);
     }
 
