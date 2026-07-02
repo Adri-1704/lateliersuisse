@@ -2,6 +2,7 @@
 
 import OpenAI from "openai";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+// v2
 
 export interface RecipeIdea {
   name: string;
