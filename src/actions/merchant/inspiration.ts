@@ -33,7 +33,7 @@ export async function generateRecipeIdeas(
     .select("id")
     .eq("auth_user_id", user.id)
     .limit(1)
-    .single();
+    .single() as { data: { id: string } | null };
 
   if (!merchant) return { ideas: [], error: "Restaurant introuvable." };
 
