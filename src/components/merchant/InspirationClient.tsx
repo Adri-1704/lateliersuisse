@@ -3,10 +3,29 @@
 import { useState, useTransition, useRef, useEffect } from "react";
 import { generateRecipeIdeas } from "@/actions/merchant/inspiration";
 import type { RecipeIdea } from "@/actions/merchant/inspiration";
+import {
+  getSavedRecipes,
+  saveRecipe,
+  toggleRecipeCooked,
+  deleteRecipe,
+} from "@/actions/merchant/saved-recipes";
+import type { SavedRecipe } from "@/actions/merchant/saved-recipes";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, ChefHat, Lightbulb, Loader2, Mic, MicOff } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Sparkles,
+  ChefHat,
+  Lightbulb,
+  Loader2,
+  Mic,
+  MicOff,
+  Bookmark,
+  BookmarkCheck,
+  Trash2,
+  CheckSquare,
+  Square,
+} from "lucide-react";
 
 const COUNTS = [3, 5, 10] as const;
 
@@ -26,16 +45,25 @@ export function InspirationClient() {
   const [ingredients, setIngredients] = useState("");
   const [count, setCount] = useState<3 | 5 | 10>(5);
   const [ideas, setIdeas] = useState<RecipeIdea[]>([]);
+  const [savedIdeas, setSavedIdeas] = useState<Set<number>>(new Set());
+  const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micError, setMicError] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isSaving, setIsSaving] = useState<number | null>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
     setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
+    loadSavedRecipes();
   }, []);
+
+  async function loadSavedRecipes() {
+    const result = await getSavedRecipes();
+    if (!result.error) setSavedRecipes(result.recipes);
+  }
 
   function toggleMic() {
     setMicError(false);
@@ -77,6 +105,7 @@ export function InspirationClient() {
 
   function handleGenerate() {
     setError(null);
+    setSavedIdeas(new Set());
     startTransition(async () => {
       const result = await generateRecipeIdeas(ingredients, count);
       if (result.error) {
@@ -85,6 +114,28 @@ export function InspirationClient() {
         setIdeas(result.ideas);
       }
     });
+  }
+
+  async function handleSave(idea: RecipeIdea, index: number) {
+    setIsSaving(index);
+    const result = await saveRecipe(idea);
+    if (!result.error) {
+      setSavedIdeas((prev) => new Set([...prev, index]));
+      await loadSavedRecipes();
+    }
+    setIsSaving(null);
+  }
+
+  async function handleToggleCooked(id: string, current: boolean) {
+    await toggleRecipeCooked(id, !current);
+    setSavedRecipes((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, cooked: !current } : r))
+    );
+  }
+
+  async function handleDelete(id: string) {
+    await deleteRecipe(id);
+    setSavedRecipes((prev) => prev.filter((r) => r.id !== id));
   }
 
   return (
@@ -178,39 +229,114 @@ export function InspirationClient() {
         </CardContent>
       </Card>
 
-      {/* Results */}
+      {/* Generated ideas */}
       {ideas.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-base font-semibold text-muted-foreground">
             {ideas.length} idée{ideas.length > 1 ? "s" : ""} générée{ideas.length > 1 ? "s" : ""}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {ideas.map((idea, i) => (
-              <Card key={i} className="hover:shadow-md transition-shadow">
-                <CardContent className="pt-5 space-y-3">
-                  <div className="flex items-start gap-2">
-                    <ChefHat className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
-                    <h3 className="font-semibold leading-tight">{idea.name}</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{idea.description}</p>
-                  {idea.tip && (
-                    <div className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2">
-                      <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-                      <p className="text-xs text-amber-800">{idea.tip}</p>
+            {ideas.map((idea, i) => {
+              const saved = savedIdeas.has(i);
+              return (
+                <Card key={i} className="hover:shadow-md transition-shadow">
+                  <CardContent className="pt-5 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-start gap-2">
+                        <ChefHat className="mt-0.5 h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
+                        <h3 className="font-semibold leading-tight">{idea.name}</h3>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => !saved && handleSave(idea, i)}
+                        disabled={saved || isSaving === i}
+                        title={saved ? "Sauvegardé" : "Sauvegarder cette recette"}
+                        className={`shrink-0 transition-colors ${
+                          saved
+                            ? "text-[var(--color-just-tag)]"
+                            : "text-muted-foreground hover:text-[var(--color-just-tag)]"
+                        }`}
+                      >
+                        {isSaving === i ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : saved ? (
+                          <BookmarkCheck className="h-4 w-4" />
+                        ) : (
+                          <Bookmark className="h-4 w-4" />
+                        )}
+                      </button>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    <p className="text-sm text-muted-foreground leading-relaxed">{idea.description}</p>
+                    {idea.tip && (
+                      <div className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2">
+                        <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+                        <p className="text-xs text-amber-800">{idea.tip}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* Empty state */}
       {ideas.length === 0 && !isPending && (
-        <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
+        <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground">
           <ChefHat className="mb-4 h-14 w-14 opacity-15" />
           <p className="text-sm">Entrez vos ingrédients ou dictez-les avec le micro.</p>
+        </div>
+      )}
+
+      {/* Saved recipes */}
+      {savedRecipes.length > 0 && (
+        <div className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <BookmarkCheck className="h-4 w-4 text-[var(--color-just-tag)]" />
+                Recettes déjà cuisinées
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 pt-0">
+              {savedRecipes.map((r) => (
+                <div
+                  key={r.id}
+                  className={`flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors ${
+                    r.cooked ? "bg-muted/40" : "bg-background border"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleToggleCooked(r.id, r.cooked)}
+                    className={`mt-0.5 shrink-0 transition-colors ${
+                      r.cooked
+                        ? "text-[var(--color-just-tag)]"
+                        : "text-muted-foreground hover:text-[var(--color-just-tag)]"
+                    }`}
+                  >
+                    {r.cooked ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium ${r.cooked ? "line-through text-muted-foreground" : ""}`}>
+                      {r.name}
+                    </p>
+                    {r.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{r.description}</p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(r.id)}
+                    className="shrink-0 text-muted-foreground hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
