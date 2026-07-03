@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { generateRecipeIdeas } from "@/actions/merchant/inspiration";
 import type { RecipeIdea } from "@/actions/merchant/inspiration";
 import { Button } from "@/components/ui/button";
@@ -29,8 +29,13 @@ export function InspirationClient() {
   const [error, setError] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [micError, setMicError] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
   const [isPending, startTransition] = useTransition();
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+
+  useEffect(() => {
+    setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent));
+  }, []);
 
   function toggleMic() {
     setMicError(false);
@@ -97,21 +102,29 @@ export function InspirationClient() {
                 value={ingredients}
                 onChange={(e) => setIngredients(e.target.value)}
                 rows={3}
-                className="resize-none pr-12"
+                className={isIOS ? "resize-none" : "resize-none pr-12"}
               />
-              <button
-                type="button"
-                onClick={toggleMic}
-                title={isListening ? "Arrêter l'écoute" : "Dicter les ingrédients"}
-                className={`absolute bottom-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
-                  isListening
-                    ? "bg-red-500 text-white animate-pulse"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
-                }`}
-              >
-                {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </button>
+              {!isIOS && (
+                <button
+                  type="button"
+                  onClick={toggleMic}
+                  title={isListening ? "Arrêter l'écoute" : "Dicter les ingrédients"}
+                  className={`absolute bottom-2.5 right-2.5 flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                    isListening
+                      ? "bg-red-500 text-white animate-pulse"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              )}
             </div>
+            {isIOS && (
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <Mic className="h-3 w-3" />
+                Sur iPhone, utilisez le micro de votre clavier pour dicter.
+              </p>
+            )}
             {isListening && (
               <p className="text-xs text-red-500 flex items-center gap-1">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
