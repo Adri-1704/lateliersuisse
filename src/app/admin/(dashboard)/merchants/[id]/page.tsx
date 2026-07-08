@@ -1,17 +1,14 @@
 import Link from "next/link";
 import { getMerchant } from "@/actions/admin/merchants";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Mail, Phone, Calendar, CreditCard } from "lucide-react";
 import { DeleteMerchantButton } from "./DeleteMerchantButton";
 
-const statusColors: Record<string, string> = {
-  active: "bg-green-100 text-green-700",
-  past_due: "bg-red-100 text-red-700",
-  canceled: "bg-gray-100 text-gray-700",
-  incomplete: "bg-yellow-100 text-yellow-700",
-  trialing: "bg-blue-100 text-blue-700",
+const statusColors: Record<string, { bg: string; color: string }> = {
+  active: { bg: "#f0fdf4", color: "#16a34a" },
+  past_due: { bg: "#fef2f2", color: "#dc2626" },
+  canceled: { bg: "#f3f4f6", color: "#6b7280" },
+  incomplete: { bg: "#fffbeb", color: "#d97706" },
+  trialing: { bg: "#eff6ff", color: "#2563eb" },
 };
 
 const planLabels: Record<string, string> = {
@@ -32,10 +29,14 @@ export default async function MerchantDetailPage({
   if (!result.success || !result.data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Commerçant non trouvé</h1>
-        <Button asChild>
-          <Link href="/admin/merchants">Retour à la liste</Link>
-        </Button>
+        <h1 className="text-2xl font-bold text-gray-900">Commerçant non trouvé</h1>
+        <Link
+          href="/admin/merchants"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#eaecf0] bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour à la liste
+        </Link>
       </div>
     );
   }
@@ -45,79 +46,106 @@ export default async function MerchantDetailPage({
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/merchants">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">{m.name}</h1>
-          <p className="text-muted-foreground">{m.email}</p>
+        <Link
+          href="/admin/merchants"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#eaecf0] bg-white text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <div className="flex-1">
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">{m.name}</h1>
+          <p className="text-[13px] text-gray-400 mt-0.5">{m.email}</p>
         </div>
-        <div className="ml-auto">
-          <DeleteMerchantButton merchantId={m.id} merchantName={m.name} />
-        </div>
+        <DeleteMerchantButton merchantId={m.id} merchantName={m.name} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader><CardTitle>Informations</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
+        {/* Informations */}
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Informations</h2>
+          <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <a href={`mailto:${m.email}`} className="text-blue-600 hover:underline">{m.email}</a>
+              <Mail className="h-4 w-4 text-gray-400" />
+              <a href={`mailto:${m.email}`} className="text-indigo-600 hover:underline">
+                {m.email}
+              </a>
             </div>
             {m.phone && (
               <div className="flex items-center gap-3 text-sm">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{m.phone}</span>
+                <Phone className="h-4 w-4 text-gray-400" />
+                <span className="text-gray-700">{m.phone}</span>
               </div>
             )}
             <div className="flex items-center gap-3 text-sm">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>Inscrit le {new Date(m.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "long", year: "numeric" })}</span>
+              <Calendar className="h-4 w-4 text-gray-400" />
+              <span className="text-gray-700">
+                Inscrit le{" "}
+                {new Date(m.created_at).toLocaleDateString("fr-CH", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
-              Abonnement
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {sub ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Plan:</span>
-                  <Badge variant="outline">{planLabels[sub.plan_type] || sub.plan_type}</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Statut:</span>
-                  <Badge className={statusColors[sub.status] || ""}>{sub.status}</Badge>
-                </div>
-                {sub.current_period_start && (
-                  <p className="text-sm text-muted-foreground">
-                    Début : {new Date(sub.current_period_start).toLocaleDateString("fr-CH")}
-                  </p>
-                )}
-                {sub.current_period_end && (
-                  <p className="text-sm text-muted-foreground">
-                    Fin: {new Date(sub.current_period_end).toLocaleDateString("fr-CH")}
-                  </p>
-                )}
-                {sub.cancel_at_period_end && (
-                  <Badge variant="destructive">Annulation prévue</Badge>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">Aucun abonnement actif</p>
-            )}
-          </CardContent>
-        </Card>
+        {/* Abonnement */}
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-6">
+          <h2 className="flex items-center gap-2 font-bold text-gray-900 mb-4">
+            <CreditCard className="h-5 w-5 text-indigo-500" />
+            Abonnement
+          </h2>
+          {sub ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-500">Plan :</span>
+                <span
+                  className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  style={{ background: "#eef2ff", color: "#4f46e5" }}
+                >
+                  {planLabels[sub.plan_type] || sub.plan_type}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-gray-500">Statut :</span>
+                {(() => {
+                  const s = statusColors[sub.status] || { bg: "#f3f4f6", color: "#374151" };
+                  return (
+                    <span
+                      className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                      style={{ background: s.bg, color: s.color }}
+                    >
+                      {sub.status}
+                    </span>
+                  );
+                })()}
+              </div>
+              {sub.current_period_start && (
+                <p className="text-sm text-gray-500">
+                  Début : {new Date(sub.current_period_start).toLocaleDateString("fr-CH")}
+                </p>
+              )}
+              {sub.current_period_end && (
+                <p className="text-sm text-gray-500">
+                  Fin : {new Date(sub.current_period_end).toLocaleDateString("fr-CH")}
+                </p>
+              )}
+              {sub.cancel_at_period_end && (
+                <span
+                  className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  style={{ background: "#fef2f2", color: "#dc2626" }}
+                >
+                  Annulation prévue
+                </span>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm italic text-gray-400">Aucun abonnement actif</p>
+          )}
+        </div>
       </div>
     </div>
   );

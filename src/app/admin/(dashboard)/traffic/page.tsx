@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/server";
 import { TrafficCharts } from "./TrafficCharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Eye, TrendingUp, Globe, Activity, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -16,30 +15,25 @@ async function getTrafficStats() {
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  // Total all-time
   const { count: totalAll } = await supabase
     .from("page_views")
     .select("id", { count: "exact", head: true });
 
-  // Today
   const { count: totalToday } = await supabase
     .from("page_views")
     .select("id", { count: "exact", head: true })
     .gte("viewed_at", today.toISOString());
 
-  // Last 7 days
   const { count: totalWeek } = await supabase
     .from("page_views")
     .select("id", { count: "exact", head: true })
     .gte("viewed_at", weekAgo.toISOString());
 
-  // Last 30 days
   const { count: totalMonth } = await supabase
     .from("page_views")
     .select("id", { count: "exact", head: true })
     .gte("viewed_at", monthAgo.toISOString());
 
-  // Unique visitors (30d) — distinct session_id
   const { data: uniqueSessions } = await supabase
     .from("page_views")
     .select("session_id")
@@ -49,7 +43,6 @@ async function getTrafficStats() {
     (uniqueSessions as { session_id: string }[] | null)?.map((r) => r.session_id) || []
   ).size;
 
-  // Daily chart data (last 30 days)
   const { data: dailyRaw } = await supabase
     .from("page_views")
     .select("viewed_at")
@@ -70,7 +63,6 @@ async function getTrafficStats() {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, count]) => ({ date, count }));
 
-  // Top pages (30d)
   const { data: topPagesRaw } = await supabase
     .from("page_views")
     .select("path")
@@ -85,7 +77,6 @@ async function getTrafficStats() {
     .slice(0, 10)
     .map(([path, count]) => ({ path, count }));
 
-  // By page type (30d)
   const { data: typesRaw } = await supabase
     .from("page_views")
     .select("page_type")
@@ -99,7 +90,6 @@ async function getTrafficStats() {
     .sort(([, a], [, b]) => b - a)
     .map(([type, count]) => ({ type, count }));
 
-  // By locale (30d)
   const { data: localesRaw } = await supabase
     .from("page_views")
     .select("locale")
@@ -113,7 +103,6 @@ async function getTrafficStats() {
     .sort(([, a], [, b]) => b - a)
     .map(([locale, count]) => ({ locale, count }));
 
-  // By country (30d)
   const { data: countriesRaw } = await supabase
     .from("page_views")
     .select("country")
@@ -128,7 +117,6 @@ async function getTrafficStats() {
     .slice(0, 10)
     .map(([country, count]) => ({ country, count }));
 
-  // Top restaurants (30d, using restaurant_id)
   const { data: restaurantsRaw } = await supabase
     .from("page_views")
     .select("restaurant_id")
@@ -153,12 +141,7 @@ async function getTrafficStats() {
     );
     topRestaurants = topRestaurantIds.map(([id, count]) => {
       const info = infoMap.get(id);
-      return {
-        id,
-        name: info?.name_fr || "Restaurant inconnu",
-        city: info?.city || "",
-        count,
-      };
+      return { id, name: info?.name_fr || "Restaurant inconnu", city: info?.city || "", count };
     });
   }
 
@@ -179,15 +162,15 @@ async function getTrafficStats() {
 
 export default async function TrafficPage() {
   const stats = await getTrafficStats();
-
   const noData = stats.totalAll === 0;
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Trafic du site</h1>
-        <p className="mt-1 text-gray-600">
-          Statistiques de visite · Vercel Analytics disponible aussi dans le dashboard Vercel pour vues détaillées.
+        <h1 className="text-2xl font-black tracking-tight text-gray-900">Trafic du site</h1>
+        <p className="text-[13px] text-gray-400 mt-0.5">
+          Statistiques de visite · Vercel Analytics disponible aussi dans le dashboard Vercel.
         </p>
       </div>
 
@@ -197,213 +180,161 @@ export default async function TrafficPage() {
           <h3 className="font-semibold text-amber-900">Aucune donnée pour l&apos;instant</h3>
           <p className="mt-1 text-sm text-amber-800">
             Le tracking vient d&apos;être activé. Les premières visites apparaîtront ici dès que
-            des utilisateurs naviguent sur le site. Attends quelques heures après le déploiement.
+            des utilisateurs naviguent sur le site.
           </p>
         </div>
       )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
-              <Eye className="h-4 w-4" /> Vues aujourd&apos;hui
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        {[
+          { label: "Vues aujourd'hui", value: stats.totalToday, icon: <Eye className="h-5 w-5 text-indigo-600" />, color: "indigo" },
+          { label: "Vues 7 jours", value: stats.totalWeek, icon: <TrendingUp className="h-5 w-5 text-indigo-600" />, color: "indigo" },
+          { label: "Vues 30 jours", value: stats.totalMonth, icon: <Activity className="h-5 w-5 text-indigo-600" />, color: "indigo" },
+          { label: "Visiteurs uniques 30j", value: stats.uniqueVisitorsMonth, icon: <Users className="h-5 w-5 text-emerald-600" />, color: "emerald" },
+        ].map((kpi) => (
+          <div key={kpi.label} className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
+                {kpi.icon}
+              </div>
+              <p className="text-sm text-gray-500">{kpi.label}</p>
+            </div>
             <p className="text-3xl font-bold text-gray-900">
-              {stats.totalToday.toLocaleString("fr-CH")}
+              {kpi.value.toLocaleString("fr-CH")}
             </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
-              <TrendingUp className="h-4 w-4" /> Vues 7 jours
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-gray-900">
-              {stats.totalWeek.toLocaleString("fr-CH")}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
-              <Activity className="h-4 w-4" /> Vues 30 jours
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-gray-900">
-              {stats.totalMonth.toLocaleString("fr-CH")}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
-              <Users className="h-4 w-4" /> Visiteurs uniques 30j
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-[var(--color-just-tag)]">
-              {stats.uniqueVisitorsMonth.toLocaleString("fr-CH")}
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        ))}
       </div>
 
       {/* Daily chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Vues par jour (30 derniers jours)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TrafficCharts dailyChart={stats.dailyChart} />
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+        <h2 className="text-sm font-bold text-gray-900 mb-4">Vues par jour (30 derniers jours)</h2>
+        <TrafficCharts dailyChart={stats.dailyChart} />
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Top pages */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Pages les plus consultées (30j)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats.topPages.length === 0 ? (
-              <p className="text-sm text-gray-500">Aucune donnée.</p>
-            ) : (
-              <ul className="space-y-2">
-                {stats.topPages.map((p) => (
-                  <li
-                    key={p.path}
-                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm"
-                  >
-                    <code className="truncate text-xs text-gray-700">{p.path}</code>
-                    <span className="ml-3 font-semibold text-gray-900">{p.count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+          <h2 className="text-sm font-bold text-gray-900 mb-4">Pages les plus consultées (30j)</h2>
+          {stats.topPages.length === 0 ? (
+            <p className="text-sm text-gray-400">Aucune donnée.</p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.topPages.map((p) => (
+                <li
+                  key={p.path}
+                  className="flex items-center justify-between rounded-lg bg-[#f8fafc] px-3 py-2 text-sm"
+                >
+                  <code className="truncate text-xs text-gray-700">{p.path}</code>
+                  <span className="ml-3 font-semibold text-gray-900">{p.count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {/* Top restaurants */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle>Top 10 restaurants (30j)</CardTitle>
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-bold text-gray-900">Top 10 restaurants (30j)</h2>
             <Link
               href="/admin/traffic/restaurants"
-              className="inline-flex items-center gap-1 text-xs font-medium text-[var(--color-just-tag)] hover:underline"
+              className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:underline"
             >
-              Voir tous les restaurants <ArrowRight className="h-3 w-3" />
+              Voir tous <ArrowRight className="h-3 w-3" />
             </Link>
-          </CardHeader>
-          <CardContent>
-            {stats.topRestaurants.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                Aucune vue restaurant encore. Utile pour la prospection B2B : &ldquo;ton resto a été vu X fois&rdquo;.
-              </p>
-            ) : (
-              <ul className="space-y-2">
-                {stats.topRestaurants.map((r) => (
-                  <li
-                    key={r.id}
-                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm"
-                  >
-                    <div className="truncate">
-                      <div className="font-medium text-gray-900">{r.name}</div>
-                      <div className="text-xs text-gray-500">{r.city}</div>
-                    </div>
-                    <span className="ml-3 font-semibold text-[var(--color-just-tag)]">{r.count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+          {stats.topRestaurants.length === 0 ? (
+            <p className="text-sm text-gray-400">
+              Aucune vue restaurant encore. Utile pour la prospection B2B.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.topRestaurants.map((r) => (
+                <li
+                  key={r.id}
+                  className="flex items-center justify-between rounded-lg bg-[#f8fafc] px-3 py-2 text-sm"
+                >
+                  <div className="truncate">
+                    <div className="font-medium text-gray-900">{r.name}</div>
+                    <div className="text-xs text-gray-400">{r.city}</div>
+                  </div>
+                  <span className="ml-3 font-semibold text-indigo-600">{r.count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Page types */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Types de pages (30j)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats.pageTypes.length === 0 ? (
-              <p className="text-sm text-gray-500">Aucune donnée.</p>
-            ) : (
-              <ul className="space-y-2">
-                {stats.pageTypes.map((t) => (
-                  <li key={t.type} className="flex items-center justify-between text-sm">
-                    <span className="capitalize text-gray-700">{t.type}</span>
-                    <span className="font-semibold">{t.count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+          <h2 className="text-sm font-bold text-gray-900 mb-4">Types de pages (30j)</h2>
+          {stats.pageTypes.length === 0 ? (
+            <p className="text-sm text-gray-400">Aucune donnée.</p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.pageTypes.map((t) => (
+                <li key={t.type} className="flex items-center justify-between text-sm">
+                  <span className="capitalize text-gray-700">{t.type}</span>
+                  <span className="font-semibold text-gray-900">{t.count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {/* Locales */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Langues (30j)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats.locales.length === 0 ? (
-              <p className="text-sm text-gray-500">Aucune donnée.</p>
-            ) : (
-              <ul className="space-y-2">
-                {stats.locales.map((l) => (
-                  <li key={l.locale} className="flex items-center justify-between text-sm">
-                    <span className="uppercase text-gray-700">{l.locale}</span>
-                    <span className="font-semibold">{l.count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+          <h2 className="text-sm font-bold text-gray-900 mb-4">Langues (30j)</h2>
+          {stats.locales.length === 0 ? (
+            <p className="text-sm text-gray-400">Aucune donnée.</p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.locales.map((l) => (
+                <li key={l.locale} className="flex items-center justify-between text-sm">
+                  <span className="uppercase text-gray-700">{l.locale}</span>
+                  <span className="font-semibold text-gray-900">{l.count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {/* Countries */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Globe className="h-4 w-4" /> Pays (30j)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {stats.countries.length === 0 ? (
-              <p className="text-sm text-gray-500">Données pays disponibles uniquement sur Vercel prod.</p>
-            ) : (
-              <ul className="space-y-2">
-                {stats.countries.map((c) => (
-                  <li key={c.country} className="flex items-center justify-between text-sm">
-                    <span className="uppercase text-gray-700">{c.country}</span>
-                    <span className="font-semibold">{c.count}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+          <h2 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+            <Globe className="h-4 w-4" /> Pays (30j)
+          </h2>
+          {stats.countries.length === 0 ? (
+            <p className="text-sm text-gray-400">Données pays disponibles uniquement sur Vercel prod.</p>
+          ) : (
+            <ul className="space-y-2">
+              {stats.countries.map((c) => (
+                <li key={c.country} className="flex items-center justify-between text-sm">
+                  <span className="uppercase text-gray-700">{c.country}</span>
+                  <span className="font-semibold text-gray-900">{c.count}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+      <div className="rounded-xl border border-[#eaecf0] bg-[#f8fafc] p-4 text-sm text-gray-600">
         <p>
-          <strong>💡 Pour ton pitch investisseur :</strong> ces données sont privées (seul toi y as accès).
-          Prends un screenshot de la page pour l&apos;attacher à tes emails ou présentations.
+          <strong>Pour ton pitch investisseur :</strong> ces données sont privées.
+          Prends un screenshot pour l&apos;attacher à tes emails ou présentations.
         </p>
         <p className="mt-2">
-          <strong>📊 Dashboard externe :</strong> Vercel Analytics est aussi disponible sur{" "}
+          <strong>Dashboard externe :</strong> Vercel Analytics disponible sur{" "}
           <a
             href="https://vercel.com/lateliersuissech-6461s-projects/lateliersuisse/analytics"
             target="_blank"
             rel="noreferrer"
-            className="text-[var(--color-just-tag)] underline"
+            className="text-indigo-600 underline"
           >
             vercel.com
           </a>{" "}

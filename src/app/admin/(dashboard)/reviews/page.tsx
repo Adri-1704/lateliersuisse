@@ -2,10 +2,7 @@ import { listReviews } from "@/actions/admin/reviews";
 import { SearchInput } from "@/components/admin/SearchInput";
 import { Pagination } from "@/components/admin/Pagination";
 import { EmptyState } from "@/components/admin/EmptyState";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
-import { Star } from "lucide-react";
+import { MessageSquare, Star } from "lucide-react";
 
 export default async function ReviewsPage({
   searchParams,
@@ -22,9 +19,15 @@ export default async function ReviewsPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Avis</h1>
-        <p className="text-muted-foreground">{total} avis</p>
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">
+          <MessageSquare className="h-5 w-5 text-indigo-600" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Avis</h1>
+          <p className="text-[13px] text-gray-400 mt-0.5">{total} avis publiés</p>
+        </div>
       </div>
 
       <SearchInput placeholder="Rechercher par auteur, commentaire..." />
@@ -33,42 +36,46 @@ export default async function ReviewsPage({
         <EmptyState title="Aucun avis" description="Aucun avis ne correspond à votre recherche." />
       ) : (
         <>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Auteur</TableHead>
-                  <TableHead>Restaurant</TableHead>
-                  <TableHead>Note</TableHead>
-                  <TableHead className="max-w-[300px]">Commentaire</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          <div className="overflow-hidden rounded-2xl border border-[#eaecf0] bg-white">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#eaecf0] bg-[#f8fafc]">
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Date</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Auteur</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Restaurant</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Note</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Commentaire</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#f0f2f5]">
                 {reviews.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="text-sm text-muted-foreground">
+                  <tr key={r.id} className="hover:bg-[#fafbfc] transition-colors">
+                    <td className="px-4 py-3 text-gray-500">
                       {new Date(r.created_at).toLocaleDateString("fr-CH")}
-                    </TableCell>
-                    <TableCell className="font-medium">{r.author_name}</TableCell>
-                    <TableCell className="text-sm">{r.restaurant_name || "\u2014"}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-gray-900">{r.author_name}</td>
+                    <td className="px-4 py-3 text-gray-600">{r.restaurant_name || "—"}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-0.5">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
                             key={i}
-                            className={`h-3 w-3 ${i < r.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`}
+                            className={`h-3.5 w-3.5 ${
+                              i < r.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "fill-gray-200 text-gray-200"
+                            }`}
                           />
                         ))}
                       </div>
-                    </TableCell>
-                    <TableCell className="max-w-[300px] truncate text-sm text-muted-foreground">
-                      {r.comment || "\u2014"}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                    <td className="max-w-[300px] truncate px-4 py-3 text-gray-500">
+                      {r.comment || "—"}
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
           <Pagination page={page} totalPages={totalPages} total={total} />
         </>

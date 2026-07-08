@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { approveClaim, rejectClaim } from "@/actions/admin/claims";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 export function ClaimActions({ claimId }: { claimId: string }) {
@@ -45,49 +43,52 @@ export function ClaimActions({ claimId }: { claimId: string }) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="text-sm font-medium text-muted-foreground" htmlFor="admin-notes">
+      <div className="space-y-1.5">
+        <label htmlFor="admin-notes" className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
           Notes admin (obligatoire pour le rejet)
         </label>
-        <Textarea
+        <textarea
           id="admin-notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Raison de la décision, observations..."
           rows={3}
-          className="mt-1"
+          className="w-full rounded-xl border border-[#eaecf0] bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
         />
       </div>
 
       <div className="flex gap-3">
-        <Button
+        <button
           onClick={handleApprove}
           disabled={saving}
-          className="bg-green-600 hover:bg-green-700 text-white"
+          className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <CheckCircle className="h-4 w-4 mr-2" />
+            <CheckCircle className="h-4 w-4" />
           )}
           Approuver
-        </Button>
-        <Button
+        </button>
+        <button
           onClick={handleReject}
           disabled={saving}
-          variant="destructive"
+          className="flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {saving ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <XCircle className="h-4 w-4 mr-2" />
+            <XCircle className="h-4 w-4" />
           )}
           Rejeter
-        </Button>
+        </button>
       </div>
 
       {message && (
-        <p className={`text-sm ${message.type === "success" ? "text-green-600" : "text-red-600"}`}>
+        <p
+          className="text-sm font-medium"
+          style={{ color: message.type === "success" ? "#16a34a" : "#dc2626" }}
+        >
           {message.text}
         </p>
       )}

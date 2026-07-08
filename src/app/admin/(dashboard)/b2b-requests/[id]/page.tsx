@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { getB2BRequest } from "@/actions/admin/b2b-requests";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Mail, Phone, Store, MapPin, Calendar, MessageSquare } from "lucide-react";
 import { B2BStatusChanger } from "./B2BStatusChanger";
 
@@ -16,10 +14,14 @@ export default async function B2BRequestDetailPage({
   if (!result.success || !result.data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Demande non trouvée</h1>
-        <Button asChild>
-          <Link href="/admin/b2b-requests">Retour à la liste</Link>
-        </Button>
+        <h1 className="text-2xl font-bold text-gray-900">Demande non trouvée</h1>
+        <Link
+          href="/admin/b2b-requests"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#eaecf0] bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour à la liste
+        </Link>
       </div>
     );
   }
@@ -28,74 +30,84 @@ export default async function B2BRequestDetailPage({
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/b2b-requests">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
+        <Link
+          href="/admin/b2b-requests"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#eaecf0] bg-white text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
         <div>
-          <h1 className="text-2xl font-bold">{r.restaurant_name}</h1>
-          <p className="text-muted-foreground">
-            {r.first_name || r.last_name ? `${r.first_name || ""} ${r.last_name || ""}`.trim() : ""}
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">{r.restaurant_name}</h1>
+          <p className="text-[13px] text-gray-400 mt-0.5">
+            {r.first_name || r.last_name
+              ? `${r.first_name || ""} ${r.last_name || ""}`.trim()
+              : ""}
             {r.city ? ` — ${r.city}` : ""}
           </p>
         </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader><CardTitle>Contact</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
+        {/* Contact */}
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Contact</h2>
+          <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <a href={`mailto:${r.email}`} className="text-blue-600 hover:underline">{r.email}</a>
+              <Mail className="h-4 w-4 text-gray-400" />
+              <a href={`mailto:${r.email}`} className="text-indigo-600 hover:underline">{r.email}</a>
             </div>
             {r.phone && (
               <div className="flex items-center gap-3 text-sm">
-                <Phone className="h-4 w-4 text-muted-foreground" />
-                <a href={`tel:${r.phone}`} className="text-blue-600 hover:underline">{r.phone}</a>
+                <Phone className="h-4 w-4 text-gray-400" />
+                <a href={`tel:${r.phone}`} className="text-indigo-600 hover:underline">{r.phone}</a>
               </div>
             )}
             <div className="flex items-center gap-3 text-sm">
-              <Store className="h-4 w-4 text-muted-foreground" />
-              <span>{r.restaurant_name}</span>
+              <Store className="h-4 w-4 text-gray-400" />
+              <span className="text-gray-700">{r.restaurant_name}</span>
             </div>
             {r.city && (
               <div className="flex items-center gap-3 text-sm">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>{r.city}</span>
+                <MapPin className="h-4 w-4 text-gray-400" />
+                <span className="text-gray-700">{r.city}</span>
               </div>
             )}
             <div className="flex items-center gap-3 text-sm">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>Reçu le {new Date(r.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+              <Calendar className="h-4 w-4 text-gray-400" />
+              <span className="text-gray-700">
+                Reçu le{" "}
+                {new Date(r.created_at).toLocaleDateString("fr-CH", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader><CardTitle>Statut</CardTitle></CardHeader>
-          <CardContent>
-            <B2BStatusChanger id={r.id} currentStatus={r.status} />
-          </CardContent>
-        </Card>
+        {/* Statut */}
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-6">
+          <h2 className="font-bold text-gray-900 mb-4">Statut</h2>
+          <B2BStatusChanger id={r.id} currentStatus={r.status} />
+        </div>
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              Message
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {r.message ? (
-              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{r.message}</p>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">Aucun message</p>
-            )}
-          </CardContent>
-        </Card>
+        {/* Message */}
+        <div className="rounded-2xl border border-[#eaecf0] bg-white p-6 md:col-span-2">
+          <h2 className="flex items-center gap-2 font-bold text-gray-900 mb-4">
+            <MessageSquare className="h-5 w-5 text-indigo-500" />
+            Message
+          </h2>
+          {r.message ? (
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">{r.message}</p>
+          ) : (
+            <p className="text-sm italic text-gray-400">Aucun message</p>
+          )}
+        </div>
       </div>
     </div>
   );

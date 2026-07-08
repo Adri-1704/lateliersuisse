@@ -1,9 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { LogOut } from "lucide-react";
 import { logoutAdmin } from "@/actions/admin/auth";
 
@@ -20,15 +17,16 @@ export function AdminHeader({ email }: AdminHeaderProps) {
   }
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-background px-6">
-      <SidebarTrigger />
-      <Separator orientation="vertical" className="h-6" />
+    <header className="flex h-14 shrink-0 items-center border-b border-[#eaecf0] bg-white px-6 gap-4">
       <div className="flex-1" />
-      <span className="text-sm text-muted-foreground">{email}</span>
-      <Button variant="ghost" size="sm" onClick={handleLogout}>
-        <LogOut className="mr-2 h-4 w-4" />
+      <span className="text-sm text-gray-500">{email}</span>
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+      >
+        <LogOut className="h-3.5 w-3.5" />
         Déconnexion
-      </Button>
+      </button>
     </header>
   );
 }

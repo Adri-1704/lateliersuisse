@@ -3,18 +3,28 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateB2BRequestStatus } from "@/actions/admin/b2b-requests";
-import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2 } from "lucide-react";
 import type { B2BContactStatus } from "@/lib/supabase/types";
 
-const statuses: { value: B2BContactStatus; label: string; color: string }[] = [
-  { value: "new", label: "Nouveau", color: "bg-blue-100 text-blue-700" },
-  { value: "contacted", label: "Contacté", color: "bg-yellow-100 text-yellow-700" },
-  { value: "converted", label: "Converti", color: "bg-green-100 text-green-700" },
-  { value: "archived", label: "Archivé", color: "bg-gray-100 text-gray-700" },
+const statuses: {
+  value: B2BContactStatus;
+  label: string;
+  activeBg: string;
+  activeColor: string;
+}[] = [
+  { value: "new", label: "Nouveau", activeBg: "#eff6ff", activeColor: "#2563eb" },
+  { value: "contacted", label: "Contacté", activeBg: "#fffbeb", activeColor: "#d97706" },
+  { value: "converted", label: "Converti", activeBg: "#f0fdf4", activeColor: "#16a34a" },
+  { value: "archived", label: "Archivé", activeBg: "#f3f4f6", activeColor: "#374151" },
 ];
 
-export function B2BStatusChanger({ id, currentStatus }: { id: string; currentStatus: string }) {
+export function B2BStatusChanger({
+  id,
+  currentStatus,
+}: {
+  id: string;
+  currentStatus: string;
+}) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -36,27 +46,33 @@ export function B2BStatusChanger({ id, currentStatus }: { id: string; currentSta
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        {statuses.map((s) => (
-          <Button
-            key={s.value}
-            variant={currentStatus === s.value ? "default" : "outline"}
-            size="sm"
-            disabled={saving}
-            onClick={() => handleChange(s.value)}
-            className={currentStatus === s.value ? "bg-blue-600 hover:bg-blue-700" : ""}
-          >
-            {s.label}
-          </Button>
-        ))}
+        {statuses.map((s) => {
+          const isActive = currentStatus === s.value;
+          return (
+            <button
+              key={s.value}
+              disabled={saving}
+              onClick={() => handleChange(s.value)}
+              className="rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50"
+              style={
+                isActive
+                  ? { background: s.activeBg, color: s.activeColor, borderColor: s.activeColor + "40" }
+                  : { background: "white", color: "#374151", borderColor: "#eaecf0" }
+              }
+            >
+              {s.label}
+            </button>
+          );
+        })}
       </div>
       {saving && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-gray-400">
           <Loader2 className="h-3 w-3 animate-spin" />
           Mise à jour...
         </div>
       )}
       {message && !saving && (
-        <div className="flex items-center gap-2 text-sm text-green-600">
+        <div className="flex items-center gap-2 text-sm text-emerald-600">
           <CheckCircle className="h-3 w-3" />
           {message}
         </div>

@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import type { LucideIcon } from "lucide-react";
 
 interface StatsCardProps {
@@ -10,17 +9,15 @@ interface StatsCardProps {
 
 export function StatsCard({ title, value, icon: Icon, description }: StatsCardProps) {
   return (
-    <Card>
-      <CardContent className="flex items-center gap-4 p-6">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--color-just-tag-light)]">
-          <Icon className="h-6 w-6 text-[var(--color-just-tag)]" />
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
-          {description && <p className="text-xs text-muted-foreground">{description}</p>}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-center gap-4 rounded-2xl border border-[#eaecf0] bg-white p-5">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50">
+        <Icon className="h-6 w-6 text-indigo-600" />
+      </div>
+      <div>
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        {description && <p className="text-xs text-gray-400 mt-0.5">{description}</p>}
+      </div>
+    </div>
   );
 }

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Loader2, Unlink } from "lucide-react";
 import { unlinkMerchantFromRestaurant } from "@/actions/admin/restaurants";
 
@@ -18,7 +17,7 @@ export function UnlinkMerchantButton({ restaurantId, merchantName }: Props) {
 
   async function handleUnlink() {
     const confirmed = window.confirm(
-      `Voulez-vous vraiment délier "${merchantName}" de ce restaurant ?\n\nLe commerçant perdra l'accès à cette fiche. Cette action est réversible (le commerçant pourra refaire une demande).`
+      `Voulez-vous vraiment délier "${merchantName}" de ce restaurant ?\n\nLe commerçant perdra l'accès à cette fiche. Cette action est réversible.`
     );
     if (!confirmed) return;
 
@@ -36,19 +35,18 @@ export function UnlinkMerchantButton({ restaurantId, merchantName }: Props) {
 
   return (
     <div>
-      <Button
-        variant="destructive"
-        size="sm"
+      <button
         onClick={handleUnlink}
         disabled={loading}
+        className="flex items-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-100 disabled:opacity-50"
       >
         {loading ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
         ) : (
-          <Unlink className="mr-2 h-4 w-4" />
+          <Unlink className="h-3.5 w-3.5" />
         )}
         Délier ce commerçant
-      </Button>
+      </button>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
     </div>
   );

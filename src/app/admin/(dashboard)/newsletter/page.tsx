@@ -2,12 +2,13 @@ import { listNewsletterSubscribers } from "@/actions/admin/newsletter";
 import { SearchInput } from "@/components/admin/SearchInput";
 import { Pagination } from "@/components/admin/Pagination";
 import { EmptyState } from "@/components/admin/EmptyState";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
+import { Newspaper } from "lucide-react";
 
-const localeLabels: Record<string, string> = { fr: "Français", de: "Allemand", en: "Anglais" };
+const localeLabels: Record<string, string> = {
+  fr: "Français",
+  de: "Allemand",
+  en: "Anglais",
+};
 
 export default async function NewsletterPage({
   searchParams,
@@ -24,9 +25,17 @@ export default async function NewsletterPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Newsletter</h1>
-        <p className="text-muted-foreground">{total} abonné{total > 1 ? "s" : ""}</p>
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">
+          <Newspaper className="h-5 w-5 text-indigo-600" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Newsletter</h1>
+          <p className="text-[13px] text-gray-400 mt-0.5">
+            {total} abonné{total > 1 ? "s" : ""}
+          </p>
+        </div>
       </div>
 
       <SearchInput placeholder="Rechercher par email..." />
@@ -35,33 +44,40 @@ export default async function NewsletterPage({
         <EmptyState title="Aucun abonné" description="Aucun abonné à la newsletter." />
       ) : (
         <>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Langue</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Inscription</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          <div className="overflow-hidden rounded-2xl border border-[#eaecf0] bg-white">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#eaecf0] bg-[#f8fafc]">
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Email</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Langue</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Statut</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Inscription</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#f0f2f5]">
                 {subscribers.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-medium">{s.email}</TableCell>
-                    <TableCell>{localeLabels[s.locale] || s.locale}</TableCell>
-                    <TableCell>
-                      <Badge variant={s.is_active ? "default" : "secondary"}>
+                  <tr key={s.id} className="hover:bg-[#fafbfc] transition-colors">
+                    <td className="px-4 py-3 font-medium text-gray-900">{s.email}</td>
+                    <td className="px-4 py-3 text-gray-600">{localeLabels[s.locale] || s.locale}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                        style={
+                          s.is_active
+                            ? { background: "#f0fdf4", color: "#16a34a" }
+                            : { background: "#f3f4f6", color: "#6b7280" }
+                        }
+                      >
                         {s.is_active ? "Actif" : "Inactif"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">
                       {new Date(s.created_at).toLocaleDateString("fr-CH")}
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
+              </tbody>
+            </table>
           </div>
           <Pagination page={page} totalPages={totalPages} total={total} />
         </>

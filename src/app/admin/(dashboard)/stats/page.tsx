@@ -1,10 +1,7 @@
 import { getSaaSMetrics } from "@/actions/admin/stats";
 import { EARLY_BIRD_LIMIT } from "@/lib/stripe";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Users,
   UserPlus,
@@ -52,18 +49,66 @@ function TrendIndicator({ value }: { value: number }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-0.5 text-sm font-medium text-muted-foreground">
+    <span className="inline-flex items-center gap-0.5 text-sm font-medium text-gray-400">
       <Minus className="h-3.5 w-3.5" />
       0%
     </span>
   );
 }
 
-function ProgressBar({ value, max, color = "bg-[var(--color-just-tag)]" }: { value: number; max: number; color?: string }) {
+function ProgressBar({
+  value,
+  max,
+  color = "bg-indigo-500",
+}: {
+  value: number;
+  max: number;
+  color?: string;
+}) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div className="h-2.5 w-full rounded-full bg-muted">
-      <div className={`h-2.5 rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
+    <div className="h-2 w-full rounded-full bg-gray-100">
+      <div className={`h-2 rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
+
+function KpiCard({
+  title,
+  children,
+  icon,
+}: {
+  title: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm text-gray-500">{title}</p>
+        {icon && <span className="text-gray-400">{icon}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function SectionCard({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+      <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+        {icon}
+        {title}
+      </h3>
+      {children}
     </div>
   );
 }
@@ -86,196 +131,127 @@ export default async function StatsPage() {
 
   return (
     <div className="space-y-8">
-      {/* ── Header ─────────────────────────────────────── */}
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Statistiques SaaS</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl font-black tracking-tight text-gray-900">Statistiques SaaS</h1>
+        <p className="text-[13px] text-gray-400 mt-0.5">
           Tableau de bord en temps réel — Just-Tag.app
         </p>
       </div>
 
-      {/* ── KPIs principaux ────────────────────────────── */}
+      {/* KPIs principaux */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {/* MRR */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">MRR</p>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className="mt-2 text-3xl font-bold">{formatCHF(m.mrr)}</p>
-            <div className="mt-1 flex items-center gap-2">
-              <TrendIndicator value={m.mom} />
-              <span className="text-xs text-muted-foreground">vs mois préc.</span>
-            </div>
-          </CardContent>
-        </Card>
+        <KpiCard title="MRR" icon={<DollarSign className="h-4 w-4" />}>
+          <p className="text-3xl font-bold text-gray-900">{formatCHF(m.mrr)}</p>
+          <div className="mt-1 flex items-center gap-2">
+            <TrendIndicator value={m.mom} />
+            <span className="text-xs text-gray-400">vs mois préc.</span>
+          </div>
+        </KpiCard>
 
-        {/* ARR */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">ARR</p>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className="mt-2 text-3xl font-bold">{formatCHF(m.arr)}</p>
-            <p className="mt-1 text-xs text-muted-foreground">MRR x 12</p>
-          </CardContent>
-        </Card>
+        <KpiCard title="ARR" icon={<TrendingUp className="h-4 w-4" />}>
+          <p className="text-3xl font-bold text-gray-900">{formatCHF(m.arr)}</p>
+          <p className="mt-1 text-xs text-gray-400">MRR × 12</p>
+        </KpiCard>
 
-        {/* Abonnes actifs */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Abonnés actifs</p>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className="mt-2 text-3xl font-bold">{m.activeSubscribers}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              dont {m.trialingSubscribers} en trial
-            </p>
-          </CardContent>
-        </Card>
+        <KpiCard title="Abonnés actifs" icon={<Users className="h-4 w-4" />}>
+          <p className="text-3xl font-bold text-gray-900">{m.activeSubscribers}</p>
+          <p className="mt-1 text-xs text-gray-400">dont {m.trialingSubscribers} en trial</p>
+        </KpiCard>
 
-        {/* Churn */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Churn rate</p>
-              <UserMinus className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className={`mt-2 text-3xl font-bold ${m.churnRate > 5 ? "text-red-600" : m.churnRate > 0 ? "text-amber-600" : "text-emerald-600"}`}>
-              {m.churnRate}%
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">ce mois</p>
-          </CardContent>
-        </Card>
+        <KpiCard title="Churn rate" icon={<UserMinus className="h-4 w-4" />}>
+          <p
+            className={`text-3xl font-bold ${
+              m.churnRate > 5
+                ? "text-red-600"
+                : m.churnRate > 0
+                ? "text-amber-600"
+                : "text-emerald-600"
+            }`}
+          >
+            {m.churnRate}%
+          </p>
+          <p className="mt-1 text-xs text-gray-400">ce mois</p>
+        </KpiCard>
 
-        {/* Early Bird */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Places Early Bird</p>
-              <Zap className="h-4 w-4 text-amber-500" />
-            </div>
-            <p className="mt-2 text-3xl font-bold">
-              {m.earlyBirdSpotsRemaining}
-              <span className="text-lg font-normal text-muted-foreground">/{EARLY_BIRD_LIMIT}</span>
-            </p>
-            <div className="mt-2">
-              <ProgressBar
-                value={EARLY_BIRD_LIMIT - m.earlyBirdSpotsRemaining}
-                max={EARLY_BIRD_LIMIT}
-                color="bg-amber-500"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <KpiCard title="Places Early Bird" icon={<Zap className="h-4 w-4 text-amber-500" />}>
+          <p className="text-3xl font-bold text-gray-900">
+            {m.earlyBirdSpotsRemaining}
+            <span className="text-lg font-normal text-gray-400">/{EARLY_BIRD_LIMIT}</span>
+          </p>
+          <div className="mt-2">
+            <ProgressBar
+              value={EARLY_BIRD_LIMIT - m.earlyBirdSpotsRemaining}
+              max={EARLY_BIRD_LIMIT}
+              color="bg-amber-500"
+            />
+          </div>
+        </KpiCard>
       </div>
 
-      {/* ── Ligne 2 : Croissance & Conversion ──────────── */}
+      {/* Croissance & Conversion */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Revenue total estime */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Revenue total estimé</p>
-              <DollarSign className="h-4 w-4 text-emerald-600" />
-            </div>
-            <p className="mt-2 text-2xl font-bold">{formatCHF(m.revenueTotalEstime)}</p>
-            <p className="mt-1 text-xs text-muted-foreground">ARR + Lifetime</p>
-          </CardContent>
-        </Card>
+        <KpiCard title="Revenue total estimé" icon={<DollarSign className="h-4 w-4 text-emerald-600" />}>
+          <p className="text-2xl font-bold text-gray-900">{formatCHF(m.revenueTotalEstime)}</p>
+          <p className="mt-1 text-xs text-gray-400">ARR + Lifetime</p>
+        </KpiCard>
 
-        {/* Revenue Lifetime */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Revenue Lifetime</p>
-              <Award className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className="mt-2 text-2xl font-bold">{formatCHF(m.revenueLifetime)}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {m.subscribersByPlan.lifetime} abonné{m.subscribersByPlan.lifetime !== 1 ? "s" : ""} lifetime
-            </p>
-          </CardContent>
-        </Card>
+        <KpiCard title="Revenue Lifetime" icon={<Award className="h-4 w-4" />}>
+          <p className="text-2xl font-bold text-gray-900">{formatCHF(m.revenueLifetime)}</p>
+          <p className="mt-1 text-xs text-gray-400">
+            {m.subscribersByPlan.lifetime} abonné{m.subscribersByPlan.lifetime !== 1 ? "s" : ""} lifetime
+          </p>
+        </KpiCard>
 
-        {/* Nouveaux ce mois */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Nouveaux ce mois</p>
-              <UserPlus className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className="mt-2 text-2xl font-bold">{m.newSubscribersThisMonth}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              vs {m.newSubscribersPrevMonth} mois préc.
-            </p>
-          </CardContent>
-        </Card>
+        <KpiCard title="Nouveaux ce mois" icon={<UserPlus className="h-4 w-4" />}>
+          <p className="text-2xl font-bold text-gray-900">{m.newSubscribersThisMonth}</p>
+          <p className="mt-1 text-xs text-gray-400">vs {m.newSubscribersPrevMonth} mois préc.</p>
+        </KpiCard>
 
-        {/* Conversion trial */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-muted-foreground">Conversion trial → payant</p>
-              <Target className="h-4 w-4 text-muted-foreground" />
-            </div>
-            <p className={`mt-2 text-2xl font-bold ${m.trialConversionRate >= 50 ? "text-emerald-600" : m.trialConversionRate > 0 ? "text-amber-600" : ""}`}>
-              {m.trialConversionRate}%
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {m.trialingSubscribers} en trial actuellement
-            </p>
-          </CardContent>
-        </Card>
+        <KpiCard title="Conversion trial → payant" icon={<Target className="h-4 w-4" />}>
+          <p
+            className={`text-2xl font-bold ${
+              m.trialConversionRate >= 50
+                ? "text-emerald-600"
+                : m.trialConversionRate > 0
+                ? "text-amber-600"
+                : "text-gray-900"
+            }`}
+          >
+            {m.trialConversionRate}%
+          </p>
+          <p className="mt-1 text-xs text-gray-400">{m.trialingSubscribers} en trial actuellement</p>
+        </KpiCard>
       </div>
 
-      {/* ── Section Répartition ────────────────────────── */}
+      {/* Répartition */}
       <div className="grid gap-4 lg:grid-cols-3">
-        {/* Par plan */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BarChart3 className="h-4 w-4" />
-              Répartition par plan
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {(Object.entries(m.subscribersByPlan) as [string, number][]).map(
-              ([plan, count]) => (
-                <div key={plan} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span>{planLabels[plan] || plan}</span>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                  <ProgressBar value={count} max={totalByPlan || 1} />
+        <SectionCard title="Répartition par plan" icon={<BarChart3 className="h-4 w-4 text-indigo-500" />}>
+          <div className="space-y-3">
+            {(Object.entries(m.subscribersByPlan) as [string, number][]).map(([plan, count]) => (
+              <div key={plan} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-700">{planLabels[plan] || plan}</span>
+                  <span className="font-semibold text-gray-900">{count}</span>
                 </div>
-              )
-            )}
+                <ProgressBar value={count} max={totalByPlan || 1} />
+              </div>
+            ))}
             {totalByPlan === 0 && (
-              <p className="text-sm text-muted-foreground">Aucun abonné pour le moment</p>
+              <p className="text-sm text-gray-400">Aucun abonné pour le moment</p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </SectionCard>
 
-        {/* Early Bird vs Standard */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Zap className="h-4 w-4" />
-              Early Bird vs Standard
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <SectionCard title="Early Bird vs Standard" icon={<Zap className="h-4 w-4 text-amber-500" />}>
+          <div className="space-y-3">
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 text-gray-700">
                   <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />
                   Early Bird
                 </span>
-                <span className="font-medium">{m.earlyBirdCount}</span>
+                <span className="font-semibold text-gray-900">{m.earlyBirdCount}</span>
               </div>
               <ProgressBar
                 value={m.earlyBirdCount}
@@ -285,164 +261,110 @@ export default async function StatsPage() {
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-[var(--color-just-tag)]" />
+                <span className="flex items-center gap-1.5 text-gray-700">
+                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-indigo-500" />
                   Standard
                 </span>
-                <span className="font-medium">{m.standardCount}</span>
+                <span className="font-semibold text-gray-900">{m.standardCount}</span>
               </div>
-              <ProgressBar
-                value={m.standardCount}
-                max={m.earlyBirdCount + m.standardCount || 1}
-              />
+              <ProgressBar value={m.standardCount} max={m.earlyBirdCount + m.standardCount || 1} />
             </div>
-            {m.earlyBirdCount + m.standardCount === 0 && (
-              <p className="text-sm text-muted-foreground">Aucun abonné pour le moment</p>
-            )}
-          </CardContent>
-        </Card>
+          </div>
+        </SectionCard>
 
-        {/* Par canton */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Users className="h-4 w-4" />
-              Abonnés par canton
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {m.subscribersByCanton.length > 0 ? (
-              <div className="space-y-2">
-                {m.subscribersByCanton.map((c) => (
-                  <div key={c.canton} className="flex items-center justify-between text-sm">
-                    <span>{c.canton}</span>
-                    <Badge variant="secondary">{c.count}</Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">Aucune donnée canton disponible</p>
-            )}
-          </CardContent>
-        </Card>
+        <SectionCard title="Abonnés par canton" icon={<Users className="h-4 w-4 text-indigo-500" />}>
+          {m.subscribersByCanton.length > 0 ? (
+            <div className="space-y-2">
+              {m.subscribersByCanton.map((c) => (
+                <div key={c.canton} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-700">{c.canton}</span>
+                  <span
+                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                    style={{ background: "#eef2ff", color: "#4f46e5" }}
+                  >
+                    {c.count}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">Aucune donnée canton disponible</p>
+          )}
+        </SectionCard>
       </div>
 
-      {/* ── Section Clients & Claims ───────────────────── */}
+      {/* Clients & Claims */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold">Clients & Revendications</h2>
+        <h2 className="mb-4 text-base font-bold text-gray-900">Clients & Revendications</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Total commerçants</p>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-bold">{m.totalMerchants}</p>
-            </CardContent>
-          </Card>
+          <KpiCard title="Total commerçants" icon={<Users className="h-4 w-4" />}>
+            <p className="text-2xl font-bold text-gray-900">{m.totalMerchants}</p>
+          </KpiCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Demandes de claim</p>
-                <ShieldCheck className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-bold">{m.totalClaimRequests}</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                <Badge variant="default" className="bg-emerald-600">
-                  {m.claimsApproved} approuvé{m.claimsApproved !== 1 ? "s" : ""}
-                </Badge>
-                <Badge variant="secondary">
-                  {m.claimsPending} en attente
-                </Badge>
-                {m.claimsRejected > 0 && (
-                  <Badge variant="destructive">
-                    {m.claimsRejected} rejeté{m.claimsRejected !== 1 ? "s" : ""}
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <KpiCard title="Demandes de claim" icon={<ShieldCheck className="h-4 w-4" />}>
+            <p className="text-2xl font-bold text-gray-900">{m.totalClaimRequests}</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: "#f0fdf4", color: "#16a34a" }}>
+                {m.claimsApproved} approuvé{m.claimsApproved !== 1 ? "s" : ""}
+              </span>
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: "#f3f4f6", color: "#374151" }}>
+                {m.claimsPending} en attente
+              </span>
+              {m.claimsRejected > 0 && (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" style={{ background: "#fef2f2", color: "#dc2626" }}>
+                  {m.claimsRejected} rejeté{m.claimsRejected !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          </KpiCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Conversion claim → abonné</p>
-                <Target className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className={`mt-2 text-2xl font-bold ${m.claimToSubscriberRate >= 50 ? "text-emerald-600" : m.claimToSubscriberRate > 0 ? "text-amber-600" : ""}`}>
-                {m.claimToSubscriberRate}%
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                claims approuvés avec abonnement actif
-              </p>
-            </CardContent>
-          </Card>
+          <KpiCard title="Conversion claim → abonné" icon={<Target className="h-4 w-4" />}>
+            <p
+              className={`text-2xl font-bold ${
+                m.claimToSubscriberRate >= 50
+                  ? "text-emerald-600"
+                  : m.claimToSubscriberRate > 0
+                  ? "text-amber-600"
+                  : "text-gray-900"
+              }`}
+            >
+              {m.claimToSubscriberRate}%
+            </p>
+            <p className="mt-1 text-xs text-gray-400">claims approuvés avec abonnement actif</p>
+          </KpiCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">En trial</p>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-bold">{m.trialingSubscribers}</p>
-              <p className="mt-1 text-xs text-muted-foreground">14 jours d&apos;essai</p>
-            </CardContent>
-          </Card>
+          <KpiCard title="En trial" icon={<Clock className="h-4 w-4" />}>
+            <p className="text-2xl font-bold text-gray-900">{m.trialingSubscribers}</p>
+            <p className="mt-1 text-xs text-gray-400">14 jours d&apos;essai</p>
+          </KpiCard>
         </div>
       </div>
 
-      {/* ── Section Opérationnel ───────────────────────── */}
+      {/* Opérationnel */}
       <div>
-        <h2 className="mb-4 text-lg font-semibold">Indicateurs opérationnels</h2>
+        <h2 className="mb-4 text-base font-bold text-gray-900">Indicateurs opérationnels</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Restaurants publiés</p>
-                <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-bold">{m.totalPublishedRestaurants}</p>
-            </CardContent>
-          </Card>
+          <KpiCard title="Restaurants publiés" icon={<UtensilsCrossed className="h-4 w-4" />}>
+            <p className="text-2xl font-bold text-gray-900">{m.totalPublishedRestaurants}</p>
+          </KpiCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Restaurants revendiqués</p>
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
-              </div>
-              <p className="mt-2 text-2xl font-bold">{m.claimedRestaurants}</p>
-            </CardContent>
-          </Card>
+          <KpiCard title="Restaurants revendiqués" icon={<ShieldCheck className="h-4 w-4 text-emerald-600" />}>
+            <p className="text-2xl font-bold text-gray-900">{m.claimedRestaurants}</p>
+          </KpiCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Taux de revendication</p>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-bold">{m.claimRate}%</p>
-              <div className="mt-2">
-                <ProgressBar value={m.claimedRestaurants} max={m.totalPublishedRestaurants || 1} />
-              </div>
-            </CardContent>
-          </Card>
+          <KpiCard title="Taux de revendication" icon={<BarChart3 className="h-4 w-4" />}>
+            <p className="text-2xl font-bold text-gray-900">{m.claimRate}%</p>
+            <div className="mt-2">
+              <ProgressBar value={m.claimedRestaurants} max={m.totalPublishedRestaurants || 1} />
+            </div>
+          </KpiCard>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-muted-foreground">Ratio revendiqué / total</p>
-                <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="mt-2 text-2xl font-bold">
-                {m.claimedRestaurants}
-                <span className="text-lg font-normal text-muted-foreground">
-                  /{m.totalPublishedRestaurants}
-                </span>
-              </p>
-            </CardContent>
-          </Card>
+          <KpiCard title="Ratio revendiqué / total" icon={<UtensilsCrossed className="h-4 w-4" />}>
+            <p className="text-2xl font-bold text-gray-900">
+              {m.claimedRestaurants}
+              <span className="text-lg font-normal text-gray-400">/{m.totalPublishedRestaurants}</span>
+            </p>
+          </KpiCard>
         </div>
       </div>
     </div>

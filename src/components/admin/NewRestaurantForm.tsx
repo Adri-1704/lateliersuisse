@@ -3,11 +3,6 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createRestaurant } from "@/actions/admin/restaurants";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 const cantons = [
@@ -17,6 +12,11 @@ const cantons = [
   "Grisons", "Argovie", "Thurgovie", "Tessin", "Vaud", "Valais",
   "Neuchâtel", "Genève", "Jura",
 ];
+
+const inputClass =
+  "w-full rounded-xl border border-[#eaecf0] bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20";
+
+const labelClass = "block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5";
 
 export function NewRestaurantForm() {
   const router = useRouter();
@@ -54,90 +54,98 @@ export function NewRestaurantForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="name_fr">Nom du restaurant *</Label>
-          <Input id="name_fr" name="name_fr" required placeholder="Ex: Le Petit Prince" />
+        <div className="sm:col-span-2">
+          <label htmlFor="name_fr" className={labelClass}>Nom du restaurant *</label>
+          <input id="name_fr" name="name_fr" required placeholder="Ex: Le Petit Prince" className={inputClass} />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="cuisine_type">Type de cuisine</Label>
-          <Input id="cuisine_type" name="cuisine_type" placeholder="Ex: Française, Italienne..." />
+        <div>
+          <label htmlFor="cuisine_type" className={labelClass}>Type de cuisine</label>
+          <input id="cuisine_type" name="cuisine_type" placeholder="Ex: Française, Italienne..." className={inputClass} />
         </div>
 
-        <div className="space-y-2">
-          <Label>Gamme de prix</Label>
-          <Select value={priceRange} onValueChange={setPriceRange}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">CHF - Budget</SelectItem>
-              <SelectItem value="2">CHF CHF - Moyen</SelectItem>
-              <SelectItem value="3">CHF CHF CHF - Haut de gamme</SelectItem>
-              <SelectItem value="4">CHF CHF CHF CHF - Luxe</SelectItem>
-            </SelectContent>
-          </Select>
+        <div>
+          <label className={labelClass}>Gamme de prix</label>
+          <select
+            value={priceRange}
+            onChange={(e) => setPriceRange(e.target.value)}
+            className={inputClass}
+          >
+            <option value="1">CHF — Budget</option>
+            <option value="2">CHF CHF — Moyen</option>
+            <option value="3">CHF CHF CHF — Haut de gamme</option>
+            <option value="4">CHF CHF CHF CHF — Luxe</option>
+          </select>
         </div>
 
-        <div className="space-y-2">
-          <Label>Canton *</Label>
-          <Select value={canton} onValueChange={setCanton} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionner un canton" />
-            </SelectTrigger>
-            <SelectContent>
-              {cantons.map((c) => (
-                <SelectItem key={c} value={c}>{c}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div>
+          <label className={labelClass}>Canton *</label>
+          <select
+            value={canton}
+            onChange={(e) => setCanton(e.target.value)}
+            required
+            className={inputClass}
+          >
+            <option value="">Sélectionner un canton</option>
+            {cantons.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="city">Ville *</Label>
-          <Input id="city" name="city" required placeholder="Ex: Genève" />
+        <div>
+          <label htmlFor="city" className={labelClass}>Ville *</label>
+          <input id="city" name="city" required placeholder="Ex: Genève" className={inputClass} />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="address">Adresse</Label>
-          <Input id="address" name="address" placeholder="Ex: Rue du Rhône 15" />
+        <div>
+          <label htmlFor="address" className={labelClass}>Adresse</label>
+          <input id="address" name="address" placeholder="Ex: Rue du Rhône 15" className={inputClass} />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="postal_code">Code postal</Label>
-          <Input id="postal_code" name="postal_code" placeholder="Ex: 1204" />
+        <div>
+          <label htmlFor="postal_code" className={labelClass}>Code postal</label>
+          <input id="postal_code" name="postal_code" placeholder="Ex: 1204" className={inputClass} />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="phone">Téléphone</Label>
-          <Input id="phone" name="phone" type="tel" placeholder="Ex: +41 22 123 45 67" />
+        <div>
+          <label htmlFor="phone" className={labelClass}>Téléphone</label>
+          <input id="phone" name="phone" type="tel" placeholder="Ex: +41 22 123 45 67" className={inputClass} />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" placeholder="Ex: contact@restaurant.ch" />
+        <div>
+          <label htmlFor="email" className={labelClass}>Email</label>
+          <input id="email" name="email" type="email" placeholder="Ex: contact@restaurant.ch" className={inputClass} />
         </div>
 
-        <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="website">Site web</Label>
-          <Input id="website" name="website" type="url" placeholder="Ex: https://restaurant.ch" />
+        <div className="sm:col-span-2">
+          <label htmlFor="website" className={labelClass}>Site web</label>
+          <input id="website" name="website" type="url" placeholder="Ex: https://restaurant.ch" className={inputClass} />
         </div>
 
-        <div className="space-y-2 sm:col-span-2">
-          <Label htmlFor="description_fr">Description</Label>
-          <Textarea id="description_fr" name="description_fr" rows={4} placeholder="Description du restaurant..." />
+        <div className="sm:col-span-2">
+          <label htmlFor="description_fr" className={labelClass}>Description</label>
+          <textarea id="description_fr" name="description_fr" rows={4} placeholder="Description du restaurant..." className={inputClass + " resize-none"} />
         </div>
       </div>
 
-      <div className="flex gap-3">
-        <Button type="submit" disabled={isPending || !canton}>
+      <div className="flex gap-3 pt-1">
+        <button
+          type="submit"
+          disabled={isPending || !canton}
+          className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        >
           {isPending ? "Création..." : "Créer le restaurant"}
-        </Button>
-        <Button type="button" variant="outline" onClick={() => router.push("/admin/restaurants")}>
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push("/admin/restaurants")}
+          className="rounded-xl border border-[#eaecf0] bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
           Annuler
-        </Button>
+        </button>
       </div>
     </form>
   );

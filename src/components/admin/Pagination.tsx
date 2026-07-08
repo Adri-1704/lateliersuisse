@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
@@ -25,31 +24,29 @@ export function Pagination({ page, totalPages, total }: PaginationProps) {
 
   return (
     <div className="flex items-center justify-between pt-4">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-gray-500">
         {total} résultat{total > 1 ? "s" : ""}
       </p>
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
+        <button
           onClick={() => goToPage(page - 1)}
           disabled={page <= 1}
+          className="flex items-center gap-1 rounded-lg border border-[#eaecf0] bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <ChevronLeft className="h-4 w-4" />
           Précédent
-        </Button>
-        <span className="text-sm text-muted-foreground">
+        </button>
+        <span className="text-sm text-gray-500">
           {page} / {totalPages}
         </span>
-        <Button
-          variant="outline"
-          size="sm"
+        <button
           onClick={() => goToPage(page + 1)}
           disabled={page >= totalPages}
+          className="flex items-center gap-1 rounded-lg border border-[#eaecf0] bg-white px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Suivant
           <ChevronRight className="h-4 w-4" />
-        </Button>
+        </button>
       </div>
     </div>
   );

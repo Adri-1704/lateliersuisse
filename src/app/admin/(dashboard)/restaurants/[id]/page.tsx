@@ -1,8 +1,5 @@
 import Link from "next/link";
 import { getRestaurant } from "@/actions/admin/restaurants";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, UserCheck, UserX } from "lucide-react";
 import { RestaurantEditForm } from "./RestaurantEditForm";
 import { UnlinkMerchantButton } from "./UnlinkMerchantButton";
@@ -19,17 +16,20 @@ export default async function EditRestaurantPage({
   if (!result.success || !result.data) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Restaurant non trouvé</h1>
-        <Button asChild>
-          <Link href="/admin/restaurants">Retour à la liste</Link>
-        </Button>
+        <h1 className="text-2xl font-bold text-gray-900">Restaurant non trouvé</h1>
+        <Link
+          href="/admin/restaurants"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#eaecf0] bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour à la liste
+        </Link>
       </div>
     );
   }
 
   const r = result.data;
 
-  // Fetch merchant info if restaurant is claimed
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rAny = r as any;
   let merchant: { id: string; name: string; email: string } | null = null;
@@ -47,50 +47,64 @@ export default async function EditRestaurantPage({
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/restaurants">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold">{r.name_fr}</h1>
-          <p className="text-muted-foreground">{r.city}, {r.canton}</p>
+        <Link
+          href="/admin/restaurants"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#eaecf0] bg-white text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <div className="flex-1">
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">{r.name_fr}</h1>
+          <p className="text-[13px] text-gray-400 mt-0.5">
+            {r.city}, {r.canton}
+          </p>
         </div>
-        <Badge variant={r.is_published ? "default" : "secondary"} className="ml-auto">
+        <span
+          className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium"
+          style={
+            r.is_published
+              ? { background: "#f0fdf4", color: "#16a34a" }
+              : { background: "#f3f4f6", color: "#6b7280" }
+          }
+        >
           {r.is_published ? "Publié" : "Brouillon"}
-        </Badge>
+        </span>
       </div>
 
-      {/* Section commerçant lié */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            {merchant ? (
-              <UserCheck className="h-4 w-4 text-green-600" />
-            ) : (
-              <UserX className="h-4 w-4 text-gray-400" />
-            )}
-            Commerçant
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      {/* Commerçant lié */}
+      <div className="rounded-2xl border border-[#eaecf0] bg-white p-6">
+        <h2 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
           {merchant ? (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">{merchant.name}</p>
-                <p className="text-sm text-muted-foreground">{merchant.email}</p>
-                <Badge variant="default" className="mt-1">
-                  {claimStatus === "claimed" ? "Revendiqué" : claimStatus === "pending" ? "En attente" : claimStatus}
-                </Badge>
-              </div>
-              <UnlinkMerchantButton restaurantId={r.id} merchantName={merchant.name} />
-            </div>
+            <UserCheck className="h-4 w-4 text-emerald-600" />
           ) : (
-            <p className="text-sm text-muted-foreground">Aucun commerçant lié à ce restaurant.</p>
+            <UserX className="h-4 w-4 text-gray-400" />
           )}
-        </CardContent>
-      </Card>
+          Commerçant
+        </h2>
+        {merchant ? (
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-gray-900">{merchant.name}</p>
+              <p className="text-sm text-gray-500">{merchant.email}</p>
+              <span
+                className="mt-1.5 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                style={{ background: "#eef2ff", color: "#4f46e5" }}
+              >
+                {claimStatus === "claimed"
+                  ? "Revendiqué"
+                  : claimStatus === "pending"
+                  ? "En attente"
+                  : claimStatus}
+              </span>
+            </div>
+            <UnlinkMerchantButton restaurantId={r.id} merchantName={merchant.name} />
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400">Aucun commerçant lié à ce restaurant.</p>
+        )}
+      </div>
 
       <RestaurantEditForm restaurant={r} />
     </div>

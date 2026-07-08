@@ -1,29 +1,32 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, UtensilsCrossed } from "lucide-react";
 import { NewRestaurantForm } from "@/components/admin/NewRestaurantForm";
 
 export default function NewRestaurantPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/restaurants">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-bold">Nouveau restaurant</h1>
+        <Link
+          href="/admin/restaurants"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#eaecf0] bg-white text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Link>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">
+            <UtensilsCrossed className="h-5 w-5 text-indigo-600" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-gray-900">Nouveau restaurant</h1>
+            <p className="text-[13px] text-gray-400 mt-0.5">Créer une nouvelle fiche restaurant</p>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Informations du restaurant</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <NewRestaurantForm />
-        </CardContent>
-      </Card>
+      <div className="rounded-2xl border border-[#eaecf0] bg-white p-6">
+        <h2 className="mb-5 text-sm font-bold text-gray-700">Informations du restaurant</h2>
+        <NewRestaurantForm />
+      </div>
     </div>
   );
 }

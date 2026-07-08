@@ -1,15 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, TrendingUp, DollarSign, Link2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const COMMISSION_RATE = 0.10; // 10%
+const COMMISSION_RATE = 0.10;
 
 interface AffiliateStats {
   ref: string;
-  /** Si le ref code correspond à un merchant interne, son nom (ex: parrain restaurateur) */
   parrainName: string | null;
   parrainEmail: string | null;
   totalSubscriptions: number;
@@ -36,7 +34,6 @@ async function getAffiliateStats(): Promise<{
     return { affiliates: [], totals: { subscriptions: 0, revenue: 0, commission: 0 } };
   }
 
-  // Get merchant details (filleuls)
   const merchantIds = [...new Set(subs.map((s) => s.merchant_id))];
   const { data: merchants } = await supabase
     .from("merchants")
@@ -45,7 +42,6 @@ async function getAffiliateStats(): Promise<{
 
   const merchantMap = new Map((merchants || []).map((m) => [m.id, m]));
 
-  // Match each unique affiliate_ref against merchants.ref_code (parrains)
   const uniqueRefs = [...new Set(subs.map((s) => s.affiliate_ref))];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: parrains } = await (supabase.from("merchants") as any)
@@ -56,15 +52,13 @@ async function getAffiliateStats(): Promise<{
     (parrains || []).map((p) => [p.ref_code, { name: p.name, email: p.email }])
   );
 
-  // Price mapping
   function getPrice(plan: string, isEarlyBird: boolean): number {
     if (plan === "lifetime") return 1495;
     if (plan === "annual") return isEarlyBird ? 299 : 499;
     if (plan === "semiannual") return isEarlyBird ? 159 : 269;
-    return isEarlyBird ? 29.95 : 49.95; // monthly
+    return isEarlyBird ? 29.95 : 49.95;
   }
 
-  // Group by affiliate
   const affiliateMap = new Map<string, AffiliateStats>();
 
   for (const sub of subs) {
@@ -116,148 +110,143 @@ async function getAffiliateStats(): Promise<{
 
 export default async function AffiliationsAdminPage() {
   const { affiliates, totals } = await getAffiliateStats();
-
   const noData = affiliates.length === 0;
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Affiliations</h1>
-        <p className="mt-1 text-gray-600">
-          Suivi des commissions affiliés. Chaque lien <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs">?ref=xxx</code> est tracké automatiquement.
-        </p>
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50">
+          <Link2 className="h-5 w-5 text-indigo-600" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Affiliations</h1>
+          <p className="text-[13px] text-gray-400 mt-0.5">
+            Suivi des commissions affiliés via{" "}
+            <code className="rounded bg-gray-100 px-1 text-xs">?ref=xxx</code>
+          </p>
+        </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
-              <Users className="h-4 w-4" /> Abonnements via affiliés
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-gray-900">{totals.subscriptions}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
-              <TrendingUp className="h-4 w-4" /> Revenu généré
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-gray-900">{totals.revenue.toFixed(2)} CHF</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
-              <DollarSign className="h-4 w-4" /> Commissions dues (10%)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-[var(--color-just-tag)]">{totals.commission.toFixed(2)} CHF</p>
-          </CardContent>
-        </Card>
+        {[
+          { title: "Abonnements via affiliés", value: totals.subscriptions, icon: <Users className="h-5 w-5 text-indigo-600" /> },
+          { title: "Revenu généré", value: `${totals.revenue.toFixed(2)} CHF`, icon: <TrendingUp className="h-5 w-5 text-indigo-600" /> },
+          { title: "Commissions dues (10%)", value: `${totals.commission.toFixed(2)} CHF`, icon: <DollarSign className="h-5 w-5 text-indigo-600" />, highlight: true },
+        ].map((kpi) => (
+          <div key={kpi.title} className="rounded-2xl border border-[#eaecf0] bg-white p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50">
+                {kpi.icon}
+              </div>
+              <p className="text-sm text-gray-500">{kpi.title}</p>
+            </div>
+            <p className={`text-3xl font-bold ${kpi.highlight ? "text-indigo-600" : "text-gray-900"}`}>
+              {kpi.value}
+            </p>
+          </div>
+        ))}
       </div>
 
       {noData ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Link2 className="mx-auto mb-4 h-10 w-10 text-gray-300" />
-            <h3 className="text-lg font-semibold text-gray-900">Aucun abonnement via affilié pour l&apos;instant</h3>
-            <p className="mt-2 text-sm text-gray-500">
-              Quand un restaurateur s&apos;abonnera via un lien <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs">?ref=xxx</code>, il apparaîtra ici automatiquement.
-            </p>
-            <div className="mt-6 rounded-lg bg-gray-50 p-4 text-left text-sm">
-              <p className="font-semibold text-gray-700">Comment ça marche :</p>
-              <ol className="mt-2 list-decimal space-y-1 pl-5 text-gray-600">
-                <li>Tu donnes un lien personnalisé à un influenceur : <code className="rounded bg-gray-100 px-1 text-xs">just-tag.app/fr/pour-restaurateurs?ref=marie</code></li>
-                <li>L&apos;influenceur partage le lien à sa communauté</li>
-                <li>Un restaurateur clique, un cookie <code className="rounded bg-gray-100 px-1 text-xs">jt_ref=marie</code> est stocké 30 jours</li>
-                <li>Le restaurateur s&apos;inscrit et paie → le code &ldquo;marie&rdquo; est attaché à l&apos;abonnement</li>
-                <li>Tu vois ici quel affilié a amené quel client et combien tu lui dois</li>
-              </ol>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-[#eaecf0] bg-white py-12 text-center">
+          <Link2 className="mx-auto mb-4 h-10 w-10 text-gray-200" />
+          <h3 className="text-lg font-bold text-gray-900">Aucun abonnement via affilié pour l&apos;instant</h3>
+          <p className="mt-2 text-sm text-gray-400">
+            Quand un restaurateur s&apos;abonnera via un lien{" "}
+            <code className="rounded bg-gray-100 px-1 text-xs">?ref=xxx</code>, il apparaîtra ici automatiquement.
+          </p>
+          <div className="mx-auto mt-6 max-w-md rounded-xl border border-[#eaecf0] bg-[#f8fafc] p-4 text-left text-sm">
+            <p className="font-semibold text-gray-700">Comment ça marche :</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-gray-500">
+              <li>Tu donnes un lien à un influenceur : <code className="rounded bg-gray-100 px-1 text-xs">just-tag.app/fr/pour-restaurateurs?ref=marie</code></li>
+              <li>Un restaurateur clique → cookie <code className="rounded bg-gray-100 px-1 text-xs">jt_ref=marie</code> stocké 30 jours</li>
+              <li>Le restaurateur s&apos;inscrit et paie → le code est attaché à l&apos;abonnement</li>
+              <li>Tu vois ici quel affilié a amené quel client et combien tu lui dois</li>
+            </ol>
+          </div>
+        </div>
       ) : (
-        <>
+        <div className="space-y-4">
           {affiliates.map((aff) => (
-            <Card key={aff.ref}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-just-tag)]/10 font-bold text-[var(--color-just-tag)]">
-                      {(aff.parrainName || aff.ref).slice(0, 2).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold text-gray-900">
-                        {aff.parrainName || aff.ref}
-                        {aff.parrainName && (
-                          <span className="ml-2 text-xs font-normal text-gray-500">
-                            (code {aff.ref})
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {aff.parrainEmail ? `${aff.parrainEmail} · ` : ""}
-                        Lien : just-tag.app/fr/pour-restaurateurs?ref={aff.ref}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-[var(--color-just-tag)]">{aff.commissionDue.toFixed(2)} CHF</p>
-                    <p className="text-xs text-gray-500">commission due</p>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4 flex gap-6 text-sm">
-                  <div>
-                    <span className="text-gray-500">Abonnements actifs :</span>{" "}
-                    <span className="font-semibold">{aff.activeSubscriptions}</span>
+            <div key={aff.ref} className="rounded-2xl border border-[#eaecf0] bg-white overflow-hidden">
+              {/* Affiliate header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#eaecf0]">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                    {(aff.parrainName || aff.ref).slice(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <span className="text-gray-500">Revenu généré :</span>{" "}
-                    <span className="font-semibold">{aff.totalRevenue.toFixed(2)} CHF</span>
+                    <p className="font-bold text-gray-900">
+                      {aff.parrainName || aff.ref}
+                      {aff.parrainName && (
+                        <span className="ml-2 text-xs font-normal text-gray-400">(code {aff.ref})</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {aff.parrainEmail ? `${aff.parrainEmail} · ` : ""}
+                      just-tag.app/fr/pour-restaurateurs?ref={aff.ref}
+                    </p>
                   </div>
                 </div>
-                <table className="w-full text-sm">
-                  <thead className="border-b bg-gray-50 text-left text-xs font-medium uppercase text-gray-600">
-                    <tr>
-                      <th className="px-3 py-2">Restaurant</th>
-                      <th className="px-3 py-2">Email</th>
-                      <th className="px-3 py-2">Plan</th>
-                      <th className="px-3 py-2">Statut</th>
-                      <th className="px-3 py-2">Date</th>
+                <div className="text-right">
+                  <p className="text-2xl font-bold text-indigo-600">{aff.commissionDue.toFixed(2)} CHF</p>
+                  <p className="text-xs text-gray-400">commission due</p>
+                </div>
+              </div>
+
+              {/* Affiliate summary */}
+              <div className="flex gap-6 px-6 py-3 text-sm border-b border-[#f0f2f5] bg-[#f8fafc]">
+                <div>
+                  <span className="text-gray-500">Abonnements actifs :</span>{" "}
+                  <span className="font-semibold text-gray-900">{aff.activeSubscriptions}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Revenu généré :</span>{" "}
+                  <span className="font-semibold text-gray-900">{aff.totalRevenue.toFixed(2)} CHF</span>
+                </div>
+              </div>
+
+              {/* Filleuls table */}
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#eaecf0] bg-[#f8fafc]">
+                    <th className="px-4 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Restaurant</th>
+                    <th className="px-4 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Email</th>
+                    <th className="px-4 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Plan</th>
+                    <th className="px-4 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Statut</th>
+                    <th className="px-4 py-2 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f0f2f5]">
+                  {aff.merchants.map((m, i) => (
+                    <tr key={i} className="hover:bg-[#fafbfc] transition-colors">
+                      <td className="px-4 py-2.5 font-medium text-gray-900">{m.name}</td>
+                      <td className="px-4 py-2.5 text-gray-500">{m.email}</td>
+                      <td className="px-4 py-2.5 capitalize text-gray-700">{m.plan}</td>
+                      <td className="px-4 py-2.5">
+                        <span
+                          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                          style={
+                            m.status === "active"
+                              ? { background: "#f0fdf4", color: "#16a34a" }
+                              : m.status === "trialing"
+                              ? { background: "#eff6ff", color: "#2563eb" }
+                              : { background: "#f3f4f6", color: "#374151" }
+                          }
+                        >
+                          {m.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-gray-500">{m.date}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {aff.merchants.map((m, i) => (
-                      <tr key={i} className="border-b last:border-b-0">
-                        <td className="px-3 py-2 font-medium">{m.name}</td>
-                        <td className="px-3 py-2 text-gray-600">{m.email}</td>
-                        <td className="px-3 py-2 capitalize">{m.plan}</td>
-                        <td className="px-3 py-2">
-                          <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                            m.status === "active" ? "bg-green-100 text-green-800"
-                              : m.status === "trialing" ? "bg-blue-100 text-blue-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}>
-                            {m.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2 text-gray-600">{m.date}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ))}
-        </>
+        </div>
       )}
     </div>
   );
