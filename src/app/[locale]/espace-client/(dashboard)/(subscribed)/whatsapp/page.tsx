@@ -40,6 +40,7 @@ export default function WhatsAppPage() {
   const [phoneInput, setPhoneInput] = useState<string>("");
   const [savingPhone, setSavingPhone] = useState(false);
   const [phoneSaved, setPhoneSaved] = useState(false);
+  const [restaurantName, setRestaurantName] = useState<string>("Restaurant");
   const [history, setHistory] = useState<Broadcast[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -65,6 +66,7 @@ export default function WhatsAppPage() {
           const phone = restResult.data.phone ?? null;
           setReservationPhone(phone);
           setPhoneInput(phone ?? "");
+          setRestaurantName(restResult.data.name_fr || "Restaurant");
           const [count, hist, tier, subs, usage] = await Promise.all([
             getWhatsAppSubscriberCount(id),
             getBroadcastHistory(id),
@@ -234,120 +236,211 @@ export default function WhatsAppPage() {
         </div>
       )}
 
-      {/* Compose */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Nouveau message</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Image preview */}
-          {imagePreview && (
-            <div className="relative w-32">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imagePreview}
-                alt="Aperçu"
-                className="h-32 w-32 rounded-lg object-cover border border-gray-200"
+      {/* Compose + Preview */}
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+
+        {/* Compose form */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Nouveau message</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Image preview */}
+            {imagePreview && (
+              <div className="relative w-32">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imagePreview}
+                  alt="Aperçu"
+                  className="h-32 w-32 rounded-lg object-cover border border-gray-200"
+                />
+                <button
+                  onClick={removeImage}
+                  className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-600"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+
+            {/* Textarea */}
+            <div className="space-y-1">
+              <Textarea
+                placeholder="Plat du jour : Entrecôte sauce béarnaise CHF 28, frites maison. À midi seulement !"
+                rows={4}
+                maxLength={MAX_CHARS}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="resize-none"
               />
-              <button
-                onClick={removeImage}
-                className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-600"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <p className="text-right text-xs text-muted-foreground">
+                {message.length}/{MAX_CHARS}
+              </p>
             </div>
-          )}
 
-          {/* Textarea */}
-          <div className="space-y-1">
-            <Textarea
-              placeholder="Plat du jour : Entrecôte sauce béarnaise CHF 28, frites maison. À midi seulement !"
-              rows={4}
-              maxLength={MAX_CHARS}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="resize-none"
-            />
-            <p className="text-right text-xs text-muted-foreground">
-              {message.length}/{MAX_CHARS}
-            </p>
-          </div>
+            {/* Reservation phone */}
+            <div className="space-y-1.5 rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <Label className="text-xs font-medium text-gray-600">
+                📞 Numéro de réservation
+                <span className="ml-1 font-normal text-muted-foreground">(ajouté automatiquement à chaque message)</span>
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  type="tel"
+                  placeholder="+41 22 123 45 67"
+                  value={phoneInput}
+                  onChange={(e) => { setPhoneInput(e.target.value); setPhoneSaved(false); }}
+                  className="h-8 text-sm bg-white"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 shrink-0"
+                  disabled={savingPhone || phoneInput === (reservationPhone ?? "")}
+                  onClick={handleSavePhone}
+                >
+                  {savingPhone ? <Loader2 className="h-3 w-3 animate-spin" /> : phoneSaved ? <CheckCircle2 className="h-3 w-3 text-green-600" /> : "Sauvegarder"}
+                </Button>
+              </div>
+            </div>
 
-          {/* Reservation phone */}
-          <div className="space-y-1.5 rounded-lg border border-gray-100 bg-gray-50 p-3">
-            <Label className="text-xs font-medium text-gray-600">
-              📞 Numéro de réservation
-              <span className="ml-1 font-normal text-muted-foreground">(ajouté automatiquement à chaque message)</span>
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                type="tel"
-                placeholder="+41 22 123 45 67"
-                value={phoneInput}
-                onChange={(e) => { setPhoneInput(e.target.value); setPhoneSaved(false); }}
-                className="h-8 text-sm bg-white"
+            {/* Feedback */}
+            {error && (
+              <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+            {result && (
+              <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
+                <CheckCircle2 className="h-4 w-4" />
+                Message envoyé à <strong>{result.sent}</strong> abonné{result.sent !== 1 ? "s" : ""}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handleImageChange}
               />
               <Button
                 type="button"
-                size="sm"
                 variant="outline"
-                className="h-8 shrink-0"
-                disabled={savingPhone || phoneInput === (reservationPhone ?? "")}
-                onClick={handleSavePhone}
+                size="sm"
+                onClick={() => fileRef.current?.click()}
               >
-                {savingPhone ? <Loader2 className="h-3 w-3 animate-spin" /> : phoneSaved ? <CheckCircle2 className="h-3 w-3 text-green-600" /> : "Sauvegarder"}
+                <ImagePlus className="mr-2 h-4 w-4" />
+                {image ? "Changer la photo" : "Ajouter une photo"}
+              </Button>
+
+              <Button
+                className="ml-auto bg-[#25D366] hover:bg-[#1ebe59] text-white"
+                disabled={!message.trim() || sending || quotaUsed >= quotaMax}
+                onClick={handleSend}
+              >
+                {sending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                {sending ? "Envoi…" : quotaUsed >= quotaMax ? "Quota atteint" : `Envoyer à ${subscriberCount ?? "…"} abonné${(subscriberCount ?? 0) > 1 ? "s" : ""}`}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* iPhone preview */}
+        <div className="flex flex-col items-center gap-3">
+          <p className="self-start text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Aperçu — ce que reçoit l&apos;abonné
+          </p>
+
+          {/* Phone frame */}
+          <div
+            className="relative w-[260px] rounded-[42px] p-[11px] shadow-2xl"
+            style={{ background: "#1a1a1a", boxShadow: "0 0 0 1px #2a2a2a, 0 24px 64px rgba(0,0,0,0.5)" }}
+          >
+            {/* Dynamic island */}
+            <div className="absolute left-1/2 top-[17px] h-[24px] w-[88px] -translate-x-1/2 rounded-full bg-black" />
+
+            {/* Screen */}
+            <div className="overflow-hidden rounded-[32px]" style={{ background: "#ece5dd", minHeight: 520 }}>
+
+              {/* WA header */}
+              <div className="flex items-center gap-2 px-3 pb-2 pt-11" style={{ background: "#075E54" }}>
+                <span className="text-lg text-white opacity-80">‹</span>
+                <div
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ background: "#25D366" }}
+                >
+                  {restaurantName.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-semibold leading-tight text-white">{restaurantName}</p>
+                  <p className="text-[10px] text-white opacity-60">en ligne</p>
+                </div>
+              </div>
+
+              {/* Chat area */}
+              <div className="flex flex-col gap-2 p-2" style={{ background: "#ece5dd", minHeight: 380 }}>
+                {/* Date chip */}
+                <div className="self-center rounded px-2 py-0.5 text-[10px] text-gray-600" style={{ background: "rgba(255,255,255,0.7)" }}>
+                  Aujourd&apos;hui
+                </div>
+
+                {/* Bubble */}
+                {(message || imagePreview) ? (
+                  <div className="w-[88%] overflow-hidden rounded-[0_10px_10px_10px] shadow-sm" style={{ background: "#fff" }}>
+                    {/* Image */}
+                    {imagePreview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={imagePreview} alt="" className="h-[130px] w-full object-cover" />
+                    ) : (
+                      <div className="flex h-[90px] items-center justify-center text-[11px] text-gray-400" style={{ background: "#c8d8e8" }}>
+                        Ajoutez une photo
+                      </div>
+                    )}
+                    {/* Text */}
+                    <div className="px-2 pb-1 pt-1.5">
+                      <p className="whitespace-pre-wrap break-words text-[11px] leading-[1.5] text-gray-900">
+                        {message || ""}
+                        {phoneInput && (
+                          <span className="text-gray-500">{message ? "\n" : ""}Pour réserver : 📞 {phoneInput}</span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex justify-end gap-1 px-2 pb-1.5">
+                      <span className="text-[9px] text-gray-400">12:34</span>
+                      <span className="text-[9px]" style={{ color: "#53bdeb" }}>✓✓</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="mt-6 text-center text-[11px] text-gray-400">
+                    Tapez un message pour<br />voir l&apos;aperçu
+                  </p>
+                )}
+              </div>
+
+              {/* Input bar */}
+              <div className="flex items-center gap-2 border-t border-gray-200 px-2 py-1.5" style={{ background: "#f0f0f0" }}>
+                <div className="flex-1 rounded-full bg-white px-3 py-1 text-[10px] text-gray-400">
+                  Votre message…
+                </div>
+                <span className="text-base opacity-40">🎤</span>
+              </div>
+            </div>
           </div>
 
-          {/* Feedback */}
-          {error && (
-            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-          {result && (
-            <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
-              <CheckCircle2 className="h-4 w-4" />
-              Message envoyé à <strong>{result.sent}</strong> abonné{result.sent !== 1 ? "s" : ""}
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex items-center gap-3">
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handleImageChange}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => fileRef.current?.click()}
-            >
-              <ImagePlus className="mr-2 h-4 w-4" />
-              {image ? "Changer la photo" : "Ajouter une photo"}
-            </Button>
-
-            <Button
-              className="ml-auto bg-[#25D366] hover:bg-[#1ebe59] text-white"
-              disabled={!message.trim() || sending || quotaUsed >= quotaMax}
-              onClick={handleSend}
-            >
-              {sending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="mr-2 h-4 w-4" />
-              )}
-              {sending ? "Envoi…" : quotaUsed >= quotaMax ? "Quota atteint" : `Envoyer à ${subscriberCount ?? "…"} abonné${(subscriberCount ?? 0) > 1 ? "s" : ""}`}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          <p className="text-[11px] text-muted-foreground">
+            Aperçu fidèle · iPhone &amp; Android
+          </p>
+        </div>
+      </div>
 
       {/* Subscribers list */}
       <Card>
