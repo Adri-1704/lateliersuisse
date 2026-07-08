@@ -2,15 +2,16 @@
 
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { LogOut, ExternalLink } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { logoutMerchant } from "@/actions/merchant/auth";
 
 interface MerchantHeaderProps {
   email: string;
   restaurantName?: string;
+  onMenuClick: () => void;
 }
 
-export function MerchantHeader({ email, restaurantName }: MerchantHeaderProps) {
+export function MerchantHeader({ email, restaurantName, onMenuClick }: MerchantHeaderProps) {
   const params = useParams();
   const locale = params.locale as string;
   const t = useTranslations("merchantPortal");
@@ -25,9 +26,18 @@ export function MerchantHeader({ email, restaurantName }: MerchantHeaderProps) {
 
   return (
     <header
-      className="flex h-14 shrink-0 items-center gap-4 px-6"
+      className="flex h-14 shrink-0 items-center gap-3 px-4 md:px-6"
       style={{ background: "#fff", borderBottom: "1px solid #eaecf0" }}
     >
+      {/* Hamburger — mobile only */}
+      <button
+        onClick={onMenuClick}
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 md:hidden"
+        aria-label="Menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
       {/* Restaurant pill */}
       {restaurantName && (
         <div

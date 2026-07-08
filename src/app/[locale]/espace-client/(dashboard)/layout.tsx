@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { getMerchantSession } from "@/actions/merchant/auth";
-import { MerchantSidebar } from "@/components/merchant/MerchantSidebar";
-import { MerchantHeader } from "@/components/merchant/MerchantHeader";
+import { MerchantLayoutClient } from "@/components/merchant/MerchantLayoutClient";
 
 export default async function MerchantDashboardLayout({
   children,
@@ -31,12 +30,8 @@ export default async function MerchantDashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f5f6fa]">
-      <MerchantSidebar />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <MerchantHeader email={email} restaurantName={restaurantName} />
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
-      </div>
-    </div>
+    <MerchantLayoutClient email={email} restaurantName={restaurantName}>
+      {children}
+    </MerchantLayoutClient>
   );
 }

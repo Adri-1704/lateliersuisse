@@ -56,7 +56,13 @@ const navItems = [
   },
 ];
 
-export function MerchantSidebar() {
+export function MerchantSidebar({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const pathname = usePathname();
   const params = useParams();
   const locale = params.locale as string;
@@ -71,7 +77,10 @@ export function MerchantSidebar() {
   }
 
   return (
-    <aside className="flex h-screen w-64 flex-col" style={{ background: "#0f1117", borderRight: "1px solid #1e2028" }}>
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 flex h-screen w-64 flex-col transition-transform duration-300 md:relative md:z-auto md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+      style={{ background: "#0f1117", borderRight: "1px solid #1e2028" }}
+    >
 
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: "1px solid #1e2028" }}>
