@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { PriceRange } from "@/lib/supabase/types";
 
@@ -198,6 +199,7 @@ export async function fetchFilteredRestaurants(
   data: RestaurantListItem[];
   totalCount: number;
 }> {
+  noStore();
   try {
     const supabase = createAdminClient();
 

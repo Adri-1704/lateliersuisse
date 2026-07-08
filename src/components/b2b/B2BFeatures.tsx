@@ -1,9 +1,11 @@
 "use client";
 
-import { Store, Search, Camera, MessageSquare, BarChart3, Phone } from "lucide-react";
+import { Store, Search, Camera, MessageSquare, BarChart3, Phone, Sparkles, MessageCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const featureKeys = [
+  { icon: MessageCircle, key: "whatsapp" },
+  { icon: Sparkles, key: "inspiration" },
   { icon: Store, key: "profile" },
   { icon: Search, key: "seo" },
   { icon: Camera, key: "gallery" },

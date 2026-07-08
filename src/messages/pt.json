@@ -1,4 +1,18 @@
 {
+  "joinPage": {
+    "subtitle": "Receba ofertas, pratos do dia e menus deste restaurante diretamente no WhatsApp.",
+    "firstName": "Nome (opcional)",
+    "firstNamePlaceholder": "O seu nome",
+    "phone": "Número do WhatsApp",
+    "phonePlaceholder": "+41 79 000 00 00",
+    "consent": "Aceito receber mensagens do WhatsApp de {restaurant} sobre ofertas e menus. Posso cancelar a inscrição a qualquer momento respondendo STOP.",
+    "submit": "Receber ofertas",
+    "submitting": "A inscrever…",
+    "successTitle": "Está inscrito!",
+    "successMessage": "Receberá as próximas ofertas e menus deste restaurante diretamente no WhatsApp.",
+    "errorInvalid": "Número de telefone inválido.",
+    "errorServer": "Ocorreu um erro, por favor tente novamente."
+  },
   "metadata": {
     "title": "Just-Tag | Os melhores restaurantes da Suíça Romanda",
     "description": "Descubra os melhores restaurantes da Suíça Romanda. Pesquise por cantão, cozinha e orçamento para encontrar o seu restaurante ideal."
@@ -100,7 +114,7 @@
     "priceRange": "Faixa de preço",
     "cuisine": "Tipo de cozinha",
     "website": "Visitar o site",
-    "call": "Ligar",
+    "call": "Reservar",
     "email": "Enviar email",
     "similar": "Restaurantes semelhantes",
     "writeReview": "Escrever uma avaliação",
@@ -458,6 +472,14 @@
         "directContact": {
           "title": "Contacto direto com o cliente",
           "desc": "Os clientes ligam-lhe ou escrevem-lhe diretamente. Sem comissão, sem plataforma de intermediário."
+        },
+        "inspiration": {
+          "title": "Inspiração culinária com IA",
+          "desc": "Indique os ingredientes disponíveis hoje e o Just-Tag sugere ideias de pratos adaptadas ao seu tipo de cozinha. Valorize os seus produtos frescos e simplifique a criação do menu do dia."
+        },
+        "whatsapp": {
+          "title": "Marketing no WhatsApp",
+          "desc": "Envie as suas promoções, menus do dia e eventos diretamente para o telemóvel dos seus clientes. Taxa de abertura de 98% — as suas mensagens são lidas em menos de 5 minutos. Sem comissão."
         }
       }
     },
@@ -801,7 +823,7 @@
       "postalCode": "Codigo postal",
       "city": "Cidade",
       "canton": "Cantao",
-      "phone": "Telefone",
+      "phone": "Número de reserva",
       "emailField": "Email",
       "website": "Website",
       "cuisineAndPrice": "Cozinha e preco",

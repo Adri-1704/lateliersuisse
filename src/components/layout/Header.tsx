@@ -66,10 +66,13 @@ export function Header() {
         {/* Right side */}
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
+          {/* Desktop search — inline in header */}
           {searchOpen ? (
             <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center gap-1">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <button type="submit" className="absolute left-2.5 top-1/2 -translate-y-1/2 p-0 border-0 bg-transparent cursor-pointer">
+                  <Search className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                </button>
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -94,12 +97,8 @@ export function Header() {
               size="sm"
               className="flex items-center gap-2"
               onClick={() => {
-                if (window.innerWidth < 640) {
-                  router.push(`/${locale}/restaurants`);
-                } else {
-                  setSearchOpen(true);
-                  setTimeout(() => searchInputRef.current?.focus(), 50);
-                }
+                setSearchOpen(true);
+                setTimeout(() => searchInputRef.current?.focus(), 50);
               }}
             >
               <Search className="h-4 w-4" />
@@ -147,6 +146,39 @@ export function Header() {
           </Sheet>
         </div>
       </div>
+
+      {/* Mobile search bar — full width below main row */}
+      {searchOpen && (
+        <div className="sm:hidden border-t bg-white px-4 py-2">
+          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t("searchPlaceholder") || "Nom, ville, cuisine..."}
+                autoFocus
+                className="h-10 w-full rounded-md border border-gray-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]/30"
+              />
+            </div>
+            <button
+              type="submit"
+              className="h-10 shrink-0 rounded-md bg-[var(--color-just-tag)] px-4 text-sm font-semibold text-white"
+            >
+              {t("search")}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </form>
+        </div>
+      )}
     </header>
   );
 }

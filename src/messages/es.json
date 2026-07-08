@@ -1,4 +1,18 @@
 {
+  "joinPage": {
+    "subtitle": "Recibe ofertas, platos del día y menús de este restaurante directamente en WhatsApp.",
+    "firstName": "Nombre (opcional)",
+    "firstNamePlaceholder": "Tu nombre",
+    "phone": "Número de WhatsApp",
+    "phonePlaceholder": "+41 79 000 00 00",
+    "consent": "Acepto recibir mensajes de WhatsApp de {restaurant} sobre ofertas y menús. Puedo darme de baja en cualquier momento respondiendo STOP.",
+    "submit": "Recibir ofertas",
+    "submitting": "Registrando…",
+    "successTitle": "¡Estás suscrito!",
+    "successMessage": "Recibirás las próximas ofertas y menús de este restaurante directamente en WhatsApp.",
+    "errorInvalid": "Número de teléfono inválido.",
+    "errorServer": "Ocurrió un error, por favor inténtalo de nuevo."
+  },
   "metadata": {
     "title": "Just-Tag | Los mejores restaurantes de la Suiza Romanda",
     "description": "Descubre los mejores restaurantes de la Suiza Romanda. Busca por canton, cocina y presupuesto para encontrar tu restaurante ideal."
@@ -100,7 +114,7 @@
     "priceRange": "Rango de precios",
     "cuisine": "Tipo de cocina",
     "website": "Visitar sitio web",
-    "call": "Llamar",
+    "call": "Reservar",
     "email": "Enviar correo electronico",
     "similar": "Restaurantes similares",
     "writeReview": "Escribir una resena",
@@ -458,6 +472,14 @@
         "directContact": {
           "title": "Contacto directo con el cliente",
           "desc": "Los clientes le llaman o le escriben directamente. Sin comisión, sin plataforma de intermediario."
+        },
+        "inspiration": {
+          "title": "Inspiración culinaria con IA",
+          "desc": "Indique los ingredientes disponibles hoy y Just-Tag le sugiere ideas de platos adaptadas a su tipo de cocina. Aproveche sus productos frescos y simplifique la creación de su menú del día."
+        },
+        "whatsapp": {
+          "title": "Marketing por WhatsApp",
+          "desc": "Envíe sus ofertas del día, menús y eventos directamente al teléfono de sus clientes. Tasa de apertura del 98% — sus mensajes se leen en menos de 5 minutos. Sin comisión."
         }
       }
     },
@@ -801,7 +823,7 @@
       "postalCode": "Codigo postal",
       "city": "Ciudad",
       "canton": "Canton",
-      "phone": "Telefono",
+      "phone": "Número de reserva",
       "emailField": "Correo electronico",
       "website": "Sitio web",
       "cuisineAndPrice": "Cocina y precio",

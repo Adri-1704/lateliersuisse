@@ -98,6 +98,11 @@ export function Footer({ locale }: { locale: string }) {
                   Blog
                 </Link>
               </li>
+              <li>
+                <Link href={`/${locale}/pour-partenaires`} className="text-sm text-gray-600 hover:text-gray-400 transition-colors">
+                  Partenaires
+                </Link>
+              </li>
             </ul>
           </div>
 

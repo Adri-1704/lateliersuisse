@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { AffiliateProgramCard } from "@/components/merchant/AffiliateProgramCard";
 
 const planLabels: Record<string, string> = {
   monthly: "Mensuel",
@@ -208,11 +207,6 @@ export default async function MerchantDashboardPage({
             </Card>
           )}
 
-          {/* Programme d'affiliation — partage code unique + gain commission */}
-          <AffiliateProgramCard
-            refCode={(merchant as { ref_code?: string | null } | undefined)?.ref_code ?? null}
-            locale={locale}
-          />
         </>
       )}
     </div>

@@ -1,4 +1,18 @@
 {
+  "joinPage": {
+    "subtitle": "Erhalten Sie Angebote, Tagesgerichte und Menüs dieses Restaurants direkt auf WhatsApp.",
+    "firstName": "Vorname (optional)",
+    "firstNamePlaceholder": "Ihr Vorname",
+    "phone": "WhatsApp-Nummer",
+    "phonePlaceholder": "+41 79 000 00 00",
+    "consent": "Ich stimme zu, WhatsApp-Nachrichten von {restaurant} über Angebote und Menüs zu erhalten. Ich kann mich jederzeit durch Antworten mit STOP abmelden.",
+    "submit": "Angebote erhalten",
+    "submitting": "Anmeldung läuft…",
+    "successTitle": "Sie sind angemeldet!",
+    "successMessage": "Sie erhalten die nächsten Angebote und Menüs dieses Restaurants direkt auf WhatsApp.",
+    "errorInvalid": "Ungültige Telefonnummer.",
+    "errorServer": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+  },
   "metadata": {
     "title": "Just-Tag | Die besten Restaurants der Westschweiz",
     "description": "Entdecken Sie die besten Restaurants der Westschweiz. Suchen Sie nach Kanton, Küche und Budget, um Ihr ideales Restaurant zu finden."
@@ -100,7 +114,7 @@
     "priceRange": "Preisspanne",
     "cuisine": "Küchenart",
     "website": "Website besuchen",
-    "call": "Anrufen",
+    "call": "Reservieren",
     "email": "E-Mail senden",
     "similar": "Ähnliche Restaurants",
     "writeReview": "Bewertung schreiben",
@@ -458,6 +472,14 @@
         "directContact": {
           "title": "Direkter Kundenkontakt",
           "desc": "Gäste rufen Sie an oder schreiben Ihnen direkt. Keine Provision, keine Plattform dazwischen."
+        },
+        "inspiration": {
+          "title": "KI-Kochinspirazione",
+          "desc": "Geben Sie die heute verfügbaren Zutaten ein, und Just-Tag schlägt Gerichtideen passend zu Ihrer Küche vor. Verwerten Sie frische Produkte und vereinfachen Sie Ihre Tagesmenü-Erstellung."
+        },
+        "whatsapp": {
+          "title": "WhatsApp-Marketing",
+          "desc": "Senden Sie Ihre Tagesangebote, Menüs und Events direkt ans Handy Ihrer Kunden. 98% Öffnungsrate — Ihre Nachrichten werden innerhalb von 5 Minuten gelesen. Ohne Provision."
         }
       }
     },
@@ -801,7 +823,7 @@
       "postalCode": "Postleitzahl",
       "city": "Stadt",
       "canton": "Kanton",
-      "phone": "Telefon",
+      "phone": "Reservierungsnummer",
       "emailField": "E-Mail",
       "website": "Website",
       "cuisineAndPrice": "Kuche und Preis",

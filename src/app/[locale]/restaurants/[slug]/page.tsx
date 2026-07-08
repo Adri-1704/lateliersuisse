@@ -402,6 +402,11 @@ export default async function RestaurantDetailPage({
         reviews={reviews}
         locale={locale}
         featuresOptions={featuresOptions}
+        mapsEmbedUrl={
+          process.env.GOOGLE_MAPS_KEY
+            ? `https://www.google.com/maps/embed/v1/place?key=${process.env.GOOGLE_MAPS_KEY}&q=${encodeURIComponent(`${enrichedRestaurant.nameFr}, ${enrichedRestaurant.address}, ${enrichedRestaurant.postalCode} ${enrichedRestaurant.city}, Suisse`)}`
+            : null
+        }
       />
     </>
   );

@@ -102,7 +102,9 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
           {t("searchLabel") || "Rechercher"}
         </label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 p-0 border-0 bg-transparent cursor-pointer">
+            <Search className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+          </button>
           <input
             type="text"
             value={searchText}

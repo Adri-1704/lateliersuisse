@@ -281,7 +281,8 @@ export default function MyRestaurantPage() {
             </div>
             <div className="space-y-2">
               <Label>{t("restaurant.phone")}</Label>
-              <Input value={form.phone} onChange={(e) => updateField("phone", e.target.value)} type="tel" />
+              <Input value={form.phone} onChange={(e) => updateField("phone", e.target.value)} type="tel" placeholder="+41 22 123 45 67" />
+              <p className="text-xs text-muted-foreground">Ce numéro apparaîtra comme bouton « Réserver » sur votre fiche publique</p>
             </div>
             <div className="space-y-2">
               <Label>{t("restaurant.emailField")}</Label>
@@ -651,8 +652,9 @@ function CreateRestaurantForm({
           <CardHeader><CardTitle>Contact</CardTitle></CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Telephone</Label>
+              <Label>Numéro de réservation</Label>
               <Input value={form.phone} onChange={(e) => updateField("phone", e.target.value)} type="tel" placeholder="+41 22 123 45 67" />
+              <p className="text-xs text-muted-foreground">Ce numéro apparaîtra comme bouton « Réserver » sur votre fiche publique</p>
             </div>
             <div className="space-y-2">
               <Label>Email</Label>

@@ -117,7 +117,7 @@
     "priceRange": "Fourchette de prix",
     "cuisine": "Type de cuisine",
     "website": "Visiter le site",
-    "call": "Appeler",
+    "call": "Réserver",
     "email": "Envoyer un email",
     "similar": "Restaurants similaires",
     "writeReview": "Écrire un avis",
@@ -477,6 +477,14 @@
         "directContact": {
           "title": "Contact direct client",
           "desc": "Les clients vous appellent ou vous écrivent sans intermédiaire. Pas de commission, pas de plateforme entre vous deux."
+        },
+        "inspiration": {
+          "title": "Inspiration cuisine IA",
+          "desc": "Indiquez les ingrédients disponibles ce jour-là, et Just-Tag vous suggère des idées de plats adaptées à votre type de cuisine. Valorisez vos produits frais, simplifiez la création de votre menu du jour."
+        },
+        "whatsapp": {
+          "title": "Marketing WhatsApp",
+          "desc": "Envoyez vos offres du moment, vos menus du jour et vos événements directement sur le téléphone de vos clients. Taux d'ouverture de 98% — vos messages sont lus en moins de 5 minutes. Sans commission."
         }
       }
     },
@@ -820,7 +828,7 @@
       "postalCode": "Code postal",
       "city": "Ville",
       "canton": "Canton",
-      "phone": "Telephone",
+      "phone": "Numéro de réservation",
       "emailField": "Email",
       "website": "Site web",
       "cuisineAndPrice": "Cuisine et prix",

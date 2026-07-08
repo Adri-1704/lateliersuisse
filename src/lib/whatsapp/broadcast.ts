@@ -30,7 +30,7 @@ export async function sendWhatsAppBroadcast({
 }: BroadcastOptions): Promise<number> {
   const token = process.env.META_WHATSAPP_TOKEN;
   const phoneId = process.env.META_WHATSAPP_PHONE_ID;
-  const templateName = process.env.META_WHATSAPP_TEMPLATE_NAME || "plat_du_jour";
+  const templateName = process.env.META_WHATSAPP_TEMPLATE_NAME || "message_restaurant";
 
   if (!token || !phoneId) {
     console.warn("WhatsApp broadcast skipped: missing META_WHATSAPP_TOKEN or META_WHATSAPP_PHONE_ID");
@@ -38,6 +38,22 @@ export async function sendWhatsAppBroadcast({
   }
 
   const supabase = createAdminClient();
+
+  // The message_restaurant template always requires a header image.
+  // Use the user-provided image, fall back to the restaurant cover image.
+  let resolvedImageUrl = imageUrl ?? null;
+  if (!resolvedImageUrl) {
+    const { data: resto } = await (supabase
+      .from("restaurants") as ReturnType<typeof supabase.from>)
+      .select("cover_image")
+      .eq("id", restaurantId)
+      .single() as { data: { cover_image: string | null } | null };
+    resolvedImageUrl = resto?.cover_image ?? null;
+  }
+
+  if (!resolvedImageUrl) {
+    throw new Error("Une image est requise (ajoutez-en une ou configurez la photo de couverture du restaurant).");
+  }
 
   const { data: subscribers, error } = await (supabase
     .from("whatsapp_subscribers") as ReturnType<typeof supabase.from>)
@@ -53,7 +69,7 @@ export async function sendWhatsAppBroadcast({
 
   const results = await Promise.allSettled(
     subscribers.map(({ phone }) =>
-      sendMetaMessage({ apiUrl, token, to: phone, restaurantName, message, imageUrl, templateName })
+      sendMetaMessage({ apiUrl, token, to: phone, restaurantName, message, imageUrl: resolvedImageUrl, templateName })
     )
   );
 
@@ -128,11 +144,13 @@ function buildTemplatePayload({
   }
 
   // Body with restaurant name + message
+  // Meta template params forbid newlines, tabs, and 4+ consecutive spaces
+  const sanitizedMessage = message.replace(/[\r\n\t]/g, " ").replace(/ {5,}/g, "    ").slice(0, 1024);
   components.push({
     type: "body",
     parameters: [
       { type: "text", text: restaurantName },
-      { type: "text", text: message.slice(0, 1024) },
+      { type: "text", text: sanitizedMessage },
     ],
   });
 

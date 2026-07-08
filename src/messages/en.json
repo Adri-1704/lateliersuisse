@@ -1,4 +1,18 @@
 {
+  "joinPage": {
+    "subtitle": "Receive offers, daily specials and menus from this restaurant directly on WhatsApp.",
+    "firstName": "First name (optional)",
+    "firstNamePlaceholder": "Your first name",
+    "phone": "WhatsApp number",
+    "phonePlaceholder": "+41 79 000 00 00",
+    "consent": "I agree to receive WhatsApp messages from {restaurant} about offers and menus. I can unsubscribe at any time by replying STOP.",
+    "submit": "Receive offers",
+    "submitting": "Subscribing…",
+    "successTitle": "You're subscribed!",
+    "successMessage": "You will receive the next offers and menus from this restaurant directly on WhatsApp.",
+    "errorInvalid": "Invalid phone number.",
+    "errorServer": "An error occurred, please try again."
+  },
   "metadata": {
     "title": "Just-Tag | The Best Restaurants in Western Switzerland",
     "description": "Discover the best restaurants in Western Switzerland. Search by canton, cuisine and budget to find your ideal restaurant."
@@ -100,7 +114,7 @@
     "priceRange": "Price range",
     "cuisine": "Cuisine type",
     "website": "Visit website",
-    "call": "Call",
+    "call": "Reserve",
     "email": "Send email",
     "similar": "Similar restaurants",
     "writeReview": "Write a review",
@@ -458,6 +472,14 @@
         "directContact": {
           "title": "Direct customer contact",
           "desc": "Customers call or write to you directly. No commission, no platform standing between you."
+        },
+        "inspiration": {
+          "title": "AI Cooking Inspiration",
+          "desc": "Enter the ingredients you have today, and Just-Tag suggests dish ideas tailored to your cuisine type. Make the most of your fresh produce and simplify your daily menu creation."
+        },
+        "whatsapp": {
+          "title": "WhatsApp Marketing",
+          "desc": "Send your daily specials, menus, and events directly to your customers' phones. 98% open rate — your messages are read within 5 minutes. No commission."
         }
       }
     },
@@ -801,7 +823,7 @@
       "postalCode": "Postal code",
       "city": "City",
       "canton": "Canton",
-      "phone": "Phone",
+      "phone": "Reservation number",
       "emailField": "Email",
       "website": "Website",
       "cuisineAndPrice": "Cuisine and price",

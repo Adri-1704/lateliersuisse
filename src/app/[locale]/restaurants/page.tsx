@@ -9,7 +9,7 @@ import {
 } from "@/lib/restaurants/queries";
 import RestaurantsView from "./RestaurantsView";
 
-export const revalidate = 1800;
+export const dynamic = "force-dynamic";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 

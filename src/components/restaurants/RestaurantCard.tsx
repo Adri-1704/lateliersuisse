@@ -38,7 +38,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   const open = isOpenNow(restaurant.openingHours);
 
   return (
-    <Link href={`/${locale}/restaurants/${restaurant.slug}`}>
+    <Link href={`/${locale}/restaurants/${restaurant.slug}`} className="block w-full">
       <div className="group h-full overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
         <div className="relative h-44 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center px-4">
           <h4 className="relative z-10 text-center text-lg font-bold text-white leading-snug line-clamp-3">{name}</h4>
