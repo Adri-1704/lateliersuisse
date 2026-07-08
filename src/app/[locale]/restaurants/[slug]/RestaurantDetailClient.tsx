@@ -423,11 +423,6 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 <DistinctionBadges badges={restaurant.badges} />
               </div>
             )}
-            {restaurant.promotions && restaurant.promotions.length > 0 && (
-              <div className="mt-3">
-                <PromotionBanner promotions={restaurant.promotions} />
-              </div>
-            )}
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
               {/* Rating circle */}
               <div className="flex items-center gap-2">
