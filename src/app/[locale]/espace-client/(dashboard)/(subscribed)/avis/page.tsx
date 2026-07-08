@@ -2,23 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
-  Loader2,
-  Star,
-  CheckCircle,
-  MessageSquare,
-  AlertCircle,
-  Pencil,
-  Trash2,
-  Send,
-  X,
+  Loader2, Star, CheckCircle, MessageSquare, AlertCircle, Pencil, Trash2, Send, X,
 } from "lucide-react";
 import {
-  getMerchantReviews,
-  replyToReview,
-  deleteReply,
+  getMerchantReviews, replyToReview, deleteReply,
 } from "@/actions/merchant/reviews";
 import type { DbReview } from "@/lib/supabase/types";
 
@@ -28,27 +16,31 @@ function StarDisplay({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
-          className={`h-4 w-4 ${
-            star <= rating
-              ? "fill-yellow-400 text-yellow-400"
-              : "text-gray-200"
-          }`}
+          className={`h-4 w-4 ${star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`}
         />
       ))}
     </div>
   );
 }
 
+const AVATAR_GRADIENTS = [
+  "linear-gradient(135deg, #f97316, #fb923c)",
+  "linear-gradient(135deg, #3b82f6, #60a5fa)",
+  "linear-gradient(135deg, #10b981, #34d399)",
+  "linear-gradient(135deg, #8b5cf6, #a78bfa)",
+  "linear-gradient(135deg, #ec4899, #f472b6)",
+  "linear-gradient(135deg, #f59e0b, #fbbf24)",
+];
+
+function getAvatarGradient(name: string) {
+  const code = name.charCodeAt(0) % AVATAR_GRADIENTS.length;
+  return AVATAR_GRADIENTS[code];
+}
+
 function formatDate(dateStr: string): string {
   try {
-    return new Date(dateStr).toLocaleDateString("fr-CH", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  } catch {
-    return dateStr;
-  }
+    return new Date(dateStr).toLocaleDateString("fr-CH", { day: "numeric", month: "long", year: "numeric" });
+  } catch { return dateStr; }
 }
 
 export default function AvisPage() {
@@ -57,8 +49,6 @@ export default function AvisPage() {
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Reply form state
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [editingReply, setEditingReply] = useState<string | null>(null);
   const [replyText, setReplyText] = useState("");
@@ -67,9 +57,7 @@ export default function AvisPage() {
   useEffect(() => {
     async function load() {
       const result = await getMerchantReviews();
-      if (result.success && result.data) {
-        setReviews(result.data);
-      }
+      if (result.success && result.data) setReviews(result.data);
       setLoading(false);
     }
     load();
@@ -86,113 +74,82 @@ export default function AvisPage() {
   }, []);
 
   function openReplyForm(reviewId: string, existingReply?: string | null) {
-    if (existingReply) {
-      setEditingReply(reviewId);
-      setReplyingTo(null);
-    } else {
-      setReplyingTo(reviewId);
-      setEditingReply(null);
-    }
+    if (existingReply) { setEditingReply(reviewId); setReplyingTo(null); }
+    else { setReplyingTo(reviewId); setEditingReply(null); }
     setReplyText(existingReply || "");
   }
 
-  function cancelReply() {
-    setReplyingTo(null);
-    setEditingReply(null);
-    setReplyText("");
-  }
+  function cancelReply() { setReplyingTo(null); setEditingReply(null); setReplyText(""); }
 
   async function handleSubmitReply(reviewId: string) {
     if (!replyText.trim()) return;
-
     setSubmitting(true);
     setError(null);
-
     const result = await replyToReview(reviewId, replyText.trim());
-
     if (result.success) {
-      // Update local state
-      setReviews((prev) =>
-        prev.map((r) =>
-          r.id === reviewId
-            ? {
-                ...r,
-                reply_comment: replyText.trim(),
-                reply_date: new Date().toISOString(),
-              }
-            : r
-        )
-      );
+      setReviews((prev) => prev.map((r) =>
+        r.id === reviewId ? { ...r, reply_comment: replyText.trim(), reply_date: new Date().toISOString() } : r
+      ));
       cancelReply();
       showSuccess(t("reviews.replySaved"));
     } else {
       showError(result.error || "Erreur");
     }
-
     setSubmitting(false);
   }
 
   async function handleDeleteReply(reviewId: string) {
-    const confirmed = window.confirm(t("reviews.confirmDelete"));
-    if (!confirmed) return;
-
+    if (!window.confirm(t("reviews.confirmDelete"))) return;
     setSubmitting(true);
     setError(null);
-
     const result = await deleteReply(reviewId);
-
     if (result.success) {
-      setReviews((prev) =>
-        prev.map((r) =>
-          r.id === reviewId
-            ? { ...r, reply_comment: null, reply_date: null }
-            : r
-        )
-      );
+      setReviews((prev) => prev.map((r) => r.id === reviewId ? { ...r, reply_comment: null, reply_date: null } : r));
       showSuccess(t("reviews.replyDeleted"));
     } else {
       showError(result.error || "Erreur");
     }
-
     setSubmitting(false);
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#f59e0b" }} />
       </div>
     );
   }
 
-  // Stats
   const totalReviews = reviews.length;
-  const avgRating =
-    totalReviews > 0
-      ? (
-          reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
-        ).toFixed(1)
-      : "–";
+  const avgRating = totalReviews > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1)
+    : "–";
   const noReplyCount = reviews.filter((r) => !r.reply_comment).length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-3xl">
+
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{t("reviews.title")}</h1>
-          <p className="text-muted-foreground">{t("reviews.subtitle")}</p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, #f59e0b, #fbbf24)" }}>
+            <MessageSquare className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-gray-900">{t("reviews.title")}</h1>
+            <p className="text-[13px] text-gray-400">{t("reviews.subtitle")}</p>
+          </div>
         </div>
         {success && (
-          <div className="flex items-center gap-1 text-green-600">
+          <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium" style={{ background: "#f0fdf4", color: "#16a34a" }}>
             <CheckCircle className="h-4 w-4" />
-            <span className="text-sm">{success}</span>
+            {success}
           </div>
         )}
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm" style={{ background: "#fef2f2", color: "#dc2626", border: "1px solid #fecaca" }}>
           <AlertCircle className="h-4 w-4 shrink-0" />
           {error}
         </div>
@@ -200,189 +157,153 @@ export default function AvisPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold">{totalReviews}</p>
-            <p className="text-xs text-muted-foreground">
-              {t("reviews.total")}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center gap-1">
-              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-              <span className="text-2xl font-bold">{avgRating}</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {t("reviews.avgRating")}
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold">{noReplyCount}</p>
-            <p className="text-xs text-muted-foreground">
-              {t("reviews.noReply")}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl p-5 text-center" style={{ background: "linear-gradient(135deg, #fffbeb, #fef3c7)", border: "1.5px solid #f59e0b22" }}>
+          <p className="text-4xl font-black text-gray-900">{totalReviews}</p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#f59e0b" }}>{t("reviews.total")}</p>
+        </div>
+        <div className="rounded-2xl p-5 text-center" style={{ background: "linear-gradient(135deg, #fffbeb, #fef3c7)", border: "1.5px solid #f59e0b22" }}>
+          <div className="flex items-center justify-center gap-1.5">
+            <Star className="h-6 w-6 fill-yellow-400 text-yellow-400" />
+            <span className="text-4xl font-black text-gray-900">{avgRating}</span>
+          </div>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#f59e0b" }}>{t("reviews.avgRating")}</p>
+        </div>
+        <div className="rounded-2xl p-5 text-center" style={{ background: "linear-gradient(135deg, #eff6ff, #dbeafe)", border: "1.5px solid #3b82f622" }}>
+          <p className="text-4xl font-black text-gray-900">{noReplyCount}</p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#3b82f6" }}>{t("reviews.noReply")}</p>
+        </div>
       </div>
 
       {/* Empty state */}
       {reviews.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <MessageSquare className="h-12 w-12 text-muted-foreground/40" />
-            <h3 className="mt-4 font-semibold">{t("reviews.empty")}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("reviews.emptyDescription")}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center rounded-2xl py-20 text-center" style={{ background: "#fff", border: "1.5px solid #eaecf0" }}>
+          <span className="text-5xl">⭐</span>
+          <h3 className="mt-4 text-lg font-bold text-gray-800">{t("reviews.empty")}</h3>
+          <p className="mt-1 text-sm text-gray-400 max-w-xs">{t("reviews.emptyDescription")}</p>
+        </div>
       ) : (
-        /* Reviews list */
         <div className="space-y-4">
           {reviews.map((review) => {
             const isReplying = replyingTo === review.id;
             const isEditing = editingReply === review.id;
             const showForm = isReplying || isEditing;
+            const hasNoReply = !review.reply_comment && !showForm;
+            const initials = review.author_name.trim().split(/\s+/).slice(0, 2).map((w: string) => w[0]?.toUpperCase() || "").join("");
 
             return (
-              <Card key={review.id}>
-                <CardContent className="p-5">
-                  {/* Review header */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      {/* Avatar */}
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600">
-                        {review.author_name.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="font-medium">{review.author_name}</p>
-                        <div className="flex items-center gap-2">
-                          <StarDisplay rating={review.rating} />
-                          <span className="text-xs text-muted-foreground">
-                            {formatDate(review.created_at)}
-                          </span>
-                        </div>
+              <div
+                key={review.id}
+                className="rounded-2xl bg-white p-5"
+                style={{ border: "1.5px solid #eaecf0" }}
+              >
+                {/* Review header */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+                      style={{ background: getAvatarGradient(review.author_name) }}
+                    >
+                      {initials}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{review.author_name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <StarDisplay rating={review.rating} />
+                        <span className="text-[11px] text-gray-400">{formatDate(review.created_at)}</span>
                       </div>
                     </div>
-
-                    {/* Reply action button */}
-                    {!review.reply_comment && !showForm && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openReplyForm(review.id)}
-                        className="text-xs"
-                      >
-                        <MessageSquare className="mr-1 h-3.5 w-3.5" />
-                        {t("reviews.reply")}
-                      </Button>
-                    )}
                   </div>
 
-                  {/* Review comment */}
-                  {review.comment && (
-                    <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                      {review.comment}
-                    </p>
+                  {hasNoReply && (
+                    <button
+                      onClick={() => openReplyForm(review.id)}
+                      className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[12px] font-semibold transition-colors"
+                      style={{ background: "#f5f6fa", color: "#6b7280", border: "1px solid #eaecf0" }}
+                    >
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      {t("reviews.reply")}
+                    </button>
                   )}
+                </div>
 
-                  {/* Existing reply */}
-                  {review.reply_comment && !isEditing && (
-                    <div className="mt-4 ml-4 rounded-lg bg-gray-50 border-l-2 border-[var(--color-just-tag)] p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-[var(--color-just-tag)]">
-                            {t("reviews.replyLabel")}
-                          </span>
-                          {review.reply_date && (
-                            <span className="text-xs text-gray-400">
-                              {formatDate(review.reply_date)}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs"
-                            onClick={() =>
-                              openReplyForm(review.id, review.reply_comment)
-                            }
-                          >
-                            <Pencil className="mr-1 h-3 w-3" />
-                            {t("reviews.editReply")}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
-                            onClick={() => handleDeleteReply(review.id)}
-                            disabled={submitting}
-                          >
-                            <Trash2 className="mr-1 h-3 w-3" />
-                            {t("reviews.deleteReply")}
-                          </Button>
-                        </div>
-                      </div>
-                      <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                        {review.reply_comment}
-                      </p>
-                    </div>
-                  )}
+                {/* Review comment */}
+                {review.comment && (
+                  <p className="mt-3 text-sm text-gray-600 leading-relaxed">{review.comment}</p>
+                )}
 
-                  {/* Reply form */}
-                  {showForm && (
-                    <div className="mt-4 ml-4 space-y-3">
-                      <textarea
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        placeholder={t("reviews.replyPlaceholder")}
-                        maxLength={1000}
-                        rows={3}
-                        className="w-full rounded-lg border border-gray-200 p-3 text-sm focus:border-[var(--color-just-tag)] focus:outline-none focus:ring-1 focus:ring-[var(--color-just-tag)] resize-none"
-                        autoFocus
-                      />
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {replyText.length}/1000
+                {/* Existing reply */}
+                {review.reply_comment && !isEditing && (
+                  <div className="mt-4 rounded-xl p-4" style={{ background: "#f8fafc", borderLeft: "3px solid #e85d26" }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "#e85d26" }}>
+                          {t("reviews.replyLabel")}
                         </span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={cancelReply}
-                            disabled={submitting}
-                          >
-                            <X className="mr-1 h-3.5 w-3.5" />
-                            {t("reviews.cancel")}
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => handleSubmitReply(review.id)}
-                            disabled={
-                              submitting || replyText.trim().length < 2
-                            }
-                            className="bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag)]/90"
-                          >
-                            {submitting ? (
-                              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
-                            ) : (
-                              <Send className="mr-1 h-3.5 w-3.5" />
-                            )}
-                            {isEditing
-                              ? t("reviews.updateReply")
-                              : t("reviews.submitReply")}
-                          </Button>
-                        </div>
+                        {review.reply_date && (
+                          <span className="text-[11px] text-gray-400">{formatDate(review.reply_date)}</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => openReplyForm(review.id, review.reply_comment)}
+                          className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+                        >
+                          <Pencil className="h-3 w-3" />
+                          {t("reviews.editReply")}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReply(review.id)}
+                          disabled={submitting}
+                          className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-medium transition-colors"
+                          style={{ color: "#dc2626" }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          {t("reviews.deleteReply")}
+                        </button>
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+                    <p className="text-sm text-gray-600 leading-relaxed">{review.reply_comment}</p>
+                  </div>
+                )}
+
+                {/* Reply form */}
+                {showForm && (
+                  <div className="mt-4 space-y-3 rounded-xl p-4" style={{ background: "#f8fafc", border: "1px solid #eaecf0" }}>
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder={t("reviews.replyPlaceholder")}
+                      maxLength={1000}
+                      rows={3}
+                      autoFocus
+                      className="w-full rounded-xl border border-gray-200 bg-white p-3 text-sm resize-none focus:outline-none focus:ring-2"
+                      style={{ focusRingColor: "#e85d26" } as React.CSSProperties}
+                    />
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-gray-400">{replyText.length}/1000</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={cancelReply}
+                          disabled={submitting}
+                          className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[12px] font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                          {t("reviews.cancel")}
+                        </button>
+                        <button
+                          onClick={() => handleSubmitReply(review.id)}
+                          disabled={submitting || replyText.trim().length < 2}
+                          className="flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-[12px] font-bold text-white transition-opacity disabled:opacity-50"
+                          style={{ background: "linear-gradient(135deg, #e85d26, #ff8c5a)" }}
+                        >
+                          {submitting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                          {isEditing ? t("reviews.updateReply") : t("reviews.submitReply")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

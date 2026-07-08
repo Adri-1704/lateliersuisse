@@ -3,26 +3,20 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Loader2, CreditCard, Calendar, ExternalLink, Check, Zap, Users } from "lucide-react";
 import { getMerchantSubscription, createBillingPortalSession, createPlanChangeSession } from "@/actions/merchant/subscription";
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
 const planLabels: Record<string, string> = {
-  monthly: "Mensuel",
-  semiannual: "Semestriel",
-  annual: "Annuel",
-  lifetime: "À vie",
+  monthly: "Mensuel", semiannual: "Semestriel", annual: "Annuel", lifetime: "À vie",
 };
 
-const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
-  active: { label: "Actif", variant: "default" },
-  past_due: { label: "Paiement en retard", variant: "destructive" },
-  canceled: { label: "Annulé", variant: "secondary" },
-  incomplete: { label: "Incomplet", variant: "secondary" },
-  trialing: { label: "Période d'essai", variant: "default" },
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  active:     { label: "Actif",               color: "#16a34a", bg: "#f0fdf4" },
+  past_due:   { label: "Paiement en retard",   color: "#dc2626", bg: "#fef2f2" },
+  canceled:   { label: "Annulé",               color: "#6b7280", bg: "#f9fafb" },
+  incomplete: { label: "Incomplet",            color: "#d97706", bg: "#fffbeb" },
+  trialing:   { label: "Période d'essai",      color: "#2563eb", bg: "#eff6ff" },
 };
 
 type Period = "monthly" | "semiannual" | "annual";
@@ -34,7 +28,6 @@ const PERIODS: { key: Period; label: string; badge: string | null }[] = [
   { key: "annual",     label: "Annuel",     badge: "−17%" },
 ];
 
-// [earlyBird, standard] CHF/mois — 4 messages/mois inclus
 const PRICES: Record<Period, Record<Tier, [number, number]>> = {
   monthly:    { 50: [59.95,  89.95],  100: [89.95,  149.95],  200: [149.95, 249.95] },
   semiannual: { 50: [52.95,  79.95],  100: [79.95,  132.95],  200: [132.95, 219.95] },
@@ -66,9 +59,7 @@ export default function SubscriptionPage() {
         setSubscription(result.data.subscription);
         setMerchant(result.data.merchant);
         const pt = result.data.subscription.plan_type;
-        if (pt === "monthly" || pt === "semiannual" || pt === "annual") {
-          setSelectedPeriod(pt);
-        }
+        if (pt === "monthly" || pt === "semiannual" || pt === "annual") setSelectedPeriod(pt);
       }
       setLoading(false);
     }
@@ -78,28 +69,22 @@ export default function SubscriptionPage() {
   async function handleManageBilling() {
     setRedirecting(true);
     const result = await createBillingPortalSession(locale);
-    if (result.url) {
-      window.location.href = result.url;
-    } else {
-      setRedirecting(false);
-    }
+    if (result.url) window.location.href = result.url;
+    else setRedirecting(false);
   }
 
   async function handleChangePlan(period: Period, tier: Tier) {
     const key = `${period}-${tier}`;
     setChangingPlan(key);
     const result = await createPlanChangeSession(period, tier, locale);
-    if (result.url) {
-      window.location.href = result.url;
-    } else {
-      setChangingPlan(null);
-    }
+    if (result.url) window.location.href = result.url;
+    else setChangingPlan(null);
   }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#6366f1" }} />
       </div>
     );
   }
@@ -108,112 +93,114 @@ export default function SubscriptionPage() {
   const currentTier = (subscription?.whatsapp_tier ?? 100) as Tier;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t("subscription.title")}</h1>
-        <p className="text-muted-foreground">{t("subscription.subtitle")}</p>
+    <div className="space-y-6 max-w-4xl">
+
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, #6366f1, #818cf8)" }}>
+          <CreditCard className="h-5 w-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">{t("subscription.title")}</h1>
+          <p className="text-[13px] text-gray-400">{t("subscription.subtitle")}</p>
+        </div>
       </div>
 
       {subscription ? (
         <>
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  {t("subscription.currentPlan")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          {/* Current plan info */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white p-5" style={{ border: "1.5px solid #eaecf0" }}>
+              <div className="flex items-center gap-2 mb-4">
+                <CreditCard className="h-4 w-4" style={{ color: "#6366f1" }} />
+                <h2 className="font-bold text-gray-900">{t("subscription.currentPlan")}</h2>
+              </div>
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{t("subscription.plan")}</span>
-                  <span className="text-lg font-bold">
-                    {planLabels[subscription.plan_type] || subscription.plan_type}
+                  <span className="text-sm text-gray-500">{t("subscription.plan")}</span>
+                  <span className="text-sm font-bold text-gray-900">{planLabels[subscription.plan_type] || subscription.plan_type}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Abonnés WhatsApp</span>
+                  <span className="flex items-center gap-1 text-sm font-semibold text-gray-900">
+                    <Users className="h-3.5 w-3.5" /> {currentTier}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Abonnés WhatsApp</span>
-                  <span className="text-sm font-medium flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5" /> {currentTier}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{t("subscription.status")}</span>
-                  <Badge variant={statusConfig[subscription.status]?.variant || "secondary"}>
-                    {statusConfig[subscription.status]?.label || subscription.status}
-                  </Badge>
+                  <span className="text-sm text-gray-500">{t("subscription.status")}</span>
+                  {(() => {
+                    const cfg = STATUS_CONFIG[subscription.status] || { label: subscription.status, color: "#6b7280", bg: "#f9fafb" };
+                    return (
+                      <span className="rounded-full px-2.5 py-0.5 text-[11px] font-bold" style={{ background: cfg.bg, color: cfg.color }}>
+                        {cfg.label}
+                      </span>
+                    );
+                  })()}
                 </div>
                 {subscription.cancel_at_period_end && (
-                  <div className="rounded-md bg-yellow-50 px-3 py-2 text-sm text-yellow-700">
+                  <div className="rounded-xl px-3 py-2 text-sm" style={{ background: "#fffbeb", color: "#92400e" }}>
                     {t("subscription.cancelAtEnd")}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  {t("subscription.period")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="rounded-2xl bg-white p-5" style={{ border: "1.5px solid #eaecf0" }}>
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="h-4 w-4" style={{ color: "#6366f1" }} />
+                <h2 className="font-bold text-gray-900">{t("subscription.period")}</h2>
+              </div>
+              <div className="space-y-3">
                 {subscription.current_period_start && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">{t("subscription.startDate")}</span>
-                    <span className="text-sm font-medium">
-                      {new Date(subscription.current_period_start).toLocaleDateString(locale)}
-                    </span>
+                    <span className="text-sm text-gray-500">{t("subscription.startDate")}</span>
+                    <span className="text-sm font-medium text-gray-900">{new Date(subscription.current_period_start).toLocaleDateString(locale)}</span>
                   </div>
                 )}
                 {subscription.current_period_end && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">{t("subscription.endDate")}</span>
-                    <span className="text-sm font-medium">
-                      {new Date(subscription.current_period_end).toLocaleDateString(locale)}
-                    </span>
+                    <span className="text-sm text-gray-500">{t("subscription.endDate")}</span>
+                    <span className="text-sm font-medium text-gray-900">{new Date(subscription.current_period_end).toLocaleDateString(locale)}</span>
                   </div>
                 )}
                 {merchant?.email && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Email</span>
-                    <span className="text-sm">{merchant.email}</span>
+                    <span className="text-sm text-gray-500">Email</span>
+                    <span className="text-sm text-gray-600">{merchant.email}</span>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Change plan */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Zap className="h-5 w-5 text-[#e85d26]" />
-                Changer de formule
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Choisissez votre durée et votre nombre d&apos;abonnés WhatsApp.
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Period selector */}
+          <div className="rounded-2xl bg-white" style={{ border: "1.5px solid #eaecf0" }}>
+            <div className="px-6 py-4" style={{ borderBottom: "1px solid #f5f6fa" }}>
+              <div className="flex items-center gap-2 mb-0.5">
+                <Zap className="h-4 w-4" style={{ color: "#e85d26" }} />
+                <h2 className="font-bold text-gray-900">Changer de formule</h2>
+              </div>
+              <p className="text-[13px] text-gray-400 ml-6">Choisissez votre durée et votre nombre d&apos;abonnés WhatsApp.</p>
+            </div>
+            <div className="p-6 space-y-6">
+
+              {/* Period tabs */}
               <div className="flex gap-2 flex-wrap">
                 {PERIODS.map((p) => (
                   <button
                     key={p.key}
                     onClick={() => setSelectedPeriod(p.key)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                      selectedPeriod === p.key
-                        ? "bg-[#e85d26] text-white border-[#e85d26]"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
-                    }`}
+                    className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all"
+                    style={selectedPeriod === p.key
+                      ? { background: "#e85d26", color: "#fff", border: "1.5px solid #e85d26" }
+                      : { background: "#fff", color: "#374151", border: "1.5px solid #eaecf0" }}
                   >
                     {p.label}
                     {p.badge && (
-                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
-                        selectedPeriod === p.key ? "bg-white/20 text-white" : "bg-green-100 text-green-700"
-                      }`}>
+                      <span className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                        style={selectedPeriod === p.key
+                          ? { background: "rgba(255,255,255,0.25)", color: "#fff" }
+                          : { background: "#dcfce7", color: "#16a34a" }}>
                         {p.badge}
                       </span>
                     )}
@@ -229,7 +216,6 @@ export default function SubscriptionPage() {
                   const isCurrent = subscription.plan_type === selectedPeriod && currentTier === tier.value;
                   const key = `${selectedPeriod}-${tier.value}`;
                   const isChanging = changingPlan === key;
-
                   const isSelected = selectedTier === tier.value;
                   const showTotal = selectedPeriod !== "monthly";
                   const totalAmount = selectedPeriod === "semiannual" ? (price * 6).toFixed(2) : (price * 12).toFixed(2);
@@ -239,67 +225,58 @@ export default function SubscriptionPage() {
                     <div
                       key={tier.value}
                       onClick={() => setSelectedTier(tier.value)}
-                      className={`relative rounded-xl border-2 p-5 flex flex-col gap-3 transition-all cursor-pointer ${
-                        isCurrent
-                          ? "border-[#e85d26] bg-orange-50"
-                          : isSelected
-                          ? "border-[#e85d26] bg-white shadow-md"
-                          : tier.popular
-                          ? "border-gray-900 bg-white hover:shadow-md"
-                          : "border-gray-200 bg-white hover:border-gray-400 hover:shadow-sm"
-                      }`}
+                      className="relative flex flex-col gap-3 rounded-2xl p-5 transition-all cursor-pointer"
+                      style={{
+                        border: isCurrent ? "2px solid #e85d26" : isSelected ? "2px solid #e85d26" : tier.popular ? "2px solid #0f1117" : "1.5px solid #eaecf0",
+                        background: isCurrent ? "#fff3ee" : "#fff",
+                        boxShadow: (isSelected && !isCurrent) ? "0 8px 24px rgba(232,93,38,0.12)" : "none",
+                      }}
                     >
                       {tier.popular && !isCurrent && (
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full bg-gray-900 text-white whitespace-nowrap">
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-3 py-1 text-[10px] font-bold text-white" style={{ background: "#0f1117" }}>
                           ⭐ Populaire
                         </span>
                       )}
                       {isCurrent && (
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full bg-[#e85d26] text-white whitespace-nowrap">
+                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-3 py-1 text-[10px] font-bold text-white" style={{ background: "#e85d26" }}>
                           Formule actuelle
                         </span>
                       )}
 
                       <div>
-                        <p className="font-semibold text-gray-900 flex items-center gap-1.5">
-                          <Users className="w-4 h-4 text-gray-500" />
+                        <p className="flex items-center gap-1.5 font-semibold text-gray-900">
+                          <Users className="h-4 w-4 text-gray-400" />
                           {tier.label}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">{tier.desc}</p>
+                        <p className="mt-0.5 text-[12px] text-gray-500">{tier.desc}</p>
                       </div>
 
                       <div>
-                        <span className="text-3xl font-bold text-gray-900">{price.toFixed(2)}</span>
-                        <span className="text-sm text-gray-500 ml-1">CHF / mois</span>
+                        <span className="text-3xl font-black text-gray-900">{price.toFixed(2)}</span>
+                        <span className="ml-1 text-sm text-gray-400">CHF / mois</span>
                         {showTotal && (
-                          <p className="mt-0.5 text-xs text-gray-400">
-                            soit <span className="font-semibold text-gray-600">CHF {totalAmount}</span> {totalPeriod}
+                          <p className="mt-0.5 text-[11px] text-gray-400">
+                            soit <span className="font-bold text-gray-600">CHF {totalAmount}</span> {totalPeriod}
                           </p>
                         )}
                       </div>
 
                       {isCurrent ? (
-                        <div className="flex items-center gap-1.5 text-[#e85d26] text-sm font-medium mt-auto">
-                          <Check className="w-4 h-4" />
+                        <div className="mt-auto flex items-center gap-1.5 text-sm font-semibold" style={{ color: "#e85d26" }}>
+                          <Check className="h-4 w-4" />
                           Formule actuelle
                         </div>
                       ) : (
-                        <Button
-                          size="sm"
+                        <button
                           onClick={(e) => { e.stopPropagation(); handleChangePlan(selectedPeriod, tier.value); }}
                           disabled={!!changingPlan}
-                          className={`mt-auto ${
-                            isSelected || tier.popular
-                              ? "bg-[#e85d26] hover:bg-[#d04e1e] text-white"
-                              : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                          }`}
+                          className="mt-auto flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-bold text-white transition-opacity disabled:opacity-60"
+                          style={{
+                            background: (isSelected || tier.popular) ? "#e85d26" : "#0f1117",
+                          }}
                         >
-                          {isChanging ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            "Choisir cette formule"
-                          )}
-                        </Button>
+                          {isChanging ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Choisir cette formule"}
+                        </button>
                       )}
                     </div>
                   );
@@ -307,58 +284,54 @@ export default function SubscriptionPage() {
               </div>
 
               {isEarlyBird && (
-                <p className="text-xs text-[#e85d26] font-medium">
+                <p className="text-[12px] font-semibold" style={{ color: "#e85d26" }}>
                   ✦ Tarifs Early Bird — réservés aux 100 premiers restaurants inscrits
                 </p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-[12px] text-gray-500">
                 ✦ Jusqu&apos;à {(selectedTier ?? currentTier) * 4} messages WhatsApp par mois · Renouvellement le 1er de chaque mois
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-[11px] text-gray-400">
                 Prix TTC · Facturation en CHF · Annulable à tout moment
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </>
       ) : (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <CreditCard className="h-12 w-12 text-muted-foreground/40" />
-            <h3 className="mt-4 font-semibold">{t("subscription.noSubscription")}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">{t("subscription.noSubscriptionDescription")}</p>
-            <a
-              href={`/${locale}/partenaire-inscription?step=plan`}
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-just-tag)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
-            >
-              Commencer l&apos;essai gratuit 14 jours →
-            </a>
-            <p className="mt-2 text-xs text-muted-foreground">Aucun débit pendant l&apos;essai · Annulable à tout moment</p>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center rounded-2xl py-20 text-center bg-white" style={{ border: "1.5px solid #eaecf0" }}>
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: "linear-gradient(135deg, #eef2ff, #e0e7ff)" }}>
+            <CreditCard className="h-8 w-8" style={{ color: "#6366f1" }} />
+          </div>
+          <h3 className="mt-4 text-lg font-bold text-gray-800">{t("subscription.noSubscription")}</h3>
+          <p className="mt-1 text-sm text-gray-400 max-w-xs">{t("subscription.noSubscriptionDescription")}</p>
+          <a
+            href={`/${locale}/partenaire-inscription?step=plan`}
+            className="mt-6 inline-flex items-center gap-2 rounded-2xl px-6 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
+            style={{ background: "linear-gradient(135deg, #e85d26, #ff8c5a)" }}
+          >
+            Commencer l&apos;essai gratuit 14 jours →
+          </a>
+          <p className="mt-2 text-[11px] text-gray-400">Aucun débit pendant l&apos;essai · Annulable à tout moment</p>
+        </div>
       )}
 
       {/* Manage billing */}
       {subscription && merchant?.stripe_customer_id && (
-        <Card>
-          <CardContent className="flex items-center justify-between pt-6">
-            <div>
-              <h3 className="font-semibold">{t("subscription.manageBilling")}</h3>
-              <p className="text-sm text-muted-foreground">{t("subscription.manageBillingDescription")}</p>
-            </div>
-            <Button
-              variant="outline"
-              onClick={handleManageBilling}
-              disabled={redirecting}
-            >
-              {redirecting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <ExternalLink className="mr-2 h-4 w-4" />
-              )}
-              {t("subscription.manageButton")}
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-between rounded-2xl bg-white p-5" style={{ border: "1.5px solid #eaecf0" }}>
+          <div>
+            <h3 className="font-bold text-gray-900">{t("subscription.manageBilling")}</h3>
+            <p className="text-[13px] text-gray-400">{t("subscription.manageBillingDescription")}</p>
+          </div>
+          <button
+            onClick={handleManageBilling}
+            disabled={redirecting}
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 disabled:opacity-50"
+            style={{ border: "1.5px solid #eaecf0" }}
+          >
+            {redirecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
+            {t("subscription.manageButton")}
+          </button>
+        </div>
       )}
     </div>
   );

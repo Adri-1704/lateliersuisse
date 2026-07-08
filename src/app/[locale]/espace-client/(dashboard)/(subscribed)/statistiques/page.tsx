@@ -1,7 +1,6 @@
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { createAdminClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, TrendingUp, Calendar, Globe } from "lucide-react";
+import { Eye, TrendingUp, Calendar, Globe, BarChart3 } from "lucide-react";
 
 interface ViewRecord {
   viewed_at: string;
@@ -16,10 +15,17 @@ async function getRestaurantViews(restaurantId: string) {
     .eq("restaurant_id", restaurantId)
     .order("viewed_at", { ascending: false })
     .limit(10000) as { data: ViewRecord[] | null; error: unknown };
-
   if (error || !data) return [];
   return data;
 }
+
+const SOURCE_LABELS: Record<string, string> = {
+  direct: "Direct",
+  google: "Google",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  qr: "QR Code",
+};
 
 export default async function StatistiquesPage() {
   const session = await getMerchantSession();
@@ -28,17 +34,14 @@ export default async function StatistiquesPage() {
   if (!restaurant) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Statistiques</h1>
-        <p className="text-muted-foreground">
-          Vous devez d&apos;abord créer ou lier votre fiche restaurant pour voir les statistiques.
-        </p>
+        <h1 className="text-2xl font-black tracking-tight text-gray-900">Statistiques</h1>
+        <p className="text-gray-500">Vous devez d&apos;abord créer votre fiche restaurant.</p>
       </div>
     );
   }
 
   const views = await getRestaurantViews(restaurant.id);
 
-  // Calculate stats
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today.getTime() - 86400000);
@@ -54,22 +57,17 @@ export default async function StatistiquesPage() {
   const last30DaysViews = views.filter(v => new Date(v.viewed_at) >= last30Days).length;
   const totalViews = views.length;
 
-  // Source breakdown
   const sources: Record<string, number> = {};
   views.forEach(v => {
     const src = v.source || "direct";
     sources[src] = (sources[src] || 0) + 1;
   });
-  const topSources = Object.entries(sources)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
+  const topSources = Object.entries(sources).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  // Daily views for last 30 days (chart data)
   const dailyViews: Record<string, number> = {};
   for (let i = 0; i < 30; i++) {
     const d = new Date(today.getTime() - i * 86400000);
-    const key = d.toISOString().slice(0, 10);
-    dailyViews[key] = 0;
+    dailyViews[d.toISOString().slice(0, 10)] = 0;
   }
   views.forEach(v => {
     const key = new Date(v.viewed_at).toISOString().slice(0, 10);
@@ -77,124 +75,154 @@ export default async function StatistiquesPage() {
   });
   const maxDaily = Math.max(...Object.values(dailyViews), 1);
   const sortedDays = Object.entries(dailyViews).sort((a, b) => a[0].localeCompare(b[0]));
+  const trend = todayViews >= yesterdayViews ? "↗" : "↘";
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Statistiques de visites</h1>
-        <p className="text-muted-foreground">
-          Suivez le nombre de personnes qui consultent votre fiche restaurant
-        </p>
+    <div className="space-y-6 max-w-5xl">
+
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, #3b82f6, #60a5fa)" }}>
+          <BarChart3 className="h-5 w-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Statistiques</h1>
+          <p className="text-[13px] text-gray-400">Vues de votre fiche {restaurant.name_fr}</p>
+        </div>
       </div>
 
-      {/* Key stats */}
+      {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Aujourd&apos;hui</CardTitle>
-            <Eye className="h-4 w-4 text-blue-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{todayViews}</div>
-            <p className="text-xs text-muted-foreground">
-              {todayViews >= yesterdayViews ? "↗" : "↘"} hier: {yesterdayViews}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">7 derniers jours</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{last7DaysViews}</div>
-            <p className="text-xs text-muted-foreground">vues cette semaine</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">30 derniers jours</CardTitle>
-            <Calendar className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{last30DaysViews}</div>
-            <p className="text-xs text-muted-foreground">vues ce mois-ci</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total</CardTitle>
-            <Globe className="h-4 w-4 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalViews}</div>
-            <p className="text-xs text-muted-foreground">vues depuis le lancement</p>
-          </CardContent>
-        </Card>
+        <StatCard
+          label="Aujourd'hui"
+          value={todayViews}
+          sub={`${trend} hier : ${yesterdayViews}`}
+          icon={<Eye className="h-5 w-5" style={{ color: "#3b82f6" }} />}
+          gradient="linear-gradient(135deg, #eff6ff, #dbeafe)"
+          color="#3b82f6"
+        />
+        <StatCard
+          label="7 derniers jours"
+          value={last7DaysViews}
+          sub="cette semaine"
+          icon={<TrendingUp className="h-5 w-5" style={{ color: "#10b981" }} />}
+          gradient="linear-gradient(135deg, #f0fdf4, #dcfce7)"
+          color="#10b981"
+        />
+        <StatCard
+          label="30 derniers jours"
+          value={last30DaysViews}
+          sub="ce mois-ci"
+          icon={<Calendar className="h-5 w-5" style={{ color: "#f97316" }} />}
+          gradient="linear-gradient(135deg, #fff7ed, #ffedd5)"
+          color="#f97316"
+        />
+        <StatCard
+          label="Total"
+          value={totalViews}
+          sub="depuis le lancement"
+          icon={<Globe className="h-5 w-5" style={{ color: "#8b5cf6" }} />}
+          gradient="linear-gradient(135deg, #f5f3ff, #ede9fe)"
+          color="#8b5cf6"
+        />
       </div>
 
-      {/* Daily chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Vues des 30 derniers jours</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {totalViews === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              Aucune visite enregistrée pour le moment.
-            </p>
-          ) : (
-            <div className="flex items-end gap-1 h-40">
-              {sortedDays.map(([date, count]) => {
-                const height = (count / maxDaily) * 100;
-                const dayLabel = new Date(date).toLocaleDateString("fr-CH", { day: "numeric", month: "short" });
-                return (
-                  <div key={date} className="flex-1 flex flex-col items-center gap-1">
-                    <div
-                      className="w-full bg-[var(--color-just-tag)]/20 rounded-t hover:bg-[var(--color-just-tag)] transition-colors min-h-[2px]"
-                      style={{ height: `${height}%` }}
-                      title={`${dayLabel}: ${count} vue${count > 1 ? "s" : ""}`}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+      {/* Chart */}
+      <div className="rounded-2xl bg-white p-6" style={{ border: "1.5px solid #eaecf0" }}>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-bold text-gray-900">Vues des 30 derniers jours</h2>
+          {totalViews > 0 && (
+            <span className="rounded-full px-3 py-1 text-[11px] font-bold" style={{ background: "#eff6ff", color: "#3b82f6" }}>
+              {last30DaysViews} vues
+            </span>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Top sources */}
-      {topSources.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Sources de trafic</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {topSources.map(([source, count]) => {
-                const pct = Math.round((count / totalViews) * 100);
-                return (
-                  <div key={source} className="flex items-center gap-3">
-                    <span className="text-sm font-medium w-32 truncate">{source}</span>
-                    <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
-                      <div
-                        className="h-full bg-[var(--color-just-tag)] flex items-center justify-end px-2 text-xs text-white font-semibold"
-                        style={{ width: `${pct}%`, minWidth: pct > 0 ? "30px" : "0" }}
-                      >
-                        {count}
-                      </div>
+        {totalViews === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <span className="text-5xl">📊</span>
+            <p className="mt-4 font-semibold text-gray-700">Aucune visite encore</p>
+            <p className="mt-1 text-sm text-gray-400">Les vues apparaîtront ici dès que des clients consulteront votre fiche</p>
+          </div>
+        ) : (
+          <div className="flex items-end gap-[3px]" style={{ height: 160 }}>
+            {sortedDays.map(([date, count]) => {
+              const heightPct = (count / maxDaily) * 100;
+              const isToday = date === today.toISOString().slice(0, 10);
+              const label = new Date(date).toLocaleDateString("fr-CH", { day: "numeric", month: "short" });
+              return (
+                <div key={date} className="group relative flex flex-1 flex-col items-center">
+                  <div
+                    className="w-full rounded-t-sm transition-all"
+                    style={{
+                      height: `${Math.max(heightPct, count > 0 ? 4 : 1)}%`,
+                      background: isToday
+                        ? "linear-gradient(180deg, #3b82f6, #60a5fa)"
+                        : count > 0
+                        ? "linear-gradient(180deg, #93c5fd, #bfdbfe)"
+                        : "#f1f5f9",
+                      minHeight: 2,
+                    }}
+                    title={`${label} : ${count} vue${count !== 1 ? "s" : ""}`}
+                  />
+                  {/* Tooltip on hover */}
+                  {count > 0 && (
+                    <div className="pointer-events-none absolute -top-8 left-1/2 hidden -translate-x-1/2 rounded-lg px-2 py-1 text-[10px] font-bold text-white shadow-lg group-hover:block" style={{ background: "#1e293b", whiteSpace: "nowrap" }}>
+                      {count}
                     </div>
-                    <span className="text-sm text-muted-foreground w-12 text-right">{pct}%</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Sources */}
+      {topSources.length > 0 && (
+        <div className="rounded-2xl bg-white p-6" style={{ border: "1.5px solid #eaecf0" }}>
+          <h2 className="mb-4 font-bold text-gray-900">Sources de trafic</h2>
+          <div className="space-y-3">
+            {topSources.map(([source, count], i) => {
+              const pct = Math.round((count / totalViews) * 100);
+              const colors = ["#3b82f6", "#10b981", "#f97316", "#8b5cf6", "#ec4899"];
+              const color = colors[i % colors.length];
+              return (
+                <div key={source} className="flex items-center gap-3">
+                  <span className="w-24 shrink-0 text-[13px] font-semibold text-gray-700 truncate">
+                    {SOURCE_LABELS[source] || source}
+                  </span>
+                  <div className="relative flex-1 h-6 overflow-hidden rounded-full" style={{ background: "#f1f5f9" }}>
+                    <div
+                      className="absolute inset-y-0 left-0 flex items-center justify-end rounded-full pr-2 text-[11px] font-bold text-white"
+                      style={{ width: `${Math.max(pct, 8)}%`, background: color, minWidth: 28 }}
+                    >
+                      {count}
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  <span className="w-10 shrink-0 text-right text-[12px] font-bold" style={{ color }}>{pct}%</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
+    </div>
+  );
+}
+
+function StatCard({ label, value, sub, icon, gradient, color }: {
+  label: string; value: number; sub: string;
+  icon: React.ReactNode; gradient: string; color: string;
+}) {
+  return (
+    <div className="rounded-2xl p-5" style={{ background: gradient, border: `1.5px solid ${color}22` }}>
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color }}>{label}</span>
+        {icon}
+      </div>
+      <p className="mt-3 text-4xl font-black tracking-tight" style={{ color: "#0f1117" }}>{value}</p>
+      <p className="mt-0.5 text-[12px]" style={{ color: `${color}cc` }}>{sub}</p>
     </div>
   );
 }

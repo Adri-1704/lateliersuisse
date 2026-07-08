@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Plus, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { getMerchantHappyHours } from "@/actions/happy-hours";
 import { HappyHourListCard } from "@/components/merchant/HappyHourListCard";
@@ -18,13 +17,11 @@ export default async function MerchantHappyHoursPage({
 
   if (!restaurant) {
     return (
-      <div className="rounded-xl border border-dashed p-8 text-center">
-        <Sparkles className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-        <h2 className="text-lg font-semibold text-gray-900">
-          Aucun restaurant associe
-        </h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Reclamez ou creez d&apos;abord votre restaurant pour gerer vos Happy Hours.
+      <div className="flex flex-col items-center justify-center rounded-2xl py-20 text-center bg-white" style={{ border: "1.5px solid #eaecf0" }}>
+        <span className="text-5xl">🍹</span>
+        <h2 className="mt-4 text-lg font-bold text-gray-800">Aucun restaurant associé</h2>
+        <p className="mt-2 text-sm text-gray-400 max-w-xs">
+          Réclamez ou créez d&apos;abord votre restaurant pour gérer vos Happy Hours.
         </p>
       </div>
     );
@@ -35,53 +32,61 @@ export default async function MerchantHappyHoursPage({
 
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
-  const active = list.filter(
-    (h) => new Date(h.starts_at).getTime() <= now && new Date(h.ends_at).getTime() > now,
-  );
+  const active = list.filter((h) => new Date(h.starts_at).getTime() <= now && new Date(h.ends_at).getTime() > now);
   const upcoming = list.filter((h) => new Date(h.starts_at).getTime() > now);
   const past = list.filter((h) => new Date(h.ends_at).getTime() <= now);
 
   const basePath = `/${locale}/espace-client/happy-hours`;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl">
+
+      {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold">Happy Hours</h1>
-          <p className="text-muted-foreground">
-            Creez des offres flash pour remplir vos creneaux creux.
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, #f97316, #fb923c)" }}>
+            <Sparkles className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black tracking-tight text-gray-900">Happy Hours</h1>
+            <p className="text-[13px] text-gray-400">Créez des offres flash pour remplir vos créneaux creux.</p>
+          </div>
         </div>
-        <Link href={`${basePath}/new`}>
-          <Button className="bg-rose-500 hover:bg-rose-600">
-            <Plus className="mr-2 h-4 w-4" />
-            Creer une Happy Hour
-          </Button>
+        <Link
+          href={`${basePath}/new`}
+          className="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #f97316, #fb923c)" }}
+        >
+          <Plus className="h-4 w-4" />
+          Créer une Happy Hour
         </Link>
       </div>
 
       {list.length === 0 && (
-        <div className="rounded-xl border-2 border-dashed border-gray-200 bg-white p-10 text-center">
-          <Sparkles className="mx-auto mb-3 h-10 w-10 text-gray-300" />
-          <h3 className="text-base font-semibold">Aucune Happy Hour</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            Lancez votre premiere offre flash pour remplir vos creneaux creux
-            (mardi midi, mercredi soir, etc.).
+        <div className="flex flex-col items-center justify-center rounded-2xl py-16 text-center bg-white" style={{ border: "2px dashed #fed7aa" }}>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl mb-4" style={{ background: "linear-gradient(135deg, #fff7ed, #ffedd5)" }}>
+            <Sparkles className="h-7 w-7" style={{ color: "#f97316" }} />
+          </div>
+          <h3 className="text-base font-bold text-gray-800">Aucune Happy Hour</h3>
+          <p className="mt-1 text-sm text-gray-400 max-w-sm">
+            Lancez votre première offre flash pour remplir vos créneaux creux (mardi midi, mercredi soir, etc.).
           </p>
-          <Link href={`${basePath}/new`}>
-            <Button className="mt-4 bg-rose-500 hover:bg-rose-600">
-              <Plus className="mr-2 h-4 w-4" />
-              Creer ma premiere Happy Hour
-            </Button>
+          <Link
+            href={`${basePath}/new`}
+            className="mt-5 flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
+            style={{ background: "linear-gradient(135deg, #f97316, #fb923c)" }}
+          >
+            <Plus className="h-4 w-4" />
+            Créer ma première Happy Hour
           </Link>
         </div>
       )}
 
       {active.length > 0 && (
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-wide text-rose-600 mb-3">
-            En cours
-          </h2>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest" style={{ color: "#f97316" }}>
+            🟢 En cours
+          </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {active.map((hh) => (
               <HappyHourListCard key={hh.id} hh={hh} locale={locale} basePath={basePath} />
@@ -92,9 +97,9 @@ export default async function MerchantHappyHoursPage({
 
       {upcoming.length > 0 && (
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-wide text-gray-600 mb-3">
-            A venir
-          </h2>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+            🕐 À venir
+          </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {upcoming.map((hh) => (
               <HappyHourListCard key={hh.id} hh={hh} locale={locale} basePath={basePath} />
@@ -105,18 +110,12 @@ export default async function MerchantHappyHoursPage({
 
       {past.length > 0 && (
         <section>
-          <h2 className="text-sm font-bold uppercase tracking-wide text-gray-400 mb-3">
-            Passees
-          </h2>
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            Passées
+          </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {past.slice(0, 10).map((hh) => (
-              <HappyHourListCard
-                key={hh.id}
-                hh={hh}
-                locale={locale}
-                basePath={basePath}
-                dimmed
-              />
+              <HappyHourListCard key={hh.id} hh={hh} locale={locale} basePath={basePath} dimmed />
             ))}
           </div>
         </section>

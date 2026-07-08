@@ -1,11 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2, ArrowUpCircle, Trash2 } from "lucide-react";
 import { getMerchantRestaurant, updateRestaurantPhone } from "@/actions/merchant/restaurant";
 import { getMerchantSession } from "@/actions/merchant/auth";
@@ -56,10 +51,7 @@ export default function WhatsAppPage() {
   useEffect(() => {
     async function load() {
       try {
-        const [restResult, session] = await Promise.all([
-          getMerchantRestaurant(),
-          getMerchantSession(),
-        ]);
+        const [restResult, session] = await Promise.all([getMerchantRestaurant(), getMerchantSession()]);
         if (restResult.success && restResult.data) {
           const id = restResult.data.id;
           setRestaurantId(id);
@@ -126,13 +118,10 @@ export default function WhatsAppPage() {
     setSending(true);
     setError(null);
     setResult(null);
-
     const fd = new FormData();
     fd.append("message", message);
     if (image) fd.append("image", image);
-
     const res = await broadcastWhatsApp(fd);
-
     if (res.success) {
       setResult({ sent: res.sent });
       if (res.quotaUsed !== undefined) setQuotaUsed(res.quotaUsed);
@@ -150,87 +139,81 @@ export default function WhatsAppPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#25D366" }} />
       </div>
     );
   }
 
+  const quotaColor = quotaUsed >= quotaMax ? "#dc2626" : quotaUsed >= quotaMax - 2 ? "#f97316" : "#25D366";
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl">
+
       {/* Header */}
-      <div>
-        <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <MessageCircle className="h-6 w-6 text-[#25D366]" />
-          WhatsApp
-        </h1>
-        <p className="text-muted-foreground">
-          Envoyez votre plat du jour ou une offre directement dans le WhatsApp de vos abonnés
-        </p>
-      </div>
-
-      {/* Subscriber count */}
-      <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-        <Users className="h-5 w-5 text-green-600" />
-        <div>
-          <span className="font-semibold text-green-800">
-            {subscriberCount ?? "—"} abonné{subscriberCount !== 1 ? "s" : ""}
-          </span>
-          <span className="ml-1 text-sm text-green-700">recevront votre message</span>
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}>
+          <MessageCircle className="h-5 w-5 text-white" />
         </div>
-        {subscriberCount === 0 && (
-          <span className="ml-auto text-xs text-green-600">
-            Vos clients s&apos;abonnent en scannant votre QR code
-          </span>
-        )}
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">WhatsApp</h1>
+          <p className="text-[13px] text-gray-400">Envoyez votre plat du jour ou une offre directement dans le WhatsApp de vos abonnés</p>
+        </div>
       </div>
 
-      {/* Quota mensuel */}
-      <div className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${
-        quotaUsed >= quotaMax
-          ? "border-red-200 bg-red-50"
-          : quotaUsed >= quotaMax - 2
-          ? "border-orange-200 bg-orange-50"
-          : "border-gray-200 bg-gray-50"
-      }`}>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <span className={`text-sm font-medium ${
-              quotaUsed >= quotaMax ? "text-red-700" : quotaUsed >= quotaMax - 2 ? "text-orange-700" : "text-gray-700"
-            }`}>
-              {quotaUsed >= quotaMax
-                ? "Quota mensuel atteint — renouvellement le 1er du mois"
-                : `${quotaUsed} / ${quotaMax} envois ce mois${planTier ? ` · jusqu'à ${planTier * 4} messages` : ""}`}
-            </span>
-            <span className="text-xs text-gray-500">{quotaMax - quotaUsed} restant{quotaMax - quotaUsed > 1 ? "s" : ""}</span>
+      {/* Subscriber count + quota */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex items-center gap-3 rounded-2xl px-4 py-4" style={{ background: "linear-gradient(135deg, #f0fdf4, #dcfce7)", border: "1.5px solid #25D36630" }}>
+          <Users className="h-5 w-5" style={{ color: "#25D366" }} />
+          <div>
+            <p className="text-2xl font-black" style={{ color: "#0f1117" }}>{subscriberCount ?? "—"}</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "#25D366" }}>
+              Abonné{subscriberCount !== 1 ? "s" : ""} · recevront votre message
+            </p>
           </div>
-          <div className="mt-2 h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
+          {subscriberCount === 0 && (
+            <p className="ml-auto text-[11px] text-green-600">Vos clients s&apos;abonnent via QR code</p>
+          )}
+        </div>
+
+        <div className="rounded-2xl px-4 py-4" style={{
+          background: quotaUsed >= quotaMax ? "#fef2f2" : quotaUsed >= quotaMax - 2 ? "#fff7ed" : "#f8fafc",
+          border: `1.5px solid ${quotaColor}30`,
+        }}>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold" style={{ color: quotaUsed >= quotaMax ? "#dc2626" : quotaUsed >= quotaMax - 2 ? "#ea580c" : "#374151" }}>
+              {quotaUsed >= quotaMax
+                ? "Quota mensuel atteint"
+                : `${quotaUsed} / ${quotaMax} envois ce mois${planTier ? ` · jusqu'à ${planTier * 4} msgs` : ""}`}
+            </p>
+            <span className="text-[11px] font-bold" style={{ color: quotaColor }}>
+              {quotaMax - quotaUsed} restant{quotaMax - quotaUsed > 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: "#e5e7eb" }}>
             <div
-              className={`h-full rounded-full transition-all ${
-                quotaUsed >= quotaMax ? "bg-red-500" : quotaUsed >= quotaMax - 2 ? "bg-orange-400" : "bg-[#25D366]"
-              }`}
-              style={{ width: `${Math.min(100, (quotaUsed / quotaMax) * 100)}%` }}
+              className="h-full rounded-full transition-all"
+              style={{ width: `${Math.min(100, (quotaUsed / quotaMax) * 100)}%`, background: quotaColor }}
             />
           </div>
+          {quotaUsed >= quotaMax && (
+            <p className="mt-1 text-[11px]" style={{ color: "#dc2626" }}>Renouvellement le 1er du mois</p>
+          )}
         </div>
       </div>
 
-      {/* Upsell banner — shown when subscriber count exceeds plan tier */}
+      {/* Upsell */}
       {planTier !== null && subscriberCount !== null && subscriberCount > planTier && (
-        <div className="flex items-start gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3">
-          <ArrowUpCircle className="mt-0.5 h-5 w-5 shrink-0 text-orange-500" />
+        <div className="flex items-start gap-3 rounded-2xl px-4 py-4" style={{ background: "#fff7ed", border: "1.5px solid #fed7aa" }}>
+          <ArrowUpCircle className="mt-0.5 h-5 w-5 shrink-0" style={{ color: "#f97316" }} />
           <div className="flex-1">
-            <p className="font-semibold text-orange-800">
+            <p className="font-bold text-orange-900">
               Vous avez {subscriberCount} abonnés — votre plan est limité à {planTier}
             </p>
             <p className="mt-0.5 text-sm text-orange-700">
-              {subscriberCount - planTier} abonné{subscriberCount - planTier > 1 ? "s" : ""} ne recevront pas vos messages.
-              Passez au plan {planTier === 50 ? "100" : "200"} abonnés pour les inclure.
+              {subscriberCount - planTier} abonné{subscriberCount - planTier > 1 ? "s" : ""} ne recevront pas vos messages. Passez au plan {planTier === 50 ? "100" : "200"} pour les inclure.
             </p>
           </div>
-          <a
-            href="../abonnement"
-            className="shrink-0 rounded-lg bg-orange-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-600"
-          >
+          <a href="../abonnement" className="shrink-0 rounded-xl px-3 py-1.5 text-sm font-bold text-white hover:opacity-90 transition-opacity" style={{ background: "#f97316" }}>
             Mettre à jour
           </a>
         </div>
@@ -240,24 +223,18 @@ export default function WhatsAppPage() {
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
 
         {/* Compose form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Nouveau message</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="rounded-2xl bg-white" style={{ border: "1.5px solid #eaecf0" }}>
+          <div className="px-6 py-4" style={{ borderBottom: "1px solid #f5f6fa" }}>
+            <h2 className="font-bold text-gray-900">Nouveau message</h2>
+          </div>
+          <div className="p-5 space-y-4">
+
             {/* Image preview */}
             {imagePreview && (
               <div className="relative w-32">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={imagePreview}
-                  alt="Aperçu"
-                  className="h-32 w-32 rounded-lg object-cover border border-gray-200"
-                />
-                <button
-                  onClick={removeImage}
-                  className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-600"
-                >
+                <img src={imagePreview} alt="Aperçu" className="h-32 w-32 rounded-xl object-cover" style={{ border: "1px solid #eaecf0" }} />
+                <button onClick={removeImage} className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-600">
                   <X className="h-3 w-3" />
                 </button>
               </div>
@@ -265,119 +242,95 @@ export default function WhatsAppPage() {
 
             {/* Textarea */}
             <div className="space-y-1">
-              <Textarea
+              <textarea
                 placeholder="Plat du jour : Entrecôte sauce béarnaise CHF 28, frites maison. À midi seulement !"
                 rows={4}
                 maxLength={MAX_CHARS}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="resize-none"
+                className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2"
               />
-              <p className="text-right text-xs text-muted-foreground">
-                {message.length}/{MAX_CHARS}
-              </p>
+              <p className="text-right text-[11px] text-gray-400">{message.length}/{MAX_CHARS}</p>
             </div>
 
             {/* Reservation phone */}
-            <div className="space-y-1.5 rounded-lg border border-gray-100 bg-gray-50 p-3">
-              <Label className="text-xs font-medium text-gray-600">
+            <div className="rounded-xl p-3 space-y-2" style={{ background: "#f8fafc", border: "1px solid #eaecf0" }}>
+              <p className="text-[11px] font-semibold text-gray-600">
                 📞 Numéro de réservation
-                <span className="ml-1 font-normal text-muted-foreground">(ajouté automatiquement à chaque message)</span>
-              </Label>
+                <span className="ml-1 font-normal text-gray-400">(ajouté automatiquement à chaque message)</span>
+              </p>
               <div className="flex gap-2">
-                <Input
+                <input
                   type="tel"
                   placeholder="+41 22 123 45 67"
                   value={phoneInput}
                   onChange={(e) => { setPhoneInput(e.target.value); setPhoneSaved(false); }}
-                  className="h-8 text-sm bg-white"
+                  className="h-8 flex-1 rounded-lg border border-gray-200 bg-white px-3 text-sm focus:outline-none focus:ring-1"
                 />
-                <Button
+                <button
                   type="button"
-                  size="sm"
-                  variant="outline"
-                  className="h-8 shrink-0"
                   disabled={savingPhone || phoneInput === (reservationPhone ?? "")}
                   onClick={handleSavePhone}
+                  className="h-8 shrink-0 rounded-lg px-3 text-[12px] font-semibold transition-colors disabled:opacity-40"
+                  style={{ border: "1px solid #eaecf0", background: "#fff", color: "#374151" }}
                 >
                   {savingPhone ? <Loader2 className="h-3 w-3 animate-spin" /> : phoneSaved ? <CheckCircle2 className="h-3 w-3 text-green-600" /> : "Sauvegarder"}
-                </Button>
+                </button>
               </div>
             </div>
 
             {/* Feedback */}
             {error && (
-              <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              <div className="rounded-xl px-3 py-2 text-sm" style={{ background: "#fef2f2", color: "#dc2626", border: "1px solid #fecaca" }}>
                 {error}
               </div>
             )}
             {result && (
-              <div className="flex items-center gap-2 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
+              <div className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm" style={{ background: "#f0fdf4", color: "#16a34a" }}>
                 <CheckCircle2 className="h-4 w-4" />
                 Message envoyé à <strong>{result.sent}</strong> abonné{result.sent !== 1 ? "s" : ""}
               </div>
             )}
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={handleImageChange}
-              />
-              <Button
+            <div className="flex items-center gap-3 pt-1">
+              <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImageChange} />
+              <button
                 type="button"
-                variant="outline"
-                size="sm"
                 onClick={() => fileRef.current?.click()}
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-[12px] font-semibold text-gray-600 transition-colors hover:bg-gray-100"
+                style={{ border: "1px solid #eaecf0" }}
               >
-                <ImagePlus className="mr-2 h-4 w-4" />
-                {image ? "Changer la photo" : "Ajouter une photo"}
-              </Button>
-
-              <Button
-                className="ml-auto bg-[#25D366] hover:bg-[#1ebe59] text-white"
+                <ImagePlus className="h-4 w-4" />
+                {image ? "Changer" : "Photo"}
+              </button>
+              <button
+                className="ml-auto flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white transition-opacity disabled:opacity-50"
+                style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
                 disabled={!message.trim() || sending || quotaUsed >= quotaMax}
                 onClick={handleSend}
               >
-                {sending ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="mr-2 h-4 w-4" />
-                )}
+                {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 {sending ? "Envoi…" : quotaUsed >= quotaMax ? "Quota atteint" : `Envoyer à ${subscriberCount ?? "…"} abonné${(subscriberCount ?? 0) > 1 ? "s" : ""}`}
-              </Button>
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* iPhone preview */}
         <div className="flex flex-col items-center gap-3">
-          <p className="self-start text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="self-start text-[10px] font-bold uppercase tracking-widest text-gray-400">
             Aperçu — ce que reçoit l&apos;abonné
           </p>
-
-          {/* Phone frame */}
           <div
             className="relative w-[260px] rounded-[42px] p-[11px] shadow-2xl"
             style={{ background: "#1a1a1a", boxShadow: "0 0 0 1px #2a2a2a, 0 24px 64px rgba(0,0,0,0.5)" }}
           >
-            {/* Dynamic island */}
             <div className="absolute left-1/2 top-[17px] h-[24px] w-[88px] -translate-x-1/2 rounded-full bg-black" />
-
-            {/* Screen */}
             <div className="overflow-hidden rounded-[32px]" style={{ background: "#ece5dd", minHeight: 520 }}>
-
-              {/* WA header */}
               <div className="flex items-center gap-2 px-3 pb-2 pt-11" style={{ background: "#075E54" }}>
                 <span className="text-lg text-white opacity-80">‹</span>
-                <div
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                  style={{ background: "#25D366" }}
-                >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: "#25D366" }}>
                   {restaurantName.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0">
@@ -385,27 +338,16 @@ export default function WhatsAppPage() {
                   <p className="text-[10px] text-white opacity-60">en ligne</p>
                 </div>
               </div>
-
-              {/* Chat area */}
               <div className="flex flex-col gap-2 p-2" style={{ background: "#ece5dd", minHeight: 380 }}>
-                {/* Date chip */}
                 <div className="self-center rounded px-2 py-0.5 text-[10px] text-gray-600" style={{ background: "rgba(255,255,255,0.7)" }}>
                   Aujourd&apos;hui
                 </div>
-
-                {/* Bubble */}
                 {(message || imagePreview) ? (
                   <div className="w-[88%] overflow-hidden rounded-[0_10px_10px_10px] shadow-sm" style={{ background: "#fff" }}>
-                    {/* Image */}
-                    {imagePreview ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={imagePreview} alt="" className="h-[130px] w-full object-cover" />
-                    ) : (
-                      <div className="flex h-[90px] items-center justify-center text-[11px] text-gray-400" style={{ background: "#c8d8e8" }}>
-                        Ajoutez une photo
-                      </div>
-                    )}
-                    {/* Text */}
+                    {imagePreview
+                      ? <img src={imagePreview} alt="" className="h-[130px] w-full object-cover" /> // eslint-disable-line @next/next/no-img-element
+                      : <div className="flex h-[90px] items-center justify-center text-[11px] text-gray-400" style={{ background: "#c8d8e8" }}>Ajoutez une photo</div>
+                    }
                     <div className="px-2 pb-1 pt-1.5">
                       <p className="whitespace-pre-wrap break-words text-[11px] leading-[1.5] text-gray-900">
                         {message || ""}
@@ -420,43 +362,30 @@ export default function WhatsAppPage() {
                     </div>
                   </div>
                 ) : (
-                  <p className="mt-6 text-center text-[11px] text-gray-400">
-                    Tapez un message pour<br />voir l&apos;aperçu
-                  </p>
+                  <p className="mt-6 text-center text-[11px] text-gray-400">Tapez un message pour<br />voir l&apos;aperçu</p>
                 )}
               </div>
-
-              {/* Input bar */}
               <div className="flex items-center gap-2 border-t border-gray-200 px-2 py-1.5" style={{ background: "#f0f0f0" }}>
-                <div className="flex-1 rounded-full bg-white px-3 py-1 text-[10px] text-gray-400">
-                  Votre message…
-                </div>
+                <div className="flex-1 rounded-full bg-white px-3 py-1 text-[10px] text-gray-400">Votre message…</div>
                 <span className="text-base opacity-40">🎤</span>
               </div>
             </div>
           </div>
-
-          <p className="text-[11px] text-muted-foreground">
-            Aperçu fidèle · iPhone &amp; Android
-          </p>
+          <p className="text-[11px] text-gray-400">Aperçu fidèle · iPhone &amp; Android</p>
         </div>
       </div>
 
       {/* Subscribers list */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Users className="h-4 w-4" />
-            Abonnés ({subscribers.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="rounded-2xl bg-white" style={{ border: "1.5px solid #eaecf0" }}>
+        <div className="flex items-center gap-2 px-6 py-4" style={{ borderBottom: "1px solid #f5f6fa" }}>
+          <Users className="h-4 w-4" style={{ color: "#25D366" }} />
+          <h2 className="font-bold text-gray-900">Abonnés ({subscribers.length})</h2>
+        </div>
+        <div className="p-4">
           {subscribers.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">
-              Aucun abonné pour l&apos;instant
-            </p>
+            <p className="py-6 text-center text-sm text-gray-400">Aucun abonné pour l&apos;instant</p>
           ) : (
-            <div className="divide-y">
+            <div className="divide-y divide-gray-50">
               {subscribers.map((sub) => (
                 <div key={sub.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <div>
@@ -464,63 +393,52 @@ export default function WhatsAppPage() {
                       {sub.first_name && <span className="mr-1">{sub.first_name}</span>}
                       <span className="font-mono text-gray-500">{sub.phone}</span>
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-[11px] text-gray-400">
                       Abonné le {new Date(sub.subscribed_at).toLocaleDateString("fr-CH", { day: "numeric", month: "short", year: "numeric" })}
-                      {sub.source && sub.source !== "website" && (
-                        <span className="ml-1 text-gray-400">· {sub.source}</span>
-                      )}
+                      {sub.source && sub.source !== "website" && <span className="ml-1">· {sub.source}</span>}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  <button
                     disabled={deletingId === sub.id}
                     onClick={() => handleDeleteSubscriber(sub.id)}
+                    className="rounded-lg p-2 transition-colors hover:bg-red-50 disabled:opacity-40"
                   >
                     {deletingId === sub.id
-                      ? <Loader2 className="h-4 w-4 animate-spin" />
-                      : <Trash2 className="h-4 w-4" />
-                    }
-                  </Button>
+                      ? <Loader2 className="h-4 w-4 animate-spin text-red-400" />
+                      : <Trash2 className="h-4 w-4 text-red-400" />}
+                  </button>
                 </div>
               ))}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* History */}
       {history.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Clock className="h-4 w-4" />
-              Messages récents
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="divide-y">
+        <div className="rounded-2xl bg-white" style={{ border: "1.5px solid #eaecf0" }}>
+          <div className="flex items-center gap-2 px-6 py-4" style={{ borderBottom: "1px solid #f5f6fa" }}>
+            <Clock className="h-4 w-4 text-gray-400" />
+            <h2 className="font-bold text-gray-900">Messages récents</h2>
+          </div>
+          <div className="divide-y divide-gray-50 p-4">
             {history.map((item) => (
               <div key={item.id} className="flex gap-3 py-4 first:pt-0 last:pb-0">
                 {item.image_url && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={item.image_url}
-                    alt=""
-                    className="h-14 w-14 shrink-0 rounded-lg object-cover"
-                  />
+                  <img src={item.image_url} alt="" className="h-14 w-14 shrink-0 rounded-xl object-cover" />
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-sm text-gray-800">{item.message}</p>
-                  <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="mt-1 flex items-center gap-3 text-[11px] text-gray-400">
                     <span>{new Date(item.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
-                    <span className="text-green-600 font-medium">✓ {item.sent_count} envoyés</span>
+                    <span className="font-semibold" style={{ color: "#25D366" }}>✓ {item.sent_count} envoyés</span>
                   </div>
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );
