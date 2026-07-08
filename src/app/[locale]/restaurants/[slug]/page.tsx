@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { ClaimBanner } from "./ClaimBanner";
 import { HappyHourBanner } from "@/components/restaurant-detail/HappyHourBanner";
+import { PromotionBannerTop } from "@/components/restaurant-detail/PromotionBannerTop";
 import { getActiveHappyHoursForRestaurant } from "@/actions/happy-hours";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/supabase/types";
@@ -382,20 +383,29 @@ export default async function RestaurantDetailPage({
           locale={locale}
         />
       )}
-      {featuredHappyHour && (
-        <HappyHourBanner
-          id={featuredHappyHour.id}
-          title={featuredHappyHour.title}
-          description={featuredHappyHour.description}
-          promoType={featuredHappyHour.promo_type}
-          promoValue={featuredHappyHour.promo_value}
-          startsAt={featuredHappyHour.starts_at}
-          endsAt={featuredHappyHour.ends_at}
-          restaurantSlug={slug}
-          restaurantName={getLocalizedName(enrichedRestaurant, locale)}
-          restaurantPhone={enrichedRestaurant.phone || null}
-          locale={locale}
-        />
+      {(featuredHappyHour || (enrichedRestaurant.promotions && enrichedRestaurant.promotions.length > 0)) && (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
+          <div className={`grid gap-4 ${featuredHappyHour && enrichedRestaurant.promotions?.length ? "md:grid-cols-2" : "grid-cols-1"}`}>
+            {featuredHappyHour && (
+              <HappyHourBanner
+                id={featuredHappyHour.id}
+                title={featuredHappyHour.title}
+                description={featuredHappyHour.description}
+                promoType={featuredHappyHour.promo_type}
+                promoValue={featuredHappyHour.promo_value}
+                startsAt={featuredHappyHour.starts_at}
+                endsAt={featuredHappyHour.ends_at}
+                restaurantSlug={slug}
+                restaurantName={getLocalizedName(enrichedRestaurant, locale)}
+                restaurantPhone={enrichedRestaurant.phone || null}
+                locale={locale}
+              />
+            )}
+            {enrichedRestaurant.promotions && enrichedRestaurant.promotions.length > 0 && (
+              <PromotionBannerTop promotions={enrichedRestaurant.promotions} />
+            )}
+          </div>
+        </div>
       )}
       <RestaurantDetailClient
         restaurant={enrichedRestaurant}

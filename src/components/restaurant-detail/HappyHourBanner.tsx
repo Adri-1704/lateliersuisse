@@ -77,8 +77,7 @@ export function HappyHourBanner({
     locale === "en" ? "Book by phone" : locale === "de" ? "Telefonisch buchen" : "Reserver";
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
-      <div className="rounded-2xl border-2 border-rose-200 bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50 p-5 shadow-sm">
+    <div className="rounded-2xl border-2 border-rose-200 bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50 p-5 shadow-sm">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white">
             <Sparkles className="h-5 w-5" />
@@ -127,6 +126,5 @@ export function HappyHourBanner({
           </div>
         </div>
       </div>
-    </div>
   );
 }
