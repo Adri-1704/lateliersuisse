@@ -34,6 +34,7 @@ export default function WhatsAppPage() {
   const [planTier, setPlanTier] = useState<50 | 100 | 200 | null>(null);
   const [quotaUsed, setQuotaUsed] = useState<number>(0);
   const [quotaMax] = useState<number>(30);
+  const [reservationPhone, setReservationPhone] = useState<string | null>(null);
   const [history, setHistory] = useState<Broadcast[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -56,6 +57,7 @@ export default function WhatsAppPage() {
         if (restResult.success && restResult.data) {
           const id = restResult.data.id;
           setRestaurantId(id);
+          setReservationPhone(restResult.data.phone ?? null);
           const [count, hist, tier, subs, usage] = await Promise.all([
             getWhatsAppSubscriberCount(id),
             getBroadcastHistory(id),
@@ -251,6 +253,24 @@ export default function WhatsAppPage() {
             <p className="text-right text-xs text-muted-foreground">
               {message.length}/{MAX_CHARS}
             </p>
+          </div>
+
+          {/* Reservation phone hint */}
+          <div className="flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
+            <span className="text-base">📞</span>
+            {reservationPhone ? (
+              <span className="text-gray-700">
+                <span className="font-medium">{reservationPhone}</span>
+                <span className="text-muted-foreground ml-1">sera ajouté à chaque message pour les réservations</span>
+              </span>
+            ) : (
+              <span className="text-muted-foreground">
+                Aucun numéro de réservation —{" "}
+                <a href="../mon-restaurant" className="underline text-gray-700 hover:text-gray-900">
+                  ajouter dans Mon restaurant
+                </a>
+              </span>
+            )}
           </div>
 
           {/* Feedback */}

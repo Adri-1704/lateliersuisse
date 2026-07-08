@@ -42,13 +42,22 @@ export async function sendWhatsAppBroadcast({
   // The message_restaurant template always requires a header image.
   // Use the user-provided image, fall back to the restaurant cover image.
   let resolvedImageUrl = imageUrl ?? null;
+  let reservationPhone: string | null = null;
   if (!resolvedImageUrl) {
     const { data: resto } = await (supabase
       .from("restaurants") as ReturnType<typeof supabase.from>)
-      .select("cover_image")
+      .select("cover_image, phone")
       .eq("id", restaurantId)
-      .single() as { data: { cover_image: string | null } | null };
+      .single() as { data: { cover_image: string | null; phone: string | null } | null };
     resolvedImageUrl = resto?.cover_image ?? null;
+    reservationPhone = resto?.phone ?? null;
+  } else {
+    const { data: resto } = await (supabase
+      .from("restaurants") as ReturnType<typeof supabase.from>)
+      .select("phone")
+      .eq("id", restaurantId)
+      .single() as { data: { phone: string | null } | null };
+    reservationPhone = resto?.phone ?? null;
   }
 
   if (!resolvedImageUrl) {
@@ -69,7 +78,7 @@ export async function sendWhatsAppBroadcast({
 
   const results = await Promise.allSettled(
     subscribers.map(({ phone }) =>
-      sendMetaMessage({ apiUrl, token, to: phone, restaurantName, message, imageUrl: resolvedImageUrl, templateName })
+      sendMetaMessage({ apiUrl, token, to: phone, restaurantName, message, imageUrl: resolvedImageUrl, templateName, reservationPhone })
     )
   );
 
@@ -91,6 +100,7 @@ async function sendMetaMessage({
   message,
   imageUrl,
   templateName,
+  reservationPhone,
 }: {
   apiUrl: string;
   token: string;
@@ -99,11 +109,12 @@ async function sendMetaMessage({
   message: string;
   imageUrl?: string | null;
   templateName: string;
+  reservationPhone?: string | null;
 }): Promise<void> {
   // Strip non-digits and leading + for Meta API format
   const toClean = to.replace(/[^0-9]/g, "");
 
-  const body = buildTemplatePayload({ to: toClean, restaurantName, message, imageUrl, templateName });
+  const body = buildTemplatePayload({ to: toClean, restaurantName, message, imageUrl, templateName, reservationPhone });
 
   const res = await fetch(apiUrl, {
     method: "POST",
@@ -126,12 +137,14 @@ function buildTemplatePayload({
   message,
   imageUrl,
   templateName,
+  reservationPhone,
 }: {
   to: string;
   restaurantName: string;
   message: string;
   imageUrl?: string | null;
   templateName: string;
+  reservationPhone?: string | null;
 }) {
   const components: object[] = [];
 
@@ -145,12 +158,14 @@ function buildTemplatePayload({
 
   // Body with restaurant name + message
   // Meta template params forbid newlines, tabs, and 4+ consecutive spaces
-  const sanitizedMessage = message.replace(/[\r\n\t]/g, " ").replace(/ {5,}/g, "    ").slice(0, 1024);
+  const sanitizedMessage = message.replace(/[\r\n\t]/g, " ").replace(/ {5,}/g, "    ");
+  const phoneSuffix = reservationPhone ? ` | Pour réserver : 📞 ${reservationPhone}` : "";
+  const finalMessage = (sanitizedMessage + phoneSuffix).slice(0, 1024);
   components.push({
     type: "body",
     parameters: [
       { type: "text", text: restaurantName },
-      { type: "text", text: sanitizedMessage },
+      { type: "text", text: finalMessage },
     ],
   });
 
