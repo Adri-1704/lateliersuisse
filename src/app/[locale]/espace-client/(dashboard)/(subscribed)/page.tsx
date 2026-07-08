@@ -1,23 +1,12 @@
 import { getMerchantSession } from "@/actions/merchant/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail, ExternalLink } from "lucide-react";
+import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail, ExternalLink, ImageIcon, MessageCircle, Tag, Sparkles, BarChart3 } from "lucide-react";
 import Link from "next/link";
 
 const planLabels: Record<string, string> = {
   monthly: "Mensuel",
   semiannual: "Semestriel",
   annual: "Annuel",
-  lifetime: "À vie",
-};
-
-const statusLabels: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
-  active: { label: "Actif", variant: "default" },
-  past_due: { label: "Paiement en retard", variant: "destructive" },
-  canceled: { label: "Annulé", variant: "secondary" },
-  incomplete: { label: "Incomplet", variant: "secondary" },
-  trialing: { label: "Essai", variant: "default" },
+  lifetime: "À vie ✦",
 };
 
 export default async function MerchantDashboardPage({
@@ -33,182 +22,176 @@ export default async function MerchantDashboardPage({
   const restaurant = session?.restaurant;
   const pendingClaim = session?.pendingClaim;
 
+  const base = `/${locale}/espace-client`;
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8 max-w-5xl">
+
+      {/* Welcome */}
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Tableau de bord</h1>
-          <p className="text-muted-foreground">
-            Bienvenue{merchant ? `, ${merchant.name}` : ""} !
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            Bonjour{merchant?.name ? `, ${merchant.name}` : ""} 👋
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {restaurant?.name_fr
+              ? `Voici le tableau de bord de ${restaurant.name_fr}`
+              : "Bienvenue dans votre espace restaurant"}
           </p>
         </div>
         {restaurant?.slug && (
-          <Button asChild className="bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)] text-white">
-            <a href={`/${locale}/restaurants/${restaurant.slug}`} target="_blank" rel="noopener noreferrer">
-              Voir mon restaurant
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </a>
-          </Button>
+          <a
+            href={`/${locale}/restaurants/${restaurant.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ background: "linear-gradient(135deg, #e85d26, #ff8c5a)" }}
+          >
+            Ma fiche publique
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
         )}
       </div>
 
-      {/* Bandeau claim pending — remplace le contenu principal */}
+      {/* Pending claim */}
       {!restaurant && pendingClaim && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-6 sm:p-8 text-center space-y-3">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+        <div
+          className="rounded-2xl p-6 text-center space-y-3"
+          style={{ background: "#fffbeb", border: "1.5px solid #fde68a" }}
+        >
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "#fef3c7" }}>
             <Clock className="h-6 w-6 text-amber-600" />
           </div>
-          <h2 className="text-lg font-semibold text-amber-900">
-            Votre demande de revendication est en cours de vérification
-          </h2>
+          <h2 className="text-lg font-semibold text-amber-900">Demande de revendication en cours</h2>
           <p className="text-sm text-amber-700 max-w-md mx-auto">
-            Notre équipe valide votre demande dans les 24h. Vous recevrez un email de confirmation dès que votre fiche sera activée.
+            Notre équipe valide votre demande dans les 24h. Vous recevrez un email de confirmation.
           </p>
-          <div className="flex items-center justify-center gap-2 text-xs text-amber-600 pt-2">
+          <div className="flex items-center justify-center gap-2 text-xs text-amber-600 pt-1">
             <Mail className="h-3.5 w-3.5" />
-            <span>Une notification sera envoyée à {merchant?.email}</span>
+            <span>{merchant?.email}</span>
           </div>
         </div>
       )}
 
-      {/* Contenu principal masqué si claim pending sans restaurant */}
       {!(pendingClaim && !restaurant) && (
         <>
           {/* Stats */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Note moyenne</CardTitle>
-                <Star className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {restaurant?.avg_rating ? restaurant.avg_rating.toFixed(1) : "—"}
-                </div>
-                <p className="text-xs text-muted-foreground">sur 5</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Avis</CardTitle>
-                <MessageSquare className="h-4 w-4 text-blue-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{restaurant?.review_count || 0}</div>
-                <p className="text-xs text-muted-foreground">avis clients</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Statut</CardTitle>
-                <Eye className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <Badge variant={restaurant?.is_published ? "default" : "secondary"}>
-                  {restaurant?.is_published ? "Publié" : "Brouillon"}
-                </Badge>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Abonnement</CardTitle>
-                <UtensilsCrossed className="h-4 w-4 text-[var(--color-just-tag)]" />
-              </CardHeader>
-              <CardContent>
-                {subscription ? (
-                  <>
-                    <div className="text-lg font-bold">
-                      {planLabels[subscription.plan_type] || subscription.plan_type}
-                    </div>
-                    <Badge variant={statusLabels[subscription.status]?.variant || "secondary"}>
-                      {statusLabels[subscription.status]?.label || subscription.status}
-                    </Badge>
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Aucun abonnement</p>
-                )}
-              </CardContent>
-            </Card>
+            <StatCard
+              label="Note moyenne"
+              value={restaurant?.avg_rating ? `${restaurant.avg_rating.toFixed(1)} ★` : "—"}
+              sub="sur 5"
+              color="#f59e0b"
+              gradient="linear-gradient(135deg, #fffbeb, #fef3c7)"
+              icon={<Star className="h-5 w-5" style={{ color: "#f59e0b" }} />}
+            />
+            <StatCard
+              label="Avis clients"
+              value={String(restaurant?.review_count || 0)}
+              sub="avis reçus"
+              color="#3b82f6"
+              gradient="linear-gradient(135deg, #eff6ff, #dbeafe)"
+              icon={<MessageSquare className="h-5 w-5" style={{ color: "#3b82f6" }} />}
+            />
+            <StatCard
+              label="Fiche"
+              value={restaurant?.is_published ? "Publiée" : "Brouillon"}
+              sub={restaurant?.city || ""}
+              color="#10b981"
+              gradient="linear-gradient(135deg, #f0fdf4, #dcfce7)"
+              icon={<Eye className="h-5 w-5" style={{ color: "#10b981" }} />}
+            />
+            <StatCard
+              label="Abonnement"
+              value={subscription ? (planLabels[subscription.plan_type] || subscription.plan_type) : "—"}
+              sub={subscription?.status === "active" ? "Actif" : subscription?.status || "Aucun"}
+              color="#e85d26"
+              gradient="linear-gradient(135deg, #fff3ee, #ffe4d6)"
+              icon={<UtensilsCrossed className="h-5 w-5" style={{ color: "#e85d26" }} />}
+            />
           </div>
 
           {/* Quick actions */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="hover:border-[var(--color-just-tag)]/30 transition-colors">
-              <CardContent className="flex items-center gap-4 pt-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-just-tag)]/10">
-                  <UtensilsCrossed className="h-5 w-5 text-[var(--color-just-tag)]" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold">Mon restaurant</h3>
-                  <p className="text-xs text-muted-foreground">Modifier ma fiche</p>
-                </div>
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href={`/${locale}/espace-client/mon-restaurant`}>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:border-[var(--color-just-tag)]/30 transition-colors">
-              <CardContent className="flex items-center gap-4 pt-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
-                  <MessageSquare className="h-5 w-5 text-blue-500" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold">Ma carte</h3>
-                  <p className="text-xs text-muted-foreground">Gerer le menu</p>
-                </div>
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href={`/${locale}/espace-client/carte`}>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:border-[var(--color-just-tag)]/30 transition-colors">
-              <CardContent className="flex items-center gap-4 pt-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
-                  <Eye className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold">Photos</h3>
-                  <p className="text-xs text-muted-foreground">Gerer les images</p>
-                </div>
-                <Button variant="ghost" size="icon" asChild>
-                  <Link href={`/${locale}/espace-client/photos`}>
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+          <div>
+            <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Accès rapide</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <ActionCard href={`${base}/whatsapp`}    icon={<MessageCircle className="h-5 w-5" />} label="WhatsApp"          sub="Envoyer un message"        color="#25D366" />
+              <ActionCard href={`${base}/mon-restaurant`} icon={<UtensilsCrossed className="h-5 w-5" />} label="Mon restaurant" sub="Modifier ma fiche"       color="#e85d26" />
+              <ActionCard href={`${base}/photos`}      icon={<ImageIcon className="h-5 w-5" />}       label="Photos"          sub="Gérer les images"          color="#ec4899" />
+              <ActionCard href={`${base}/carte`}       icon={<Tag className="h-5 w-5" />}              label="Carte"           sub="Plats & menus"             color="#8b5cf6" />
+              <ActionCard href={`${base}/avis`}        icon={<MessageSquare className="h-5 w-5" />}    label="Avis clients"    sub="Répondre aux avis"         color="#f59e0b" />
+              <ActionCard href={`${base}/statistiques`} icon={<BarChart3 className="h-5 w-5" />}       label="Statistiques"    sub="Vues de votre fiche"       color="#3b82f6" />
+            </div>
           </div>
 
-          {/* Restaurant preview link */}
-          {restaurant?.slug && (
-            <Card>
-              <CardContent className="flex items-center justify-between pt-6">
-                <div>
-                  <h3 className="font-semibold">Voir ma fiche publique</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {restaurant.name_fr} — {restaurant.city}
-                  </p>
-                </div>
-                <Button variant="outline" asChild>
-                  <Link href={`/${locale}/restaurants/${restaurant.slug}`} target="_blank">
-                    Voir <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
+          {/* Happy Hours promo */}
+          <div
+            className="flex items-center gap-5 rounded-2xl p-5"
+            style={{ background: "linear-gradient(135deg, #fff7ed, #ffedd5)", border: "1.5px solid #fed7aa" }}
+          >
+            <div
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+              style={{ background: "linear-gradient(135deg, #f97316, #fb923c)" }}
+            >
+              <Sparkles className="h-6 w-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-orange-900">Happy Hours &amp; offres flash</p>
+              <p className="text-sm text-orange-700">Remplissez vos créneaux creux avec des promotions ciblées</p>
+            </div>
+            <Link
+              href={`${base}/happy-hours`}
+              className="flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90"
+              style={{ background: "#f97316" }}
+            >
+              Créer <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         </>
       )}
     </div>
+  );
+}
+
+function StatCard({
+  label, value, sub, color, gradient, icon,
+}: {
+  label: string; value: string; sub: string; color: string; gradient: string; icon: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl p-5" style={{ background: gradient, border: `1.5px solid ${color}22` }}>
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color }}>{label}</span>
+        {icon}
+      </div>
+      <p className="mt-3 text-3xl font-black tracking-tight" style={{ color: "#0f1117" }}>{value}</p>
+      <p className="mt-0.5 text-[12px]" style={{ color: `${color}cc` }}>{sub}</p>
+    </div>
+  );
+}
+
+function ActionCard({
+  href, icon, label, sub, color,
+}: {
+  href: string; icon: React.ReactNode; label: string; sub: string; color: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex items-center gap-4 rounded-2xl p-4 transition-all hover:shadow-md"
+      style={{ background: "#fff", border: "1.5px solid #eaecf0" }}
+    >
+      <div
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-110"
+        style={{ background: `${color}18`, color }}
+      >
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-gray-900">{label}</p>
+        <p className="text-[12px] text-gray-400">{sub}</p>
+      </div>
+      <ArrowRight className="h-4 w-4 text-gray-300 transition-colors group-hover:text-gray-500" />
+    </Link>
   );
 }
