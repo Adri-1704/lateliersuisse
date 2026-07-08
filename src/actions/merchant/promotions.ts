@@ -1,9 +1,45 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { assertMerchantOwnsPromotion } from "@/lib/merchant-auth";
 import type { DbPromotion } from "@/lib/supabase/types";
+
+async function getSlugForRestaurant(restaurantId: string): Promise<string | null> {
+  try {
+    const admin = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (admin.from("restaurants") as any)
+      .select("slug")
+      .eq("id", restaurantId)
+      .single();
+    return (data?.slug as string) || null;
+  } catch {
+    return null;
+  }
+}
+
+async function getSlugForPromotion(promotionId: string): Promise<string | null> {
+  try {
+    const admin = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: promo } = await (admin.from("restaurant_promotions") as any)
+      .select("restaurant_id")
+      .eq("id", promotionId)
+      .single();
+    if (!promo?.restaurant_id) return null;
+    return getSlugForRestaurant(promo.restaurant_id as string);
+  } catch {
+    return null;
+  }
+}
+
+function revalidateRestaurantPage(slug: string | null) {
+  if (!slug) return;
+  revalidatePath(`/[locale]/restaurants/${slug}`, "page");
+  revalidatePath("/[locale]", "page");
+}
 
 export interface PromotionData {
   restaurant_id: string;
@@ -115,6 +151,8 @@ export async function createPromotion(item: PromotionData): Promise<{
     });
 
     if (error) return { success: false, error: "Erreur lors de l'ajout" };
+    const slug = await getSlugForRestaurant(item.restaurant_id);
+    revalidateRestaurantPage(slug);
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Erreur inattendue" };
@@ -137,6 +175,8 @@ export async function updatePromotion(
       .eq("id", id);
 
     if (error) return { success: false, error: "Erreur lors de la mise à jour" };
+    const slug = await getSlugForPromotion(id);
+    revalidateRestaurantPage(slug);
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Erreur inattendue" };
@@ -158,6 +198,8 @@ export async function deletePromotion(
       .eq("id", id);
 
     if (error) return { success: false, error: "Erreur lors de la suppression" };
+    const slug = await getSlugForPromotion(id);
+    revalidateRestaurantPage(slug);
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Erreur inattendue" };
@@ -180,6 +222,8 @@ export async function togglePromotion(
       .eq("id", id);
 
     if (error) return { success: false, error: "Erreur lors de la mise à jour" };
+    const slug = await getSlugForPromotion(id);
+    revalidateRestaurantPage(slug);
     return { success: true, error: null };
   } catch {
     return { success: false, error: "Erreur inattendue" };
