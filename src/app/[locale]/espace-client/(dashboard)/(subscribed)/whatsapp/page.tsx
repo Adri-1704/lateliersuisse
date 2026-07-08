@@ -33,7 +33,7 @@ export default function WhatsAppPage() {
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [planTier, setPlanTier] = useState<50 | 100 | 200 | null>(null);
   const [quotaUsed, setQuotaUsed] = useState<number>(0);
-  const [quotaMax] = useState<number>(4);
+  const [quotaMax] = useState<number>(30);
   const [history, setHistory] = useState<Broadcast[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);

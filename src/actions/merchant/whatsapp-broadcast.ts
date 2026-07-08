@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { sendWhatsAppBroadcast } from "@/lib/whatsapp/broadcast";
 
-const MONTHLY_BROADCAST_QUOTA = 4;
+const MONTHLY_BROADCAST_QUOTA = 30;
 
 export async function getMonthlyBroadcastUsage(restaurantId: string): Promise<number> {
   try {
