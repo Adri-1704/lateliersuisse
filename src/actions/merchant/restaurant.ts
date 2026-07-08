@@ -140,6 +140,28 @@ export async function updateMerchantRestaurant(data: UpdateRestaurantData): Prom
   }
 }
 
+export async function updateRestaurantPhone(phone: string): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Non authentifié" };
+
+    const merchantId = await findMerchantId(supabase, user.id, user.email || "");
+    if (!merchantId) return { success: false, error: "Marchand non trouvé" };
+
+    const admin = createAdminClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (admin.from("restaurants") as any)
+      .update({ phone: phone.trim() || null })
+      .eq("merchant_id", merchantId);
+
+    if (error) return { success: false, error: "Erreur lors de la sauvegarde" };
+    return { success: true, error: null };
+  } catch {
+    return { success: false, error: "Erreur inattendue" };
+  }
+}
+
 export async function createMerchantRestaurant(data: {
   name_fr: string;
   name_de?: string;

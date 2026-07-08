@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2, ArrowUpCircle, Trash2 } from "lucide-react";
-import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
+import { getMerchantRestaurant, updateRestaurantPhone } from "@/actions/merchant/restaurant";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount, getWhatsAppPlanTier, getSubscribers, deleteSubscriber, getMonthlyBroadcastUsage } from "@/actions/merchant/whatsapp-broadcast";
 
@@ -35,6 +37,9 @@ export default function WhatsAppPage() {
   const [quotaUsed, setQuotaUsed] = useState<number>(0);
   const [quotaMax] = useState<number>(30);
   const [reservationPhone, setReservationPhone] = useState<string | null>(null);
+  const [phoneInput, setPhoneInput] = useState<string>("");
+  const [savingPhone, setSavingPhone] = useState(false);
+  const [phoneSaved, setPhoneSaved] = useState(false);
   const [history, setHistory] = useState<Broadcast[]>([]);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -57,7 +62,9 @@ export default function WhatsAppPage() {
         if (restResult.success && restResult.data) {
           const id = restResult.data.id;
           setRestaurantId(id);
-          setReservationPhone(restResult.data.phone ?? null);
+          const phone = restResult.data.phone ?? null;
+          setReservationPhone(phone);
+          setPhoneInput(phone ?? "");
           const [count, hist, tier, subs, usage] = await Promise.all([
             getWhatsAppSubscriberCount(id),
             getBroadcastHistory(id),
@@ -99,6 +106,17 @@ export default function WhatsAppPage() {
       setSubscriberCount((prev) => (prev !== null ? Math.max(0, prev - 1) : null));
     }
     setDeletingId(null);
+  }
+
+  async function handleSavePhone() {
+    setSavingPhone(true);
+    const res = await updateRestaurantPhone(phoneInput);
+    if (res.success) {
+      setReservationPhone(phoneInput.trim() || null);
+      setPhoneSaved(true);
+      setTimeout(() => setPhoneSaved(false), 2500);
+    }
+    setSavingPhone(false);
   }
 
   async function handleSend() {
@@ -255,22 +273,31 @@ export default function WhatsAppPage() {
             </p>
           </div>
 
-          {/* Reservation phone hint */}
-          <div className="flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
-            <span className="text-base">📞</span>
-            {reservationPhone ? (
-              <span className="text-gray-700">
-                <span className="font-medium">{reservationPhone}</span>
-                <span className="text-muted-foreground ml-1">sera ajouté à chaque message pour les réservations</span>
-              </span>
-            ) : (
-              <span className="text-muted-foreground">
-                Aucun numéro de réservation —{" "}
-                <a href="../mon-restaurant" className="underline text-gray-700 hover:text-gray-900">
-                  ajouter dans Mon restaurant
-                </a>
-              </span>
-            )}
+          {/* Reservation phone */}
+          <div className="space-y-1.5 rounded-lg border border-gray-100 bg-gray-50 p-3">
+            <Label className="text-xs font-medium text-gray-600">
+              📞 Numéro de réservation
+              <span className="ml-1 font-normal text-muted-foreground">(ajouté automatiquement à chaque message)</span>
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                type="tel"
+                placeholder="+41 22 123 45 67"
+                value={phoneInput}
+                onChange={(e) => { setPhoneInput(e.target.value); setPhoneSaved(false); }}
+                className="h-8 text-sm bg-white"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8 shrink-0"
+                disabled={savingPhone || phoneInput === (reservationPhone ?? "")}
+                onClick={handleSavePhone}
+              >
+                {savingPhone ? <Loader2 className="h-3 w-3 animate-spin" /> : phoneSaved ? <CheckCircle2 className="h-3 w-3 text-green-600" /> : "Sauvegarder"}
+              </Button>
+            </div>
           </div>
 
           {/* Feedback */}
