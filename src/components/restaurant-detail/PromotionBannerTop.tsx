@@ -45,19 +45,6 @@ export function PromotionBannerTop({ promotions }: Props) {
             <p className="mt-1 text-sm text-gray-700">{promotions[0].description}</p>
           )}
 
-          {promotions.length > 1 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {promotions.slice(1).map((p, i) => (
-                <span
-                  key={i}
-                  className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-white px-2.5 py-0.5 text-xs font-medium text-orange-700"
-                >
-                  <Tag className="h-3 w-3" />
-                  {p.title}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>
