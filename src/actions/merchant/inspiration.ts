@@ -7,6 +7,7 @@ export interface RecipeIdea {
   name: string;
   description: string;
   tip: string;
+  missing_ingredients: string[];
 }
 
 export async function generateRecipeIdeas(
@@ -70,6 +71,7 @@ Propose exactement ${validCount} idées de plats. Retourne uniquement un objet J
 - "name" : nom court et accrocheur du plat (max 6 mots)
 - "description" : description appétissante pour le menu (max 25 mots)
 - "tip" : astuce de préparation ou de présentation (max 15 mots)
+- "missing_ingredients" : tableau des ingrédients nécessaires à cette recette qui ne sont PAS dans la liste fournie (max 4 ingrédients, noms courts). Tableau vide [] si la recette se fait entièrement avec les ingrédients disponibles. Ne liste que les ingrédients vraiment indispensables, pas les condiments basiques (sel, poivre, huile).
 
 Réponds uniquement avec le JSON, sans texte autour.`;
 
@@ -91,6 +93,7 @@ Réponds uniquement avec le JSON, sans texte autour.`;
       name: i.name || "",
       description: i.description || "",
       tip: i.tip || "",
+      missing_ingredients: Array.isArray(i.missing_ingredients) ? i.missing_ingredients : [],
     }));
 
     return { ideas, error: null };

@@ -25,6 +25,7 @@ import {
   Trash2,
   CheckSquare,
   Square,
+  ShoppingCart,
 } from "lucide-react";
 
 const COUNTS = [3, 5, 10] as const;
@@ -267,6 +268,15 @@ export function InspirationClient() {
                       </button>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">{idea.description}</p>
+                    {idea.missing_ingredients?.length > 0 && (
+                      <div className="flex items-start gap-2 rounded-md px-3 py-2" style={{ background: "#fef2f2", border: "1px solid #fecaca" }}>
+                        <ShoppingCart className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: "#dc2626" }} />
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "#dc2626" }}>Ingrédients manquants</p>
+                          <p className="text-xs" style={{ color: "#991b1b" }}>{idea.missing_ingredients.join(", ")}</p>
+                        </div>
+                      </div>
+                    )}
                     {idea.tip && (
                       <div className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2">
                         <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
