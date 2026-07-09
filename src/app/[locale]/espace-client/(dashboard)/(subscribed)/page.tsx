@@ -1,4 +1,5 @@
 import { getMerchantSession } from "@/actions/merchant/auth";
+import { createAdminClient } from "@/lib/supabase/server";
 import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail, ExternalLink, ImageIcon, MessageCircle, Tag, Sparkles, BarChart3, CheckCircle2, Circle } from "lucide-react";
 import Link from "next/link";
 import type { DbRestaurant } from "@/lib/supabase/types";
@@ -10,7 +11,7 @@ interface CompletenessItem {
   points: number;
 }
 
-function getCompletenessItems(restaurant: DbRestaurant, base: string): CompletenessItem[] {
+function getCompletenessItems(restaurant: DbRestaurant, base: string, hasPhotos: boolean): CompletenessItem[] {
   const hours = restaurant.opening_hours || {};
   const configuredDays = Object.values(hours).filter((h) => h?.closed || (h?.open && h?.close));
 
@@ -19,31 +20,43 @@ function getCompletenessItems(restaurant: DbRestaurant, base: string): Completen
       label: "Description du restaurant",
       done: !!restaurant.description_fr && restaurant.description_fr.trim().length >= 50,
       href: `${base}/mon-restaurant`,
-      points: 25,
+      points: 20,
+    },
+    {
+      label: "Photos du restaurant",
+      done: hasPhotos,
+      href: `${base}/photos`,
+      points: 15,
     },
     {
       label: "Horaires d'ouverture",
       done: configuredDays.length >= 3,
       href: `${base}/mon-restaurant`,
-      points: 20,
+      points: 15,
     },
     {
       label: "Numéro de téléphone",
       done: !!restaurant.phone,
       href: `${base}/mon-restaurant`,
-      points: 20,
+      points: 15,
     },
     {
       label: "Type de cuisine",
       done: !!restaurant.cuisine_type,
       href: `${base}/mon-restaurant`,
-      points: 15,
+      points: 10,
     },
     {
       label: "Adresse complète",
       done: !!(restaurant.address && restaurant.postal_code),
       href: `${base}/mon-restaurant`,
       points: 10,
+    },
+    {
+      label: "Vidéo de présentation",
+      done: !!restaurant.video_url,
+      href: `${base}/mon-restaurant`,
+      points: 5,
     },
     {
       label: "Caractéristiques (terrasse, wifi…)",
@@ -60,8 +73,8 @@ function getCompletenessItems(restaurant: DbRestaurant, base: string): Completen
   ];
 }
 
-function CompletenessWidget({ restaurant, base }: { restaurant: DbRestaurant; base: string }) {
-  const items = getCompletenessItems(restaurant, base);
+function CompletenessWidget({ restaurant, base, hasPhotos }: { restaurant: DbRestaurant; base: string; hasPhotos: boolean }) {
+  const items = getCompletenessItems(restaurant, base, hasPhotos);
   const score = items.filter((i) => i.done).reduce((sum, i) => sum + i.points, 0);
   const missing = items.filter((i) => !i.done);
 
@@ -171,6 +184,15 @@ export default async function MerchantDashboardPage({
 
   const base = `/${locale}/espace-client`;
 
+  let hasPhotos = false;
+  if (restaurant?.id) {
+    const supabase = createAdminClient();
+    const { count } = await (supabase.from("restaurant_images") as any)
+      .select("id", { count: "exact", head: true })
+      .eq("restaurant_id", restaurant.id);
+    hasPhotos = (count ?? 0) > 0;
+  }
+
   return (
     <div className="space-y-8 max-w-5xl">
 
@@ -259,7 +281,7 @@ export default async function MerchantDashboardPage({
           </div>
 
           {/* Profile completeness */}
-          {restaurant && <CompletenessWidget restaurant={restaurant} base={base} />}
+          {restaurant && <CompletenessWidget restaurant={restaurant} base={base} hasPhotos={hasPhotos} />}
 
           {/* Quick actions */}
           <div>
