@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DbReview } from "@/lib/supabase/types";
 
@@ -84,6 +85,15 @@ export async function submitReview(data: SubmitReviewData): Promise<SubmitReview
     }
 
     const dbReview = review as DbReview;
+
+    // Invalide le cache ISR de la fiche restaurant
+    const { data: resto } = await (admin.from("restaurants") as any)
+      .select("slug")
+      .eq("id", data.restaurant_id)
+      .single();
+    if (resto?.slug) {
+      revalidatePath(`/[locale]/restaurants/${resto.slug}`, "page");
+    }
 
     return {
       success: true,

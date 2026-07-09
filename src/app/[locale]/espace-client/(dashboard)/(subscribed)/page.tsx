@@ -1,6 +1,159 @@
 import { getMerchantSession } from "@/actions/merchant/auth";
-import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail, ExternalLink, ImageIcon, MessageCircle, Tag, Sparkles, BarChart3 } from "lucide-react";
+import { Star, MessageSquare, Eye, UtensilsCrossed, ArrowRight, Clock, Mail, ExternalLink, ImageIcon, MessageCircle, Tag, Sparkles, BarChart3, CheckCircle2, Circle } from "lucide-react";
 import Link from "next/link";
+import type { DbRestaurant } from "@/lib/supabase/types";
+
+interface CompletenessItem {
+  label: string;
+  done: boolean;
+  href: string;
+  points: number;
+}
+
+function getCompletenessItems(restaurant: DbRestaurant, base: string): CompletenessItem[] {
+  const hours = restaurant.opening_hours || {};
+  const configuredDays = Object.values(hours).filter((h) => h?.closed || (h?.open && h?.close));
+
+  return [
+    {
+      label: "Description du restaurant",
+      done: !!restaurant.description_fr && restaurant.description_fr.trim().length >= 50,
+      href: `${base}/mon-restaurant`,
+      points: 20,
+    },
+    {
+      label: "Photo de couverture",
+      done: !!restaurant.cover_image,
+      href: `${base}/photos`,
+      points: 20,
+    },
+    {
+      label: "Horaires d'ouverture",
+      done: configuredDays.length >= 3,
+      href: `${base}/mon-restaurant`,
+      points: 15,
+    },
+    {
+      label: "Numéro de téléphone",
+      done: !!restaurant.phone,
+      href: `${base}/mon-restaurant`,
+      points: 15,
+    },
+    {
+      label: "Type de cuisine",
+      done: !!restaurant.cuisine_type,
+      href: `${base}/mon-restaurant`,
+      points: 10,
+    },
+    {
+      label: "Adresse complète",
+      done: !!(restaurant.address && restaurant.postal_code),
+      href: `${base}/mon-restaurant`,
+      points: 10,
+    },
+    {
+      label: "Caractéristiques (terrasse, wifi…)",
+      done: restaurant.features?.length > 0,
+      href: `${base}/mon-restaurant`,
+      points: 5,
+    },
+    {
+      label: "Réseau social",
+      done: !!(restaurant.instagram || restaurant.facebook || restaurant.tiktok),
+      href: `${base}/mon-restaurant`,
+      points: 5,
+    },
+  ];
+}
+
+function CompletenessWidget({ restaurant, base }: { restaurant: DbRestaurant; base: string }) {
+  const items = getCompletenessItems(restaurant, base);
+  const score = items.filter((i) => i.done).reduce((sum, i) => sum + i.points, 0);
+  const missing = items.filter((i) => !i.done);
+
+  const color =
+    score >= 80 ? "#10b981" :
+    score >= 50 ? "#f59e0b" :
+    "#e85d26";
+
+  const bgColor =
+    score >= 80 ? "linear-gradient(135deg, #f0fdf4, #dcfce7)" :
+    score >= 50 ? "linear-gradient(135deg, #fffbeb, #fef3c7)" :
+    "linear-gradient(135deg, #fff3ee, #ffe4d6)";
+
+  const radius = 30;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference - (score / 100) * circumference;
+
+  return (
+    <div className="rounded-2xl p-5" style={{ background: bgColor, border: `1.5px solid ${color}22` }}>
+      <div className="flex items-center gap-5">
+        {/* Circular progress */}
+        <div className="relative shrink-0 flex items-center justify-center" style={{ width: 80, height: 80 }}>
+          <svg width="80" height="80" viewBox="0 0 80 80" style={{ transform: "rotate(-90deg)" }}>
+            <circle cx="40" cy="40" r={radius} fill="none" stroke={`${color}20`} strokeWidth="8" />
+            <circle
+              cx="40" cy="40" r={radius}
+              fill="none"
+              stroke={color}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={dashOffset}
+              style={{ transition: "stroke-dashoffset 0.6s ease" }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-xl font-black" style={{ color }}>{score}%</span>
+          </div>
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-gray-900">
+            {score === 100 ? "Fiche complète !" :
+             score >= 80 ? "Presque parfait" :
+             score >= 50 ? "Bonne progression" :
+             "Complétez votre fiche"}
+          </p>
+          <p className="mt-0.5 text-[12px] text-gray-500">
+            {score === 100
+              ? "Votre fiche est optimisée pour attirer un maximum de clients."
+              : `${missing.length} point${missing.length > 1 ? "s" : ""} à compléter pour booster votre visibilité.`}
+          </p>
+
+          {missing.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {missing.slice(0, 3).map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-opacity hover:opacity-80"
+                  style={{ background: `${color}18`, color }}
+                >
+                  <Circle className="h-2.5 w-2.5 shrink-0" />
+                  {item.label}
+                </Link>
+              ))}
+              {missing.length > 3 && (
+                <span className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium text-gray-400" style={{ background: "#f1f5f9" }}>
+                  +{missing.length - 3} autre{missing.length - 3 > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+          )}
+
+          {score === 100 && (
+            <div className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold" style={{ color }}>
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Tous les critères sont remplis
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const planLabels: Record<string, string> = {
   monthly: "Mensuel",
@@ -110,6 +263,9 @@ export default async function MerchantDashboardPage({
               icon={<UtensilsCrossed className="h-5 w-5" style={{ color: "#e85d26" }} />}
             />
           </div>
+
+          {/* Profile completeness */}
+          {restaurant && <CompletenessWidget restaurant={restaurant} base={base} />}
 
           {/* Quick actions */}
           <div>

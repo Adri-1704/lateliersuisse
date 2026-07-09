@@ -27,6 +27,9 @@ export interface Restaurant {
   priceRange: 1 | 2 | 3 | 4;
   avgRating: number;
   reviewCount: number;
+  googleRating?: number | null;
+  googleReviewCount?: number | null;
+  googlePlaceId?: string | null;
   openingHours: Record<string, { open: string; close: string } | null>;
   features: string[];
   coverImage: string;
@@ -93,6 +96,8 @@ export const featuresOptions = [
   { value: "parking", labelFr: "Parking", labelDe: "Parkplatz", labelEn: "Parking", labelPt: "Estacionamento", labelEs: "Aparcamiento" },
   { value: "wifi", labelFr: "WiFi gratuit", labelDe: "Kostenloses WLAN", labelEn: "Free WiFi", labelPt: "WiFi grátis", labelEs: "WiFi gratis" },
   { value: "accessible", labelFr: "Accessible PMR", labelDe: "Barrierefrei", labelEn: "Wheelchair accessible", labelPt: "Acessível", labelEs: "Accesible" },
+  { value: "wheelchair", labelFr: "Accessible PMR", labelDe: "Barrierefrei", labelEn: "Wheelchair accessible", labelPt: "Acessível", labelEs: "Accesible" },
+  { value: "credit_card", labelFr: "Carte de crédit acceptée", labelDe: "Kreditkarte akzeptiert", labelEn: "Credit card accepted", labelPt: "Cartão aceite", labelEs: "Tarjeta aceptada" },
   { value: "vegetarian", labelFr: "Options vegetariennes", labelDe: "Vegetarische Optionen", labelEn: "Vegetarian options", labelPt: "Opções vegetarianas", labelEs: "Opciones vegetarianas" },
   { value: "vegan", labelFr: "Options vegan", labelDe: "Vegane Optionen", labelEn: "Vegan options", labelPt: "Opções veganas", labelEs: "Opciones veganas" },
   { value: "gluten-free", labelFr: "Options sans gluten", labelDe: "Glutenfreie Optionen", labelEn: "Gluten-free options", labelPt: "Opções sem glúten", labelEs: "Opciones sin gluten" },

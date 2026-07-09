@@ -7,25 +7,17 @@ import { slugifyCity, VALID_CANTONS } from "@/lib/city-slug";
 // SEO long-tail : abaissé de 5 à 1 pour rendre indexables toutes les villes
 // avec au moins 1 resto. Évite les 404 quand Google découvre une ville via
 // un lien interne (canton page → liste villes) qui était sous le seuil.
-const MIN_RESTAURANTS_FOR_CITY_PAGE = 1;
+const MIN_RESTAURANTS_FOR_CITY_PAGE = 3;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://just-tag.app";
-  // SEO Quick Win: seules les URLs FR sont soumises dans le sitemap pour éviter
-  // le signal "trop d'URLs similaires" envoyé à Google sur un site jeune. Les pages
-  // DE/EN/PT/ES restent accessibles et référencées via hreflang (voir `alternates`).
+    // SEO : seules les URLs FR sont dans le sitemap et indexées.
+  // Les hreflang vers DE/EN/PT/ES ont été retirés du sitemap car ces pages
+  // sont en noindex — Google les découvrait via hreflang, ne pouvait pas
+  // les indexer, et choisissait un canonical différent (9 969 erreurs Search Console).
   const locales = ["fr"];
-  const alternateLocales = ["fr", "de", "en", "pt", "es"];
   const now = new Date();
-
   const entries: MetadataRoute.Sitemap = [];
-
-  // Helper to generate alternates for a given path (hreflang : 5 locales)
-  const alternates = (path: string) => ({
-    languages: Object.fromEntries(
-      alternateLocales.map((l) => [l, `${baseUrl}/${l}${path}`])
-    ),
-  });
 
   // Homepage
   for (const locale of locales) {
@@ -34,7 +26,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "daily",
       priority: 1.0,
-      alternates: alternates(""),
     });
   }
 
@@ -45,7 +36,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
-      alternates: alternates("/restaurants"),
     });
   }
 
@@ -56,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
-      alternates: alternates("/collections"),
+
     });
   }
 
@@ -67,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.8,
-      alternates: alternates("/blog"),
+
     });
   }
 
@@ -89,7 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: post.updated_at ? new Date(post.updated_at) : now,
             changeFrequency: "weekly",
             priority: 0.7,
-            alternates: alternates(`/blog/${post.slug}`),
+
           });
         }
       }
@@ -105,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.8,
-      alternates: alternates("/happy-hours"),
+
     });
   }
 
@@ -118,7 +108,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: now,
         changeFrequency: "weekly",
         priority: 0.8,
-        alternates: alternates(`/${page}`),
+
       });
     }
   }
@@ -131,7 +121,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: now,
         changeFrequency: "weekly",
         priority: 0.85,
-        alternates: alternates(`/restaurants/canton/${canton.value}`),
+
       });
     }
   }
@@ -165,7 +155,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: now,
             changeFrequency: "weekly",
             priority: 0.8,
-            alternates: alternates(`/restaurants/ville/${slug}`),
+
           });
         }
       }
@@ -182,7 +172,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: now,
         changeFrequency: "weekly",
         priority: 0.75,
-        alternates: alternates(`/collections/${collection.slug}`),
+
       });
     }
   }
@@ -202,7 +192,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: now,
         changeFrequency: "monthly",
         priority: 0.5,
-        alternates: alternates(`/${page}`),
+
       });
     }
   }
@@ -244,7 +234,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             : now,
           changeFrequency: "weekly",
           priority: 0.8,
-          alternates: alternates(`/restaurants/${r.slug}`),
+  
         });
       }
     }
