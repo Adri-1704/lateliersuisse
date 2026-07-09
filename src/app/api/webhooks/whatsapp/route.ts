@@ -61,10 +61,11 @@ async function handleMetaWebhook(request: NextRequest) {
         const value = change.value;
         const phoneNumberId = value.metadata?.phone_number_id;
 
+        // Handle incoming messages (STOP, replies)
         for (const msg of value.messages || []) {
           if (msg.type !== "text") continue;
 
-          const from = msg.from as string; // digits only, no +
+          const from = msg.from as string;
           const text = (msg.text?.body || "") as string;
 
           if (text.trim().toUpperCase() === "STOP") {
@@ -83,6 +84,31 @@ async function handleMetaWebhook(request: NextRequest) {
               from,
               "Merci pour votre message ! 🍽️\n\nDécouvrez les meilleurs restaurants suisses sur just-tag.app"
             );
+          }
+        }
+
+        // Handle message status updates (delivered, read)
+        for (const statusUpdate of value.statuses || []) {
+          const wamid = statusUpdate.id as string;
+          const status = statusUpdate.status as string;
+
+          if (status !== "delivered" && status !== "read") continue;
+
+          try {
+            const { data: tracking } = await (supabase.from("whatsapp_message_tracking") as ReturnType<typeof supabase.from>)
+              .select("broadcast_id")
+              .eq("wamid", wamid)
+              .single() as { data: { broadcast_id: string } | null };
+
+            if (tracking?.broadcast_id) {
+              const field = status === "read" ? "read_count" : "delivered_count";
+              await (supabase.rpc as Function)("increment_broadcast_stat", {
+                p_broadcast_id: tracking.broadcast_id,
+                p_field: field,
+              });
+            }
+          } catch {
+            // Non-blocking — tracking table may not exist yet
           }
         }
       }
@@ -198,7 +224,7 @@ async function handleTwilioWebhook(request: NextRequest) {
         posted_by_phone: normalizedPhone,
       } as Record<string, unknown>);
 
-    const sent = await sendWhatsAppBroadcast({
+    const { sent } = await sendWhatsAppBroadcast({
       restaurantId: restaurant.id,
       restaurantName: restaurant.name_fr,
       message: body,

@@ -27,14 +27,14 @@ export async function sendWhatsAppBroadcast({
   restaurantName,
   message,
   imageUrl,
-}: BroadcastOptions): Promise<number> {
+}: BroadcastOptions): Promise<{ sent: number; wamids: string[] }> {
   const token = process.env.META_WHATSAPP_TOKEN;
   const phoneId = process.env.META_WHATSAPP_PHONE_ID;
   const templateName = process.env.META_WHATSAPP_TEMPLATE_NAME || "message_restaurant";
 
   if (!token || !phoneId) {
     console.warn("WhatsApp broadcast skipped: missing META_WHATSAPP_TOKEN or META_WHATSAPP_PHONE_ID");
-    return 0;
+    return { sent: 0, wamids: [] };
   }
 
   const supabase = createAdminClient();
@@ -71,7 +71,7 @@ export async function sendWhatsAppBroadcast({
     .eq("is_active", true) as { data: { phone: string }[] | null; error: unknown };
 
   if (error || !subscribers || subscribers.length === 0) {
-    return 0;
+    return { sent: 0, wamids: [] };
   }
 
   const apiUrl = `https://graph.facebook.com/v19.0/${phoneId}/messages`;
@@ -82,14 +82,21 @@ export async function sendWhatsAppBroadcast({
     )
   );
 
-  const sent = results.filter((r) => r.status === "fulfilled").length;
-  const failed = results.length - sent;
+  const wamids: string[] = [];
+  let sent = 0;
+  for (const r of results) {
+    if (r.status === "fulfilled" && r.value) {
+      wamids.push(r.value);
+      sent++;
+    }
+  }
 
+  const failed = results.length - sent;
   if (failed > 0) {
     console.error(`WhatsApp broadcast: ${failed}/${results.length} failed for restaurant ${restaurantId}`);
   }
 
-  return sent;
+  return { sent, wamids };
 }
 
 async function sendMetaMessage({
@@ -110,8 +117,7 @@ async function sendMetaMessage({
   imageUrl?: string | null;
   templateName: string;
   reservationPhone?: string | null;
-}): Promise<void> {
-  // Strip non-digits and leading + for Meta API format
+}): Promise<string | null> {
   const toClean = to.replace(/[^0-9]/g, "");
 
   const body = buildTemplatePayload({ to: toClean, restaurantName, message, imageUrl, templateName, reservationPhone });
@@ -129,6 +135,9 @@ async function sendMetaMessage({
     const text = await res.text();
     throw new Error(`Meta API error ${res.status}: ${text}`);
   }
+
+  const data = await res.json();
+  return (data?.messages?.[0]?.id as string) ?? null;
 }
 
 function buildTemplatePayload({

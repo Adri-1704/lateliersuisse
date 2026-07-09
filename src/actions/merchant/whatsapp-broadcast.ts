@@ -66,24 +66,32 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
       imageUrl = urlData.publicUrl;
     }
 
-    const sent = await sendWhatsAppBroadcast({
+    const { sent, wamids } = await sendWhatsAppBroadcast({
       restaurantId: session.restaurant.id,
       restaurantName: session.restaurant.name_fr,
       message,
       imageUrl,
     });
 
-    // Save to broadcast history (non-blocking — table may not exist yet)
+    // Save broadcast + wamid tracking (non-blocking)
     try {
       const adminForHistory = createAdminClient();
-      await (adminForHistory.from("whatsapp_broadcasts") as ReturnType<typeof adminForHistory.from>).insert({
-        restaurant_id: session.restaurant.id,
-        message,
-        image_url: imageUrl,
-        sent_count: sent,
-      });
+      const { data: inserted } = await (adminForHistory.from("whatsapp_broadcasts") as ReturnType<typeof adminForHistory.from>)
+        .insert({
+          restaurant_id: session.restaurant.id,
+          message,
+          image_url: imageUrl,
+          sent_count: sent,
+        })
+        .select("id")
+        .single() as { data: { id: string } | null };
+
+      if (inserted?.id && wamids.length > 0) {
+        await (adminForHistory.from("whatsapp_message_tracking") as ReturnType<typeof adminForHistory.from>)
+          .insert(wamids.map((wamid) => ({ wamid, broadcast_id: inserted.id })));
+      }
     } catch {
-      // Table not created yet — broadcast still succeeded
+      // Tables not created yet — broadcast still succeeded
     }
 
     return { success: true, sent, error: null, quotaUsed: used + 1, quotaMax: MONTHLY_BROADCAST_QUOTA };
@@ -98,15 +106,27 @@ export async function getBroadcastHistory(restaurantId: string): Promise<{
   message: string;
   image_url: string | null;
   sent_count: number;
+  delivered_count: number;
+  read_count: number;
   created_at: string;
 }[]> {
   try {
     const admin = createAdminClient();
     const { data } = await (admin.from("whatsapp_broadcasts") as ReturnType<typeof admin.from>)
-      .select("id, message, image_url, sent_count, created_at")
+      .select("id, message, image_url, sent_count, delivered_count, read_count, created_at")
       .eq("restaurant_id", restaurantId)
       .order("created_at", { ascending: false })
-      .limit(10) as { data: { id: string; message: string; image_url: string | null; sent_count: number; created_at: string }[] | null };
+      .limit(10) as {
+        data: {
+          id: string;
+          message: string;
+          image_url: string | null;
+          sent_count: number;
+          delivered_count: number;
+          read_count: number;
+          created_at: string;
+        }[] | null
+      };
     return data || [];
   } catch {
     return [];

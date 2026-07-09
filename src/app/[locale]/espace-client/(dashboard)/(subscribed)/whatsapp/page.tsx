@@ -11,6 +11,8 @@ interface Broadcast {
   message: string;
   image_url: string | null;
   sent_count: number;
+  delivered_count: number;
+  read_count: number;
   created_at: string;
 }
 
@@ -430,9 +432,17 @@ export default function WhatsAppPage() {
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="line-clamp-2 text-sm text-gray-800">{item.message}</p>
-                  <div className="mt-1 flex items-center gap-3 text-[11px] text-gray-400">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
                     <span>{new Date(item.created_at).toLocaleDateString("fr-CH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
                     <span className="font-semibold" style={{ color: "#25D366" }}>✓ {item.sent_count} envoyés</span>
+                    {item.delivered_count > 0 && (
+                      <span className="font-semibold" style={{ color: "#3b82f6" }}>✓✓ {item.delivered_count} délivrés</span>
+                    )}
+                    {item.read_count > 0 && (
+                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold" style={{ background: "#fef3c7", color: "#d97706" }}>
+                        👁 {item.read_count} lus
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
