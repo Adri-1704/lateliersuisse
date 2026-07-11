@@ -165,19 +165,6 @@ export async function uploadImage(
       return { success: false, error: "Erreur lors de l'enregistrement" };
     }
 
-    // Auto-set as cover if the restaurant has no cover image yet
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: resto } = await (admin.from("restaurants") as any)
-      .select("cover_image")
-      .eq("id", restaurantId)
-      .single();
-    if (!resto?.cover_image) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (admin.from("restaurants") as any)
-        .update({ cover_image: url })
-        .eq("id", restaurantId);
-    }
-
     return { success: true, error: null, url };
   } catch {
     return { success: false, error: "Erreur inattendue" };

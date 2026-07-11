@@ -45,17 +45,25 @@ export async function sendWhatsAppBroadcast({
 
   const { data: resto } = await (supabase
     .from("restaurants") as ReturnType<typeof supabase.from>)
-    .select("cover_image, phone")
+    .select("phone")
     .eq("id", restaurantId)
-    .single() as { data: { cover_image: string | null; phone: string | null } | null };
+    .single() as { data: { phone: string | null } | null };
 
   reservationPhone = resto?.phone ?? null;
 
-  // Use the restaurant cover image (the main photo shown on the public page)
-  if (!resolvedImageUrl) resolvedImageUrl = resto?.cover_image ?? null;
+  // Use the first uploaded photo from the gallery (position 0)
+  const { data: firstPhoto } = await (supabase
+    .from("restaurant_images") as ReturnType<typeof supabase.from>)
+    .select("url")
+    .eq("restaurant_id", restaurantId)
+    .order("position", { ascending: true })
+    .limit(1)
+    .single() as { data: { url: string } | null };
+
+  resolvedImageUrl = firstPhoto?.url ?? null;
 
   if (!resolvedImageUrl) {
-    throw new Error("Configurez une photo de couverture dans la section « Mon Restaurant » pour envoyer des messages WhatsApp.");
+    throw new Error("Ajoutez au moins une photo dans la section « Photos » pour envoyer des messages WhatsApp.");
   }
 
   let subscribers: { phone: string }[] | null;
