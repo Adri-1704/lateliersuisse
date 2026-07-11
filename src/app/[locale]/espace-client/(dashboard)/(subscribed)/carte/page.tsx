@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, Plus, Trash2, Pencil, X, CheckCircle, ImagePlus, BookOpen, FileText, Upload } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil, X, CheckCircle, ImagePlus, BookOpen, FileText, Upload, Download } from "lucide-react";
 import { useRef } from "react";
 import Image from "next/image";
 import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
@@ -36,6 +36,8 @@ export default function MenuPage() {
   const t = useTranslations("merchantPortal");
   const [items, setItems] = useState<DbMenuItem[]>([]);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [restaurantName, setRestaurantName] = useState<string>("Restaurant");
+  const [generatingPdf, setGeneratingPdf] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -57,6 +59,7 @@ export default function MenuPage() {
         const restResult = await getMerchantRestaurant();
         if (restResult.success && restResult.data) {
           setRestaurantId(restResult.data.id);
+          setRestaurantName(restResult.data.name_fr || "Restaurant");
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           setMenuPdfUrl((restResult.data as any).menu_pdf_url || null);
           const menuResult = await getMenuItems(restResult.data.id);
@@ -154,6 +157,44 @@ export default function MenuPage() {
       setPdfError(result.error || "Erreur lors de l'upload");
     }
     setUploadingPdf(false);
+  }
+
+  async function handleGeneratePdf() {
+    if (items.filter((i) => i.is_available).length === 0) {
+      setPdfError("Ajoutez des plats disponibles avant de générer le PDF");
+      return;
+    }
+    setGeneratingPdf(true);
+    setPdfError(null);
+    try {
+      const { generateMenuPdfBlob } = await import("@/lib/generate-menu-pdf");
+      const blob = await generateMenuPdfBlob(items, restaurantName);
+
+      // Upload to Supabase and update menu_pdf_url
+      const formData = new FormData();
+      formData.append("file", new File([blob], "menu.pdf", { type: "application/pdf" }));
+      const result = await uploadMenuPdf(formData);
+      if (result.success && result.url) {
+        setMenuPdfUrl(result.url);
+        setPdfSuccess(true);
+        setTimeout(() => setPdfSuccess(false), 3000);
+      } else {
+        setPdfError(result.error || "Erreur lors de la génération");
+        return;
+      }
+
+      // Also trigger local download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${restaurantName} — Carte.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setPdfError("Erreur lors de la génération du PDF");
+    } finally {
+      setGeneratingPdf(false);
+    }
   }
 
   async function handlePdfDelete() {
@@ -257,10 +298,22 @@ export default function MenuPage() {
                 </button>
               </>
             )}
+            <button
+              onClick={handleGeneratePdf}
+              disabled={generatingPdf || uploadingPdf || items.filter((i) => i.is_available).length === 0}
+              className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg, #0f1117, #1a1f2e)" }}
+              title={items.filter((i) => i.is_available).length === 0 ? "Ajoutez des plats d'abord" : ""}
+            >
+              {generatingPdf
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> Génération...</>
+                : <><Download className="h-4 w-4" /> Générer PDF</>
+              }
+            </button>
             <label className="flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60" style={{ background: "linear-gradient(135deg, #8b5cf6, #a78bfa)" }}>
               {uploadingPdf
                 ? <><Loader2 className="h-4 w-4 animate-spin" /> Chargement...</>
-                : <><Upload className="h-4 w-4" /> {menuPdfUrl ? "Remplacer" : "Importer"}</>
+                : <><Upload className="h-4 w-4" /> {menuPdfUrl ? "Importer PDF" : "Importer PDF"}</>
               }
               <input
                 ref={pdfInputRef}
