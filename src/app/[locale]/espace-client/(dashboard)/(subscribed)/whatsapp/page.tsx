@@ -134,6 +134,7 @@ export default function WhatsAppPage() {
       ? `${message}\n\n📋 Notre carte : ${menuPdfUrl}`
       : message;
     fd.append("message", finalMessage);
+    if (includeMenuPdf) fd.append("includePdf", "true");
     const activeCount = subscribers.filter((s) => s.is_active).length;
     // Only send selectedIds if it's a partial selection
     if (selectedIds.size < activeCount) {
@@ -377,9 +378,17 @@ export default function WhatsAppPage() {
                 </div>
                 {message ? (
                   <div className="w-[88%] overflow-hidden rounded-[0_10px_10px_10px] shadow-sm" style={{ background: "#fff" }}>
-                    <div className="flex h-[90px] items-center justify-center text-[10px] font-medium" style={{ background: "#c8d8e8", color: "#5c7a99" }}>
-                      📸 Photo de couverture du restaurant
-                    </div>
+                    {includeMenuPdf ? (
+                      <div className="flex h-[90px] flex-col items-center justify-center gap-1" style={{ background: "linear-gradient(135deg, #0f1117, #1a1f2e)" }}>
+                        <div style={{ width: 20, height: 2, background: "#e85d26", borderRadius: 1 }} />
+                        <p className="text-[10px] font-black text-white text-center px-2" style={{ letterSpacing: "-0.3px" }}>{restaurantName}</p>
+                        <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)", letterSpacing: "1px" }}>JUST-TAG.APP</p>
+                      </div>
+                    ) : (
+                      <div className="flex h-[90px] items-center justify-center text-[10px] font-medium" style={{ background: "#c8d8e8", color: "#5c7a99" }}>
+                        📸 1ère photo de la galerie
+                      </div>
+                    )}
                     <div className="px-2 pb-1 pt-1.5">
                       <p className="whitespace-pre-wrap break-words text-[11px] leading-[1.5] text-gray-900">
                         {message || ""}

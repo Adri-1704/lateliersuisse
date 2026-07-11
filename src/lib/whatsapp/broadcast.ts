@@ -19,6 +19,7 @@ interface BroadcastOptions {
   restaurantId: string;
   restaurantName: string;
   message: string;
+  imageUrl?: string | null;   // override image (e.g. OG card for PDF menu)
   selectedPhones?: string[]; // if provided, only send to these numbers
   tierLimit?: number;         // max subscribers allowed by subscription
 }
@@ -27,6 +28,7 @@ export async function sendWhatsAppBroadcast({
   restaurantId,
   restaurantName,
   message,
+  imageUrl,
   selectedPhones,
   tierLimit,
 }: BroadcastOptions): Promise<{ sent: number; wamids: string[] }> {
@@ -40,7 +42,7 @@ export async function sendWhatsAppBroadcast({
 
   const supabase = createAdminClient();
 
-  let resolvedImageUrl: string | null = null;
+  let resolvedImageUrl: string | null = imageUrl ?? null;
   let reservationPhone: string | null = null;
 
   const { data: resto } = await (supabase
@@ -51,16 +53,18 @@ export async function sendWhatsAppBroadcast({
 
   reservationPhone = resto?.phone ?? null;
 
-  // Use the first uploaded photo from the gallery (position 0)
-  const { data: firstPhoto } = await (supabase
-    .from("restaurant_images") as ReturnType<typeof supabase.from>)
-    .select("url")
-    .eq("restaurant_id", restaurantId)
-    .order("position", { ascending: true })
-    .limit(1)
-    .single() as { data: { url: string } | null };
+  if (!resolvedImageUrl) {
+    // Use the first uploaded photo from the gallery (position 0)
+    const { data: firstPhoto } = await (supabase
+      .from("restaurant_images") as ReturnType<typeof supabase.from>)
+      .select("url")
+      .eq("restaurant_id", restaurantId)
+      .order("position", { ascending: true })
+      .limit(1)
+      .single() as { data: { url: string } | null };
 
-  resolvedImageUrl = firstPhoto?.url ?? null;
+    resolvedImageUrl = firstPhoto?.url ?? null;
+  }
 
   if (!resolvedImageUrl) {
     throw new Error("Ajoutez au moins une photo dans la section « Photos » pour envoyer des messages WhatsApp.");

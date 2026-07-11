@@ -84,10 +84,18 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
       };
     }
 
+    // When PDF menu is included, use the branded OG card instead of gallery photo
+    const includePdf = formData.get("includePdf") === "true";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+    const ogImageUrl = includePdf
+      ? `${siteUrl}/api/og/restaurant?name=${encodeURIComponent(session.restaurant.name_fr)}`
+      : null;
+
     const { sent, wamids } = await sendWhatsAppBroadcast({
       restaurantId: session.restaurant.id,
       restaurantName: session.restaurant.name_fr,
       message,
+      imageUrl: ogImageUrl,
       selectedPhones,
       tierLimit: tier ?? 50,
     });
