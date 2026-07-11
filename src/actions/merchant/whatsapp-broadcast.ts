@@ -84,18 +84,34 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
       };
     }
 
-    // When PDF menu is included, use the branded OG card instead of gallery photo
     const includePdf = formData.get("includePdf") === "true";
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
-    const ogImageUrl = includePdf
-      ? `${siteUrl}/api/og/restaurant?name=${encodeURIComponent(session.restaurant.name_fr)}`
-      : null;
+    let imageUrl: string | null = null;
+
+    if (includePdf) {
+      // Branded OG card: dark background + restaurant name
+      imageUrl = `${siteUrl}/api/og/restaurant?name=${encodeURIComponent(session.restaurant.name_fr)}`;
+    } else {
+      // Chef photo uploaded from the form
+      const imageFile = formData.get("image") as File | null;
+      if (imageFile && imageFile.size > 0) {
+        const admin = createAdminClient();
+        const ext = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
+        const path = `whatsapp/${session.restaurant.id}/${Date.now()}.${ext}`;
+        const { error: uploadError } = await admin.storage
+          .from("restaurant-images")
+          .upload(path, imageFile, { cacheControl: "86400", upsert: false });
+        if (uploadError) return { success: false, sent: 0, error: `Upload échoué: ${uploadError.message}` };
+        const { data: urlData } = admin.storage.from("restaurant-images").getPublicUrl(path);
+        imageUrl = urlData.publicUrl;
+      }
+    }
 
     const { sent, wamids } = await sendWhatsAppBroadcast({
       restaurantId: session.restaurant.id,
       restaurantName: session.restaurant.name_fr,
       message,
-      imageUrl: ogImageUrl,
+      imageUrl,
       selectedPhones,
       tierLimit: tier ?? 50,
     });

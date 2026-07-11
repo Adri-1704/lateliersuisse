@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { MessageCircle, Send, Users, CheckCircle2, Clock, Loader2, ArrowUpCircle, Trash2, Square, CheckSquare, FileText } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { MessageCircle, ImagePlus, Send, Users, X, CheckCircle2, Clock, Loader2, ArrowUpCircle, Trash2, Square, CheckSquare, FileText } from "lucide-react";
 import { getMerchantRestaurant, updateRestaurantPhone } from "@/actions/merchant/restaurant";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { broadcastWhatsApp, getBroadcastHistory, getWhatsAppSubscriberCount, getWhatsAppPlanTier, getSubscribers, deleteSubscriber, getMonthlyBroadcastUsage } from "@/actions/merchant/whatsapp-broadcast";
@@ -45,6 +45,9 @@ export default function WhatsAppPage() {
   const [menuPdfUrl, setMenuPdfUrl] = useState<string | null>(null);
   const [includeMenuPdf, setIncludeMenuPdf] = useState(false);
   const [message, setMessage] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ sent: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -84,6 +87,19 @@ export default function WhatsAppPage() {
     }
     load();
   }, []);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
+
+  function removeImage() {
+    setImage(null);
+    setImagePreview(null);
+    if (fileRef.current) fileRef.current.value = "";
+  }
 
   async function handleDeleteSubscriber(id: string) {
     setDeletingId(id);
@@ -134,7 +150,11 @@ export default function WhatsAppPage() {
       ? `${message}\n\n📋 Notre carte : ${menuPdfUrl}`
       : message;
     fd.append("message", finalMessage);
-    if (includeMenuPdf) fd.append("includePdf", "true");
+    if (includeMenuPdf) {
+      fd.append("includePdf", "true");
+    } else if (image) {
+      fd.append("image", image);
+    }
     const activeCount = subscribers.filter((s) => s.is_active).length;
     // Only send selectedIds if it's a partial selection
     if (selectedIds.size < activeCount) {
@@ -145,6 +165,7 @@ export default function WhatsAppPage() {
       setResult({ sent: res.sent });
       if (res.quotaUsed !== undefined) setQuotaUsed(res.quotaUsed);
       setMessage("");
+      removeImage();
       const hist = await getBroadcastHistory(restaurantId);
       setHistory(hist);
     } else {
@@ -247,6 +268,17 @@ export default function WhatsAppPage() {
           </div>
           <div className="p-5 space-y-4">
 
+            {/* Photo preview (message normal uniquement) */}
+            {!includeMenuPdf && imagePreview && (
+              <div className="relative w-32">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imagePreview} alt="Aperçu" className="h-32 w-32 rounded-xl object-cover" style={{ border: "1px solid #eaecf0" }} />
+                <button onClick={removeImage} className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-600">
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+
             {/* Textarea */}
             <div className="space-y-1">
               <textarea
@@ -338,6 +370,20 @@ export default function WhatsAppPage() {
 
             {/* Actions */}
             <div className="flex items-center gap-3 pt-1">
+              {!includeMenuPdf && (
+                <>
+                  <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImageChange} />
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-[12px] font-semibold text-gray-600 transition-colors hover:bg-gray-100"
+                    style={{ border: "1px solid #eaecf0" }}
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                    {image ? "Changer" : "Photo du plat"}
+                  </button>
+                </>
+              )}
               <button
                 className="ml-auto flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white transition-opacity disabled:opacity-50"
                 style={{ background: "linear-gradient(135deg, #25D366, #128C7E)" }}
@@ -384,6 +430,9 @@ export default function WhatsAppPage() {
                         <p className="text-[10px] font-black text-white text-center px-2" style={{ letterSpacing: "-0.3px" }}>{restaurantName}</p>
                         <p className="text-[7px]" style={{ color: "rgba(255,255,255,0.4)", letterSpacing: "1px" }}>JUST-TAG.APP</p>
                       </div>
+                    ) : imagePreview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={imagePreview} alt="" className="h-[130px] w-full object-cover" />
                     ) : (
                       <div className="flex h-[90px] items-center justify-center text-[10px] font-medium" style={{ background: "#c8d8e8", color: "#5c7a99" }}>
                         📸 1ère photo de la galerie
