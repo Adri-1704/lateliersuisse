@@ -39,6 +39,7 @@ export interface Restaurant {
   menuItems: MenuItem[];
   badges?: RestaurantBadge[];
   promotions?: RestaurantPromotion[];
+  menuPdfUrl?: string | null;
 }
 
 export interface MenuItem {

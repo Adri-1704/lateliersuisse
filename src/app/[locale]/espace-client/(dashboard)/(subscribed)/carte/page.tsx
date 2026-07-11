@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Loader2, Plus, Trash2, Pencil, X, CheckCircle, ImagePlus, BookOpen } from "lucide-react";
+import { Loader2, Plus, Trash2, Pencil, X, CheckCircle, ImagePlus, BookOpen, FileText, Upload } from "lucide-react";
 import { useRef } from "react";
 import Image from "next/image";
 import { getMerchantRestaurant } from "@/actions/merchant/restaurant";
 import { getMenuItems, createMenuItem, updateMenuItem, deleteMenuItem, uploadMenuItemImage, deleteMenuItemImage } from "@/actions/merchant/menu";
+import { uploadMenuPdf, deleteMenuPdf } from "@/actions/merchant/menu-pdf";
 import type { DbMenuItem } from "@/lib/supabase/types";
 
 interface MenuItemForm {
@@ -43,7 +44,12 @@ export default function MenuPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [uploadingImageFor, setUploadingImageFor] = useState<string | null>(null);
+  const [menuPdfUrl, setMenuPdfUrl] = useState<string | null>(null);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [pdfSuccess, setPdfSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function load() {
@@ -51,6 +57,8 @@ export default function MenuPage() {
         const restResult = await getMerchantRestaurant();
         if (restResult.success && restResult.data) {
           setRestaurantId(restResult.data.id);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setMenuPdfUrl((restResult.data as any).menu_pdf_url || null);
           const menuResult = await getMenuItems(restResult.data.id);
           if (menuResult.success && menuResult.data) setItems(menuResult.data);
         }
@@ -132,6 +140,34 @@ export default function MenuPage() {
     if (result.success) setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, image_url: null } : i));
   }
 
+  async function handlePdfUpload(file: File) {
+    setUploadingPdf(true);
+    setPdfError(null);
+    const formData = new FormData();
+    formData.append("file", file);
+    const result = await uploadMenuPdf(formData);
+    if (result.success && result.url) {
+      setMenuPdfUrl(result.url);
+      setPdfSuccess(true);
+      setTimeout(() => setPdfSuccess(false), 3000);
+    } else {
+      setPdfError(result.error || "Erreur lors de l'upload");
+    }
+    setUploadingPdf(false);
+  }
+
+  async function handlePdfDelete() {
+    setUploadingPdf(true);
+    setPdfError(null);
+    const result = await deleteMenuPdf();
+    if (result.success) {
+      setMenuPdfUrl(null);
+    } else {
+      setPdfError(result.error || "Erreur lors de la suppression");
+    }
+    setUploadingPdf(false);
+  }
+
   const categories = [...new Set(items.map((i) => i.category))].sort();
 
   if (loading) {
@@ -176,6 +212,72 @@ export default function MenuPage() {
             </button>
           )}
         </div>
+      </div>
+
+      {/* PDF Menu section */}
+      <div className="rounded-2xl bg-white" style={{ border: "1.5px solid #eaecf0" }}>
+        <div className="flex items-center justify-between px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: "#fdf4ff" }}>
+              <FileText className="h-4 w-4" style={{ color: "#8b5cf6" }} />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-900">Menu PDF</p>
+              <p className="text-[12px] text-gray-400">
+                {menuPdfUrl ? "Un PDF est en ligne — les visiteurs peuvent le télécharger" : "Importez votre carte en PDF pour que les visiteurs puissent la télécharger"}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {pdfSuccess && (
+              <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "#f0fdf4", color: "#16a34a" }}>
+                <CheckCircle className="h-3.5 w-3.5" />
+                Enregistré
+              </div>
+            )}
+            {menuPdfUrl && (
+              <>
+                <a
+                  href={menuPdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors hover:bg-gray-100"
+                  style={{ color: "#8b5cf6" }}
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  Voir le PDF
+                </a>
+                <button
+                  onClick={handlePdfDelete}
+                  disabled={uploadingPdf}
+                  className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50 disabled:opacity-50"
+                >
+                  {uploadingPdf ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
+                  Supprimer
+                </button>
+              </>
+            )}
+            <label className="flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60" style={{ background: "linear-gradient(135deg, #8b5cf6, #a78bfa)" }}>
+              {uploadingPdf
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> Chargement...</>
+                : <><Upload className="h-4 w-4" /> {menuPdfUrl ? "Remplacer" : "Importer"}</>
+              }
+              <input
+                ref={pdfInputRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                disabled={uploadingPdf}
+                onChange={(e) => { const file = e.target.files?.[0]; if (file) handlePdfUpload(file); e.target.value = ""; }}
+              />
+            </label>
+          </div>
+        </div>
+        {pdfError && (
+          <div className="mx-5 mb-4 rounded-xl px-3 py-2 text-sm" style={{ background: "#fef2f2", color: "#dc2626" }}>
+            {pdfError}
+          </div>
+        )}
       </div>
 
       {error && !showForm && (

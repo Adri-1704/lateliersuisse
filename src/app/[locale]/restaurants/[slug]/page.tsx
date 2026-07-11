@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { featuresOptions } from "@/data/mock-restaurants";
 import type { Restaurant, Review } from "@/data/mock-restaurants";
 import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { ClaimBanner } from "./ClaimBanner";
 import { HappyHourBanner } from "@/components/restaurant-detail/HappyHourBanner";
@@ -54,6 +54,9 @@ function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaur
     priceRange: parseInt(row.price_range as string || "2") as 1 | 2 | 3 | 4,
     avgRating: parseFloat(row.avg_rating as string) || 0,
     reviewCount: (row.review_count as number) || 0,
+    googleRating: row.google_rating != null ? parseFloat(row.google_rating as string) : null,
+    googleReviewCount: (row.google_review_count as number) || null,
+    googlePlaceId: (row.google_place_id as string) || null,
     openingHours: (row.opening_hours as Record<string, { open: string; close: string }>) || {},
     features: (row.features as string[]) || [],
     coverImage: (row.cover_image as string) || placeholderImages[index % placeholderImages.length],
@@ -63,6 +66,7 @@ function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaur
     isFeatured: (row.is_featured as boolean) || false,
     isPublished: (row.is_published as boolean) || true,
     menuItems: [],
+    menuPdfUrl: (row.menu_pdf_url as string) || null,
   };
 }
 
@@ -225,7 +229,7 @@ export default async function RestaurantDetailPage({
   const result = await getRestaurant(slug);
 
   if (!result) {
-    notFound();
+    redirect(`/${locale}/restaurants`);
   }
 
   const { restaurant, merchantId, claimStatus } = result;

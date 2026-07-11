@@ -202,6 +202,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [carouselOffset, setCarouselOffset] = useState(0);
 
   // Review form state
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -359,27 +360,48 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
       {/* Photos ajoutées par le restaurateur (si disponibles) */}
       {restaurant.images && restaurant.images.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
-          {restaurant.images.slice(0, 8).map((img, i) => (
-            <div
-              key={i}
-              className="relative aspect-square overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
-              onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
+        <div className="mt-4 relative">
+          {/* Flèche gauche */}
+          {carouselOffset > 0 && (
+            <button
+              onClick={() => setCarouselOffset((i) => i - 1)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-md rounded-full p-2 -ml-3"
             >
-              <Image
-                src={img}
-                alt={`${name} photo ${i + 1}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              />
-              {i === 7 && restaurant.images.length > 8 && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold text-lg">
-                  +{restaurant.images.length - 8}
+              <ChevronLeft className="w-5 h-5 text-gray-800" />
+            </button>
+          )}
+          {/* Piste */}
+          <div className="overflow-hidden rounded-xl">
+            <div
+              className="flex gap-2 transition-transform duration-300"
+              style={{ transform: `translateX(calc(-${carouselOffset} * (25% + 0.5rem)))` }}
+            >
+              {restaurant.images.map((img, i) => (
+                <div
+                  key={i}
+                  className="relative aspect-square flex-none w-1/2 md:w-1/3 lg:w-1/4 overflow-hidden rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => { setLightboxIndex(i); setLightboxOpen(true); }}
+                >
+                  <Image
+                    src={img}
+                    alt={`${name} photo ${i + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  />
                 </div>
-              )}
+              ))}
             </div>
-          ))}
+          </div>
+          {/* Flèche droite */}
+          {carouselOffset < restaurant.images.length - 4 && (
+            <button
+              onClick={() => setCarouselOffset((i) => i + 1)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-md rounded-full p-2 -mr-3"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-800" />
+            </button>
+          )}
         </div>
       )}
 
@@ -520,6 +542,23 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                   </p>
                 </div>
               )}
+              {/* PDF download button */}
+              {restaurant.menuPdfUrl && (
+                <div className="mb-6">
+                  <a
+                    href={restaurant.menuPdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-just-tag)]/30 bg-[var(--color-just-tag)]/5 px-4 py-2.5 text-sm font-semibold text-[var(--color-just-tag)] transition-colors hover:bg-[var(--color-just-tag)]/10"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    {{ de: "Speisekarte herunterladen", en: "Download menu", pt: "Baixar cardápio", es: "Descargar carta" }[locale] || "Télécharger la carte (PDF)"}
+                  </a>
+                </div>
+              )}
               {/* Average price indicator */}
               {avgMenuPrice > 0 && (
                 <div className="mb-6 inline-flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-2 text-sm">
@@ -530,7 +569,16 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 </div>
               )}
               {(() => {
-                const categories = [...new Set(restaurant.menuItems.map((item) => item.category))];
+                const CATEGORY_ORDER = ["Menu du jour", "Entrées", "Plats", "Spécialités suisses", "Desserts", "Vins", "Boissons"];
+                const categories = [...new Set(restaurant.menuItems.map((item) => item.category))]
+                  .sort((a, b) => {
+                    const ia = CATEGORY_ORDER.indexOf(a);
+                    const ib = CATEGORY_ORDER.indexOf(b);
+                    if (ia === -1 && ib === -1) return a.localeCompare(b);
+                    if (ia === -1) return 1;
+                    if (ib === -1) return -1;
+                    return ia - ib;
+                  });
                 return categories.map((category, catIdx) => (
                   <div key={category} className="mb-8">
                     <h3 className={`text-lg font-semibold text-gray-900 mb-4 border-l-4 pl-3 ${categoryColors[catIdx % categoryColors.length]}`}>
@@ -592,29 +640,62 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               {/* Aggregate rating */}
               <div className="mb-8 flex flex-col items-center gap-6 rounded-xl border bg-gray-50 p-6 sm:flex-row">
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-gray-900">{localAvgRating}</div>
-                  <div className="mt-1 flex items-center gap-0.5">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.round(localAvgRating)
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-200"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="mt-1 text-sm text-gray-500">{localReviewCount} {t("reviews")}</p>
-                  <a
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#4285F4"/></svg>
-                    {locale === "de" ? "Alle Bewertungen auf Google" : locale === "en" ? "All reviews on Google" : "Tous les avis sur Google"}
-                  </a>
+                  {/* Google rating — source de vérité si disponible */}
+                  {restaurant.googleRating != null ? (
+                    <>
+                      <div className="text-5xl font-bold text-gray-900">{restaurant.googleRating.toFixed(1)}</div>
+                      <div className="mt-1 flex items-center gap-0.5">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < Math.round(restaurant.googleRating!)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {restaurant.googleReviewCount?.toLocaleString()} {t("reviews")}
+                      </p>
+                      <a
+                        href={googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#4285F4"/></svg>
+                        {locale === "de" ? "Alle Bewertungen auf Google" : locale === "en" ? "All reviews on Google" : "Tous les avis sur Google"}
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-5xl font-bold text-gray-900">{localAvgRating}</div>
+                      <div className="mt-1 flex items-center gap-0.5">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < Math.round(localAvgRating)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-200"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="mt-1 text-sm text-gray-500">{localReviewCount} {t("reviews")}</p>
+                      <a
+                        href={googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white border border-gray-200 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#4285F4"/></svg>
+                        {locale === "de" ? "Alle Bewertungen auf Google" : locale === "en" ? "All reviews on Google" : "Tous les avis sur Google"}
+                      </a>
+                    </>
+                  )}
                 </div>
                 <div className="w-full max-w-xs">
                   <RatingDistribution reviews={localReviews} />
@@ -641,7 +722,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                       <SubRatingBar label={locale === "de" ? "Ambiente" : locale === "en" ? "Ambiance" : locale === "pt" ? "Ambiente" : locale === "es" ? "Ambiente" : "Ambiance"} value={withAmbiance.reduce((s, r) => s + (r.ratingAmbiance || 0), 0) / withAmbiance.length} />
                     )}
                     {withValue.length > 0 && (
-                      <SubRatingBar label={locale === "de" ? "Preis/Leistung" : locale === "en" ? "Value" : locale === "pt" ? "Custo-benefício" : locale === "es" ? "Relacion calidad-precio" : "Rapport qualite-prix"} value={withValue.reduce((s, r) => s + (r.ratingValue || 0), 0) / withValue.length} />
+                      <SubRatingBar label={locale === "de" ? "Preis/Leistung" : locale === "en" ? "Value" : locale === "pt" ? "Custo-benefício" : locale === "es" ? "Relacion calidad-precio" : "Rapport qualité-prix"} value={withValue.reduce((s, r) => s + (r.ratingValue || 0), 0) / withValue.length} />
                     )}
                   </div>
                 );
@@ -777,14 +858,14 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                     {/* Sub-ratings (optional) */}
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {locale === "de" ? "Detailbewertung (optional)" : locale === "en" ? "Detailed rating (optional)" : locale === "pt" ? "Avaliação detalhada (opcional)" : locale === "es" ? "Valoración detallada (opcional)" : "Notes detaillees (optionnel)"}
+                        {locale === "de" ? "Detailbewertung (optional)" : locale === "en" ? "Detailed rating (optional)" : locale === "pt" ? "Avaliação detalhada (opcional)" : locale === "es" ? "Valoración detallada (opcional)" : "Notes détaillées (optionnel)"}
                       </label>
                       <div className="grid grid-cols-2 gap-3">
                         {[
                           { label: locale === "de" ? "Kueche" : locale === "en" ? "Cuisine" : "Cuisine", value: reviewCuisine, setter: setReviewCuisine },
                           { label: "Service", value: reviewService, setter: setReviewService },
                           { label: locale === "de" ? "Ambiente" : locale === "en" ? "Ambiance" : "Ambiance", value: reviewAmbiance, setter: setReviewAmbiance },
-                          { label: locale === "de" ? "Preis/Leistung" : locale === "en" ? "Value" : locale === "pt" ? "Custo-benefício" : locale === "es" ? "Calidad-precio" : "Qualite-prix", value: reviewValue, setter: setReviewValue },
+                          { label: locale === "de" ? "Preis/Leistung" : locale === "en" ? "Value" : locale === "pt" ? "Custo-benefício" : locale === "es" ? "Calidad-precio" : "Qualité-prix", value: reviewValue, setter: setReviewValue },
                         ].map((sub) => (
                           <div key={sub.label} className="flex items-center gap-2">
                             <span className="text-xs text-gray-600 w-20 shrink-0">{sub.label}</span>

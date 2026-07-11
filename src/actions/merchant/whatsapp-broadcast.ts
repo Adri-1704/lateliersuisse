@@ -4,7 +4,9 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { sendWhatsAppBroadcast } from "@/lib/whatsapp/broadcast";
 
-const MONTHLY_BROADCAST_QUOTA = 30;
+function monthlyQuotaForTier(tier: number | null): number {
+  return (tier ?? 50) * 4; // 50→200, 100→400, 200→800 individual messages/month
+}
 
 export async function getMonthlyBroadcastUsage(restaurantId: string): Promise<number> {
   try {
@@ -12,11 +14,11 @@ export async function getMonthlyBroadcastUsage(restaurantId: string): Promise<nu
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
-    const { count } = await (admin.from("whatsapp_broadcasts") as ReturnType<typeof admin.from>)
-      .select("id", { count: "exact", head: true })
+    const { data } = await (admin.from("whatsapp_broadcasts") as ReturnType<typeof admin.from>)
+      .select("sent_count")
       .eq("restaurant_id", restaurantId)
-      .gte("created_at", startOfMonth.toISOString()) as { count: number | null };
-    return count || 0;
+      .gte("created_at", startOfMonth.toISOString()) as { data: { sent_count: number }[] | null };
+    return data?.reduce((sum, row) => sum + (row.sent_count || 0), 0) ?? 0;
   } catch {
     return 0;
   }
@@ -37,40 +39,57 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
     if (!message) return { success: false, sent: 0, error: "Message vide" };
     if (message.length > 1024) return { success: false, sent: 0, error: "Message trop long (max 1024 caractères)" };
 
+    // Fetch subscription tier for quota and subscriber limit
+    const tier = session.merchant?.id ? await getWhatsAppPlanTier(session.merchant.id) : null;
+    const quota = monthlyQuotaForTier(tier);
+
     const used = await getMonthlyBroadcastUsage(session.restaurant.id);
-    if (used >= MONTHLY_BROADCAST_QUOTA) {
+    if (used >= quota) {
       return {
         success: false,
         sent: 0,
-        error: `Quota mensuel atteint (${MONTHLY_BROADCAST_QUOTA} messages/mois). Renouvellement le 1er du mois prochain.`,
+        error: `Quota mensuel atteint (${quota} messages/mois). Renouvellement le 1er du mois prochain.`,
         quotaUsed: used,
-        quotaMax: MONTHLY_BROADCAST_QUOTA,
+        quotaMax: quota,
       };
     }
 
-    const imageFile = formData.get("image") as File | null;
-    let imageUrl: string | null = null;
+    const remaining = quota - used;
 
-    if (imageFile && imageFile.size > 0) {
-      const admin = createAdminClient();
-      const ext = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `whatsapp/${session.restaurant.id}/${Date.now()}.${ext}`;
+    // Optional recipient filter — array of subscriber IDs
+    const selectedIdsRaw = formData.get("selectedIds") as string | null;
+    let selectedPhones: string[] | undefined;
+    if (selectedIdsRaw) {
+      const selectedIds: string[] = JSON.parse(selectedIdsRaw);
+      if (selectedIds.length > 0) {
+        const admin = createAdminClient();
+        const { data: rows } = await (admin.from("whatsapp_subscribers") as ReturnType<typeof admin.from>)
+          .select("phone")
+          .eq("restaurant_id", session.restaurant.id)
+          .eq("is_active", true)
+          .in("id", selectedIds) as { data: { phone: string }[] | null };
+        selectedPhones = rows?.map((r) => r.phone) ?? [];
+      }
+    }
 
-      const { error: uploadError } = await admin.storage
-        .from("restaurant-images")
-        .upload(path, imageFile, { cacheControl: "86400", upsert: false });
-
-      if (uploadError) return { success: false, sent: 0, error: `Upload échoué: ${uploadError.message}` };
-
-      const { data: urlData } = admin.storage.from("restaurant-images").getPublicUrl(path);
-      imageUrl = urlData.publicUrl;
+    // Block if the planned send would exceed the remaining quota
+    const plannedCount = selectedPhones ? selectedPhones.length : (tier ?? 50);
+    if (plannedCount > remaining) {
+      return {
+        success: false,
+        sent: 0,
+        error: `Quota insuffisant : il vous reste ${remaining} message${remaining > 1 ? "s" : ""} ce mois (vous tentez d'en envoyer ${plannedCount}).`,
+        quotaUsed: used,
+        quotaMax: quota,
+      };
     }
 
     const { sent, wamids } = await sendWhatsAppBroadcast({
       restaurantId: session.restaurant.id,
       restaurantName: session.restaurant.name_fr,
       message,
-      imageUrl,
+      selectedPhones,
+      tierLimit: tier ?? 50,
     });
 
     // Save broadcast + wamid tracking (non-blocking)
@@ -80,7 +99,7 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
         .insert({
           restaurant_id: session.restaurant.id,
           message,
-          image_url: imageUrl,
+          image_url: null,
           sent_count: sent,
         })
         .select("id")
@@ -94,7 +113,7 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
       // Tables not created yet — broadcast still succeeded
     }
 
-    return { success: true, sent, error: null, quotaUsed: used + 1, quotaMax: MONTHLY_BROADCAST_QUOTA };
+    return { success: true, sent, error: null, quotaUsed: used + 1, quotaMax: quota };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Erreur inattendue";
     return { success: false, sent: 0, error: msg };

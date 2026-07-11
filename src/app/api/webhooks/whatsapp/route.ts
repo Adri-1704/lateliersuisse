@@ -228,7 +228,6 @@ async function handleTwilioWebhook(request: NextRequest) {
       restaurantId: restaurant.id,
       restaurantName: restaurant.name_fr,
       message: body,
-      imageUrl,
     });
 
     const subscriberLine = sent > 0
