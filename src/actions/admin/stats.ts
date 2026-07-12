@@ -155,7 +155,9 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
       .from("subscriptions")
       .select("*")
       .in("status", ["active", "canceled", "past_due"]);
-    const allTrialsEnded = (rawTrialsEnded || []) as Subscription[];
+    const allTrialsEnded = ((rawTrialsEnded || []) as Subscription[]).filter(
+      (s) => s.stripe_subscription_id !== null || s.stripe_checkout_session_id !== null
+    );
 
     // We consider that a subscription that was once trialing and is now active = converted
     // Approximation: subscriptions that are active AND were created more than 14 days ago
@@ -163,6 +165,7 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
       .from("subscriptions")
       .select("id", { count: "exact", head: true })
       .eq("status", "active")
+      .not("stripe_subscription_id", "is", null)
       .lt("created_at", new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString());
 
     // ── Subscribers by canton (via restaurant) ────────────────
@@ -174,7 +177,11 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
     const cantonData = (rawCantonData || []) as DbRestaurant[];
 
     // ── Compute metrics ───────────────────────────────────────
-    const subs = (allSubscriptions.data || []) as Subscription[];
+    const allSubs = (allSubscriptions.data || []) as Subscription[];
+    // Exclude comp/owner accounts (no Stripe payment of any kind)
+    const subs = allSubs.filter(
+      (s) => s.stripe_subscription_id !== null || s.stripe_checkout_session_id !== null
+    );
 
     // MRR
     let mrr = 0;
