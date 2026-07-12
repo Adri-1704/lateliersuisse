@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function loginAdmin(email: string, password: string) {
@@ -15,12 +16,23 @@ export async function loginAdmin(email: string, password: string) {
     return { success: false, error: "Email ou mot de passe incorrect" };
   }
 
+  // Pose un cookie lisible côté JS pour que PageViewTracker ignore les visites admin
+  const cookieStore = await cookies();
+  cookieStore.set("jt_admin", "1", {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+    httpOnly: false,
+  });
+
   return { success: true, error: null };
 }
 
 export async function logoutAdmin() {
   const supabase = await createClient();
   await supabase.auth.signOut();
+  const cookieStore = await cookies();
+  cookieStore.delete("jt_admin");
   redirect("/admin/login");
 }
 
