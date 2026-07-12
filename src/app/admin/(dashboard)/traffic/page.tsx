@@ -38,7 +38,8 @@ async function getTrafficStats() {
     .from("page_views")
     .select("session_id")
     .gte("viewed_at", monthAgo.toISOString())
-    .not("session_id", "is", null);
+    .not("session_id", "is", null)
+    .limit(10000);
   const uniqueVisitorsMonth = new Set(
     (uniqueSessions as { session_id: string }[] | null)?.map((r) => r.session_id) || []
   ).size;
@@ -47,7 +48,8 @@ async function getTrafficStats() {
     .from("page_views")
     .select("viewed_at")
     .gte("viewed_at", monthAgo.toISOString())
-    .order("viewed_at", { ascending: true });
+    .order("viewed_at", { ascending: true })
+    .limit(10000);
 
   const dailyCounts: Record<string, number> = {};
   for (let i = 0; i < 30; i++) {
@@ -67,7 +69,7 @@ async function getTrafficStats() {
     .from("page_views")
     .select("path")
     .gte("viewed_at", monthAgo.toISOString())
-    .limit(5000);
+    .limit(10000);
   const pathCounts: Record<string, number> = {};
   for (const row of (topPagesRaw as { path: string }[] | null) || []) {
     pathCounts[row.path] = (pathCounts[row.path] || 0) + 1;
@@ -80,7 +82,8 @@ async function getTrafficStats() {
   const { data: typesRaw } = await supabase
     .from("page_views")
     .select("page_type")
-    .gte("viewed_at", monthAgo.toISOString());
+    .gte("viewed_at", monthAgo.toISOString())
+    .limit(10000);
   const typeCounts: Record<string, number> = {};
   for (const row of (typesRaw as { page_type: string | null }[] | null) || []) {
     const t = row.page_type || "other";
@@ -94,7 +97,8 @@ async function getTrafficStats() {
     .from("page_views")
     .select("locale")
     .gte("viewed_at", monthAgo.toISOString())
-    .not("locale", "is", null);
+    .not("locale", "is", null)
+    .limit(10000);
   const localeCounts: Record<string, number> = {};
   for (const row of (localesRaw as { locale: string }[] | null) || []) {
     localeCounts[row.locale] = (localeCounts[row.locale] || 0) + 1;
@@ -107,7 +111,8 @@ async function getTrafficStats() {
     .from("page_views")
     .select("country")
     .gte("viewed_at", monthAgo.toISOString())
-    .not("country", "is", null);
+    .not("country", "is", null)
+    .limit(10000);
   const countryCounts: Record<string, number> = {};
   for (const row of (countriesRaw as { country: string }[] | null) || []) {
     countryCounts[row.country] = (countryCounts[row.country] || 0) + 1;
@@ -121,7 +126,8 @@ async function getTrafficStats() {
     .from("page_views")
     .select("restaurant_id")
     .gte("viewed_at", monthAgo.toISOString())
-    .not("restaurant_id", "is", null);
+    .not("restaurant_id", "is", null)
+    .limit(10000);
   const restaurantCounts: Record<string, number> = {};
   for (const row of (restaurantsRaw as { restaurant_id: string }[] | null) || []) {
     restaurantCounts[row.restaurant_id] = (restaurantCounts[row.restaurant_id] || 0) + 1;

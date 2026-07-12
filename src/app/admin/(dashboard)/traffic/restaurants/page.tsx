@@ -202,7 +202,8 @@ async function loadRestaurantTraffic(
     const { data: viewsRaw } = await supabase
       .from("page_views")
       .select("restaurant_id, viewed_at")
-      .in("restaurant_id", ids) as { data: { restaurant_id: string; viewed_at: string }[] | null };
+      .in("restaurant_id", ids)
+      .limit(10000) as { data: { restaurant_id: string; viewed_at: string }[] | null };
 
     const viewMap = new Map<string, { period: number; all: number }>();
     for (const id of ids) viewMap.set(id, { period: 0, all: 0 });
