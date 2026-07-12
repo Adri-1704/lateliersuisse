@@ -5,6 +5,7 @@ import crypto from "crypto";
 // Filtrer les bots connus (Googlebot, Bing, etc.) pour ne tracker que les vrais humains
 const BOT_PATTERNS = [
   /googlebot/i, /google-inspectiontool/i, /google-extended/i,
+  /Nexus 5X Build\/MMB29P/,  // Googlebot rendering UA
   /bingbot/i, /msnbot/i,
   /yandexbot/i, /baiduspider/i, /duckduckbot/i,
   /slurp/i, /facebookexternalhit/i, /twitterbot/i, /linkedinbot/i,
@@ -16,8 +17,20 @@ const BOT_PATTERNS = [
   /crawl/i, /spider/i, /bot\b/i,
 ];
 
+// Chrome max plausible : ~142 en juillet 2026, on bloque à partir de 143
+// pour éliminer les scrapers qui utilisent de faux user-agents futurs
+function isFutureBrowserVersion(userAgent: string): boolean {
+  const match = userAgent.match(/Chrome\/(\d+)/);
+  if (match) {
+    const version = parseInt(match[1], 10);
+    if (version >= 143) return true;
+  }
+  return false;
+}
+
 function isBot(userAgent: string | null): boolean {
   if (!userAgent) return true; // pas de UA = probablement un bot ou un script
+  if (isFutureBrowserVersion(userAgent)) return true;
   return BOT_PATTERNS.some((pattern) => pattern.test(userAgent));
 }
 
