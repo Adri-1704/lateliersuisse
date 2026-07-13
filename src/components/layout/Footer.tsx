@@ -103,6 +103,11 @@ export function Footer({ locale }: { locale: string }) {
                   Partenaires
                 </Link>
               </li>
+              <li>
+                <Link href={`/${locale}/application`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                  L&apos;application
+                </Link>
+              </li>
             </ul>
           </div>
 
