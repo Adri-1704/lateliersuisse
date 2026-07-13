@@ -53,13 +53,9 @@ export function HappyHourShareButton({
 
   const waLink = `https://wa.me/?text=${encodeURIComponent(message)}`;
 
-  async function handleWhatsAppClick() {
-    try {
-      await trackHappyHourClick(happyHourId);
-    } catch {
-      // no-op
-    }
+  function handleWhatsAppClick() {
     window.open(waLink, "_blank", "noopener,noreferrer");
+    trackHappyHourClick(happyHourId).catch(() => {});
   }
 
   async function handleCopy() {
