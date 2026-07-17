@@ -37,26 +37,17 @@ function buildCantonNormalizer(): (raw: string) => string {
   };
 }
 
-async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, number>; cuisineCounts: Record<string, number>; totalReviews: number }> {
+async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, number>; cuisineCounts: Record<string, number>; totalReviews: number; totalRestaurantsOverride: number }> {
   try {
     const supabase = createAdminClient();
-    const romandCantons = ["geneve", "vaud", "fribourg", "neuchatel", "valais", "jura", "berne"];
 
-    // Count per canton via individual queries (bypasses 1000 row limit)
-    const cantonCounts: Record<string, number> = {};
-    const [, { count: reviewsCount }] = await Promise.all([
-      Promise.all(
-        romandCantons.map(async (canton) => {
-          const { count } = await supabase
-            .from("restaurants")
-            .select("id", { count: "exact", head: true })
-            .eq("is_published", true)
-            .eq("canton", canton);
-          cantonCounts[canton] = count || 0;
-        })
-      ),
+    // Total count without canton filter (canton field is sparsely populated)
+    const [{ count: totalCount }, { count: reviewsCount }] = await Promise.all([
+      supabase.from("restaurants").select("id", { count: "exact", head: true }).eq("is_published", true),
       supabase.from("reviews").select("id", { count: "exact", head: true }),
     ]);
+
+    const cantonCounts: Record<string, number> = {};
 
     // Cuisine counts (use pagination to get all)
     const cuisineCounts: Record<string, number> = {};
@@ -78,16 +69,16 @@ async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, num
       offset += pageSize;
     }
 
-    return { cantonCounts, cuisineCounts, totalReviews: reviewsCount ?? 0 };
+    return { cantonCounts, cuisineCounts, totalReviews: reviewsCount ?? 0, totalRestaurantsOverride: totalCount ?? 0 };
   } catch {
-    return { cantonCounts: {}, cuisineCounts: {}, totalReviews: 0 };
+    return { cantonCounts: {}, cuisineCounts: {}, totalReviews: 0, totalRestaurantsOverride: 0 };
   }
 }
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const { cantonCounts, cuisineCounts, totalReviews } = await getRestaurantCounts();
-  const totalRestaurants = Object.values(cantonCounts).reduce((sum, n) => sum + n, 0);
+  const { cantonCounts, cuisineCounts, totalReviews, totalRestaurantsOverride } = await getRestaurantCounts();
+  const totalRestaurants = totalRestaurantsOverride;
 
   return (
     <>
