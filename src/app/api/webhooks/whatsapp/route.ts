@@ -2,6 +2,12 @@ import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendWhatsAppBroadcast } from "@/lib/whatsapp/broadcast";
+import {
+  getMonthlyBroadcastUsage,
+  getWhatsAppPlanTier,
+  recordBroadcast,
+} from "@/actions/merchant/whatsapp-broadcast";
+import { monthlyQuotaForTier } from "@/lib/whatsapp/quota";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -173,11 +179,11 @@ async function handleTwilioWebhook(request: NextRequest) {
 
     const { data: restaurant } = await supabase
       .from("restaurants")
-      .select("id, name_fr")
+      .select("id, name_fr, merchant_id")
       .or(`whatsapp_phone.eq.${normalizedPhone},phone.eq.${normalizedPhone},phone.eq.${from}`)
       .eq("is_published", true)
       .limit(1)
-      .single() as { data: { id: string; name_fr: string } | null };
+      .single() as { data: { id: string; name_fr: string; merchant_id: string | null } | null };
 
     if (!restaurant) {
       return twimlResponse(
@@ -224,11 +230,29 @@ async function handleTwilioWebhook(request: NextRequest) {
         posted_by_phone: normalizedPhone,
       } as Record<string, unknown>);
 
-    const { sent } = await sendWhatsAppBroadcast({
+    // Ce webhook envoyait auparavant en appelant directement sendWhatsAppBroadcast(),
+    // sans jamais vérifier ni enregistrer le quota mensuel — contrairement au flow
+    // dashboard (broadcastWhatsApp). Un restaurateur pouvait donc envoyer des
+    // messages WhatsApp réels (facturés par Meta) sans aucune limite, invisibles
+    // dans le suivi d'usage. On applique désormais le même contrôle ici.
+    const tier = restaurant.merchant_id ? await getWhatsAppPlanTier(restaurant.merchant_id) : null;
+    const quota = monthlyQuotaForTier(tier);
+    const used = await getMonthlyBroadcastUsage(restaurant.id);
+
+    if (used >= quota) {
+      return twimlResponse(
+        `⚠️ Quota WhatsApp mensuel atteint (${quota} messages/mois) pour ${restaurant.name_fr}. Le plat du jour a bien été mis à jour sur just-tag.app, mais aucun message n'a été envoyé aux abonnés. Renouvellement le 1er du mois prochain.`
+      );
+    }
+
+    const { sent, wamids } = await sendWhatsAppBroadcast({
       restaurantId: restaurant.id,
       restaurantName: restaurant.name_fr,
       message: body,
+      tierLimit: tier ?? 50,
     });
+
+    await recordBroadcast(restaurant.id, body, sent, wamids);
 
     const subscriberLine = sent > 0
       ? `\n\n📲 Envoyé à ${sent} abonné${sent > 1 ? "s" : ""} WhatsApp.`
