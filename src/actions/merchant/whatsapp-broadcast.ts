@@ -3,24 +3,65 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { sendWhatsAppBroadcast } from "@/lib/whatsapp/broadcast";
+import { monthlyQuotaForTier } from "@/lib/whatsapp/quota";
 
-function monthlyQuotaForTier(tier: number | null): number {
-  return (tier ?? 50) * 4; // 50→200, 100→400, 200→800 individual messages/month
-}
-
+/**
+ * Usage réel du mois en cours. Fail-CLOSED : si la requête échoue, on
+ * retourne Infinity (bloque tout envoi) plutôt que 0 (qui désactivait
+ * silencieusement toute limite de quota en cas d'incident DB).
+ */
 export async function getMonthlyBroadcastUsage(restaurantId: string): Promise<number> {
   try {
     const admin = createAdminClient();
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
-    const { data } = await (admin.from("whatsapp_broadcasts") as ReturnType<typeof admin.from>)
+    const { data, error } = await (admin.from("whatsapp_broadcasts") as ReturnType<typeof admin.from>)
       .select("sent_count")
       .eq("restaurant_id", restaurantId)
-      .gte("created_at", startOfMonth.toISOString()) as { data: { sent_count: number }[] | null };
+      .gte("created_at", startOfMonth.toISOString()) as { data: { sent_count: number }[] | null; error: unknown };
+    if (error) {
+      console.error("[getMonthlyBroadcastUsage] Erreur, quota bloqué par prudence:", error);
+      return Infinity;
+    }
     return data?.reduce((sum, row) => sum + (row.sent_count || 0), 0) ?? 0;
-  } catch {
-    return 0;
+  } catch (err) {
+    console.error("[getMonthlyBroadcastUsage] Erreur inattendue, quota bloqué par prudence:", err);
+    return Infinity;
+  }
+}
+
+/**
+ * Enregistre un envoi WhatsApp dans l'historique (whatsapp_broadcasts +
+ * whatsapp_message_tracking), pour que getMonthlyBroadcastUsage() le
+ * comptabilise. Utilisé par tous les chemins d'envoi (dashboard, webhook
+ * Twilio "plat du jour") — un envoi qui ne passe pas par ici est invisible
+ * au quota, c'est exactement le bug qu'on corrige.
+ */
+export async function recordBroadcast(
+  restaurantId: string,
+  message: string,
+  sentCount: number,
+  wamids: string[]
+): Promise<void> {
+  try {
+    const admin = createAdminClient();
+    const { data: inserted } = await (admin.from("whatsapp_broadcasts") as ReturnType<typeof admin.from>)
+      .insert({
+        restaurant_id: restaurantId,
+        message,
+        image_url: null,
+        sent_count: sentCount,
+      })
+      .select("id")
+      .single() as { data: { id: string } | null };
+
+    if (inserted?.id && wamids.length > 0) {
+      await (admin.from("whatsapp_message_tracking") as ReturnType<typeof admin.from>)
+        .insert(wamids.map((wamid) => ({ wamid, broadcast_id: inserted.id })));
+    }
+  } catch (err) {
+    console.error("[recordBroadcast] Échec enregistrement (l'envoi a quand même eu lieu):", err);
   }
 }
 
@@ -116,28 +157,9 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
       tierLimit: tier ?? 50,
     });
 
-    // Save broadcast + wamid tracking (non-blocking)
-    try {
-      const adminForHistory = createAdminClient();
-      const { data: inserted } = await (adminForHistory.from("whatsapp_broadcasts") as ReturnType<typeof adminForHistory.from>)
-        .insert({
-          restaurant_id: session.restaurant.id,
-          message,
-          image_url: null,
-          sent_count: sent,
-        })
-        .select("id")
-        .single() as { data: { id: string } | null };
+    await recordBroadcast(session.restaurant.id, message, sent, wamids);
 
-      if (inserted?.id && wamids.length > 0) {
-        await (adminForHistory.from("whatsapp_message_tracking") as ReturnType<typeof adminForHistory.from>)
-          .insert(wamids.map((wamid) => ({ wamid, broadcast_id: inserted.id })));
-      }
-    } catch {
-      // Tables not created yet — broadcast still succeeded
-    }
-
-    return { success: true, sent, error: null, quotaUsed: used + 1, quotaMax: quota };
+    return { success: true, sent, error: null, quotaUsed: used + sent, quotaMax: quota };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Erreur inattendue";
     return { success: false, sent: 0, error: msg };
