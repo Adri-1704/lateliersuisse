@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { Users, TrendingUp, DollarSign, Link2 } from "lucide-react";
+import { Users, TrendingUp, Link2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -122,18 +122,16 @@ export default async function AffiliationsAdminPage() {
         <div>
           <h1 className="text-2xl font-black tracking-tight text-gray-900">Je suis client Aligro</h1>
           <p className="text-[13px] text-gray-400 mt-0.5">
-            Suivi des commissions affiliés via{" "}
-            <code className="rounded bg-gray-100 px-1 text-xs">?ref=xxx</code>
+            Suivi des restaurateurs venus via le code promo Aligro — remise accordée, aucune commission due
           </p>
         </div>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[
-          { title: "Abonnements via affiliés", value: totals.subscriptions, icon: <Users className="h-5 w-5 text-indigo-600" /> },
+          { title: "Clients Aligro abonnés", value: totals.subscriptions, icon: <Users className="h-5 w-5 text-indigo-600" /> },
           { title: "Revenu généré", value: `${totals.revenue.toFixed(2)} CHF`, icon: <TrendingUp className="h-5 w-5 text-indigo-600" /> },
-          { title: "Commissions dues (10%)", value: `${totals.commission.toFixed(2)} CHF`, icon: <DollarSign className="h-5 w-5 text-indigo-600" />, highlight: true },
         ].map((kpi) => (
           <div key={kpi.title} className="rounded-2xl border border-[#eaecf0] bg-white p-5">
             <div className="flex items-center gap-2 mb-2">
@@ -142,9 +140,7 @@ export default async function AffiliationsAdminPage() {
               </div>
               <p className="text-sm text-gray-500">{kpi.title}</p>
             </div>
-            <p className={`text-3xl font-bold ${kpi.highlight ? "text-indigo-600" : "text-gray-900"}`}>
-              {kpi.value}
-            </p>
+            <p className="text-3xl font-bold text-gray-900">{kpi.value}</p>
           </div>
         ))}
       </div>
@@ -152,18 +148,17 @@ export default async function AffiliationsAdminPage() {
       {noData ? (
         <div className="rounded-2xl border border-[#eaecf0] bg-white py-12 text-center">
           <Link2 className="mx-auto mb-4 h-10 w-10 text-gray-200" />
-          <h3 className="text-lg font-bold text-gray-900">Aucun abonnement via affilié pour l&apos;instant</h3>
+          <h3 className="text-lg font-bold text-gray-900">Aucun client Aligro pour l&apos;instant</h3>
           <p className="mt-2 text-sm text-gray-400">
-            Quand un restaurateur s&apos;abonnera via un lien{" "}
-            <code className="rounded bg-gray-100 px-1 text-xs">?ref=xxx</code>, il apparaîtra ici automatiquement.
+            Quand un restaurateur s&apos;abonnera avec le code promo Aligro, il apparaîtra ici automatiquement.
           </p>
           <div className="mx-auto mt-6 max-w-md rounded-xl border border-[#eaecf0] bg-[#f8fafc] p-4 text-left text-sm">
             <p className="font-semibold text-gray-700">Comment ça marche :</p>
             <ol className="mt-2 list-decimal space-y-1 pl-5 text-gray-500">
-              <li>Tu donnes un lien à un influenceur : <code className="rounded bg-gray-100 px-1 text-xs">just-tag.app/fr/pour-restaurateurs?ref=marie</code></li>
-              <li>Un restaurateur clique → cookie <code className="rounded bg-gray-100 px-1 text-xs">jt_ref=marie</code> stocké 30 jours</li>
+              <li>Aligro communique le code promo (ex. <code className="rounded bg-gray-100 px-1 text-xs">ALIGRO20</code>) directement à ses clients restaurateurs</li>
+              <li>Le restaurateur entre le code sur la page de paiement Just-Tag et obtient la remise</li>
               <li>Le restaurateur s&apos;inscrit et paie → le code est attaché à l&apos;abonnement</li>
-              <li>Tu vois ici quel affilié a amené quel client et combien tu lui dois</li>
+              <li>Tu vois ici quel client est venu via ce code — aucune commission n&apos;est due à Aligro</li>
             </ol>
           </div>
         </div>
@@ -186,13 +181,13 @@ export default async function AffiliationsAdminPage() {
                     </p>
                     <p className="text-xs text-gray-400">
                       {aff.parrainEmail ? `${aff.parrainEmail} · ` : ""}
-                      just-tag.app/fr/pour-restaurateurs?ref={aff.ref}
+                      code promo {aff.ref}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-indigo-600">{aff.commissionDue.toFixed(2)} CHF</p>
-                  <p className="text-xs text-gray-400">commission due</p>
+                  <p className="text-2xl font-bold text-indigo-600">{aff.activeSubscriptions}</p>
+                  <p className="text-xs text-gray-400">client{aff.activeSubscriptions > 1 ? "s" : ""} actif{aff.activeSubscriptions > 1 ? "s" : ""} · aucune commission</p>
                 </div>
               </div>
 
