@@ -120,7 +120,7 @@ export default async function AffiliationsAdminPage() {
           <Link2 className="h-5 w-5 text-indigo-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-gray-900">Je suis client Aligro</h1>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Clients Aligro</h1>
           <p className="text-[13px] text-gray-400 mt-0.5">
             Suivi des restaurateurs venus via le code promo Aligro — remise accordée, aucune commission due
           </p>
