@@ -113,8 +113,15 @@ export async function broadcastWhatsApp(formData: FormData): Promise<{
       }
     }
 
-    // Block if the planned send would exceed the remaining quota
-    const plannedCount = selectedPhones ? selectedPhones.length : (tier ?? 50);
+    // Block if the planned send would exceed the remaining quota.
+    // Sans filtre (envoi à "tous les abonnés"), le nombre réel d'abonnés
+    // actifs est souvent bien inférieur au palier d'abonnement (tier) — le
+    // prendre comme approximation pouvait bloquer à tort un envoi légitime
+    // quand le quota restant était inférieur au tier mais supérieur au vrai
+    // nombre d'abonnés.
+    const plannedCount = selectedPhones
+      ? selectedPhones.length
+      : Math.min(await getWhatsAppSubscriberCount(session.restaurant.id), tier ?? 50);
     if (plannedCount > remaining) {
       return {
         success: false,
