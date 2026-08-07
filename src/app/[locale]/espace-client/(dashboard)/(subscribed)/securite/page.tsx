@@ -5,6 +5,7 @@ import { Loader2, CheckCircle, ShieldCheck } from "lucide-react";
 import { changeMerchantPassword } from "@/actions/merchant/auth";
 
 export default function SecurityPage() {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,10 +19,11 @@ export default function SecurityPage() {
     if (newPassword !== confirmPassword) { setError("Les deux mots de passe ne correspondent pas."); return; }
     if (newPassword.length < 8) { setError("Le mot de passe doit contenir au moins 8 caractères."); return; }
     setLoading(true);
-    const result = await changeMerchantPassword(newPassword);
+    const result = await changeMerchantPassword(currentPassword, newPassword);
     setLoading(false);
     if (result.success) {
       setSuccess(true);
+      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } else {
@@ -66,6 +68,21 @@ export default function SecurityPage() {
           )}
 
           <div className="space-y-1.5">
+            <label htmlFor="currentPassword" className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
+              Mot de passe actuel
+            </label>
+            <input
+              id="currentPassword"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+              className={inputClass}
+            />
+          </div>
+
+          <div className="space-y-1.5">
             <label htmlFor="newPassword" className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
               Nouveau mot de passe
             </label>
@@ -107,7 +124,7 @@ export default function SecurityPage() {
 
           <button
             type="submit"
-            disabled={loading || !newPassword || !confirmPassword}
+            disabled={loading || !currentPassword || !newPassword || !confirmPassword}
             className="flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-opacity disabled:opacity-50 hover:opacity-90"
             style={{ background: "linear-gradient(135deg, #64748b, #94a3b8)" }}
           >

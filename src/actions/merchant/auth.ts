@@ -148,10 +148,13 @@ export async function getMerchantSession(): Promise<MerchantSession | null> {
   }
 }
 
-export async function resetMerchantPassword(email: string) {
+const SUPPORTED_LOCALES = ["fr", "de", "en", "pt", "es"];
+
+export async function resetMerchantPassword(email: string, locale: string = "fr") {
   try {
+    const safeLocale = SUPPORTED_LOCALES.includes(locale) ? locale : "fr";
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
-    const redirectTo = `${siteUrl}/fr/espace-client/reset-mot-de-passe`;
+    const redirectTo = `${siteUrl}/${safeLocale}/espace-client/reset-mot-de-passe`;
 
     // Always return success to the client to avoid email enumeration —
     // any actual error is logged server-side.
@@ -228,8 +231,13 @@ export async function resetMerchantPassword(email: string) {
 
 /**
  * Change the password for the currently logged-in merchant.
+ *
+ * Exige le mot de passe actuel : avant ce fix, une session active suffisait
+ * à en définir un nouveau, sans jamais revérifier l'ancien — une session
+ * volée (cookie XSS, poste partagé non déconnecté) pouvait donc éjecter le
+ * vrai propriétaire du compte sans même connaître son mot de passe.
  */
-export async function changeMerchantPassword(newPassword: string) {
+export async function changeMerchantPassword(currentPassword: string, newPassword: string) {
   try {
     if (!newPassword || newPassword.length < 8) {
       return { success: false, error: "Le mot de passe doit contenir au moins 8 caractères." };
@@ -240,8 +248,16 @@ export async function changeMerchantPassword(newPassword: string) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
+    if (!user || !user.email) {
       return { success: false, error: "Vous devez être connecté pour changer votre mot de passe." };
+    }
+
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    if (verifyError) {
+      return { success: false, error: "Mot de passe actuel incorrect." };
     }
 
     const { error } = await supabase.auth.updateUser({ password: newPassword });

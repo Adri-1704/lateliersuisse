@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
 
-    const result = await resetMerchantPassword(email);
+    const result = await resetMerchantPassword(email, locale);
 
     if (result.success) {
       setSent(true);
