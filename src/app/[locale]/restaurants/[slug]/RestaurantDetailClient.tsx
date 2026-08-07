@@ -1105,10 +1105,16 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
         {/* Plat du jour + WhatsApp subscribe */}
         <div className="mb-8 grid gap-6 sm:grid-cols-2">
           <PlatDuJour restaurantId={restaurant.id} />
-          <WhatsAppSubscribe
-            restaurantId={restaurant.id}
-            restaurantName={restaurant.nameFr}
-          />
+          {/* id="whatsapp" : cible de l'ancre #whatsapp utilisée par le QR code
+              "Mon restaurant" (redirection /wa/[slug] -> /restaurants/[slug]#whatsapp).
+              scroll-mt-24 évite que la section n'atterrisse masquée sous un
+              éventuel élément sticky (cf. sidebar sticky top-24 plus haut). */}
+          <div id="whatsapp" className="scroll-mt-24">
+            <WhatsAppSubscribe
+              restaurantId={restaurant.id}
+              restaurantName={restaurant.nameFr}
+            />
+          </div>
         </div>
 
         <SimilarRestaurants restaurant={restaurant} />
