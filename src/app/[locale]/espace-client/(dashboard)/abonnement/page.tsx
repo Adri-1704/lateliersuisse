@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Loader2, CreditCard, Calendar, ExternalLink, Check, Zap, Users, MessageSquare } from "lucide-react";
+import { Loader2, CreditCard, Calendar, ExternalLink, Check, Zap, Users, MessageSquare, Gift } from "lucide-react";
 import { getMerchantSubscription, createBillingPortalSession, createPlanChangeSession } from "@/actions/merchant/subscription";
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
@@ -108,6 +108,28 @@ export default function SubscriptionPage() {
 
       {subscription ? (
         <>
+          {/* Partner discount banner — visible when a promo code / referral was used at checkout */}
+          {subscription.affiliate_ref && (
+            <div className="flex items-center gap-3 rounded-2xl px-5 py-4" style={{ border: "1.5px solid #c7d2fe", background: "#eef2ff" }}>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white">
+                <Gift className="h-[18px] w-[18px]" style={{ color: "#4f46e5" }} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">
+                  {subscription.affiliate_ref.toLowerCase().includes("aligro")
+                    ? "Remise partenaire Aligro"
+                    : "Code promo appliqué"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {subscription.affiliate_ref.toLowerCase().includes("aligro")
+                    ? "Votre abonnement bénéficie d'une remise grâce à votre partenariat avec Aligro."
+                    : "Votre abonnement bénéficie d'une remise partenaire."}
+                  {" "}Code : <span className="font-mono font-semibold text-gray-700">{subscription.affiliate_ref}</span>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Current plan info */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl bg-white p-5" style={{ border: "1.5px solid #eaecf0" }}>

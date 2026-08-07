@@ -42,6 +42,7 @@ export interface Subscription {
   is_early_bird: boolean;
   stripe_price_id: string | null;
   whatsapp_tier?: 50 | 100 | 200 | null;
+  affiliate_ref?: string | null;
   created_at: string;
   updated_at: string;
 }
