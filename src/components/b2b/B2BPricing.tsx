@@ -33,8 +33,8 @@ const FEATURES = [
   "Adresse, contact & plan",
   "Horaires d'ouverture",
   "Offres du moment",
-  "4 envois WhatsApp/mois inclus",
   "Opt-in géré pour vous",
+  "Inspiration IA",
 ];
 
 export function B2BPricing() {
@@ -172,7 +172,7 @@ export function B2BPricing() {
                     <div>
                       <p className="text-xs font-semibold text-green-800">WhatsApp inclus</p>
                       <p className="text-xs text-green-700">
-                        {count * 4} messages/mois · jusqu&apos;à {count} abonnés
+                        {count * 4} messages/mois inclus
                       </p>
                     </div>
                   </div>

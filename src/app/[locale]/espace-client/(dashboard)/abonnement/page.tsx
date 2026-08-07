@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Loader2, CreditCard, Calendar, ExternalLink, Check, Zap, Users } from "lucide-react";
+import { Loader2, CreditCard, Calendar, ExternalLink, Check, Zap, Users, MessageSquare, Gift } from "lucide-react";
 import { getMerchantSubscription, createBillingPortalSession, createPlanChangeSession } from "@/actions/merchant/subscription";
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
@@ -35,9 +35,9 @@ const PRICES: Record<Period, Record<Tier, [number, number]>> = {
 };
 
 const TIERS: { value: Tier; label: string; desc: string; popular: boolean }[] = [
-  { value: 50,  label: "50 abonnés",  desc: "Idéal pour démarrer",    popular: false },
-  { value: 100, label: "100 abonnés", desc: "Le plus populaire",      popular: true  },
-  { value: 200, label: "200 abonnés", desc: "Pour les grands volumes", popular: false },
+  { value: 50,  label: "200 messages/mois",  desc: "Idéal pour démarrer",    popular: false },
+  { value: 100, label: "400 messages/mois", desc: "Le plus populaire",      popular: true  },
+  { value: 200, label: "800 messages/mois", desc: "Pour les grands volumes", popular: false },
 ];
 
 export default function SubscriptionPage() {
@@ -108,6 +108,28 @@ export default function SubscriptionPage() {
 
       {subscription ? (
         <>
+          {/* Partner discount banner — visible when a promo code / referral was used at checkout */}
+          {subscription.affiliate_ref && (
+            <div className="flex items-center gap-3 rounded-2xl px-5 py-4" style={{ border: "1.5px solid #c7d2fe", background: "#eef2ff" }}>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white">
+                <Gift className="h-[18px] w-[18px]" style={{ color: "#4f46e5" }} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">
+                  {subscription.affiliate_ref.toLowerCase().includes("aligro")
+                    ? "Remise partenaire Aligro"
+                    : "Code promo appliqué"}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {subscription.affiliate_ref.toLowerCase().includes("aligro")
+                    ? "Votre abonnement bénéficie d'une remise grâce à votre partenariat avec Aligro."
+                    : "Votre abonnement bénéficie d'une remise partenaire."}
+                  {" "}Code : <span className="font-mono font-semibold text-gray-700">{subscription.affiliate_ref}</span>
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Current plan info */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl bg-white p-5" style={{ border: "1.5px solid #eaecf0" }}>
@@ -121,9 +143,9 @@ export default function SubscriptionPage() {
                   <span className="text-sm font-bold text-gray-900">{planLabels[subscription.plan_type] || subscription.plan_type}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">Abonnés WhatsApp</span>
+                  <span className="text-sm text-gray-500">Messages WhatsApp</span>
                   <span className="flex items-center gap-1 text-sm font-semibold text-gray-900">
-                    <Users className="h-3.5 w-3.5" /> {currentTier}
+                    <MessageSquare className="h-3.5 w-3.5" /> {currentTier * 4}/mois
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -180,7 +202,7 @@ export default function SubscriptionPage() {
                 <Zap className="h-4 w-4" style={{ color: "#e85d26" }} />
                 <h2 className="font-bold text-gray-900">Changer de formule</h2>
               </div>
-              <p className="text-[13px] text-gray-400 ml-6">Choisissez votre durée et votre nombre d&apos;abonnés WhatsApp.</p>
+              <p className="text-[13px] text-gray-400 ml-6">Choisissez votre durée et votre quota de messages WhatsApp.</p>
             </div>
             <div className="p-6 space-y-6">
 

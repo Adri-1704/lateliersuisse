@@ -142,26 +142,25 @@ export function B2BSimulator() {
             </div>
 
             <div>
-              <ControlLabel label="Abonnés WhatsApp" />
+              <ControlLabel label="Quota de messages" />
               <PillGroup<Tier>
                 options={[
-                  { label: "50 abonnés", value: 50 },
-                  { label: "100 abonnés", value: 100 },
-                  { label: "200 abonnés", value: 200 },
+                  { label: "200 msg/mois", value: 50 },
+                  { label: "400 msg/mois", value: 100 },
+                  { label: "800 msg/mois", value: 200 },
                 ]}
                 value={tier}
                 onChange={setTier}
               />
               <p className="mt-2 text-xs font-semibold text-green-700">
-                {r.totalMsgs} messages/mois{" "}
-                <span className="font-normal text-gray-400">· 4 envois × {tier} abonnés</span>
+                {r.totalMsgs} messages/mois disponibles
               </p>
             </div>
 
             <div>
               <ControlLabel
                 label="Taux de conversion"
-                hint="% d'abonnés qui réservent suite à un message"
+                hint="% de destinataires qui réservent suite à un message"
               />
               <div className="flex items-center gap-4">
                 <input
@@ -224,8 +223,7 @@ export function B2BSimulator() {
               </div>
               <p className="text-sm text-green-800">
                 <span className="text-base font-extrabold text-green-700">{r.totalMsgs}</span>{" "}
-                messages WhatsApp envoyés ce mois ·{" "}
-                <span className="text-xs text-green-600">4 envois × {tier} abonnés</span>
+                messages WhatsApp envoyés ce mois
               </p>
             </div>
 
@@ -239,7 +237,7 @@ export function B2BSimulator() {
               <div className="px-5 py-4">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Réservations / mois</p>
                 <p className="mt-1 text-xl font-bold text-gray-900 tabular-nums">{fmtInt(r.monthlyVisits)}</p>
-                <p className="text-xs text-gray-400">{convRate} % de {tier} abonnés</p>
+                <p className="text-xs text-gray-400">{convRate} % des destinataires</p>
               </div>
               <div className="px-5 py-4">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Revenus / mois</p>
