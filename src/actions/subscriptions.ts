@@ -134,6 +134,11 @@ export async function createCheckoutSession(
       customer_email: merchant.email,
       line_items: [{ price: priceId, quantity: 1 }],
       metadata,
+      // Champ "code promo" natif sur la page Stripe — permet d'offrir une
+      // remise (ex. partenariat Aligro) sans avoir besoin de coder quoi que
+      // ce soit côté app : le code + le % se créent dans le Dashboard Stripe
+      // (Produits > Codes promotionnels) le jour où le montant est décidé.
+      allow_promotion_codes: true,
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/espace-client?checkout=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription?step=plan&canceled=1`,
       locale: stripeLocale,
@@ -229,6 +234,7 @@ export async function createLegacyCheckoutSession(
       payment_method_types: ["card"],
       customer_email: merchantEmail,
       line_items: [{ price: priceId, quantity: 1 }],
+      allow_promotion_codes: true,
       subscription_data: {
         trial_period_days: TRIAL_DAYS,
       },
@@ -394,7 +400,26 @@ export async function handleSubscriptionWebhook(
           .eq("stripe_checkout_session_id", checkoutSessionId)
           .maybeSingle();
 
-        const affiliateRef = metadata.affiliate_ref || null;
+        // Un partenaire comme Aligro communique un code promo directement à
+        // ses clients (pas de lien cliqué, donc pas de cookie jt_ref) : on
+        // récupère le code réellement rédimé sur la session Stripe et on le
+        // range dans affiliate_ref, pour qu'il apparaisse dans le même
+        // dashboard /admin/affiliations que les parrainages classiques.
+        let redeemedPromoCode: string | null = null;
+        try {
+          const stripe = getStripe();
+          const fullSession = await stripe.checkout.sessions.retrieve(data.id, {
+            expand: ["discounts.promotion_code"],
+          });
+          const promo = fullSession.discounts?.[0]?.promotion_code;
+          if (promo && typeof promo === "object") {
+            redeemedPromoCode = promo.code || null;
+          }
+        } catch (err) {
+          console.error("[Webhook] Impossible de récupérer le code promo Stripe:", err);
+        }
+
+        const affiliateRef = metadata.affiliate_ref || redeemedPromoCode || null;
 
         if (existingSub) {
           console.log(`[Webhook] Subscription for checkout ${checkoutSessionId} already exists — skipping (idempotent).`);

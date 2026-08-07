@@ -1,6 +1,15 @@
 import { getWhatsAppCosts } from "@/actions/admin/whatsapp-costs";
 import { MessageCircle, DollarSign, Send, Calendar, Info } from "lucide-react";
 
+// Sans ça, Next.js tente de pré-générer cette page au moment du build (SSG),
+// ce qui exécute getWhatsAppCosts() -> createAdminClient() pendant le build
+// lui-même. Si les variables Supabase ne sont pas disponibles à ce moment
+// précis (ex. build Preview, cf. audit du 2026-08-07), tout le build plante.
+// Cette page dépend de données qui changent en continu (coûts WhatsApp) —
+// elle n'a de toute façon aucun intérêt à être statique.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function fmtUsd(n: number) {
   return new Intl.NumberFormat("fr-CH", {
     style: "currency",

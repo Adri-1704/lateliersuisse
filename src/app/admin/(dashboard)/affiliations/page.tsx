@@ -120,7 +120,7 @@ export default async function AffiliationsAdminPage() {
           <Link2 className="h-5 w-5 text-indigo-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-gray-900">Affiliations</h1>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Je suis client Aligro</h1>
           <p className="text-[13px] text-gray-400 mt-0.5">
             Suivi des commissions affiliés via{" "}
             <code className="rounded bg-gray-100 px-1 text-xs">?ref=xxx</code>
