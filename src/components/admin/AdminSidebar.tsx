@@ -26,7 +26,7 @@ const navItems = [
   { title: "Trafic", href: "/admin/traffic", icon: TrendingUp },
   { title: "Coûts WhatsApp", href: "/admin/whatsapp-costs", icon: MessageCircle },
   { title: "Blog", href: "/admin/blog", icon: FileText },
-  { title: "Je suis client Aligro", href: "/admin/affiliations", icon: Link2 },
+  { title: "Clients Aligro", href: "/admin/affiliations", icon: Link2 },
   { title: "Restaurants", href: "/admin/restaurants", icon: UtensilsCrossed },
   { title: "Commerçants", href: "/admin/merchants", icon: Store },
   { title: "Avis", href: "/admin/reviews", icon: MessageSquare },
