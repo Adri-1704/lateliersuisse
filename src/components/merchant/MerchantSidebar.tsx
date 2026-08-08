@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Video,
 } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 const navItems = [
   {
@@ -86,9 +87,7 @@ export function MerchantSidebar({
 
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: "1px solid #1e2028" }}>
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ background: "linear-gradient(135deg, #e85d26, #ff8c5a)" }}>
-          <UtensilsCrossed className="h-4 w-4 text-white" />
-        </div>
+        <Logo size={36} className="rounded-xl" />
         <div>
           <p className="text-[15px] font-bold tracking-tight text-white">
             Just<span style={{ color: "#e85d26" }}>-Tag</span>

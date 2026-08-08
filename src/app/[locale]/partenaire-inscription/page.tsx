@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { SwissCross } from "@/components/ui/swiss-cross";
+import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -241,7 +241,7 @@ export default function MerchantSignupPage() {
       {/* Header */}
       <div className="text-center">
         <Link href={`/${locale}`} className="inline-flex items-center gap-2">
-          <SwissCross size={36} />
+          <Logo size={36} />
           <span className="text-xl font-bold">
             Just<span className="text-[var(--color-just-tag)]">-Tag</span>
           </span>
