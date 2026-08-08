@@ -12,9 +12,9 @@ export default function VideosPage() {
           <Video className="h-5 w-5 text-white" />
         </div>
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-gray-900">Vidéos de présentation</h1>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Prise en main</h1>
           <p className="text-[13px] text-gray-400">
-            Découvrez comment tirer le meilleur de Just-Tag pour votre restaurant.
+            Vidéos de présentation Just-Tag — découvrez comment tirer le meilleur de la plateforme pour votre restaurant.
           </p>
         </div>
       </div>

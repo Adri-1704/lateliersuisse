@@ -26,7 +26,7 @@ const navItems = [
     group: "Principal",
     items: [
       { key: "dashboard",    label: "Tableau de bord", href: "",               icon: LayoutDashboard, color: "#e85d26", bg: "#fff3ee" },
-      { key: "videos",       label: "Vidéos",           href: "/videos",         icon: Video,           color: "#e85d26", bg: "#fff3ee" },
+      { key: "videos",       label: "Prise en main",    href: "/videos",         icon: Video,           color: "#e85d26", bg: "#fff3ee" },
       { key: "restaurant",   label: "Mon restaurant",  href: "/mon-restaurant", icon: UtensilsCrossed, color: "#e85d26", bg: "#fff3ee" },
       { key: "photos",       label: "Photos",           href: "/photos",         icon: ImageIcon,       color: "#ec4899", bg: "#fdf2f8" },
       { key: "menu",         label: "Carte",            href: "/carte",          icon: BookOpen,        color: "#8b5cf6", bg: "#f5f3ff" },
