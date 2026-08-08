@@ -19,6 +19,7 @@ import {
   Link2,
   MessageCircle,
 } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
 
 const navItems = [
   { title: "Vue d'ensemble", href: "/admin", icon: LayoutDashboard },
@@ -45,9 +46,7 @@ export function AdminSidebar() {
     <aside className="flex h-screen w-60 shrink-0 flex-col bg-[#0f1117]">
       {/* Logo */}
       <div className="flex h-14 items-center gap-3 border-b border-white/10 px-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500">
-          <UtensilsCrossed className="h-3.5 w-3.5 text-white" />
-        </div>
+        <Logo size={28} className="rounded-lg" />
         <span className="text-[15px] font-bold text-white">
           Just<span className="text-indigo-400">-Tag</span>{" "}
           <span className="text-[11px] font-normal text-white/30">admin</span>

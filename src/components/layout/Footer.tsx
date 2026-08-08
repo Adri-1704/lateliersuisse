@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
-import { SwissCross, SwissCrossIcon } from "@/components/ui/swiss-cross";
+import { SwissCrossIcon } from "@/components/ui/swiss-cross";
+import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 
 export function Footer({ locale }: { locale: string }) {
@@ -31,7 +32,7 @@ export function Footer({ locale }: { locale: string }) {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link href={`/${locale}`} className="flex items-center gap-2">
-              <SwissCross size={36} />
+              <Logo size={36} />
               <span className="text-xl font-bold tracking-tight text-white">
                 Just<span className="text-[var(--color-just-tag)]">-Tag</span>
               </span>
