@@ -158,5 +158,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  // apple-icon est exclu explicitement : Next.js le sert sans extension dans
+  // l'URL (/apple-icon), donc le pattern ".*\\..*" ne le filtrait pas — le
+  // middleware next-intl le préfixait de la locale (/fr/apple-icon) et
+  // renvoyait un 404, rendant l'icône Apple invisible sur l'écran d'accueil
+  // iOS.
+  matcher: ["/((?!api|_next|_vercel|apple-icon|.*\\..*).*)"],
 };
