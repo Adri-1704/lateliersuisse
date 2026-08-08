@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
 import { cantons } from "@/data/cantons";
 import { collections } from "@/data/collections";
-import { slugifyCity, VALID_CANTONS } from "@/lib/city-slug";
+import { slugifyCity, VALID_CANTON_CODES } from "@/lib/city-slug";
 
 // SEO long-tail : abaissé de 5 à 1 pour rendre indexables toutes les villes
 // avec au moins 1 resto. Évite les 404 quand Google découvre une ville via
@@ -135,7 +135,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq("is_published", true)
       .not("city", "is", null)
       .neq("city", "")
-      .in("canton", VALID_CANTONS as unknown as string[])
+      .in("canton", VALID_CANTON_CODES)
       .limit(15000);
 
     if (cityData) {
