@@ -88,7 +88,7 @@ async function handleMetaWebhook(request: NextRequest) {
             await sendFreeMetaMessage(
               phoneNumberId,
               from,
-              "Merci pour votre message ! 🍽️\n\nDécouvrez les meilleurs restaurants suisses sur just-tag.app"
+              await buildIncomingReplyMessage(supabase, from)
             );
           }
         }
@@ -125,6 +125,49 @@ async function handleMetaWebhook(request: NextRequest) {
     console.error("Meta webhook error:", error);
     // Always return 200 to Meta to avoid retries
     return NextResponse.json({ status: "ok" });
+  }
+}
+
+/**
+ * Un client qui répond directement au broadcast WhatsApp d'un restaurant
+ * arrive sur le numéro Just-Tag partagé, pas sur le restaurant — s'il
+ * pensait réserver via ce message, sa demande ne sera jamais vue. On
+ * identifie le(s) restaurant(s) auquel ce numéro est abonné pour donner
+ * une réponse précise avec le vrai numéro de réservation, plutôt qu'un
+ * message générique qui n'aide pas à corriger la confusion.
+ */
+async function buildIncomingReplyMessage(
+  supabase: ReturnType<typeof createAdminClient>,
+  from: string
+): Promise<string> {
+  const genericReply =
+    "Ce numéro sert uniquement à recevoir des actus WhatsApp des restaurants abonnés — il n'est pas surveillé pour les réservations. Pour réserver, contactez directement le restaurant via le numéro affiché sur sa fiche just-tag.app.";
+
+  try {
+    const { data: subs } = await (supabase.from("whatsapp_subscribers") as ReturnType<typeof supabase.from>)
+      .select("restaurant_id")
+      .eq("is_active", true)
+      .or(`phone.eq.${from},phone.eq.+${from}`) as { data: { restaurant_id: string }[] | null };
+
+    const restaurantIds = [...new Set((subs || []).map((s) => s.restaurant_id))];
+    if (restaurantIds.length !== 1) return genericReply;
+
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("name_fr, phone, slug")
+      .eq("id", restaurantIds[0])
+      .single() as { data: { name_fr: string; phone: string | null; slug: string } | null };
+
+    if (!restaurant) return genericReply;
+
+    const contactLine = restaurant.phone
+      ? `📞 ${restaurant.phone}`
+      : `just-tag.app/fr/restaurants/${restaurant.slug}`;
+
+    return `Ce numéro sert uniquement à vous envoyer les actus WhatsApp de ${restaurant.name_fr} — il n'est pas surveillé pour les réservations.\n\nPour réserver, contactez directement le restaurant : ${contactLine}`;
+  } catch (err) {
+    console.error("[whatsapp webhook] Impossible d'identifier le restaurant pour la réponse auto:", err);
+    return genericReply;
   }
 }
 
