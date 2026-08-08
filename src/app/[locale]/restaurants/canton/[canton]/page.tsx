@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cantons, type Canton } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
 import { createAdminClient } from "@/lib/supabase/server";
-import { slugifyCity } from "@/lib/city-slug";
+import { slugifyCity, cantonSlugToCode } from "@/lib/city-slug";
 import { MapPin, Star } from "lucide-react";
 
 const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
@@ -17,11 +17,13 @@ export const dynamicParams = true;
 // Récupère les top villes du canton pour internal linking
 async function getTopCitiesInCanton(canton: string, limit = 10): Promise<{ slug: string; name: string; count: number }[]> {
   const supabase = createAdminClient();
+  // La colonne `canton` en base stocke des codes à 2 lettres ("VD"), pas le
+  // slug reçu de l'URL ("vaud").
   const { data, error } = await supabase
     .from("restaurants")
     .select("city")
     .eq("is_published", true)
-    .eq("canton", canton)
+    .eq("canton", cantonSlugToCode(canton) ?? canton)
     .not("city", "is", null)
     .neq("city", "")
     .limit(5000);

@@ -25,3 +25,33 @@ export const VALID_CANTONS = [
   "jura",
   "berne",
 ] as const;
+
+/**
+ * La colonne `canton` en base stocke des codes à 2 lettres ("GE", "VD"...),
+ * pas les slugs utilisés dans les URLs/filtres ("geneve", "vaud"...).
+ * Toute requête Supabase filtrant sur `canton` à partir d'un slug doit
+ * passer par cette table de correspondance.
+ */
+const CANTON_SLUG_TO_CODE: Record<string, string> = {
+  geneve: "GE",
+  vaud: "VD",
+  fribourg: "FR",
+  neuchatel: "NE",
+  valais: "VS",
+  jura: "JU",
+  berne: "BE",
+};
+
+export function cantonSlugToCode(slug: string): string | null {
+  return CANTON_SLUG_TO_CODE[slug] ?? null;
+}
+
+const CANTON_CODE_TO_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(CANTON_SLUG_TO_CODE).map(([slug, code]) => [code, slug])
+);
+
+export function cantonCodeToSlug(code: string): string | null {
+  return CANTON_CODE_TO_SLUG[code] ?? null;
+}
+
+export const VALID_CANTON_CODES = Object.values(CANTON_SLUG_TO_CODE);

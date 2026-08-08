@@ -1,6 +1,7 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { PriceRange } from "@/lib/supabase/types";
+import { cantonSlugToCode } from "@/lib/city-slug";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -128,7 +129,9 @@ function applyFilters(query: any, filters: RestaurantFilters) {
   }
 
   if (filters.canton) {
-    q = q.eq("canton", filters.canton);
+    // La colonne `canton` en base stocke des codes à 2 lettres ("VD", "GE"...),
+    // pas les slugs utilisés dans les URLs/filtres ("vaud", "geneve"...).
+    q = q.eq("canton", cantonSlugToCode(filters.canton) ?? filters.canton);
   }
   if (filters.cuisine) {
     q = q.eq("cuisine_type", filters.cuisine);

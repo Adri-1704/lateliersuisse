@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/server";
+import { cantonSlugToCode } from "@/lib/city-slug";
 import { ExternalLink, Eye, ArrowUpDown } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +61,8 @@ async function loadRestaurantTraffic(
   pageSize = 50
 ): Promise<{ rows: RestaurantRow[]; totalCount: number; grandTotals: { period: number; all: number } }> {
   const supabase = createAdminClient();
+  // DB stores canton as a 2-letter code (e.g. "GE"), the dropdown/URL use slugs (e.g. "geneve").
+  const cantonCode = canton ? (cantonSlugToCode(canton) ?? canton) : "";
 
   const [{ count: totalPeriod }, { count: totalAll }] = await Promise.all([
     supabase
@@ -99,7 +102,7 @@ async function loadRestaurantTraffic(
 
     let countQuery = supabase.from("restaurants").select("id", { count: "exact", head: true });
     if (query) countQuery = countQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
-    if (canton) countQuery = countQuery.eq("canton", canton);
+    if (canton) countQuery = countQuery.eq("canton", cantonCode);
     const { count: totalRestaurants } = await countQuery;
 
     const from = (page - 1) * pageSize;
@@ -125,7 +128,7 @@ async function loadRestaurantTraffic(
           };
         })
         .filter((r) => {
-          if (canton && r.canton !== canton) return false;
+          if (canton && r.canton !== cantonCode) return false;
           if (query) {
             const q = query.toLowerCase();
             return r.name.toLowerCase().includes(q) || r.city.toLowerCase().includes(q) || r.slug.toLowerCase().includes(q);
@@ -143,7 +146,7 @@ async function loadRestaurantTraffic(
           .order("name_fr", { ascending: true })
           .limit(remaining);
         if (query) fillQuery = fillQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
-        if (canton) fillQuery = fillQuery.eq("canton", canton);
+        if (canton) fillQuery = fillQuery.eq("canton", cantonCode);
         if (viewedIds.length > 0 && viewedIds.length <= 100) {
           fillQuery = fillQuery.not("id", "in", `(${viewedIds.join(",")})`);
         }
@@ -163,7 +166,7 @@ async function loadRestaurantTraffic(
         .order("name_fr", { ascending: true })
         .range(zeroViewOffset, zeroViewOffset + pageSize - 1);
       if (query) fillQuery = fillQuery.or(`name_fr.ilike.%${query}%,city.ilike.%${query}%,slug.ilike.%${query}%`);
-      if (canton) fillQuery = fillQuery.eq("canton", canton);
+      if (canton) fillQuery = fillQuery.eq("canton", cantonCode);
       if (viewedIds.length > 0 && viewedIds.length <= 100) {
         fillQuery = fillQuery.not("id", "in", `(${viewedIds.join(",")})`);
       }
@@ -185,7 +188,7 @@ async function loadRestaurantTraffic(
       const term = query.trim();
       restaurantQuery = restaurantQuery.or(`name_fr.ilike.%${term}%,city.ilike.%${term}%,slug.ilike.%${term}%`);
     }
-    if (canton) restaurantQuery = restaurantQuery.eq("canton", canton);
+    if (canton) restaurantQuery = restaurantQuery.eq("canton", cantonCode);
 
     restaurantQuery = restaurantQuery.order("name_fr", { ascending: true });
     const offset = (page - 1) * pageSize;

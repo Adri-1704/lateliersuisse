@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cantons } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
 import { createAdminClient } from "@/lib/supabase/server";
-import { slugifyCity, VALID_CANTONS } from "@/lib/city-slug";
+import { slugifyCity, VALID_CANTON_CODES, cantonCodeToSlug, cantonSlugToCode } from "@/lib/city-slug";
 import { MapPin, Star } from "lucide-react";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
@@ -31,14 +31,17 @@ interface ResolvedCity {
 async function resolveCity(slug: string): Promise<ResolvedCity | null> {
   const supabase = createAdminClient();
 
-  // Fetch distinct cities with counts using a light query
+  // Fetch distinct cities with counts using a light query. La colonne
+  // `canton` en base stocke des codes à 2 lettres ("VD"), pas les slugs
+  // ("vaud") — on filtre sur les codes puis on reconvertit en slug ci-dessous
+  // pour préserver le format attendu par le reste de la page (liens, i18n).
   const { data, error } = await supabase
     .from("restaurants")
     .select("city, canton")
     .eq("is_published", true)
     .not("city", "is", null)
     .neq("city", "")
-    .in("canton", VALID_CANTONS as unknown as string[])
+    .in("canton", VALID_CANTON_CODES)
     .limit(15000);
 
   if (error) console.error("[resolveCity] Erreur:", error);
@@ -49,10 +52,11 @@ async function resolveCity(slug: string): Promise<ResolvedCity | null> {
   for (const row of data as { city: string; canton: string }[]) {
     const citySlug = slugifyCity(row.city);
     if (!citySlug) continue;
-    const key = `${citySlug}::${row.canton}`;
+    const cantonSlug = cantonCodeToSlug(row.canton) ?? row.canton;
+    const key = `${citySlug}::${cantonSlug}`;
     const existing = cityMap.get(key);
     if (existing) existing.count++;
-    else cityMap.set(key, { name: row.city, canton: row.canton, count: 1 });
+    else cityMap.set(key, { name: row.city, canton: cantonSlug, count: 1 });
   }
 
   // Find the first city matching the slug (preferring the most populated one if multiple cantons have same slug)
@@ -75,11 +79,12 @@ async function resolveCity(slug: string): Promise<ResolvedCity | null> {
 
 async function getOtherCitiesInCanton(canton: string, currentCitySlug: string, limit = 8): Promise<{ slug: string; name: string; count: number }[]> {
   const supabase = createAdminClient();
+  // `canton` ici est un slug ("vaud") — la colonne en base stocke un code ("VD").
   const { data, error } = await supabase
     .from("restaurants")
     .select("city")
     .eq("is_published", true)
-    .eq("canton", canton)
+    .eq("canton", cantonSlugToCode(canton) ?? canton)
     .not("city", "is", null)
     .neq("city", "")
     .limit(5000);
