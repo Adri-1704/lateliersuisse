@@ -31,7 +31,8 @@ export async function listContacts(params: {
     if (error) throw error;
 
     return { success: true, error: null, data: { contacts: data || [], total: count || 0 } };
-  } catch {
+  } catch (err) {
+    console.error("[admin/contacts] Erreur, fallback mock:", err);
     let filtered = [...mockContacts];
     if (search) {
       const s = search.toLowerCase();
@@ -51,7 +52,8 @@ export async function markContactAsRead(id: string): Promise<{ success: boolean;
     const { error } = await (supabase as any).from("contact_submissions").update({ is_read: true }).eq("id", id);
     if (error) throw error;
     return { success: true, error: null };
-  } catch {
+  } catch (err) {
+    console.error("[admin/contacts] Erreur, fallback mock:", err);
     return { success: false, error: "Impossible de marquer comme lu (mode démo)" };
   }
 }

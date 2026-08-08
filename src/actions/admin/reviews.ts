@@ -42,7 +42,8 @@ export async function listReviews(params: {
     })) as ReviewWithRestaurant[];
 
     return { success: true, error: null, data: { reviews: mapped, total: count || 0 } };
-  } catch {
+  } catch (err) {
+    console.error("[admin/reviews] Erreur, fallback mock:", err);
     let filtered = [...mockReviews];
     if (search) {
       const s = search.toLowerCase();
@@ -63,7 +64,8 @@ export async function deleteReview(id: string): Promise<{ success: boolean; erro
     const { error } = await supabase.from("reviews").delete().eq("id", id);
     if (error) throw error;
     return { success: true, error: null };
-  } catch {
+  } catch (err) {
+    console.error("[admin/reviews] Erreur, fallback mock:", err);
     return { success: false, error: "Impossible de supprimer l'avis (mode démo)" };
   }
 }

@@ -47,21 +47,25 @@ interface SignupData {
 // Plan data — prices per WhatsApp subscriber tier
 // ────────────────────────────────────────────────────────────────────────────
 
+// Montants alignés sur les vrais Price Stripe (vérifiés en direct via l'API
+// le 2026-08-08 — cette page affichait des prix différents de ce qui est
+// réellement facturé au moment du paiement, ex. palier 100/mensuel early
+// montrait "59.95" alors que le vrai prix Stripe est 89.95).
 const TIER_DISPLAY_PRICES: Record<50 | 100 | 200, {
   launch: { monthly: string; semi: string; semiTotal: string; annual: string; annualTotal: string };
   catalogue: { monthly: string; semi: string; semiTotal: string; annual: string; annualTotal: string };
 }> = {
   50: {
-    launch:    { monthly: "49.95", semi: "44.90", semiTotal: "269.40", annual: "41.90", annualTotal: "502.80" },
-    catalogue: { monthly: "69.95", semi: "62.90", semiTotal: "377.40", annual: "58.90", annualTotal: "706.80" },
+    launch:    { monthly: "59.95", semi: "52.95", semiTotal: "317.70", annual: "49.95", annualTotal: "599.40" },
+    catalogue: { monthly: "89.95", semi: "79.95", semiTotal: "479.70", annual: "74.95", annualTotal: "899.40" },
   },
   100: {
-    launch:    { monthly: "59.95", semi: "53.90", semiTotal: "323.40", annual: "49.90", annualTotal: "598.80" },
-    catalogue: { monthly: "79.95", semi: "71.90", semiTotal: "431.40", annual: "66.90", annualTotal: "802.80" },
+    launch:    { monthly: "89.95", semi: "79.95", semiTotal: "479.70", annual: "74.95", annualTotal: "899.40" },
+    catalogue: { monthly: "149.95", semi: "132.95", semiTotal: "797.70", annual: "124.95", annualTotal: "1499.40" },
   },
   200: {
-    launch:    { monthly: "99.95", semi: "89.90", semiTotal: "539.40", annual: "83.90", annualTotal: "1006.80" },
-    catalogue: { monthly: "119.95", semi: "107.90", semiTotal: "647.40", annual: "99.90", annualTotal: "1198.80" },
+    launch:    { monthly: "149.95", semi: "132.95", semiTotal: "797.70", annual: "124.95", annualTotal: "1499.40" },
+    catalogue: { monthly: "249.95", semi: "219.95", semiTotal: "1319.70", annual: "204.95", annualTotal: "2459.40" },
   },
 };
 

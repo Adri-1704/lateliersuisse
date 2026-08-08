@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { featuresOptions } from "@/data/mock-restaurants";
 import type { Restaurant, Review } from "@/data/mock-restaurants";
 import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { ClaimBanner } from "./ClaimBanner";
 import { HappyHourBanner } from "@/components/restaurant-detail/HappyHourBanner";
@@ -92,6 +92,7 @@ async function getRestaurant(slug: string): Promise<{ restaurant: Restaurant; in
     .eq("is_published", true)
     .single();
 
+  if (error) console.error("[getRestaurant] Erreur:", error);
   if (error || !data) return null;
   const row = data as Record<string, unknown>;
   return {
@@ -110,6 +111,7 @@ async function getReviews(restaurantId: string): Promise<Review[]> {
     .eq("restaurant_id", restaurantId)
     .order("created_at", { ascending: false });
 
+  if (error) console.error("[getReviews] Erreur:", error);
   if (error || !data) return [];
   return (data as unknown as DbReview[]).map((row) => mapDbToReview(row));
 }
@@ -123,6 +125,7 @@ async function getMenuItems(restaurantId: string) {
     .eq("is_available", true)
     .order("position", { ascending: true });
 
+  if (error) console.error("[getMenuItems] Erreur:", error);
   if (error || !data) return [];
   return (data as unknown as DbMenuItem[]).map((row) => ({
     nameFr: row.name_fr || "",
@@ -145,6 +148,7 @@ async function getRestaurantPromotions(restaurantId: string): Promise<Restaurant
     .eq("restaurant_id", restaurantId)
     .eq("is_active", true) as { data: DbPromotion[] | null; error: unknown };
 
+  if (error) console.error("[getRestaurantPromotions] Erreur:", error);
   if (error || !data) return [];
   return data.map((row) => ({
     type: (row.promotion_type as RestaurantPromotion["type"]) || "special_event",
@@ -163,6 +167,7 @@ async function getRestaurantImages(restaurantId: string): Promise<string[]> {
     .eq("restaurant_id", restaurantId)
     .order("position", { ascending: true });
 
+  if (error) console.error("[getRestaurantImages] Erreur:", error);
   if (error || !data) return [];
   return (data as unknown as RestaurantImage[]).map((row) => row.url);
 }
@@ -229,7 +234,7 @@ export default async function RestaurantDetailPage({
   const result = await getRestaurant(slug);
 
   if (!result) {
-    redirect(`/${locale}/restaurants`);
+    notFound();
   }
 
   const { restaurant, merchantId, claimStatus } = result;

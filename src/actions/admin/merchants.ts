@@ -24,7 +24,8 @@ export async function getMerchant(id: string): Promise<{ success: boolean; error
       subscription: Array.isArray(record.subscriptions) ? (record.subscriptions as Subscription[])[0] || null : null,
     } as MerchantWithSubscription;
     return { success: true, error: null, data: merchant };
-  } catch {
+  } catch (err) {
+    console.error("[admin/merchants] Erreur, fallback mock:", err);
     const mock = mockMerchants.find((m) => m.id === id);
     if (!mock) return { success: false, error: "Commerçant non trouvé" };
     return { success: true, error: null, data: mock };
@@ -87,7 +88,8 @@ export async function listMerchants(params: {
     })) as MerchantWithSubscription[];
 
     return { success: true, error: null, data: { merchants: mapped, total: count || 0 } };
-  } catch {
+  } catch (err) {
+    console.error("[admin/merchants] Erreur, fallback mock:", err);
     let filtered = [...mockMerchants];
     if (search) {
       const s = search.toLowerCase();

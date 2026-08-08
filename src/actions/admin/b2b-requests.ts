@@ -17,7 +17,8 @@ export async function getB2BRequest(id: string): Promise<{ success: boolean; err
     const { data, error } = await supabase.from("b2b_contact_requests").select("*").eq("id", id).single();
     if (error) throw error;
     return { success: true, error: null, data };
-  } catch {
+  } catch (err) {
+    console.error("[admin/b2b-requests] Erreur, fallback mock:", err);
     const mock = mockB2BRequests.find((r) => r.id === id);
     if (!mock) return { success: false, error: "Demande non trouvée" };
     return { success: true, error: null, data: mock };
@@ -48,7 +49,8 @@ export async function listB2BRequests(params: {
     if (error) throw error;
 
     return { success: true, error: null, data: { requests: data || [], total: count || 0 } };
-  } catch {
+  } catch (err) {
+    console.error("[admin/b2b-requests] Erreur, fallback mock:", err);
     let filtered = [...mockB2BRequests];
     if (search) {
       const s = search.toLowerCase();
@@ -79,7 +81,8 @@ export async function updateB2BRequestStatus(
     const { error } = await (supabase as any).from("b2b_contact_requests").update({ status: newStatus }).eq("id", id);
     if (error) throw error;
     return { success: true, error: null };
-  } catch {
+  } catch (err) {
+    console.error("[admin/b2b-requests] Erreur, fallback mock:", err);
     return { success: false, error: "Impossible de mettre à jour le statut (mode démo)" };
   }
 }

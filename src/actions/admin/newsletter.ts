@@ -33,7 +33,8 @@ export async function listNewsletterSubscribers(params: {
     if (error) throw error;
 
     return { success: true, error: null, data: { subscribers: data || [], total: count || 0 } };
-  } catch {
+  } catch (err) {
+    console.error("[admin/newsletter] Erreur, fallback mock:", err);
     let filtered = [...mockSubscribers];
     if (search) {
       const s = search.toLowerCase();

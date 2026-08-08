@@ -36,7 +36,8 @@ export async function listRestaurants(params: {
     if (error) throw error;
 
     return { success: true, error: null, data: { restaurants: data || [], total: count || 0 } };
-  } catch {
+  } catch (err) {
+    console.error("[admin/restaurants] Erreur, fallback mock:", err);
     // Mock fallback
     let filtered = [...mockRestaurants];
     if (search) {
@@ -107,7 +108,8 @@ export async function getRestaurant(id: string): Promise<{ success: boolean; err
     const { data, error } = await supabase.from("restaurants").select("*").eq("id", id).single();
     if (error) throw error;
     return { success: true, error: null, data };
-  } catch {
+  } catch (err) {
+    console.error("[admin/restaurants] Erreur, fallback mock:", err);
     const mock = mockRestaurants.find((r) => r.id === id);
     if (!mock) return { success: false, error: "Restaurant non trouvé" };
     return { success: true, error: null, data: {
@@ -203,7 +205,8 @@ export async function updateRestaurant(
     revalidatePath("/admin/restaurants");
     revalidatePath(`/admin/restaurants/${id}`);
     return { success: true, error: null };
-  } catch {
+  } catch (err) {
+    console.error("[admin/restaurants] Erreur, fallback mock:", err);
     return { success: false, error: "Impossible de mettre à jour le restaurant (mode démo)" };
   }
 }
@@ -215,7 +218,8 @@ export async function deleteRestaurant(id: string): Promise<{ success: boolean; 
     if (error) throw error;
     revalidatePath("/admin/restaurants");
     return { success: true, error: null };
-  } catch {
+  } catch (err) {
+    console.error("[admin/restaurants] Erreur, fallback mock:", err);
     return { success: false, error: "Impossible de supprimer le restaurant (mode démo)" };
   }
 }
@@ -227,7 +231,8 @@ export async function togglePublishRestaurant(id: string, isPublished: boolean):
     const { error } = await (supabase as any).from("restaurants").update({ is_published: isPublished }).eq("id", id);
     if (error) throw error;
     return { success: true, error: null };
-  } catch {
+  } catch (err) {
+    console.error("[admin/restaurants] Erreur, fallback mock:", err);
     return { success: false, error: "Impossible de modifier la publication (mode démo)" };
   }
 }
@@ -258,7 +263,8 @@ export async function unlinkMerchantFromRestaurant(restaurantId: string): Promis
     }).eq("restaurant_id", restaurantId).in("status", ["pending", "approved"]);
 
     return { success: true, error: null };
-  } catch {
+  } catch (err) {
+    console.error("[admin/restaurants] Erreur, fallback mock:", err);
     return { success: false, error: "Erreur lors de la suppression du lien" };
   }
 }
