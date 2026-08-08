@@ -5,61 +5,27 @@ export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
 // Même logo que src/app/icon.svg (favicon) et src/components/ui/logo.tsx
-// (back-office, site public) — une assiette (restaurant) avec un badge de
-// notification vert (message WhatsApp). Redessiné en divs car ImageResponse
-// (Satori) ne supporte pas d'injecter du SVG arbitraire.
+// (back-office, site public) — monogramme JT + badge téléphone WhatsApp.
 export default function AppleIcon() {
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: 180,
-          height: 180,
-          background: "#ff3c48",
-          display: "flex",
-          position: "relative",
-        }}
+      <svg
+        width={180}
+        height={180}
+        viewBox="0 0 32 32"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Assiette */}
-        <div
-          style={{
-            position: "absolute",
-            left: 42,
-            top: 66,
-            width: 90,
-            height: 90,
-            borderRadius: "50%",
-            border: "11px solid #ffffff",
-            display: "flex",
-          }}
+        <rect width="32" height="32" rx="7" fill="#ff3c48" />
+        <path d="M8.5,7 v9.5 a4,4 0 0 1 -4,4" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" />
+        <path d="M15.5,7 h9" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" />
+        <path d="M20,7 v13" fill="none" stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" />
+        <circle cx="24" cy="24" r="7.4" fill="#25d366" stroke="#ff3c48" strokeWidth="1.4" />
+        <path
+          d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"
+          fill="#ffffff"
+          transform="translate(24,24) scale(0.0245) translate(-243,-256)"
         />
-        <div
-          style={{
-            position: "absolute",
-            left: 71,
-            top: 95,
-            width: 32,
-            height: 32,
-            borderRadius: "50%",
-            border: "8px solid #ffffff",
-            display: "flex",
-          }}
-        />
-        {/* Badge message */}
-        <div
-          style={{
-            position: "absolute",
-            left: 111,
-            top: 12,
-            width: 56,
-            height: 56,
-            borderRadius: "50%",
-            background: "#25d366",
-            border: "8px solid #ff3c48",
-            display: "flex",
-          }}
-        />
-      </div>
+      </svg>
     ),
     { width: 180, height: 180 }
   );
