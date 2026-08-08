@@ -73,7 +73,11 @@ export async function getWhatsAppCosts(): Promise<WhatsAppCostsData> {
     error: unknown;
   };
 
-  if (error || !rawRows || rawRows.length === 0) return empty;
+  if (error) {
+    console.error("[admin/whatsapp-costs] Erreur requête whatsapp_broadcasts:", error);
+    return empty;
+  }
+  if (!rawRows || rawRows.length === 0) return empty;
 
   // Fetch restaurant names for restaurants that have broadcasts
   const restaurantIds = [...new Set(rawRows.map((r) => r.restaurant_id))];

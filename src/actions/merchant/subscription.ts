@@ -84,12 +84,25 @@ export async function createPlanChangeSession(
     const merchant = await findMerchant(supabase, user.id, user.email || "");
     if (!merchant) return { url: null, error: "Marchand non trouvé" };
 
+    // Un changement de formule crée une toute nouvelle session/souscription
+    // Stripe — sans ça, l'attribution partenaire (ex. Aligro) de l'abonnement
+    // d'origine se perdait silencieusement à moins que le client ne retape
+    // manuellement le code promo sur la nouvelle page de paiement.
+    const admin = createAdminClient();
+    const { data: currentSub } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
+      .select("affiliate_ref")
+      .eq("merchant_id", merchant.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single() as { data: { affiliate_ref: string | null } | null };
+
     const { createCheckoutSession } = await import("@/actions/subscriptions");
     return createCheckoutSession({
       planType,
       merchantId: merchant.id,
       locale,
       whatsappTier,
+      affiliateRef: currentSub?.affiliate_ref || undefined,
     });
   } catch {
     return { url: null, error: "Erreur lors de la création de la session" };

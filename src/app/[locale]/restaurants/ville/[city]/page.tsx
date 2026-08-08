@@ -32,7 +32,7 @@ async function resolveCity(slug: string): Promise<ResolvedCity | null> {
   const supabase = createAdminClient();
 
   // Fetch distinct cities with counts using a light query
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("restaurants")
     .select("city, canton")
     .eq("is_published", true)
@@ -41,6 +41,7 @@ async function resolveCity(slug: string): Promise<ResolvedCity | null> {
     .in("canton", VALID_CANTONS as unknown as string[])
     .limit(15000);
 
+  if (error) console.error("[resolveCity] Erreur:", error);
   if (!data) return null;
 
   // Group by normalized city+canton
@@ -74,7 +75,7 @@ async function resolveCity(slug: string): Promise<ResolvedCity | null> {
 
 async function getOtherCitiesInCanton(canton: string, currentCitySlug: string, limit = 8): Promise<{ slug: string; name: string; count: number }[]> {
   const supabase = createAdminClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("restaurants")
     .select("city")
     .eq("is_published", true)
@@ -83,6 +84,7 @@ async function getOtherCitiesInCanton(canton: string, currentCitySlug: string, l
     .neq("city", "")
     .limit(5000);
 
+  if (error) console.error("[getOtherCitiesInCanton] Erreur:", error);
   if (!data) return [];
 
   const cityCounts = new Map<string, { name: string; count: number }>();

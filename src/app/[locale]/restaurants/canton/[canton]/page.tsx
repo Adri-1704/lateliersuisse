@@ -17,7 +17,7 @@ export const dynamicParams = true;
 // Récupère les top villes du canton pour internal linking
 async function getTopCitiesInCanton(canton: string, limit = 10): Promise<{ slug: string; name: string; count: number }[]> {
   const supabase = createAdminClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("restaurants")
     .select("city")
     .eq("is_published", true)
@@ -25,6 +25,7 @@ async function getTopCitiesInCanton(canton: string, limit = 10): Promise<{ slug:
     .not("city", "is", null)
     .neq("city", "")
     .limit(5000);
+  if (error) console.error("[getTopCitiesInCanton] Erreur:", error);
   if (!data) return [];
   const cityCounts = new Map<string, { name: string; count: number }>();
   for (const row of data as { city: string }[]) {

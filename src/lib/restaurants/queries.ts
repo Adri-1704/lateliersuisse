@@ -247,14 +247,19 @@ export async function fetchCuisineCounts(): Promise<Record<string, number>> {
       .not("cuisine_type", "is", null)
       .neq("cuisine_type", "");
 
-    if (error || !data) return {};
+    if (error) {
+      console.error("[fetchCuisineCounts] Erreur:", error);
+      return {};
+    }
+    if (!data) return {};
 
     const counts: Record<string, number> = {};
     for (const row of data as { cuisine_type: string }[]) {
       counts[row.cuisine_type] = (counts[row.cuisine_type] || 0) + 1;
     }
     return counts;
-  } catch {
+  } catch (err) {
+    console.error("[fetchCuisineCounts] Erreur inattendue:", err);
     return {};
   }
 }
