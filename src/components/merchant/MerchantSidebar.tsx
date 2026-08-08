@@ -19,6 +19,7 @@ import {
   Lightbulb,
   ChevronRight,
   Video,
+  LifeBuoy,
 } from "lucide-react";
 import { Logo } from "@/components/ui/logo";
 
@@ -55,6 +56,7 @@ const navItems = [
     items: [
       { key: "abonnement",   label: "Abonnement",       href: "/abonnement",     icon: CreditCard,      color: "#6366f1", bg: "#eef2ff" },
       { key: "securite",     label: "Sécurité",         href: "/securite",       icon: ShieldCheck,     color: "#64748b", bg: "#f8fafc" },
+      { key: "aide",         label: "Besoin d'aide",    href: "/aide",           icon: LifeBuoy,        color: "#22c55e", bg: "#f0fdf4" },
     ],
   },
 ];
