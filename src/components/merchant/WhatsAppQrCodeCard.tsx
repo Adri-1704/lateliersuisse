@@ -10,7 +10,10 @@ interface WhatsAppQrCodeCardProps {
 }
 
 export function WhatsAppQrCodeCard({ slug, restaurantName }: WhatsAppQrCodeCardProps) {
-  const targetUrl = `https://just-tag.app/wa/${slug}`;
+  // Même destination que la section "QR Code" dédiée (/rejoindre/[slug]) —
+  // avant ce fix, ce QR pointait vers /wa/[slug] qui redirige vers la fiche
+  // restaurant complète plutôt qu'un formulaire d'inscription direct.
+  const targetUrl = `https://just-tag.app/fr/rejoindre/${slug}`;
   const qrDisplay = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(targetUrl)}`;
   const qrPrint = `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&margin=20&data=${encodeURIComponent(targetUrl)}`;
   const qrDownload = `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&margin=20&format=png&download=1&data=${encodeURIComponent(targetUrl)}`;
@@ -35,7 +38,7 @@ export function WhatsAppQrCodeCard({ slug, restaurantName }: WhatsAppQrCodeCardP
               className="rounded-lg border bg-white p-2"
             />
             <p className="text-center text-xs text-gray-500">
-              Redirige vers la fiche de {restaurantName}
+              Ouvre le formulaire d&apos;inscription WhatsApp de {restaurantName}
             </p>
           </div>
 
