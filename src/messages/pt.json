@@ -17,6 +17,27 @@
     "title": "Just-Tag | Os melhores restaurantes da Suíça Romanda",
     "description": "Descubra os melhores restaurantes da Suíça Romanda. Pesquise por cantão, cozinha e orçamento para encontrar o seu restaurante ideal."
   },
+  "pageMeta": {
+    "faqTitle": "FAQ — Perguntas frequentes sobre o Just-Tag",
+    "faqDescription": "Todas as respostas às suas perguntas sobre o Just-Tag: procurar restaurantes, inscrever o seu estabelecimento, avaliações de clientes e cantões cobertos.",
+    "contactTitle": "Contacto — Just-Tag",
+    "contactDescription": "Uma pergunta, uma sugestão? Contacte a equipa Just-Tag por email, telefone ou através do nosso formulário de contacto.",
+    "favorisTitle": "Os meus restaurantes favoritos",
+    "favorisDescription": "Encontre aqui todos os restaurantes da Suíça Romanda que adicionou aos seus favoritos no Just-Tag.",
+    "whatsUpTitle": "Whats-up — Marketing por WhatsApp para negócios suíços",
+    "whatsUpDescription": "Envie as suas ofertas e novidades diretamente para o WhatsApp dos seus clientes. Taxa de abertura de 98%, sem comissão, alojado na Suíça.",
+    "pitchTitle": "Pitch Just-Tag — Como encher as mesas do seu restaurante",
+    "pitchDescription": "Descubra em imagens como o Just-Tag ajuda os restaurantes suíços a conectarem-se diretamente com os seus clientes, sem algoritmo.",
+    "applicationTitle": "A aplicação Just-Tag para restauradores",
+    "applicationDescription": "Painel de controlo, código QR, happy hours, menu online: descubra a aplicação Just-Tag pensada para restauradores suíços.",
+    "partenaireInscriptionTitle": "Torne-se parceiro Just-Tag",
+    "partenaireInscriptionDescription": "Inscreva o seu restaurante no Just-Tag em poucos minutos: escolha o seu plano e aproveite 14 dias de teste gratuito.",
+    "legalMentionsDescription": "Aviso legal do Just-Tag.app: editor do site, alojamento, propriedade intelectual e lei aplicável.",
+    "legalConditionsDescription": "Termos e condições gerais da plataforma Just-Tag.app para restauradores e visitantes.",
+    "legalPrivacyDescription": "Política de privacidade do Just-Tag.app: dados recolhidos, finalidades do tratamento e direitos dos utilizadores (LPD/RGPD).",
+    "pourPartenairesTitle": "Parceiros — Just-Tag",
+    "pourPartenairesDescription": "Fornece restaurantes suíços? Descubra como uma colaboração com o Just-Tag pode trazer valor aos seus clientes."
+  },
   "nav": {
     "home": "Início",
     "restaurants": "Restaurantes",

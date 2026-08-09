@@ -17,6 +17,27 @@
     "title": "Just-Tag | Die besten Restaurants der Westschweiz",
     "description": "Entdecken Sie die besten Restaurants der Westschweiz. Suchen Sie nach Kanton, Küche und Budget, um Ihr ideales Restaurant zu finden."
   },
+  "pageMeta": {
+    "faqTitle": "FAQ — Häufige Fragen zu Just-Tag",
+    "faqDescription": "Alle Antworten auf Ihre Fragen zu Just-Tag: Restaurantsuche, Registrierung von Betrieben, Kundenbewertungen und abgedeckte Kantone.",
+    "contactTitle": "Kontakt — Just-Tag",
+    "contactDescription": "Eine Frage, ein Vorschlag? Kontaktieren Sie das Just-Tag-Team per E-Mail, Telefon oder über unser Kontaktformular.",
+    "favorisTitle": "Meine Lieblingsrestaurants",
+    "favorisDescription": "Finden Sie hier alle Westschweizer Restaurants, die Sie bei Just-Tag zu Ihren Favoriten hinzugefügt haben.",
+    "whatsUpTitle": "Whats-up — WhatsApp-Marketing für Schweizer Betriebe",
+    "whatsUpDescription": "Senden Sie Ihre Angebote und Neuigkeiten direkt per WhatsApp an Ihre Kunden. 98 % Öffnungsrate, keine Provision, in der Schweiz gehostet.",
+    "pitchTitle": "Just-Tag Pitch — So füllen Sie die Tische Ihres Restaurants",
+    "pitchDescription": "Entdecken Sie in Bildern, wie Just-Tag Schweizer Restaurants hilft, sich ohne Algorithmus direkt mit ihren Kunden zu verbinden.",
+    "applicationTitle": "Die Just-Tag-App für Restaurantbesitzer",
+    "applicationDescription": "Dashboard, QR-Code, Happy Hours, Online-Speisekarte: entdecken Sie die Just-Tag-App für Schweizer Restaurantbesitzer.",
+    "partenaireInscriptionTitle": "Just-Tag-Partner werden",
+    "partenaireInscriptionDescription": "Registrieren Sie Ihr Restaurant in wenigen Minuten bei Just-Tag: wählen Sie Ihr Abonnement und profitieren Sie von 14 Tagen kostenloser Testphase.",
+    "legalMentionsDescription": "Impressum von Just-Tag.app: Herausgeber der Website, Hosting, geistiges Eigentum und anwendbares Recht.",
+    "legalConditionsDescription": "Allgemeine Geschäftsbedingungen der Plattform Just-Tag.app für Restaurantbesitzer und Besucher.",
+    "legalPrivacyDescription": "Datenschutzrichtlinie von Just-Tag.app: erhobene Daten, Zwecke der Verarbeitung und Rechte der Nutzer (DSG/DSGVO).",
+    "pourPartenairesTitle": "Partner — Just-Tag",
+    "pourPartenairesDescription": "Sie beliefern Schweizer Restaurants? Erfahren Sie, wie eine Zusammenarbeit mit Just-Tag Ihren Kunden einen Mehrwert bieten kann."
+  },
   "nav": {
     "home": "Startseite",
     "restaurants": "Restaurants",
