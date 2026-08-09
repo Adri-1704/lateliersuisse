@@ -69,6 +69,13 @@ export interface ResolvedCityCanton {
   slug: string;
   /** Code canton correct à 2 lettres (après correction éventuelle). */
   cantonCode: string;
+  /**
+   * Valeur BRUTE de `restaurants.city` telle que stockée en base (trimmée),
+   * AVANT canonicalisation — ex. "Bern" ou "Bienne". Indispensable pour
+   * filtrer les restaurants réels : un restaurant dont `city = "Bern"` ne
+   * matchera jamais un filtre `.ilike("city", "Berne")` (égalité stricte).
+   */
+  rawCity: string;
 }
 
 /**
@@ -99,7 +106,7 @@ export function resolveCityCanton(
   const cantonCode = CITY_CANTON_OVERRIDES[slug] ?? cantonRaw ?? "";
   if (!cantonCode || !VALID_CANTON_CODES.includes(cantonCode)) return null;
 
-  return { name, slug, cantonCode };
+  return { name, slug, cantonCode, rawCity: trimmed };
 }
 
 export interface CityAggregateEntry {
@@ -108,6 +115,17 @@ export interface CityAggregateEntry {
   cantonCode: string;
   cantonSlug: string;
   count: number;
+  /**
+   * Toutes les valeurs BRUTES de `restaurants.city` regroupées sous ce nom
+   * canonique (ex. ["Biel", "Bienne", "Biel/Bienne"] pour le slug
+   * "biel-bienne"). À utiliser avec `.in("city", variants)` pour récupérer
+   * les restaurants réels d'une ville — un `.ilike()` sur le seul nom
+   * canonique fusionné ne matcherait aucune ligne dont `city` est une
+   * variante brute différente (#34 — bloquant sécurité : la fusion des
+   * variantes pour le comptage faisait disparaître les restaurants
+   * correspondants de la grille).
+   */
+  variants: string[];
 }
 
 /**
@@ -118,7 +136,7 @@ export interface CityAggregateEntry {
 export function buildCityAggregate(
   rows: { city: string | null; canton: string | null }[]
 ): Map<string, CityAggregateEntry> {
-  const aggregate = new Map<string, CityAggregateEntry>();
+  const aggregate = new Map<string, { name: string; slug: string; cantonCode: string; cantonSlug: string; count: number; variants: Set<string> }>();
 
   for (const row of rows) {
     const resolved = resolveCityCanton(row.city, row.canton);
@@ -127,6 +145,7 @@ export function buildCityAggregate(
     const existing = aggregate.get(resolved.slug);
     if (existing) {
       existing.count += 1;
+      existing.variants.add(resolved.rawCity);
     } else {
       aggregate.set(resolved.slug, {
         name: resolved.name,
@@ -134,11 +153,16 @@ export function buildCityAggregate(
         cantonCode: resolved.cantonCode,
         cantonSlug: cantonCodeToSlug(resolved.cantonCode) ?? resolved.cantonCode,
         count: 1,
+        variants: new Set([resolved.rawCity]),
       });
     }
   }
 
-  return aggregate;
+  const result = new Map<string, CityAggregateEntry>();
+  for (const [slug, entry] of aggregate) {
+    result.set(slug, { ...entry, variants: Array.from(entry.variants) });
+  }
+  return result;
 }
 
 /**

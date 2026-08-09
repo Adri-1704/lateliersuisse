@@ -8,8 +8,15 @@ import { safeJsonLd } from "@/lib/json-ld";
 import { MapPin, Star } from "lucide-react";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
-// Aligné avec sitemap.ts : seuil à 1 pour rendre indexables toutes les villes
-// avec au moins 1 resto (évite les 404 sur les liens internes canton → ville).
+// Seuil d'EXISTENCE de la page (≠ seuil d'indexation) : toute ville ayant au
+// moins 1 restaurant publié doit répondre 200, faute de quoi un lien interne
+// canton → ville (ou une entrée sitemap) pointerait vers un 404. Les seuils
+// des autres pages sont volontairement plus élevés car ils répondent à un
+// besoin différent : sitemap.ts (=3) n'indexe que les villes avec assez de
+// contenu pour être pertinentes pour Google ; la page canton (=5) ne met en
+// avant que les villes les plus fournies dans son bloc "Par ville :". Ces
+// trois seuils ne doivent PAS être égaux — seul celui-ci gouverne l'existence
+// réelle de la page.
 const MIN_RESTAURANTS_FOR_CITY_PAGE = 1;
 
 // SEO Quick Win: ISR (30 min) sur les pages villes — pages SEO critiques.
@@ -22,23 +29,41 @@ export const dynamicParams = true;
 // ---------------------------------------------------------------------------
 
 interface ResolvedCity {
-  name: string;           // original case: "Genève", "La Chaux-de-Fonds"
-  slug: string;           // "geneve", "la-chaux-de-fonds"
+  name: string;           // canonical display name: "Genève", "Biel/Bienne"
+  slug: string;           // "geneve", "biel-bienne"
   canton: string;         // canton value from cantons.ts
-  count: number;
+  count: number;          // compteur agrégat (utilisé uniquement comme garde d'existence — voir plus bas)
+  /**
+   * Valeurs BRUTES de `restaurants.city` regroupées sous ce nom canonique
+   * (ex. ["Bern", "Berne"]). À utiliser avec `fetchFilteredRestaurants({ city: variants })`
+   * — un filtre sur le seul nom canonique fusionné ne matcherait aucune ligne
+   * dont `city` est une variante brute différente (bloquant sécurité #34 :
+   * la page annonçait un compteur non nul mais affichait une grille vide).
+   */
+  variants: string[];
 }
 
 // La résolution passe par `resolveCitySlug`, qui pagine sur l'intégralité
 // des restaurants publiés (pas de plafond PostgREST — #33) et normalise
 // ville/canton (dédoublonnage, exclusion des codes postaux et des communes
-// étrangères, correction des rattachements erronés — #34). Le compteur
-// renvoyé (`count`) est LA source de vérité unique utilisée pour le <title>,
-// le sous-titre et le fil d'Ariane de cette page (#34 — compteurs
-// contradictoires).
+// étrangères, correction des rattachements erronés — #34).
+//
+// IMPORTANT : `entry.count` (agrégat calculé en JS) ne sert ici QUE de garde
+// d'existence (notFound si aucun restaurant). Le compteur réellement AFFICHÉ
+// (titre, sous-titre, JSON-LD) provient exclusivement du `totalCount` exact
+// renvoyé par `fetchFilteredRestaurants({ city: variants })` — c'est-à-dire
+// littéralement le nombre de lignes que la même requête utilise pour remplir
+// la grille, garantissant que compteur et liste ne peuvent plus diverger.
 async function resolveCity(slug: string): Promise<ResolvedCity | null> {
   const entry = await resolveCitySlug(slug);
   if (!entry || entry.count < MIN_RESTAURANTS_FOR_CITY_PAGE) return null;
-  return { name: entry.name, slug: entry.slug, canton: entry.cantonSlug, count: entry.count };
+  return { name: entry.name, slug: entry.slug, canton: entry.cantonSlug, count: entry.count, variants: entry.variants };
+}
+
+/** Compte exact des restaurants publiés correspondant à toutes les variantes brutes d'une ville. */
+async function countCityRestaurants(variants: string[]): Promise<number> {
+  const { totalCount } = await fetchFilteredRestaurants({ city: variants }, 1, 1);
+  return totalCount;
 }
 
 // ---------------------------------------------------------------------------
@@ -66,19 +91,24 @@ export async function generateMetadata({
   const resolved = await resolveCity(city);
   if (!resolved) return {};
 
+  // Compteur EXACT (même requête que la grille — voir countCityRestaurants),
+  // pas l'agrégat JS `resolved.count` : garantit que le <title> annonce
+  // exactement le nombre de restaurants réellement affichés sur la page.
+  const total = await countCityRestaurants(resolved.variants);
+
   // Accord singulier/pluriel (évite "1 adresses")
-  const fr_adresse = resolved.count === 1 ? "adresse" : "adresses";
-  const de_adresse = resolved.count === 1 ? "Adresse" : "Adressen";
-  const en_place = resolved.count === 1 ? "place" : "places";
-  const pt_endereco = resolved.count === 1 ? "endereço" : "endereços";
-  const es_direccion = resolved.count === 1 ? "dirección" : "direcciones";
+  const fr_adresse = total === 1 ? "adresse" : "adresses";
+  const de_adresse = total === 1 ? "Adresse" : "Adressen";
+  const en_place = total === 1 ? "place" : "places";
+  const pt_endereco = total === 1 ? "endereço" : "endereços";
+  const es_direccion = total === 1 ? "dirección" : "direcciones";
 
   const titles: Record<string, string> = {
-    fr: `Restaurants à ${resolved.name} — ${resolved.count} ${fr_adresse} | Just-Tag`,
-    de: `Restaurants in ${resolved.name} — ${resolved.count} ${de_adresse} | Just-Tag`,
-    en: `Restaurants in ${resolved.name} — ${resolved.count} ${en_place} | Just-Tag`,
-    pt: `Restaurantes em ${resolved.name} — ${resolved.count} ${pt_endereco} | Just-Tag`,
-    es: `Restaurantes en ${resolved.name} — ${resolved.count} ${es_direccion} | Just-Tag`,
+    fr: `Restaurants à ${resolved.name} — ${total} ${fr_adresse} | Just-Tag`,
+    de: `Restaurants in ${resolved.name} — ${total} ${de_adresse} | Just-Tag`,
+    en: `Restaurants in ${resolved.name} — ${total} ${en_place} | Just-Tag`,
+    pt: `Restaurantes em ${resolved.name} — ${total} ${pt_endereco} | Just-Tag`,
+    es: `Restaurantes en ${resolved.name} — ${total} ${es_direccion} | Just-Tag`,
   };
 
   const descriptions: Record<string, string> = {
@@ -191,21 +221,21 @@ export default async function CityRestaurantsPage({
     notFound();
   }
 
-  // Fetch the 24 top-rated restaurants in this city.
-  // Le compteur affiché (titre, sous-titre, JSON-LD) provient exclusivement
-  // de `resolved.count` (agrégat normalisé ville/canton) — pas du total
-  // renvoyé par cette requête — pour éviter les 3 compteurs contradictoires
-  // relevés en recette (#34). `total` ne sert ici qu'à savoir si un lien
-  // "voir tous" doit être affiché.
-  const { data: items } = await fetchFilteredRestaurants(
+  // Fetch the 24 top-rated restaurants in this city — filtré sur TOUTES les
+  // variantes brutes de la ville (ex. ["Bern", "Berne"]), pas seulement le
+  // nom canonique fusionné, sinon la grille resterait vide pour les villes
+  // dédupliquées malgré un compteur non nul (bloquant sécurité #34).
+  // `total` (exact, renvoyé par cette même requête) est LA source de vérité
+  // unique utilisée pour le sous-titre et le JSON-LD : il correspond par
+  // construction au nombre de restaurants que cette requête peut renvoyer.
+  const { data: items, totalCount: total } = await fetchFilteredRestaurants(
     {
-      city: resolved.name,
+      city: resolved.variants,
       sort: "rating",
     },
     1,
     24
   );
-  const total = resolved.count;
 
   const otherCities = await getOtherCitiesInCanton(resolved.canton, resolved.slug, 8);
 
@@ -374,7 +404,11 @@ export default async function CityRestaurantsPage({
               {total > items.length && (
                 <div className="mt-10 text-center">
                   <Link
-                    href={`/${locale}/restaurants?city=${encodeURIComponent(resolved.name)}`}
+                    // Chaque variante est encodée individuellement puis jointe par une
+                    // virgule LITTÉRALE (non encodée) qui sert de séparateur — le
+                    // parsing côté /restaurants (searchParams déjà décodé par Next)
+                    // sépare simplement sur "," pour retrouver la liste de variantes.
+                    href={`/${locale}/restaurants?city=${resolved.variants.map((v) => encodeURIComponent(v)).join(",")}`}
                     className="inline-block rounded-xl bg-[var(--color-just-tag)] px-8 py-3 font-semibold text-white shadow-md transition hover:scale-105"
                   >
                     {seeAllLabels[locale] || seeAllLabels.fr} ({total.toLocaleString("fr-CH")})

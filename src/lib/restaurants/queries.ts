@@ -60,7 +60,13 @@ export type RestaurantFilters = {
   establishmentType?: string;
   canton?: string;
   cuisine?: string;
-  city?: string;
+  /**
+   * Filtre ville. Une chaîne fait une correspondance EXACTE (insensible à la
+   * casse) sur `city`. Un tableau fait un `.in("city", [...])` : utilisé pour
+   * matcher toutes les variantes brutes d'une même commune canonicalisée
+   * (ex. ["Bern", "Berne"]) — voir lib/restaurants/city-canton.ts.
+   */
+  city?: string | string[];
   /** 1..4 — filters price_range <= priceMax (string enum comparison) */
   priceMax?: number;
   /** filters avg_rating >= ratingMin */
@@ -153,10 +159,20 @@ function applyFilters(query: any, filters: RestaurantFilters) {
     q = q.eq("cuisine_type", filters.cuisine);
   }
   if (filters.city) {
-    // Correspondance EXACTE (insensible à la casse) — un ilike avec jokers
-    // ("%Berne%") capturait aussi "Bernex" ou "Route de Berne 285", mélangeant
-    // des établissements d'autres communes dans la page /restaurants/ville/berne (#34).
-    q = q.ilike("city", escapeLikePattern(filters.city));
+    if (Array.isArray(filters.city)) {
+      // Plusieurs variantes brutes d'une même commune canonicalisée
+      // (ex. ["Bern", "Berne"]) — un simple ilike sur le nom fusionné ne
+      // matcherait aucune ligne dont `city` est une variante différente,
+      // vidant la grille malgré un compteur non nul (#34, bloquant sécurité).
+      if (filters.city.length > 0) {
+        q = q.in("city", filters.city);
+      }
+    } else {
+      // Correspondance EXACTE (insensible à la casse) — un ilike avec jokers
+      // ("%Berne%") capturait aussi "Bernex" ou "Route de Berne 285", mélangeant
+      // des établissements d'autres communes dans la page /restaurants/ville/berne (#34).
+      q = q.ilike("city", escapeLikePattern(filters.city));
+    }
   }
   if (filters.priceMax != null && filters.priceMax >= 1 && filters.priceMax <= 4) {
     q = q.lte("price_range", String(filters.priceMax));
