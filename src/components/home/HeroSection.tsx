@@ -82,9 +82,11 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl">
               {t("title")}
             </h1>
-            <p className="mt-4 max-w-xl text-base text-gray-300 sm:text-lg">
-              {t("subtitle")}
-            </p>
+            {t("subtitle") && (
+              <p className="mt-4 max-w-xl text-base text-gray-300 sm:text-lg">
+                {t("subtitle")}
+              </p>
+            )}
 
             {/* Search Box */}
             <div className="mt-8 animate-fade-in-up animate-delay-200">

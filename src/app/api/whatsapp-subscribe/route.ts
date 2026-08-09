@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 
+function toE164(raw: string): string | null {
+  let digits = raw.replace(/[^0-9+]/g, "");
+  // +41... → keep, strip +
+  if (digits.startsWith("+")) digits = digits.slice(1);
+  // 0041... → strip 00
+  else if (digits.startsWith("00")) digits = digits.slice(2);
+  // 07x... (Swiss local 10 digits) → replace leading 0 with 41
+  else if (digits.startsWith("0") && digits.length === 10) digits = "41" + digits.slice(1);
+  if (digits.length < 7) return null;
+  return "+" + digits;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { restaurant_id, phone, source, first_name } = await request.json();
@@ -9,9 +21,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "restaurant_id et phone requis" }, { status: 400 });
     }
 
-    // Normalize phone: keep only digits and +
-    const normalizedPhone = phone.replace(/[^0-9+]/g, "");
-    if (normalizedPhone.length < 10) {
+    const normalizedPhone = toE164(phone);
+    if (!normalizedPhone) {
       return NextResponse.json({ error: "Numéro invalide" }, { status: 400 });
     }
 

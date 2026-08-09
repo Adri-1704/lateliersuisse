@@ -41,11 +41,11 @@ const i18n: Record<string, {
   fr: {
     title: "Autour de moi",
     subtitle: "Les restaurants, bars et cafés les plus proches de vous",
-    button: "Trouver les restaurants autour de moi",
+    button: "Trouver les établissements autour de moi",
     loading: "Recherche en cours...",
     error: "Impossible de récupérer votre position. Vérifiez que la géolocalisation est activée.",
     denied: "Vous avez refusé la géolocalisation. Activez-la dans les paramètres de votre navigateur pour utiliser cette fonctionnalité.",
-    noResults: "Aucun restaurant trouvé dans un rayon de 20 km.",
+    noResults: "Aucun établissement trouvé dans un rayon de 20 km.",
     retry: "Réessayer",
     expand: "Chercher dans un rayon plus large",
   },
@@ -220,7 +220,7 @@ export function NearbyRestaurants({ locale }: { locale: string }) {
             ) : (
               <>
                 <p className="mb-6 text-sm text-gray-500">
-                  {restaurants.length} {locale === "de" || locale === "en" ? "restaurants" : "restaurants"} {locale === "fr" ? `dans un rayon de ${radius} km` : locale === "de" ? `im Umkreis von ${radius} km` : `within ${radius} km`}
+                  {restaurants.length} {locale === "fr" ? "établissements" : "restaurants"} {locale === "fr" ? `dans un rayon de ${radius} km` : locale === "de" ? `im Umkreis von ${radius} km` : `within ${radius} km`}
                 </p>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   {restaurants.map((r) => {

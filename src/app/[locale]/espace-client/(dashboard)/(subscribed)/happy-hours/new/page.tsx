@@ -20,8 +20,8 @@ export default async function NewHappyHourPage({
     return (
       <div className="rounded-xl border border-dashed p-8 text-center">
         <p className="text-sm text-gray-600">
-          Aucun restaurant associe a votre compte. Revendiquez ou creez votre
-          restaurant avant de creer une Happy Hour.
+          Aucun restaurant associé à votre compte. Revendiquez ou créez votre
+          restaurant avant de créer une Happy Hour.
         </p>
       </div>
     );
@@ -39,7 +39,7 @@ export default async function NewHappyHourPage({
       <div>
         <h1 className="text-2xl font-bold">Nouvelle Happy Hour</h1>
         <p className="text-muted-foreground">
-          Remplissez un creneau creux avec une offre flash.
+          Remplissez un créneau creux avec une offre flash.
         </p>
       </div>
 

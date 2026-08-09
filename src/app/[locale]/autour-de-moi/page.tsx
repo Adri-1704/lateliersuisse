@@ -11,7 +11,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<string, string> = {
-    fr: "Restaurants autour de moi — Just-Tag",
+    fr: "Établissements autour de moi — Just-Tag",
     de: "Restaurants in meiner Nähe — Just-Tag",
     en: "Restaurants near me — Just-Tag",
     pt: "Restaurantes perto de mim — Just-Tag",

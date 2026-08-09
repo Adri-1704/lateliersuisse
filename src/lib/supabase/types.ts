@@ -88,6 +88,8 @@ export interface DbRestaurant {
   search_vector: string | null;
   claim_status: RestaurantClaimStatus;
   claimed_at: string | null;
+  sponsor_name: string | null;
+  sponsor_logo_url: string | null;
   created_at: string;
   updated_at: string;
 }

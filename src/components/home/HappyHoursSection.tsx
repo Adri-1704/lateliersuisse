@@ -40,7 +40,7 @@ export async function HappyHoursSection({ locale }: { locale: string }) {
       ? "Blitzangebote jetzt in der Westschweiz"
       : locale === "en"
         ? "Flash deals right now across Western Switzerland"
-        : "Les offres flash des restaurants romands, en direct";
+        : "Les offres flash des établissements romands, en direct";
   const cta =
     locale === "de"
       ? "Alle Happy Hours"

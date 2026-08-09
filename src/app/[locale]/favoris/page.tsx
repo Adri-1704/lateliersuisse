@@ -110,7 +110,7 @@ export default function FavorisPage() {
             {locale === "de" ? "Noch keine Favoriten" : locale === "en" ? "No favorites yet" : locale === "pt" ? "Sem favoritos ainda" : locale === "es" ? "Sin favoritos todavía" : "Aucun favori pour le moment"}
           </h2>
           <p className="mt-2 text-sm text-gray-500">
-            {locale === "de" ? "Klicken Sie auf das Herz-Symbol, um Restaurants zu speichern" : locale === "en" ? "Click the heart icon to save restaurants" : locale === "pt" ? "Clique no ícone de coração para salvar restaurantes" : locale === "es" ? "Haga clic en el icono del corazón para guardar restaurantes" : "Cliquez sur le coeur pour sauvegarder des restaurants"}
+            {locale === "de" ? "Klicken Sie auf das Herz-Symbol, um Restaurants zu speichern" : locale === "en" ? "Click the heart icon to save restaurants" : locale === "pt" ? "Clique no ícone de coração para salvar restaurantes" : locale === "es" ? "Haga clic en el icono del corazón para guardar restaurantes" : "Cliquez sur le coeur pour sauvegarder des établissements"}
           </p>
         </div>
       )}

@@ -44,7 +44,7 @@ export function NewRestaurantForm() {
       });
 
       if (res.success) {
-        toast.success("Restaurant créé avec succès");
+        toast.success("Établissement créé avec succès");
         router.push("/admin/restaurants");
         router.refresh();
       } else {
@@ -137,7 +137,7 @@ export function NewRestaurantForm() {
           disabled={isPending || !canton}
           className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {isPending ? "Création..." : "Créer le restaurant"}
+          {isPending ? "Création..." : "Créer l'établissement"}
         </button>
         <button
           type="button"

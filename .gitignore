@@ -50,3 +50,7 @@ scripts/apply-migrations.mjs
 scripts/
 .env*.local
 *.csv
+
+# Local raw asset staging (not served by the app)
+/Partenaires/
+/Photos restaurant/

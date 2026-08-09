@@ -66,7 +66,7 @@ export function HappyHourQrCode({ publicUrl, title }: Props) {
             <a href={qrLargeUrl} download={`happy-hour-${title.replace(/\s+/g, "-").toLowerCase()}.png`} target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="sm">
                 <Download className="mr-2 h-4 w-4" />
-                Telecharger HD
+                Télécharger HD
               </Button>
             </a>
             <Button variant="outline" size="sm" onClick={copyLink}>
@@ -75,7 +75,7 @@ export function HappyHourQrCode({ publicUrl, title }: Props) {
               ) : (
                 <Copy className="mr-2 h-4 w-4" />
               )}
-              {copied ? "Copie" : "Copier le lien"}
+              {copied ? "Copié" : "Copier le lien"}
             </Button>
           </div>
         </div>

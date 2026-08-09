@@ -41,7 +41,7 @@ const PROMO_TYPES: {
   },
   {
     value: "special_menu",
-    label: "Menu special",
+    label: "Menu spécial",
     hint: "Menu Tapas 19 CHF",
     placeholder: "Ex: Menu 19 CHF",
   },
@@ -183,7 +183,7 @@ export function HappyHourForm({ restaurantId, existing, basePath }: Props) {
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Decrivez l'offre : produits concernes, conditions, ambiance..."
+            placeholder="Décrivez l'offre : produits concernés, conditions, ambiance..."
             maxLength={500}
           />
         </div>
@@ -212,7 +212,7 @@ export function HappyHourForm({ restaurantId, existing, basePath }: Props) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="value">Valeur affichee</Label>
+          <Label htmlFor="value">Valeur affichée</Label>
           <Input
             id="value"
             value={promoValue}
@@ -221,16 +221,16 @@ export function HappyHourForm({ restaurantId, existing, basePath }: Props) {
             maxLength={80}
           />
           <p className="text-xs text-gray-500">
-            Ce texte court sera affiche en gros sur la fiche et dans le listing.
+            Ce texte court sera affiché en gros sur la fiche et dans le listing.
           </p>
         </div>
       </section>
 
       <section className="space-y-4 rounded-xl border bg-white p-5">
-        <h3 className="font-semibold text-gray-900">Creneau</h3>
+        <h3 className="font-semibold text-gray-900">Créneau</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="starts_at">Debut *</Label>
+            <Label htmlFor="starts_at">Début *</Label>
             <Input
               id="starts_at"
               type="datetime-local"
@@ -251,14 +251,14 @@ export function HappyHourForm({ restaurantId, existing, basePath }: Props) {
           </div>
         </div>
         <p className="text-xs text-gray-500">
-          Heure Europe/Zurich. Vos visiteurs verront un badge &quot;En cours&quot; pendant le creneau.
+          Heure Europe/Zurich. Vos visiteurs verront un badge &quot;En cours&quot; pendant le créneau.
         </p>
       </section>
 
       <section className="space-y-4 rounded-xl border bg-white p-5">
         <div className="flex items-center justify-between">
           <div>
-            <Label className="block">Places limitees</Label>
+            <Label className="block">Places limitées</Label>
             <p className="text-xs text-gray-500">
               Nombre total de couverts / places pour cette offre.
             </p>
@@ -318,7 +318,7 @@ export function HappyHourForm({ restaurantId, existing, basePath }: Props) {
             ) : (
               <Save className="mr-2 h-4 w-4" />
             )}
-            {existing ? "Mettre a jour" : "Publier la Happy Hour"}
+            {existing ? "Mettre à jour" : "Publier la Happy Hour"}
           </Button>
         </div>
       </div>

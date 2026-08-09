@@ -445,6 +445,21 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 <DistinctionBadges badges={restaurant.badges} />
               </div>
             )}
+            {restaurant.sponsorLogoUrl && (
+              <div className="mt-2 flex items-center gap-2">
+                <Badge variant="outline" className="gap-1.5 border-gray-200 py-1 pl-1 pr-2 text-gray-500">
+                  <Image
+                    src={restaurant.sponsorLogoUrl}
+                    alt={restaurant.sponsorName || "Partenaire"}
+                    width={16}
+                    height={16}
+                    className="h-4 w-4 rounded-full object-contain"
+                  />
+                  {locale === "de" ? "In Partnerschaft mit" : locale === "en" ? "In partnership with" : locale === "pt" ? "Em parceria com" : locale === "es" ? "En colaboración con" : "En partenariat avec"}{" "}
+                  {restaurant.sponsorName}
+                </Badge>
+              </div>
+            )}
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
               {/* Rating circle */}
               <div className="flex items-center gap-2">

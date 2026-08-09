@@ -1,6 +1,6 @@
 {
   "joinPage": {
-    "subtitle": "Recevez les offres, plats du jour et menus de ce restaurant directement sur WhatsApp.",
+    "subtitle": "Recevez les offres, plats du jour et menus de cet établissement directement sur WhatsApp.",
     "firstName": "Prénom (optionnel)",
     "firstNamePlaceholder": "Votre prénom",
     "phone": "Numéro WhatsApp",
@@ -9,17 +9,17 @@
     "submit": "Recevoir les offres",
     "submitting": "Inscription en cours…",
     "successTitle": "Vous êtes inscrit !",
-    "successMessage": "Vous recevrez les prochaines offres et menus de ce restaurant directement sur WhatsApp.",
+    "successMessage": "Vous recevrez les prochaines offres et menus de cet établissement directement sur WhatsApp.",
     "errorInvalid": "Numéro de téléphone invalide.",
     "errorServer": "Une erreur est survenue, veuillez réessayer."
   },
   "metadata": {
-    "title": "Just-Tag | Les meilleurs restaurants de Suisse Romande",
-    "description": "Découvrez les meilleurs restaurants de Suisse Romande. Recherchez par canton, cuisine et budget pour trouver votre restaurant idéal."
+    "title": "Just-Tag | Les meilleurs établissements de Suisse Romande",
+    "description": "Découvrez les meilleurs établissements de Suisse Romande. Recherchez par canton, cuisine et budget pour trouver votre établissement idéal."
   },
   "nav": {
     "home": "Accueil",
-    "restaurants": "Restaurants",
+    "restaurants": "Établissements",
     "about": "À propos",
     "contact": "Contact",
     "faq": "FAQ",
@@ -30,8 +30,8 @@
     "searchPlaceholder": "Nom, ville, cuisine..."
   },
   "hero": {
-    "title": "La Romandie se déguste",
-    "subtitle": "Restaurants, bars et cafés — les meilleures adresses de Suisse Romande",
+    "title": "Les meilleurs établissements de Suisse Romande",
+    "subtitle": "",
     "searchPlaceholder": "Nom, ville, cuisine...",
     "canton": "Canton",
     "allCantons": "Tous les cantons",
@@ -40,12 +40,12 @@
     "searchButton": "Rechercher",
     "swissBadge": "100% Romand",
     "popularSearches": "Recherches populaires",
-    "statsCounter": "7 cantons, {count} restaurants"
+    "statsCounter": "7 cantons, {count} établissements"
   },
   "featured": {
-    "title": "Restaurants du mois",
+    "title": "Établissements du mois",
     "subtitle": "Notre sélection des meilleures tables ce mois-ci",
-    "badge": "Restaurant du mois"
+    "badge": "Établissement du mois"
   },
   "categories": {
     "title": "Explorez par type de cuisine",
@@ -54,13 +54,13 @@
   },
   "howItWorks": {
     "title": "Comment ça marche ?",
-    "subtitle": "Trouvez votre restaurant idéal en 3 étapes simples",
+    "subtitle": "Trouvez votre établissement idéal en 3 étapes simples",
     "step1Title": "Recherchez",
-    "step1Desc": "Utilisez nos filtres avancés pour trouver le restaurant parfait selon vos envies",
+    "step1Desc": "Utilisez nos filtres avancés pour trouver l'établissement parfait selon vos envies",
     "step2Title": "Découvrez",
     "step2Desc": "Consultez les fiches détaillées : menus, photos, avis et localisation",
     "step3Title": "Savourez",
-    "step3Desc": "Contactez le restaurant et profitez d'une expérience culinaire inoubliable"
+    "step3Desc": "Contactez l'établissement et profitez d'une expérience culinaire inoubliable"
   },
   "testimonials": {
     "title": "Ce que disent nos utilisateurs",
@@ -68,7 +68,7 @@
   },
   "newsletter": {
     "title": "Restez informé",
-    "subtitle": "Recevez nos meilleures recommandations et les nouveaux restaurants chaque semaine",
+    "subtitle": "Recevez nos meilleures recommandations et les nouveaux établissements chaque semaine",
     "placeholder": "Votre adresse email",
     "button": "S'inscrire",
     "privacy": "Nous respectons votre vie privée. Désabonnez-vous à tout moment.",
@@ -76,17 +76,17 @@
     "error": "Une erreur est survenue. Veuillez réessayer."
   },
   "stats": {
-    "restaurants": "Restaurants",
+    "restaurants": "Établissements",
     "cantons": "Cantons romands",
     "reviews": "Avis vérifiés",
     "cuisines": "Types de cuisine",
     "swissQuality": "Qualité Suisse Romande"
   },
   "search": {
-    "title": "Trouver un restaurant",
+    "title": "Trouver un établissement",
     "filters": "Filtres",
-    "results": "{count} restaurants trouvés",
-    "noResults": "Aucun restaurant ne correspond à votre recherche",
+    "results": "{count} établissements trouvés",
+    "noResults": "Aucun établissement ne correspond à votre recherche",
     "sortBy": "Trier par",
     "sortRating": "Meilleure note",
     "sortPrice": "Prix croissant",
@@ -99,7 +99,7 @@
     "dietaryRestrictions": "Restrictions alimentaires",
     "ambiance": "Ambiance",
     "services": "Services et equipements",
-    "searchLabel": "Rechercher un restaurant",
+    "searchLabel": "Rechercher un établissement",
     "searchPlaceholder": "Nom, ville, cuisine...",
     "clearAll": "Effacer les filtres",
     "showMore": "Afficher plus",
@@ -120,7 +120,7 @@
     "website": "Visiter le site",
     "call": "Réserver",
     "email": "Envoyer un email",
-    "similar": "Restaurants similaires",
+    "similar": "Établissements similaires",
     "writeReview": "Écrire un avis",
     "reviewForm": {
       "title": "Laisser un avis",
@@ -136,7 +136,7 @@
       "errorRating": "Veuillez sélectionner une note",
       "errorGeneric": "Une erreur est survenue, veuillez réessayer"
     },
-    "restaurantReply": "Réponse du restaurant",
+    "restaurantReply": "Réponse de l'établissement",
     "followInstagram": "Nous suivre sur Instagram",
     "followFacebook": "Nous suivre sur Facebook",
     "followTiktok": "Nous suivre sur TikTok",
@@ -152,7 +152,7 @@
   },
   "merchant": {
     "title": "Rejoignez Just-Tag",
-    "subtitle": "Mettez votre restaurant en avant auprès de milliers de gourmets romands",
+    "subtitle": "Mettez votre établissement en avant auprès de milliers de gourmets romands",
     "monthly": "Mensuel",
     "semiannual": "Semestriel",
     "annual": "Annuel",
@@ -165,7 +165,7 @@
     "bestValue": "Meilleur rapport qualité-prix",
     "subscribe": "Souscrire",
     "features": {
-      "listing": "Fiche restaurant complète",
+      "listing": "Fiche établissement complète",
       "photos": "Jusqu'à 20 photos",
       "menu": "Menu détaillé",
       "stats": "Statistiques de visite",
@@ -177,7 +177,7 @@
       "name": "Nom complet",
       "email": "Email professionnel",
       "phone": "Téléphone",
-      "restaurantName": "Nom du restaurant",
+      "restaurantName": "Nom de l'établissement",
       "city": "Ville",
       "submit": "Continuer vers le paiement"
     },
@@ -185,13 +185,13 @@
       "title": "Bienvenue chez Just-Tag !",
       "subtitle": "Votre abonnement a été activé avec succès",
       "nextSteps": "Prochaines étapes",
-      "step1": "Complétez votre fiche restaurant",
+      "step1": "Complétez votre fiche établissement",
       "step2": "Ajoutez vos photos et votre menu",
       "step3": "Publiez et attirez de nouveaux clients"
     }
   },
   "footer": {
-    "description": "Envoyez vos menus et offres directement dans le WhatsApp de vos abonnés. La plateforme des restaurants romands.",
+    "description": "Envoyez vos menus et offres directement dans le WhatsApp de vos abonnés. La plateforme des établissements romands.",
     "quickLinks": "Liens rapides",
     "legal": "Informations légales",
     "privacy": "Politique de confidentialité",
@@ -206,10 +206,10 @@
   },
   "b2b": {
     "hero": {
-      "title": "La première plateforme 100% dédiée aux restaurants de Suisse Romande",
-      "subtitle": "Rejoignez la plateforme de référence pour les restaurants en Suisse Romande et attirez de nouveaux clients chaque jour.",
+      "title": "La première plateforme 100% dédiée aux établissements de Suisse Romande",
+      "subtitle": "Rejoignez la plateforme de référence pour les établissements en Suisse Romande et attirez de nouveaux clients chaque jour.",
       "benefit1": "Visibilité auprès de milliers de gourmets romands",
-      "benefit2": "Fiche restaurant complète avec menu, photos et avis",
+      "benefit2": "Fiche établissement complète avec menu, photos et avis",
       "benefit3": "Outils marketing pour booster votre réputation",
       "socialProof": "Rejoignez les 100+ restaurateurs qui nous font confiance",
       "cta": "Demander à être contacté",
@@ -221,7 +221,7 @@
       "subtitle": "Just-Tag est conçu pour la Suisse Romande, par des Romands",
       "trilingual": {
         "title": "Multilingue par défaut",
-        "desc": "Votre fiche restaurant est automatiquement disponible en français, allemand, anglais, portugais et espagnol."
+        "desc": "Votre fiche établissement est automatiquement disponible en français, allemand, anglais, portugais et espagnol."
       },
       "seo": {
         "title": "SEO par canton",
@@ -229,7 +229,7 @@
       },
       "data": {
         "title": "Données en Suisse",
-        "desc": "Hébergement suisse, conformité RGPD et loi suisse sur la protection des données."
+        "desc": "Hébergement suisse, conforme à la LPD (loi suisse sur la protection des données)."
       },
       "community": {
         "title": "Communauté locale",
@@ -237,7 +237,7 @@
       }
     },
     "stats": {
-      "restaurants": "Restaurants partenaires",
+      "restaurants": "Établissements partenaires",
       "cantons": "Cantons couverts",
       "reviews": "Avis publiés",
       "cuisines": "Types de cuisine"
@@ -247,8 +247,8 @@
       "subtitle": "Tout ce dont vous avez besoin pour développer votre clientèle",
       "visibility": {
         "title": "Visibilité maximale",
-        "desc": "Votre restaurant apparaît dans les recherches de milliers de gourmets romands, avec une fiche optimisée pour le référencement.",
-        "point1": "Fiche restaurant détaillée et professionnelle",
+        "desc": "Votre établissement apparaît dans les recherches de milliers de gourmets romands, avec une fiche optimisée pour le référencement.",
+        "point1": "Fiche établissement détaillée et professionnelle",
         "point2": "Référencement SEO optimisé sur Google",
         "point3": "Présence sur la plateforme n°1 en Suisse Romande"
       },
@@ -283,11 +283,11 @@
       },
       "step2": {
         "title": "Créez votre fiche",
-        "desc": "Ajoutez vos photos, votre menu, vos horaires et toutes les informations de votre restaurant."
+        "desc": "Ajoutez vos photos, votre menu, vos horaires et toutes les informations de votre établissement."
       },
       "step3": {
         "title": "Publiez",
-        "desc": "Votre restaurant apparaît sur la plateforme et devient visible pour des milliers de gourmets."
+        "desc": "Votre établissement apparaît sur la plateforme et devient visible pour des milliers de gourmets."
       },
       "step4": {
         "title": "Attirez des clients",
@@ -321,7 +321,7 @@
       "subtitle": "Choisissez la formule qui vous convient et commencez à attirer de nouveaux clients",
       "earlyBirdTab": "Offre de lancement",
       "earlyBirdBadge": "-40%",
-      "earlyBirdNote": "Tarifs exclusifs réservés aux 100 premiers restaurants inscrits",
+      "earlyBirdNote": "Tarifs exclusifs réservés aux 100 premiers établissements inscrits",
       "standardTab": "Tarifs standards",
       "perMonthLabel": "/mois",
       "totalLabel": "soit CHF {price} au total",
@@ -358,9 +358,9 @@
       "subtitle": "Laissez-nous vos coordonnées et un conseiller vous recontactera sous 24h.",
       "email": "Email professionnel",
       "phone": "Téléphone",
-      "restaurantName": "Nom du restaurant",
+      "restaurantName": "Nom de l'établissement",
       "message": "Message (optionnel)",
-      "messagePlaceholder": "Dites-nous en plus sur votre restaurant...",
+      "messagePlaceholder": "Dites-nous en plus sur votre établissement...",
       "submit": "Envoyer ma demande",
       "sending": "Envoi en cours...",
       "success": "Merci ! Votre demande a bien été envoyée. Un conseiller vous contactera sous 24h.",
@@ -381,12 +381,12 @@
         "answer": "Non, le plan mensuel est sans engagement. Vous pouvez annuler à tout moment. Les plans semestriel et annuel sont facturés en une fois pour la période choisie."
       },
       "q3": {
-        "question": "Comment ma fiche restaurant est-elle mise en avant ?",
-        "answer": "Votre restaurant apparaît dans les résultats de recherche avec une fiche complète incluant photos, menu, horaires et avis. Selon votre plan, vous bénéficiez d'un affichage prioritaire et d'un badge vérifié."
+        "question": "Comment ma fiche établissement est-elle mise en avant ?",
+        "answer": "Votre établissement apparaît dans les résultats de recherche avec une fiche complète incluant photos, menu, horaires et avis. Selon votre plan, vous bénéficiez d'un affichage prioritaire et d'un badge vérifié."
       },
       "q4": {
         "question": "Le site est-il disponible en plusieurs langues ?",
-        "answer": "Oui, Just-Tag est disponible en français, allemand, anglais, portugais et espagnol. Votre fiche restaurant est traduite dans les cinq langues pour toucher un maximum de clients."
+        "answer": "Oui, Just-Tag est disponible en français, allemand, anglais, portugais et espagnol. Votre fiche établissement est traduite dans les cinq langues pour toucher un maximum de clients."
       },
       "q5": {
         "question": "Quel type de support proposez-vous ?",
@@ -402,11 +402,11 @@
     "hero": {
       "badge": "100% Suisse",
       "headline": "Remplissez vos tables sans payer de commission",
-      "subheadline": "98% de taux d'ouverture. Vos plats du jour et offres lus en 5 minutes par vos abonnés. {count}+ restaurants romands déjà sur la plateforme.",
+      "subheadline": "98% de taux d'ouverture. Vos plats du jour et offres lus en 5 minutes par vos abonnés. {count}+ établissements romands déjà sur la plateforme.",
       "benefit1": "200 à 800 messages WhatsApp/mois inclus — 98% d'ouverture, lu en 5 minutes",
       "benefit2": "Zéro commission sur vos réservations et contacts",
       "benefit3": "Fiche complète visible en 5 langues pour les touristes",
-      "socialProof": "{count} restaurants romands déjà sur la plateforme",
+      "socialProof": "{count} établissements romands déjà sur la plateforme",
       "cta": "Essayer 14 jours gratuitement",
       "ctaSecondary": "Voir une fiche exemple",
       "headlineLine1": "Vos offres et menus",
@@ -414,18 +414,18 @@
       "headlineHighlight": "WhatsApp de vos abonnés."
     },
     "trustStats": {
-      "restaurants": "Restaurants inscrits",
+      "restaurants": "Établissements inscrits",
       "cantons": "Cantons romands couverts",
       "reviews": "Avis Google vérifiés",
       "commission": "Commission sur vos réservations"
     },
     "problemSolution": {
-      "title": "Vous avez un super restaurant,",
+      "title": "Vous avez un super établissement,",
       "titleHighlight": "à nous de le mettre en lumière.",
       "problems": {
         "visibility": {
           "title": "Invisibilité en ligne",
-          "text": "Votre restaurant est noyé parmi des milliers sur Google. Pas de photos mises en valeur, pas de menu lisible, pas de fiche qui donne envie. Les clients passent à côté."
+          "text": "Votre établissement est noyé parmi des milliers sur Google. Pas de photos mises en valeur, pas de menu lisible, pas de fiche qui donne envie. Les clients passent à côté."
         },
         "commission": {
           "title": "Les plateformes prennent une commission",
@@ -453,7 +453,7 @@
     },
     "features": {
       "title": "Tout ce qu'il vous faut, rien de superflu",
-      "subtitle": "Pas de gadgets inutiles. Des outils concrets pour remplir votre restaurant.",
+      "subtitle": "Pas de gadgets inutiles. Des outils concrets pour remplir votre établissement.",
       "items": {
         "profile": {
           "title": "Fiche professionnelle",
@@ -461,7 +461,7 @@
         },
         "seo": {
           "title": "SEO par canton",
-          "desc": "Votre restaurant apparaît quand un client cherche \"restaurant [votre ville]\" sur Google."
+          "desc": "Votre établissement apparaît quand un client cherche \"restaurant [votre ville]\" sur Google."
         },
         "gallery": {
           "title": "Galerie photos et vidéo",
@@ -494,7 +494,7 @@
       "subtitle": "Tous les plans incluent les mêmes fonctionnalités. La seule différence : la durée de l'engagement et le prix.",
       "guarantee": "14 jours d'essai gratuit — satisfait ou remboursé",
       "earlyBirdLabel": "Offre de lancement",
-      "earlyBirdBannerActive": "Offre de lancement : -40% pour les 100 premiers restaurants. Plus que {count} places disponibles. Ces tarifs ne reviendront pas.",
+      "earlyBirdBannerActive": "Offre de lancement : -40% pour les 100 premiers établissements. Plus que {count} places disponibles. Ces tarifs ne reviendront pas.",
       "earlyBirdBannerExpiring": "Offre Early Bird bientôt terminée. Inscrivez-vous avant qu'il ne soit trop tard.",
       "bestValue": "Meilleur rapport qualité-prix",
       "perMonth": "/mois",
@@ -523,14 +523,14 @@
       "items": {
         "q1": {
           "question": "Comment fonctionne l'envoi WhatsApp ?",
-          "answer": "Vos clients s'abonnent depuis votre fiche Just-Tag en un clic. Une fois leur accord donné, vous leur envoyez vos menus, plats du jour et offres directement depuis votre tableau de bord. Tout est géré automatiquement, en conformité avec les règles Meta et le RGPD."
+          "answer": "Vos clients s'abonnent depuis votre fiche Just-Tag en un clic. Une fois leur accord donné, vous leur envoyez vos menus, plats du jour et offres directement depuis votre tableau de bord. Tout est géré automatiquement, en conformité avec les règles Meta et la LPD."
         },
         "q2": {
           "question": "Combien de messages puis-je envoyer par semaine ?",
           "answer": "Chaque plan inclut jusqu'à 2 envois par semaine. Vous choisissez librement quand envoyer — menu du lundi, offre spéciale du jeudi, promotion de fin de semaine. C'est vous qui décidez, dans la limite de 2 messages par semaine pour ne pas saturer vos abonnés."
         },
         "q3": {
-          "question": "Puis-je changer de plan ou augmenter mes abonnés à tout moment ?",
+          "question": "Puis-je changer de plan ou augmenter mon quota de messages à tout moment ?",
           "answer": "Oui. Vous pouvez upgrader depuis votre espace client à tout moment. Le changement prend effet au prochain cycle de facturation. Vous gardez toujours votre tarif de lancement si vous en bénéficiez."
         },
         "q4": {
@@ -539,7 +539,7 @@
         },
         "q5": {
           "question": "Qu'est-ce que le prix de lancement ?",
-          "answer": "Les 100 premiers restaurateurs à s'inscrire bénéficient d'un tarif réduit garanti à vie. Une fois la centième inscription atteinte, les nouveaux inscrits paient le prix catalogue. Vos anciens abonnés conservent leur tarif lancement définitivement."
+          "answer": "Les 100 premiers restaurateurs à s'inscrire bénéficient d'un tarif réduit garanti à vie. Une fois la centième inscription atteinte, les nouveaux inscrits paient le prix catalogue. Les restaurateurs déjà inscrits conservent leur tarif de lancement définitivement."
         },
         "q6": {
           "question": "Je peux annuler quand je veux ?",
@@ -567,15 +567,15 @@
       "expired": "Offre Early Bird bientôt terminée"
     },
     "findRestaurant": {
-      "title": "Votre restaurant est peut-être déjà sur Just-Tag",
+      "title": "Votre établissement est peut-être déjà sur Just-Tag",
       "subtitle": "Recherchez votre établissement et prenez le contrôle de votre fiche.",
-      "placeholder": "Tapez le nom de votre restaurant...",
-      "foundTitle": "Votre restaurant {name} est déjà sur Just-Tag.",
+      "placeholder": "Tapez le nom de votre établissement...",
+      "foundTitle": "Votre établissement {name} est déjà sur Just-Tag.",
       "foundSubtitle": "Revendiquez votre fiche pour la personnaliser et attirer plus de clients.",
       "claimCta": "Revendiquer ma fiche",
-      "notFoundTitle": "Votre restaurant n'est pas encore sur Just-Tag.",
+      "notFoundTitle": "Votre établissement n'est pas encore sur Just-Tag.",
       "notFoundSubtitle": "Ajoutez-le et profitez de l'offre Early Bird !",
-      "addCta": "Ajouter mon restaurant"
+      "addCta": "Ajouter mon établissement"
     },
     "meta": {
       "faqSchema": {
@@ -617,16 +617,16 @@
   "signupFlow": {
     "steps": {
       "signup": "Compte",
-      "restaurant": "Restaurant",
+      "restaurant": "Établissement",
       "plan": "Plan & Paiement"
     },
     "title": "Devenir partenaire",
-    "subtitle": "Créez votre compte, associez votre restaurant et choisissez votre plan",
+    "subtitle": "Créez votre compte, associez votre établissement et choisissez votre plan",
     "signup": {
       "name": "Nom complet *",
       "namePlaceholder": "Jean Dupont",
       "email": "Email professionnel *",
-      "emailPlaceholder": "vous@restaurant.ch",
+      "emailPlaceholder": "vous@etablissement.ch",
       "password": "Mot de passe *",
       "passwordPlaceholder": "Minimum 6 caractères",
       "passwordConfirm": "Confirmer le mot de passe *",
@@ -640,17 +640,17 @@
       "login": "Se connecter"
     },
     "restaurant": {
-      "successBanner": "Compte créé avec succès ! Associez maintenant votre restaurant.",
-      "searchLabel": "Rechercher votre restaurant",
-      "searchHint": "Trouvez votre restaurant dans notre base de données",
-      "searchPlaceholder": "Tapez le nom de votre restaurant...",
+      "successBanner": "Compte créé avec succès ! Associez maintenant votre établissement.",
+      "searchLabel": "Rechercher votre établissement",
+      "searchHint": "Trouvez votre établissement dans notre base de données",
+      "searchPlaceholder": "Tapez le nom de votre établissement...",
       "change": "Changer",
-      "noResults": "Aucun restaurant trouvé",
+      "noResults": "Aucun établissement trouvé",
       "noResultsHint": "Vous pouvez créer votre fiche ci-dessous",
       "or": "ou",
-      "notInList": "Mon restaurant n'est pas dans la liste",
-      "newTitle": "Créer une nouvelle fiche restaurant",
-      "newName": "Nom du restaurant *",
+      "notInList": "Mon établissement n'est pas dans la liste",
+      "newTitle": "Créer une nouvelle fiche établissement",
+      "newName": "Nom de l'établissement *",
       "newNamePlaceholder": "Le Petit Prince",
       "newCity": "Ville *",
       "newCityPlaceholder": "Genève",
@@ -697,7 +697,7 @@
   },
   "cantonMap": {
     "title": "Explorez par canton",
-    "subtitle": "Cliquez sur un canton pour découvrir ses restaurants"
+    "subtitle": "Cliquez sur un canton pour découvrir ses établissements"
   },
   "common": {
     "loading": "Chargement...",
@@ -726,7 +726,7 @@
   },
   "happyHours": {
     "title": "Happy Hours",
-    "subtitle": "Les offres flash des restaurants de Suisse Romande, en direct",
+    "subtitle": "Les offres flash des établissements de Suisse Romande, en direct",
     "filters": {
       "now": "Maintenant",
       "today": "Ce soir",
@@ -810,7 +810,7 @@
     "sidebar": {
       "navigation": "Navigation",
       "dashboard": "Tableau de bord",
-      "myRestaurant": "Mon restaurant",
+      "myRestaurant": "Mon établissement",
       "menu": "Ma carte",
       "photos": "Photos",
       "reviews": "Avis",
@@ -819,9 +819,9 @@
       "clientArea": "Espace client"
     },
     "restaurant": {
-      "title": "Mon restaurant",
-      "subtitle": "Modifiez les informations de votre restaurant",
-      "notFound": "Aucun restaurant associe a votre compte",
+      "title": "Mon établissement",
+      "subtitle": "Modifiez les informations de votre établissement",
+      "notFound": "Aucun établissement associe a votre compte",
       "names": "Noms",
       "descriptions": "Descriptions",
       "location": "Localisation et contact",
@@ -861,7 +861,7 @@
     },
     "photos": {
       "title": "Photos",
-      "subtitle": "Gerez les photos de votre restaurant",
+      "subtitle": "Gerez les photos de votre établissement",
       "upload": "Ajouter une photo",
       "uploaded": "Photo ajoutee !",
       "deleted": "Photo supprimee",
@@ -869,7 +869,7 @@
       "formats": "JPG, PNG ou WebP",
       "maxSize": "5 Mo maximum",
       "empty": "Aucune photo",
-      "emptyDescription": "Ajoutez des photos pour mettre en valeur votre restaurant"
+      "emptyDescription": "Ajoutez des photos pour mettre en valeur votre établissement"
     },
     "reviews": {
       "title": "Avis clients",

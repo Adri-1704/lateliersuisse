@@ -6,19 +6,19 @@ import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
-    questionFr: "Comment trouver un restaurant sur Just-Tag ?",
+    questionFr: "Comment trouver un établissement sur Just-Tag ?",
     questionDe: "Wie finde ich ein Restaurant auf Just-Tag?",
     questionEn: "How do I find a restaurant on Just-Tag?",
     questionPt: "Como encontrar um restaurante no Just-Tag?",
     questionEs: "¿Cómo encontrar un restaurante en Just-Tag?",
-    answerFr: "Utilisez notre barre de recherche en page d'accueil pour filtrer par canton, type de cuisine ou mot-cle. Vous pouvez aussi explorer par categorie de cuisine ou consulter nos restaurants du mois.",
+    answerFr: "Utilisez notre barre de recherche en page d'accueil pour filtrer par canton, type de cuisine ou mot-cle. Vous pouvez aussi explorer par categorie de cuisine ou consulter nos établissements du mois.",
     answerDe: "Nutzen Sie unsere Suchleiste auf der Startseite, um nach Kanton, Kuechenart oder Stichwort zu filtern. Sie koennen auch nach Kuechenkategorien durchstoeebern oder unsere Restaurants des Monats ansehen.",
     answerEn: "Use our search bar on the homepage to filter by canton, cuisine type or keyword. You can also browse by cuisine category or check out our restaurants of the month.",
     answerPt: "Use a nossa barra de pesquisa na página inicial para filtrar por cantão, tipo de cozinha ou palavra-chave. Também pode explorar por categoria de cozinha ou consultar os nossos restaurantes do mês.",
     answerEs: "Utilice nuestra barra de búsqueda en la página de inicio para filtrar por cantón, tipo de cocina o palabra clave. También puede explorar por categoría de cocina o consultar nuestros restaurantes del mes.",
   },
   {
-    questionFr: "Comment inscrire mon restaurant sur la plateforme ?",
+    questionFr: "Comment inscrire mon établissement sur la plateforme ?",
     questionDe: "Wie kann ich mein Restaurant auf der Plattform registrieren?",
     questionEn: "How can I register my restaurant on the platform?",
     questionPt: "Como inscrever o meu restaurante na plataforma?",
@@ -59,7 +59,7 @@ const faqs = [
     questionEn: "Can I book directly through Just-Tag?",
     questionPt: "Posso reservar diretamente pelo Just-Tag?",
     questionEs: "¿Puedo reservar directamente a través de Just-Tag?",
-    answerFr: "Pour le moment, Just-Tag vous fournit toutes les informations de contact du restaurant. Vous pouvez les appeler ou leur envoyer un email directement depuis la fiche du restaurant.",
+    answerFr: "Pour le moment, Just-Tag vous fournit toutes les informations de contact de l'établissement. Vous pouvez les appeler ou leur envoyer un email directement depuis la fiche de l'établissement.",
     answerDe: "Derzeit stellt Just-Tag Ihnen alle Kontaktinformationen des Restaurants zur Verfuegung. Sie koennen sie anrufen oder ihnen direkt von der Restaurantseite aus eine E-Mail senden.",
     answerEn: "Currently, Just-Tag provides you with all the restaurant's contact information. You can call them or send them an email directly from the restaurant page.",
     answerPt: "Atualmente, o Just-Tag fornece-lhe todas as informações de contacto do restaurante. Pode ligar ou enviar um email diretamente a partir da ficha do restaurante.",
