@@ -4,6 +4,14 @@ import { isAdminUser } from "@/lib/admin";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 
+// Ces pages sont derrière authentification et appellent des Server Actions
+// gardées par requireAdmin() (voir src/actions/admin/*). Elles ne doivent
+// JAMAIS être générées statiquement au build : à ce moment il n'y a aucun
+// utilisateur authentifié, requireAdmin() throw et casse le build. Ce garde
+// est le comportement voulu en exécution (protéger les données admin) — on
+// force donc simplement le rendu dynamique de tout le segment.
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   let email = "contact@just-tag.app";
 
