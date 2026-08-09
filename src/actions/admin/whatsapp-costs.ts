@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/actions/admin/auth";
 
 // Meta Cloud API pricing — marketing messages, Switzerland ("Rest of Western Europe")
 // Model: per-message (since July 1, 2025 — replaced per-conversation billing)
@@ -49,6 +50,7 @@ interface RestaurantRow {
 }
 
 export async function getWhatsAppCosts(): Promise<WhatsAppCostsData> {
+  await requireAdmin();
   const supabase = createAdminClient();
 
   const empty: WhatsAppCostsData = {

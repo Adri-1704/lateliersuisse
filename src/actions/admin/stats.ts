@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { PLAN_DETAILS, EARLY_BIRD_LIMIT } from "@/lib/stripe";
 import type { Subscription, DbRestaurant } from "@/lib/supabase/types";
+import { requireAdmin } from "@/actions/admin/auth";
 
 // ── Types ─────────────────────────────────────────────────────
 export interface SaaSMetrics {
@@ -75,6 +76,7 @@ function computeMonthlyRevenue(
 
 // ── Main query ────────────────────────────────────────────────
 export async function getSaaSMetrics(): Promise<SaaSMetrics> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 

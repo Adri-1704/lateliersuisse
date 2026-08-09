@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/actions/admin/auth";
 
 interface DashboardStats {
   totalRestaurants: number;
@@ -13,6 +14,7 @@ interface DashboardStats {
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 

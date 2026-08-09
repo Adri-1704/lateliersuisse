@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleSubscriptionWebhook } from "@/actions/subscriptions";
+import { handleSubscriptionWebhook } from "@/lib/subscriptions/webhook-handler";
 import { createAdminClient } from "@/lib/supabase/server";
 
 /**

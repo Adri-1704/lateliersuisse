@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import type { Merchant, Subscription } from "@/lib/supabase/types";
+import { requireAdmin } from "@/actions/admin/auth";
 
 interface MerchantWithSubscription extends Merchant {
   subscription?: Subscription | null;
@@ -14,6 +15,7 @@ const mockMerchants: MerchantWithSubscription[] = [
 ];
 
 export async function getMerchant(id: string): Promise<{ success: boolean; error: string | null; data?: MerchantWithSubscription }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase.from("merchants").select("*, subscriptions(*)").eq("id", id).single();
@@ -33,6 +35,7 @@ export async function getMerchant(id: string): Promise<{ success: boolean; error
 }
 
 export async function deleteMerchant(id: string): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 
@@ -66,6 +69,7 @@ export async function listMerchants(params: {
   limit?: number;
   search?: string;
 }): Promise<{ success: boolean; error: string | null; data?: { merchants: MerchantWithSubscription[]; total: number } }> {
+  await requireAdmin();
   const { page = 1, limit = 20, search } = params;
 
   try {
