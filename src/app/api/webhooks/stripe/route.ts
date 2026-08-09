@@ -57,9 +57,14 @@ export async function POST(request: NextRequest) {
     console.log(`Stripe webhook: ${event.type}`);
 
     // ── Event-level idempotence (C3 fix) ──
-    // Check if we already processed this Stripe event ID
+    // Check if we already processed this Stripe event ID. La dédoublonnage
+    // en écriture (marquer l'événement comme traité) ne doit avoir lieu
+    // qu'APRÈS le traitement effectif de l'événement (voir plus bas) :
+    // sinon, un échec/timeout du handler après cet insert ferait que Stripe
+    // rejoue l'événement sans jamais retraiter (l'événement paraissant déjà
+    // "traité" alors qu'il ne l'a pas été).
+    const supabase = createAdminClient();
     try {
-      const supabase = createAdminClient();
       const { data: existingEvent } = await supabase
         .from("stripe_events" as string)
         .select("id")
@@ -70,10 +75,6 @@ export async function POST(request: NextRequest) {
         console.log(`[Stripe Webhook] Event ${event.id} already processed — skipping.`);
         return NextResponse.json({ received: true, deduplicated: true });
       }
-
-      // Record this event as processed
-      await (supabase.from("stripe_events" as string) as ReturnType<typeof supabase.from>)
-        .insert({ id: event.id, event_type: event.type });
     } catch (dedupeErr) {
       // If stripe_events table doesn't exist yet, continue processing
       // (the subscription-level idempotence in handleSubscriptionWebhook is the fallback)
@@ -112,6 +113,20 @@ export async function POST(request: NextRequest) {
 
       default:
         console.log(`Unhandled event type: ${event.type}`);
+    }
+
+    // Le traitement a réussi : on marque l'événement comme traité MAINTENANT
+    // (et pas avant), pour que Stripe rejoue l'événement en cas d'échec du
+    // traitement ci-dessus (l'erreur est catchée plus bas et renvoie un
+    // statut non-2xx, sans jamais atteindre ce point).
+    try {
+      await (supabase.from("stripe_events" as string) as ReturnType<typeof supabase.from>)
+        .insert({ id: event.id, event_type: event.type });
+    } catch (dedupeWriteErr) {
+      // Si l'écriture de dédoublonnage échoue (ex: table absente), on ne
+      // fait pas échouer la requête : l'événement a bien été traité, on ne
+      // veut pas que Stripe le rejoue inutilement.
+      console.warn("[Stripe Webhook] Failed to record processed event:", dedupeWriteErr);
     }
 
     return NextResponse.json({ received: true });
