@@ -25,7 +25,7 @@ export function RestaurantDeleteButton({ id, name }: { id: string; name: string 
   return (
     <div className={isPending ? "opacity-50 pointer-events-none" : ""}>
       <DeleteConfirmDialog
-        title="Supprimer ce restaurant ?"
+        title="Supprimer cet établissement ?"
         description={`Voulez-vous vraiment supprimer "${name}" ? Cette action est irréversible.`}
         onConfirm={handleDelete}
       />

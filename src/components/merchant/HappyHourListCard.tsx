@@ -6,7 +6,7 @@ const PROMO_LABELS: Record<string, string> = {
   percentage: "Pourcentage",
   fixed_amount: "Montant fixe",
   free_item: "Article offert",
-  special_menu: "Menu special",
+  special_menu: "Menu spécial",
 };
 
 function formatRange(starts: string, ends: string): string {
@@ -54,7 +54,7 @@ export function HappyHourListCard({
             )}
             {!hh.is_active && (
               <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                Desactivee
+                Désactivée
               </span>
             )}
           </div>

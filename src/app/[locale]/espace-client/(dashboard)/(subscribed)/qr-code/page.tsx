@@ -11,6 +11,8 @@ export default function QRCodePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [slug, setSlug] = useState<string | null>(null);
   const [restaurantName, setRestaurantName] = useState<string>("");
+  const [sponsorName, setSponsorName] = useState<string | null>(null);
+  const [sponsorLogoUrl, setSponsorLogoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,6 +21,8 @@ export default function QRCodePage() {
       if (result.success && result.data) {
         setSlug(result.data.slug);
         setRestaurantName(result.data.name_fr || "");
+        setSponsorName(result.data.sponsor_name || null);
+        setSponsorLogoUrl(result.data.sponsor_logo_url || null);
       }
       setLoading(false);
     }
@@ -35,14 +39,19 @@ export default function QRCodePage() {
     });
   }, [slug]);
 
-  function handleDownload() {
+  const absoluteSponsorLogoUrl = sponsorLogoUrl
+    ? (sponsorLogoUrl.startsWith("http") ? sponsorLogoUrl : `${SITE_URL}${sponsorLogoUrl}`)
+    : null;
+
+  async function handleDownload() {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const height = sponsorLogoUrl ? 540 : 500;
     const out = document.createElement("canvas");
-    out.width = 400; out.height = 500;
+    out.width = 400; out.height = height;
     const ctx = out.getContext("2d")!;
     ctx.fillStyle = "#ffffff";
-    ctx.roundRect(0, 0, 400, 500, 20);
+    ctx.roundRect(0, 0, 400, height, 20);
     ctx.fill();
     ctx.fillStyle = "#1a1a1a";
     ctx.font = "bold 24px system-ui, sans-serif";
@@ -62,6 +71,24 @@ export default function QRCodePage() {
     ctx.fillStyle = "#bbb";
     ctx.font = "11px system-ui, sans-serif";
     ctx.fillText(`just-tag.app/fr/rejoindre/${slug}`, 200, 478);
+
+    if (sponsorLogoUrl) {
+      await new Promise<void>((resolve) => {
+        const logo = new window.Image();
+        logo.crossOrigin = "anonymous";
+        logo.onload = () => {
+          ctx.drawImage(logo, 170, 494, 28, 28);
+          ctx.fillStyle = "#999";
+          ctx.font = "10px system-ui, sans-serif";
+          ctx.textAlign = "left";
+          ctx.fillText(`En partenariat avec ${sponsorName || ""}`, 202, 512);
+          resolve();
+        };
+        logo.onerror = () => resolve();
+        logo.src = absoluteSponsorLogoUrl!;
+      });
+    }
+
     const link = document.createElement("a");
     link.download = `qr-code-${slug}.png`;
     link.href = out.toDataURL("image/png");
@@ -87,6 +114,11 @@ export default function QRCodePage() {
         <h2>${restaurantName}</h2>
         <p>Scannez pour recevoir toutes nos offres par WhatsApp</p>
         <p class="orange">just-tag.app/fr/rejoindre/${slug}</p>
+        ${sponsorLogoUrl ? `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:10px;">
+          <img src="${absoluteSponsorLogoUrl}" style="width:22px;height:22px;border-radius:50%;object-fit:contain;">
+          <span style="font-size:11px;color:#999;">En partenariat avec ${sponsorName || ""}</span>
+        </div>` : ""}
         <script>window.onload = () => { window.print(); }<\/script>
       </body></html>
     `);

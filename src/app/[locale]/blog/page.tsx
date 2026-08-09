@@ -38,13 +38,21 @@ export async function generateMetadata({
   };
 }
 
+const POSTS_PER_PAGE = 20;
+
 export default async function BlogIndexPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { locale } = await params;
-  const { posts, total } = await getPublishedPosts(20, 0);
+  const sp = await searchParams;
+  const currentPage = Math.max(1, parseInt(sp.page || "1", 10) || 1);
+  const offset = (currentPage - 1) * POSTS_PER_PAGE;
+  const { posts, total } = await getPublishedPosts(POSTS_PER_PAGE, offset);
+  const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
 
   return (
     <>
@@ -141,10 +149,36 @@ export default async function BlogIndexPage({
                   </Link>
                 ))}
               </div>
-              {total > 20 && (
-                <p className="mt-8 text-center text-sm text-gray-500">
-                  {total} articles au total.
-                </p>
+              {totalPages > 1 && (
+                <nav className="mt-10 flex items-center justify-center gap-4">
+                  {currentPage > 1 ? (
+                    <Link
+                      href={`/${locale}/blog${currentPage - 1 > 1 ? `?page=${currentPage - 1}` : ""}`}
+                      className="rounded-lg border px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                    >
+                      ← Précédent
+                    </Link>
+                  ) : (
+                    <span className="rounded-lg border px-4 py-2 text-sm font-semibold text-gray-300">
+                      ← Précédent
+                    </span>
+                  )}
+                  <span className="text-sm text-gray-500">
+                    Page {currentPage} / {totalPages} · {total} articles au total
+                  </span>
+                  {currentPage < totalPages ? (
+                    <Link
+                      href={`/${locale}/blog?page=${currentPage + 1}`}
+                      className="rounded-lg border px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                    >
+                      Suivant →
+                    </Link>
+                  ) : (
+                    <span className="rounded-lg border px-4 py-2 text-sm font-semibold text-gray-300">
+                      Suivant →
+                    </span>
+                  )}
+                </nav>
               )}
             </>
           )}

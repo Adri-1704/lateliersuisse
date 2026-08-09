@@ -40,6 +40,8 @@ export interface Restaurant {
   badges?: RestaurantBadge[];
   promotions?: RestaurantPromotion[];
   menuPdfUrl?: string | null;
+  sponsorName?: string | null;
+  sponsorLogoUrl?: string | null;
 }
 
 export interface MenuItem {

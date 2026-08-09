@@ -26,7 +26,8 @@
     "forRestaurants": "Para restauradores",
     "login": "Iniciar sessão",
     "pricing": "Precos",
-    "search": "Pesquisar"
+    "search": "Pesquisar",
+    "searchPlaceholder": "Nome, cidade, cozinha..."
   },
   "hero": {
     "title": "Saboreie a Suíça Romanda",
@@ -102,7 +103,9 @@
     "showMore": "Mostrar mais",
     "map": "Ver no mapa",
     "mapView": "Vista mapa",
-    "listView": "Vista lista"
+    "listView": "Vista lista",
+    "searchLabel": "Pesquisar um restaurante",
+    "searchPlaceholder": "Nome, cidade, cozinha..."
   },
   "restaurant": {
     "menu": "Menu",
@@ -406,7 +409,10 @@
       "benefit3": "Visível em 5 idiomas para alcançar também os turistas",
       "socialProof": "{count} restaurantes romandos já na plataforma",
       "cta": "Experimentar grátis durante 14 dias",
-      "ctaSecondary": "Ver uma ficha exemplo"
+      "ctaSecondary": "Ver uma ficha exemplo",
+      "headlineLine1": "As suas ofertas e menus",
+      "headlineLine2": "no",
+      "headlineHighlight": "WhatsApp dos seus assinantes."
     },
     "trustStats": {
       "restaurants": "Restaurantes registados",
@@ -721,63 +727,63 @@
   },
   "happyHours": {
     "title": "Happy Hours",
-    "subtitle": "Les offres flash des restaurants de Suisse Romande, en direct",
+    "subtitle": "Ofertas flash dos restaurantes da Suíça Romanda, ao vivo",
     "filters": {
-      "now": "Maintenant",
-      "today": "Ce soir",
-      "week": "Cette semaine",
-      "canton": "Canton",
-      "allCantons": "Tous les cantons"
+      "now": "Agora",
+      "today": "Esta noite",
+      "week": "Esta semana",
+      "canton": "Cantão",
+      "allCantons": "Todos os cantões"
     },
     "badge": {
-      "ongoing": "En cours",
+      "ongoing": "Em curso",
       "upcoming": "Bientot"
     },
     "actions": {
-      "share": "Partager",
-      "shareWhatsapp": "Partager sur WhatsApp",
-      "copyLink": "Copier le lien",
+      "share": "Partilhar",
+      "shareWhatsapp": "Partilhar no WhatsApp",
+      "copyLink": "Copiar ligação",
       "copied": "Copie",
       "book": "Reserver",
-      "viewAll": "Voir toutes les Happy Hours"
+      "viewAll": "Ver todos os Happy Hours"
     },
     "empty": {
       "title": "Aucune Happy Hour pour cette selection",
-      "subtitle": "Essayez un autre filtre ou revenez plus tard."
+      "subtitle": "Experimente outro filtro ou volte mais tarde."
     },
     "merchant": {
       "title": "Happy Hours",
       "subtitle": "Creez des offres flash pour remplir vos creneaux creux.",
       "create": "Creer une Happy Hour",
-      "newTitle": "Nouvelle Happy Hour",
-      "editTitle": "Modifier la Happy Hour",
+      "newTitle": "Nova Happy Hour",
+      "editTitle": "Editar Happy Hour",
       "form": {
-        "title": "Titre",
-        "description": "Description",
-        "promoType": "Type de promotion",
+        "title": "Título",
+        "description": "Descrição",
+        "promoType": "Tipo de promoção",
         "promoValue": "Valeur affichee",
         "startsAt": "Debut",
-        "endsAt": "Fin",
+        "endsAt": "Fim",
         "placesLimited": "Places limitees",
-        "placesTotal": "Nombre de places",
-        "publish": "Publier",
-        "save": "Publier la Happy Hour",
+        "placesTotal": "Número de lugares",
+        "publish": "Publicar",
+        "save": "Publicar Happy Hour",
         "update": "Mettre a jour",
-        "delete": "Supprimer",
-        "cancel": "Annuler"
+        "delete": "Eliminar",
+        "cancel": "Cancelar"
       },
       "stats": {
-        "views": "Vues",
-        "clicks": "Clics"
+        "views": "Visualizações",
+        "clicks": "Cliques"
       },
       "qr": {
-        "title": "QR Code pour vos tables",
-        "subtitle": "Imprimez ce QR et posez-le sur vos tables : les clients scannent et arrivent directement sur votre fiche.",
+        "title": "Código QR para as suas mesas",
+        "subtitle": "Imprima este QR e coloque-o nas suas mesas: os clientes digitalizam e chegam diretamente ao seu perfil.",
         "download": "Telecharger HD",
-        "copyLink": "Copier le lien"
+        "copyLink": "Copiar ligação"
       },
       "status": {
-        "active": "En cours",
+        "active": "Em curso",
         "upcoming": "A venir",
         "past": "Passees",
         "disabled": "Desactivee"
@@ -901,6 +907,14 @@
       "manageBilling": "Gerir faturacao",
       "manageBillingDescription": "Alterar o metodo de pagamento ou cancelar a assinatura",
       "manageButton": "Portal de pagamento"
+    }
+  },
+  "blog": {
+    "backToAll": "Todos os artigos",
+    "cta": {
+      "title": "Encontre o seu próximo restaurante",
+      "subtitle": "Explore mais de 11 000 restaurantes na Suíça Romanda.",
+      "button": "Explorar restaurantes"
     }
   }
 }

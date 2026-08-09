@@ -49,6 +49,37 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   return data;
 }
 
+export async function getPostBySlugLocalized(slug: string, locale: string): Promise<BlogPost | null> {
+  const supabase = createAdminClient();
+  const { data: post } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("slug", slug)
+    .eq("site", "just-tag")
+    .eq("is_published", true)
+    .single() as { data: BlogPost | null };
+
+  if (!post || locale === "fr") return post;
+
+  const { data: translation } = await supabase
+    .from("blog_post_translations")
+    .select("title, excerpt, content, meta_title, meta_description")
+    .eq("post_id", post.id)
+    .eq("locale", locale)
+    .single() as { data: { title: string; excerpt: string | null; content: string; meta_title: string | null; meta_description: string | null } | null };
+
+  if (!translation) return post;
+
+  return {
+    ...post,
+    title: translation.title,
+    excerpt: translation.excerpt,
+    content: translation.content,
+    meta_title: translation.meta_title,
+    meta_description: translation.meta_description,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Admin CRUD
 // ---------------------------------------------------------------------------

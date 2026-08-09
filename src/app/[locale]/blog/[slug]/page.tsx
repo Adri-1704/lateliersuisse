@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { getPostBySlug } from "@/actions/blog";
+import { getTranslations } from "next-intl/server";
+import { getPostBySlugLocalized } from "@/actions/blog";
 import { Calendar, ArrowLeft, Tag, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -14,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const post = await getPostBySlug(slug);
+  const post = await getPostBySlugLocalized(slug, locale);
   if (!post) return {};
 
   const title = post.meta_title || post.title;
@@ -68,7 +69,10 @@ export default async function BlogPostPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const post = await getPostBySlug(slug);
+  const [post, t] = await Promise.all([
+    getPostBySlugLocalized(slug, locale),
+    getTranslations({ locale, namespace: "blog" }),
+  ]);
 
   if (!post) {
     notFound();
@@ -116,7 +120,7 @@ export default async function BlogPostPage({
           href={`/${locale}/blog`}
           className="mb-6 inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
         >
-          <ArrowLeft className="h-4 w-4" /> Tous les articles
+          <ArrowLeft className="h-4 w-4" /> {t("backToAll")}
         </Link>
 
         {/* Header */}
@@ -137,7 +141,7 @@ export default async function BlogPostPage({
             {post.published_at && (
               <span className="flex items-center gap-1.5">
                 <Calendar className="h-4 w-4" />
-                {new Date(post.published_at).toLocaleDateString("fr-CH", {
+                {new Date(post.published_at).toLocaleDateString(locale, {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -181,15 +185,15 @@ export default async function BlogPostPage({
 
         {/* CTA */}
         <div className="mt-12 rounded-2xl bg-[var(--color-just-tag)] p-8 text-center text-white">
-          <h2 className="text-2xl font-bold">Trouvez votre prochain restaurant</h2>
+          <h2 className="text-2xl font-bold">{t("cta.title")}</h2>
           <p className="mt-2 text-white/80">
-            Explorez plus de 11 000 restaurants en Suisse Romande.
+            {t("cta.subtitle")}
           </p>
           <Link
             href={`/${locale}/restaurants`}
             className="mt-4 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-[var(--color-just-tag)] transition hover:bg-gray-100"
           >
-            Explorer les restaurants
+            {t("cta.button")}
           </Link>
         </div>
       </article>
