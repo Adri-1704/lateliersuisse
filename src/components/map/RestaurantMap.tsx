@@ -6,6 +6,7 @@ import L from "leaflet";
 import Link from "next/link";
 import { Star, MapPin } from "lucide-react";
 import type { Restaurant } from "@/data/mock-restaurants";
+import { getLocalizedName } from "@/lib/locale-helpers";
 import "leaflet/dist/leaflet.css";
 
 // Fix default marker icons in Leaflet with Next.js
@@ -53,12 +54,12 @@ export function RestaurantMap({
             <div className="min-w-[200px]">
               <Link href={`/${locale}/restaurants/${r.slug}`} className="block">
                 <h3 className="font-semibold text-gray-900 hover:text-[var(--color-just-tag)]">
-                  {r.nameFr}
+                  {getLocalizedName(r, locale)}
                 </h3>
               </Link>
               <div className="mt-1 flex items-center gap-1 text-sm text-gray-500">
                 <MapPin className="h-3 w-3" />
-                {r.city}, {r.canton}
+                {r.city ? `${r.city}, ${r.canton}` : r.canton}
               </div>
               <div className="mt-1 flex items-center gap-1 text-sm">
                 <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />

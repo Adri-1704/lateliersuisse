@@ -36,17 +36,36 @@ type LocalizedLabelAlt = {
 };
 
 /**
+ * Nettoie un texte affiché (nom d'établissement, etc.) des artefacts
+ * d'import les plus courants (#35) : guillemets d'échappement CSV doublés
+ * ('' -> "), guillemets englobants superflus, espaces en trop. Ne fait
+ * aucune mutation en base — purement cosmétique à l'affichage.
+ */
+export function cleanDisplayText(value: string | null | undefined): string {
+  if (!value) return "";
+  let cleaned = value.trim();
+  // Échappement CSV : "" -> "
+  cleaned = cleaned.replace(/""/g, '"');
+  // Guillemets (droits ou courbes) englobant tout le texte
+  cleaned = cleaned.replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
+  return cleaned.trim();
+}
+
+/**
  * Get the localized name from an object with nameFr/nameDe/nameEn/namePt/nameEs properties.
  * Falls back to French if the locale-specific name is not available.
  */
 export function getLocalizedName(item: LocalizedName, locale: string): string {
-  switch (locale) {
-    case "de": return item.nameDe;
-    case "en": return item.nameEn;
-    case "pt": return item.namePt || item.nameEn;
-    case "es": return item.nameEs || item.nameEn;
-    default: return item.nameFr;
-  }
+  const raw = (() => {
+    switch (locale) {
+      case "de": return item.nameDe;
+      case "en": return item.nameEn;
+      case "pt": return item.namePt || item.nameEn;
+      case "es": return item.nameEs || item.nameEn;
+      default: return item.nameFr;
+    }
+  })();
+  return cleanDisplayText(raw);
 }
 
 /**

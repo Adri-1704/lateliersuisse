@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MapPin, Star, Navigation, Loader2, AlertCircle } from "lucide-react";
+import { cleanDisplayText } from "@/lib/locale-helpers";
 
 interface NearbyRestaurant {
   id: string;
@@ -23,9 +24,8 @@ interface NearbyRestaurant {
 }
 
 function getLocalizedName(r: NearbyRestaurant, locale: string): string {
-  if (locale === "de") return r.name_de || r.name_fr;
-  if (locale === "en") return r.name_en || r.name_fr;
-  return r.name_fr;
+  const raw = locale === "de" ? r.name_de || r.name_fr : locale === "en" ? r.name_en || r.name_fr : r.name_fr;
+  return cleanDisplayText(raw);
 }
 
 function formatDistance(km: number): string {
