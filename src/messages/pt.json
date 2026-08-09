@@ -26,7 +26,8 @@
     "forRestaurants": "Para restauradores",
     "login": "Iniciar sessão",
     "pricing": "Precos",
-    "search": "Pesquisar"
+    "search": "Pesquisar",
+    "searchPlaceholder": "Nome, cidade, cozinha..."
   },
   "hero": {
     "title": "Saboreie a Suíça Romanda",
@@ -98,6 +99,8 @@
     "dietaryRestrictions": "Restrições alimentares",
     "ambiance": "Ambiente",
     "services": "Serviços e equipamentos",
+    "searchLabel": "Pesquisar um restaurante",
+    "searchPlaceholder": "Nome, cidade, cozinha...",
     "clearAll": "Limpar filtros",
     "showMore": "Mostrar mais",
     "map": "Ver no mapa",
@@ -406,7 +409,10 @@
       "benefit3": "Visível em 5 idiomas para alcançar também os turistas",
       "socialProof": "{count} restaurantes romandos já na plataforma",
       "cta": "Experimentar grátis durante 14 dias",
-      "ctaSecondary": "Ver uma ficha exemplo"
+      "ctaSecondary": "Ver uma ficha exemplo",
+      "headlineLine1": "As suas ofertas e menus",
+      "headlineLine2": "no",
+      "headlineHighlight": "WhatsApp dos seus subscritores."
     },
     "trustStats": {
       "restaurants": "Restaurantes registados",

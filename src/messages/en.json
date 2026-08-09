@@ -26,7 +26,8 @@
     "forRestaurants": "For restaurants",
     "login": "Log in",
     "pricing": "Pricing",
-    "search": "Search"
+    "search": "Search",
+    "searchPlaceholder": "Name, city, cuisine..."
   },
   "hero": {
     "title": "Taste Western Switzerland",
@@ -98,6 +99,8 @@
     "dietaryRestrictions": "Dietary restrictions",
     "ambiance": "Ambiance",
     "services": "Services & amenities",
+    "searchLabel": "Search for a restaurant",
+    "searchPlaceholder": "Name, city, cuisine...",
     "clearAll": "Clear filters",
     "showMore": "Show more",
     "map": "View on map",
@@ -406,7 +409,10 @@
       "benefit3": "Visible in 5 languages to reach tourists too",
       "socialProof": "{count} Western Swiss restaurants already on the platform",
       "cta": "Try free for 14 days",
-      "ctaSecondary": "See an example listing"
+      "ctaSecondary": "See an example listing",
+      "headlineLine1": "Your offers and menus",
+      "headlineLine2": "in your",
+      "headlineHighlight": "subscribers' WhatsApp."
     },
     "trustStats": {
       "restaurants": "Registered restaurants",

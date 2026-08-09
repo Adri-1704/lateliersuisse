@@ -26,7 +26,8 @@
     "forRestaurants": "Für Restaurants",
     "login": "Anmelden",
     "pricing": "Preise",
-    "search": "Suchen"
+    "search": "Suchen",
+    "searchPlaceholder": "Name, Stadt, Küche..."
   },
   "hero": {
     "title": "Die Romandie zum Geniessen",
@@ -98,6 +99,8 @@
     "dietaryRestrictions": "Ernaehrungseinschraenkungen",
     "ambiance": "Ambiente",
     "services": "Services und Ausstattung",
+    "searchLabel": "Restaurant suchen",
+    "searchPlaceholder": "Name, Stadt, Küche...",
     "clearAll": "Filter löschen",
     "showMore": "Mehr anzeigen",
     "map": "Auf Karte anzeigen",
@@ -406,7 +409,10 @@
       "benefit3": "Sichtbar in 5 Sprachen — auch für Touristen",
       "socialProof": "{count} Westschweizer Restaurants bereits auf der Plattform",
       "cta": "14 Tage kostenlos testen",
-      "ctaSecondary": "Beispielprofil ansehen"
+      "ctaSecondary": "Beispielprofil ansehen",
+      "headlineLine1": "Ihre Angebote und Speisekarten",
+      "headlineLine2": "im",
+      "headlineHighlight": "WhatsApp Ihrer Abonnenten."
     },
     "trustStats": {
       "restaurants": "Registrierte Restaurants",

@@ -26,7 +26,8 @@
     "forRestaurants": "Para restaurantes",
     "login": "Iniciar sesión",
     "pricing": "Precios",
-    "search": "Buscar"
+    "search": "Buscar",
+    "searchPlaceholder": "Nombre, ciudad, cocina..."
   },
   "hero": {
     "title": "Saborea la Suiza Romanda",
@@ -98,6 +99,8 @@
     "dietaryRestrictions": "Restricciones alimentarias",
     "ambiance": "Ambiente",
     "services": "Servicios y equipamientos",
+    "searchLabel": "Buscar un restaurante",
+    "searchPlaceholder": "Nombre, ciudad, cocina...",
     "clearAll": "Borrar filtros",
     "showMore": "Mostrar mas",
     "map": "Ver en el mapa",
@@ -406,7 +409,10 @@
       "benefit3": "Visible en 5 idiomas para llegar también a los turistas",
       "socialProof": "{count} restaurantes romandos ya en la plataforma",
       "cta": "Probar gratis durante 14 días",
-      "ctaSecondary": "Ver una ficha de ejemplo"
+      "ctaSecondary": "Ver una ficha de ejemplo",
+      "headlineLine1": "Sus ofertas y menús",
+      "headlineLine2": "en el",
+      "headlineHighlight": "WhatsApp de sus suscriptores."
     },
     "trustStats": {
       "restaurants": "Restaurantes registrados",
