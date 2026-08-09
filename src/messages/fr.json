@@ -43,7 +43,8 @@
     "searchButton": "Rechercher",
     "swissBadge": "100% Romand",
     "popularSearches": "Recherches populaires",
-    "statsCounter": "7 cantons, {count} restaurants"
+    "statsCounter": "7 cantons, {count} restaurants",
+    "nearbyButton": "Restaurants autour de moi"
   },
   "featured": {
     "title": "Restaurants du mois",
@@ -811,6 +812,7 @@
       "canton": "Canton",
       "allCantons": "Tous les cantons"
     },
+    "activeLabel": "actives",
     "badge": {
       "ongoing": "En cours",
       "upcoming": "Bientot"

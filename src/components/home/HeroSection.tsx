@@ -156,7 +156,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                   className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/20 hover:border-white/40"
                 >
                   <Navigation className="h-4 w-4" />
-                  {locale === "de" ? "Restaurants in meiner Nähe" : locale === "en" ? "Restaurants near me" : "Restaurants autour de moi"}
+                  {t("nearbyButton")}
                 </Link>
               </div>
 

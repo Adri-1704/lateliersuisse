@@ -41,9 +41,10 @@
     "cuisineType": "Tipo de cocina",
     "allCuisines": "Todas las cocinas",
     "searchButton": "Buscar",
-    "swissBadge": "100% Romando",
+    "swissBadge": "100% Romanda",
     "popularSearches": "Busquedas populares",
-    "statsCounter": "7 cantones, {count} restaurantes"
+    "statsCounter": "7 cantones, {count} restaurantes",
+    "nearbyButton": "Restaurantes cerca de mí"
   },
   "featured": {
     "title": "Restaurantes del mes",
@@ -804,7 +805,7 @@
   },
   "happyHours": {
     "title": "Happy Hours",
-    "subtitle": "Les offres flash des restaurants de Suisse Romande, en direct",
+    "subtitle": "Las ofertas flash de los restaurantes de la Suiza Romanda, en directo",
     "filters": {
       "now": "Maintenant",
       "today": "Ce soir",
@@ -812,8 +813,9 @@
       "canton": "Canton",
       "allCantons": "Tous les cantons"
     },
+    "activeLabel": "activas",
     "badge": {
-      "ongoing": "En cours",
+      "ongoing": "En curso",
       "upcoming": "Bientot"
     },
     "actions": {
@@ -822,7 +824,7 @@
       "copyLink": "Copier le lien",
       "copied": "Copie",
       "book": "Reserver",
-      "viewAll": "Voir toutes les Happy Hours"
+      "viewAll": "Ver todas las Happy Hours"
     },
     "empty": {
       "title": "Aucune Happy Hour pour cette selection",
