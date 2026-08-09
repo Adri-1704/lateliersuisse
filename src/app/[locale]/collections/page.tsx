@@ -1,9 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { collections, type Collection } from "@/data/collections";
 import { createAdminClient } from "@/lib/supabase/server";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+// Sous-titre SEO ajouté après le mot "Ambiances"/"Vibes"/"Ambiente" (issu de
+// nav.ambiances, seule source de vérité — #41 : le <title> disait "Collections
+// thématiques" alors que le h1 et le menu disaient "Ambiances", et le h1
+// lui-même restait câblé en dur en français pour /en ("Ambiances" au lieu de
+// "Vibes") malgré une traduction correcte déjà disponible dans nav.ambiances).
+const SEO_SUBTITLES: Record<string, string> = {
+  fr: "Terrasses, vue sur le lac, végétarien…",
+  de: "Terrassen, Seeblick, vegetarisch…",
+  en: "Terraces, lake view, vegetarian…",
+  pt: "Terraços, vista lago, vegetariano…",
+  es: "Terrazas, vista al lago, vegetariano…",
+};
+
+const SUBHEADINGS: Record<string, string> = {
+  fr: "Découvrez nos sélections thématiques de restaurants",
+  de: "Entdecken Sie unsere kuratierten Restaurantauswahlen",
+  en: "Discover our curated restaurant selections",
+  pt: "Descubra as nossas seleções de restaurantes",
+  es: "Descubra nuestras selecciones de restaurantes",
+};
+
+const DESCRIPTIONS: Record<string, string> = {
+  fr: "Nos sélections curées de restaurants romands : terrasses d'été, vue sur le lac, accès PMR, en famille, wifi gratuit, végétarien, gastronomique et plus.",
+  de: "Unsere kuratierten Auswahlen westschweizer Restaurants: Sommerterrassen, Seeblick, barrierefrei, familienfreundlich, Gratis-WLAN, vegetarisch und mehr.",
+  en: "Curated selections of Western Swiss restaurants: summer terraces, lake views, wheelchair accessible, family-friendly, free wifi, vegetarian and more.",
+  pt: "Seleções curadas de restaurantes da Suíça Romanda: terraços de verão, vista lago, acessíveis, para famílias, wifi grátis, vegetariano e mais.",
+  es: "Selecciones curadas de restaurantes de la Suiza Romanda: terrazas de verano, vistas al lago, accesibles, para familias, wifi gratis, vegetariano y más.",
+};
 
 export async function generateMetadata({
   params,
@@ -11,26 +41,15 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "nav" });
+  const ambiances = t("ambiances");
 
-  const titles: Record<string, string> = {
-    fr: "Collections thématiques — Terrasses, vue sur le lac, végétarien…",
-    de: "Thematische Sammlungen — Terrassen, Seeblick, vegetarisch…",
-    en: "Themed collections — Terraces, lake view, vegetarian…",
-    pt: "Coleções temáticas — Terraços, vista lago, vegetariano…",
-    es: "Colecciones temáticas — Terrazas, vista al lago, vegetariano…",
-  };
-
-  const descriptions: Record<string, string> = {
-    fr: "Nos sélections curées de restaurants romands : terrasses d'été, vue sur le lac, accès PMR, en famille, wifi gratuit, végétarien, gastronomique et plus.",
-    de: "Unsere kuratierten Auswahlen westschweizer Restaurants: Sommerterrassen, Seeblick, barrierefrei, familienfreundlich, Gratis-WLAN, vegetarisch und mehr.",
-    en: "Curated selections of Western Swiss restaurants: summer terraces, lake views, wheelchair accessible, family-friendly, free wifi, vegetarian and more.",
-    pt: "Seleções curadas de restaurantes da Suíça Romanda: terraços de verão, vista lago, acessíveis, para famílias, wifi grátis, vegetariano e mais.",
-    es: "Selecciones curadas de restaurantes de la Suiza Romanda: terrazas de verano, vistas al lago, accesibles, para familias, wifi gratis, vegetariano y más.",
-  };
+  const title = `${ambiances} — ${SEO_SUBTITLES[locale] || SEO_SUBTITLES.fr}`;
+  const description = DESCRIPTIONS[locale] || DESCRIPTIONS.fr;
 
   return {
-    title: titles[locale] || titles.fr,
-    description: descriptions[locale] || descriptions.fr,
+    title,
+    description,
     alternates: {
       canonical: `/${locale}/collections`,
       languages: {
@@ -42,8 +61,8 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: titles[locale] || titles.fr,
-      description: descriptions[locale] || descriptions.fr,
+      title,
+      description,
       url: `${baseUrl}/${locale}/collections`,
       type: "website",
     },
@@ -72,6 +91,10 @@ export default async function CollectionsPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "nav" });
+  // Même mot que le menu (nav.ambiances) — évite l'incohérence "Ambiances"
+  // (menu/h1) vs "Vibes"/"Ambiente" ailleurs, et le h1 câblé en dur.
+  const ambiances = t("ambiances");
 
   // Compte le nombre de restaurants par collection, filtre les vides
   const counts = await Promise.all(collections.map(getCollectionCount));
@@ -89,11 +112,9 @@ export default async function CollectionsPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold text-gray-900">
-        {locale === "de" ? "Ambianzen" : locale === "en" ? "Ambiances" : locale === "pt" ? "Ambientes" : locale === "es" ? "Ambientes" : "Ambiances"}
-      </h1>
+      <h1 className="text-3xl font-bold text-gray-900">{ambiances}</h1>
       <p className="mt-2 text-gray-600">
-        {locale === "de" ? "Entdecken Sie unsere kuratierten Restaurantauswahlen" : locale === "en" ? "Discover our curated restaurant selections" : locale === "pt" ? "Descubra as nossas seleções de restaurantes" : locale === "es" ? "Descubra nuestras selecciones de restaurantes" : "Decouvrez nos selections thematiques de restaurants"}
+        {SUBHEADINGS[locale] || SUBHEADINGS.fr}
       </p>
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
