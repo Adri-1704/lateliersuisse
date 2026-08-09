@@ -60,6 +60,8 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
     return getLocalizedLabel(c, locale);
   };
 
+  const cityLabel = locale === "de" ? "Stadt" : locale === "en" ? "City" : locale === "pt" ? "Cidade" : locale === "es" ? "Ciudad" : "Ville";
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[#2d4a3e] via-[#3a5f50] to-[#2d4a3e]">
       {/* Swiss cross watermark */}
@@ -93,6 +95,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                   {/* Row 1: Canton + Cuisine selects */}
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <select
+                      aria-label={t("canton")}
                       value={canton}
                       onChange={(e) => setCanton(e.target.value)}
                       className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
@@ -105,6 +108,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                       ))}
                     </select>
                     <select
+                      aria-label={t("cuisineType")}
                       value={cuisine}
                       onChange={(e) => setCuisine(e.target.value)}
                       className="w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
@@ -122,6 +126,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                   {/* Row 2: City */}
                   <Input
                     type="text"
+                    aria-label={cityLabel}
                     placeholder={locale === "de" ? "Stadt (z.B. Zürich, Genf...)" : locale === "en" ? "City (e.g. Zurich, Geneva...)" : locale === "pt" ? "Cidade (ex: Zurique, Genebra...)" : locale === "es" ? "Ciudad (ej: Zúrich, Ginebra...)" : "Ville (ex: Lausanne, Genève...)"}
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
@@ -132,6 +137,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                   <div className="flex gap-3">
                     <Input
                       type="text"
+                      aria-label={t("searchPlaceholder")}
                       placeholder={t("searchPlaceholder")}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}

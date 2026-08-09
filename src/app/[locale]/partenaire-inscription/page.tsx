@@ -27,6 +27,7 @@ import {
 } from "@/actions/subscriptions";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { getAffiliateRef } from "@/components/analytics/AffiliateTracker";
+import { isPlausiblePhoneNumber } from "@/lib/phone";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types
@@ -178,6 +179,10 @@ export default function MerchantSignupPage() {
       setError("Les mots de passe ne correspondent pas.");
       return;
     }
+    if (signupData.phone && !isPlausiblePhoneNumber(signupData.phone)) {
+      setError("Numéro de téléphone invalide.");
+      return;
+    }
     setLoading(true);
 
     const result = await registerMerchant({
@@ -326,10 +331,12 @@ export default function MerchantSignupPage() {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="signup-name" className="block text-sm font-medium text-gray-700">
               Nom complet *
             </label>
             <input
+              id="signup-name"
+              name="name"
               type="text"
               required
               value={signupData.name}
@@ -337,15 +344,18 @@ export default function MerchantSignupPage() {
                 setSignupData((p) => ({ ...p, name: e.target.value }))
               }
               placeholder="Jean Dupont"
+              autoComplete="name"
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700">
               Email professionnel *
             </label>
             <input
+              id="signup-email"
+              name="email"
               type="email"
               required
               value={signupData.email}
@@ -353,16 +363,19 @@ export default function MerchantSignupPage() {
                 setSignupData((p) => ({ ...p, email: e.target.value }))
               }
               placeholder="vous@restaurant.ch"
+              autoComplete="email"
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700">
               Mot de passe *
             </label>
             <div className="relative mt-1">
               <input
+                id="signup-password"
+                name="password"
                 type={showPassword ? "text" : "password"}
                 required
                 minLength={6}
@@ -371,11 +384,14 @@ export default function MerchantSignupPage() {
                   setSignupData((p) => ({ ...p, password: e.target.value }))
                 }
                 placeholder="Minimum 6 caractères"
+                autoComplete="new-password"
                 className="block w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-11 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                aria-pressed={showPassword}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -384,16 +400,19 @@ export default function MerchantSignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="signup-password-confirm" className="block text-sm font-medium text-gray-700">
               Confirmer le mot de passe *
             </label>
             <input
+              id="signup-password-confirm"
+              name="passwordConfirm"
               type={showPassword ? "text" : "password"}
               required
               minLength={6}
               value={signupData.passwordConfirm}
               onChange={(e) => setSignupData((p) => ({ ...p, passwordConfirm: e.target.value }))}
               placeholder="Retapez votre mot de passe"
+              autoComplete="new-password"
               className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:ring-1 ${
                 signupData.passwordConfirm && signupData.passwordConfirm !== signupData.password
                   ? "border-red-400 focus:border-red-500 focus:ring-red-500"
@@ -406,18 +425,30 @@ export default function MerchantSignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label htmlFor="signup-phone" className="block text-sm font-medium text-gray-700">
               Numéro WhatsApp du restaurant <span className="font-normal text-gray-400">(optionnel)</span>
             </label>
             <input
+              id="signup-phone"
+              name="phone"
               type="tel"
+              inputMode="tel"
+              pattern="[0-9+\s().-]*"
               value={signupData.phone}
               onChange={(e) =>
                 setSignupData((p) => ({ ...p, phone: e.target.value }))
               }
               placeholder="+41 79 123 45 67"
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-1 focus:ring-[var(--color-just-tag)]"
+              autoComplete="tel"
+              className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:ring-1 ${
+                signupData.phone && !isPlausiblePhoneNumber(signupData.phone)
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:border-[var(--color-just-tag)] focus:ring-[var(--color-just-tag)]"
+              }`}
             />
+            {signupData.phone && !isPlausiblePhoneNumber(signupData.phone) && (
+              <p className="mt-1 text-xs text-red-600">Numéro de téléphone invalide.</p>
+            )}
           </div>
 
           <Button

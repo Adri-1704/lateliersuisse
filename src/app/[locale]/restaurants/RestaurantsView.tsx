@@ -198,6 +198,7 @@ export default function RestaurantsView({
         <div className="flex items-center gap-3">
           {/* Sort */}
           <select
+            aria-label={t("sortBy")}
             defaultValue={searchParams.get("sort") || "rating"}
             onChange={(e) => {
               const newParams = new URLSearchParams(searchParams.toString());
