@@ -384,24 +384,57 @@ export async function handleSubscriptionWebhook(
 
       try {
         const supabase = createAdminClient();
+
+        // Depuis l'API Stripe 2025-03-31, current_period_start/end n'existent
+        // plus forcément à la racine de l'objet Subscription : ils sont
+        // déplacés sur items.data[0].current_period_*. On lit d'abord la
+        // valeur "moderne", avec repli sur l'ancienne pour rester compatible
+        // quelle que soit la version d'API configurée côté Stripe Dashboard.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from("subscriptions") as any)
-          .update({
-            status: mapStripeStatus(data.status),
-            current_period_start: new Date(
-              data.current_period_start * 1000
-            ).toISOString(),
-            current_period_end: new Date(
-              data.current_period_end * 1000
-            ).toISOString(),
-            cancel_at_period_end: data.cancel_at_period_end,
-          })
+        const firstItem = data.items?.data?.[0] as any;
+        const periodStartRaw = firstItem?.current_period_start ?? data.current_period_start;
+        const periodEndRaw = firstItem?.current_period_end ?? data.current_period_end;
+
+        const updatePayload: Record<string, unknown> = {
+          status: mapStripeStatus(data.status),
+          cancel_at_period_end: data.cancel_at_period_end,
+        };
+
+        // On ne construit une Date que si la valeur est un nombre fini —
+        // sinon on n'écrit pas le champ plutôt que de planter sur
+        // `new Date(NaN).toISOString()`. Le statut, lui, est TOUJOURS mis à
+        // jour, même si les dates de période sont indisponibles.
+        if (typeof periodStartRaw === "number" && Number.isFinite(periodStartRaw)) {
+          updatePayload.current_period_start = new Date(periodStartRaw * 1000).toISOString();
+        } else {
+          console.warn(
+            `[Webhook] current_period_start absent/invalide pour la subscription ${data.id} — champ non mis à jour.`
+          );
+        }
+        if (typeof periodEndRaw === "number" && Number.isFinite(periodEndRaw)) {
+          updatePayload.current_period_end = new Date(periodEndRaw * 1000).toISOString();
+        } else {
+          console.warn(
+            `[Webhook] current_period_end absent/invalide pour la subscription ${data.id} — champ non mis à jour.`
+          );
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase.from("subscriptions") as any)
+          .update(updatePayload)
           .eq("stripe_subscription_id", data.id);
+
+        if (error) {
+          throw new Error(
+            `[Webhook] Échec de la mise à jour de la subscription ${data.id}: ${error.message}`
+          );
+        }
       } catch (err) {
         console.error(
           "Supabase error in customer.subscription.updated:",
           err
         );
+        throw err;
       }
 
       break;
