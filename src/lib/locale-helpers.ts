@@ -36,19 +36,43 @@ type LocalizedLabelAlt = {
 };
 
 /**
+ * Paires de guillemets englobants reconnues pour le nettoyage d'affichage.
+ * Volontairement limité aux guillemets doubles (droits et courbes) : les
+ * apostrophes (' U+0027 et ' U+2019) sont exclues car elles servent aussi
+ * d'élision légitime en tête de nom ("'O Sole Mio", "L'Auberge",
+ * "Nell'Angolo", "Café d'Ô") et ne doivent jamais être retirées.
+ */
+const ENCLOSING_QUOTE_PAIRS: [string, string][] = [
+  ['"', '"'],
+  ["“", "”"], // “ ”
+];
+
+/**
  * Nettoie un texte affiché (nom d'établissement, etc.) des artefacts
  * d'import les plus courants (#35) : guillemets d'échappement CSV doublés
- * ('' -> "), guillemets englobants superflus, espaces en trop. Ne fait
+ * ("" -> "), guillemets englobants superflus, espaces en trop. Ne fait
  * aucune mutation en base — purement cosmétique à l'affichage.
+ *
+ * On ne retire les guillemets englobants que si le PREMIER et le DERNIER
+ * caractère forment une vraie paire symétrique (ex. `"Chez Max"` ->
+ * `Chez Max`), jamais tête et queue indépendamment : un nom comme
+ * `Restaurant "Spécial"` (guillemet interne non symétrique) reste donc
+ * intact plutôt que de laisser un guillemet orphelin.
  */
 export function cleanDisplayText(value: string | null | undefined): string {
   if (!value) return "";
   let cleaned = value.trim();
   // Échappement CSV : "" -> "
-  cleaned = cleaned.replace(/""/g, '"');
-  // Guillemets (droits ou courbes) englobant tout le texte
-  cleaned = cleaned.replace(/^["'“”‘’]+|["'“”‘’]+$/g, "");
-  return cleaned.trim();
+  cleaned = cleaned.replace(/""/g, '"').trim();
+
+  for (const [open, close] of ENCLOSING_QUOTE_PAIRS) {
+    if (cleaned.length > open.length + close.length && cleaned.startsWith(open) && cleaned.endsWith(close)) {
+      cleaned = cleaned.slice(open.length, cleaned.length - close.length).trim();
+      break;
+    }
+  }
+
+  return cleaned;
 }
 
 /**
