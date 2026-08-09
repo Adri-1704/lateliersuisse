@@ -9,6 +9,7 @@ import { B2BSimulator } from "@/components/b2b/B2BSimulator";
 import { B2BFindRestaurant } from "@/components/b2b/B2BFindRestaurant";
 import { B2BFAQ } from "@/components/b2b/B2BFAQ";
 import { B2BFinalCTA } from "@/components/b2b/B2BFinalCTA";
+import { safeJsonLd } from "@/lib/json-ld";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -105,7 +106,7 @@ export default async function PourRestaurateursPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(faqJsonLd) }}
       />
       <B2BHero totalRestaurants={totalRestaurants} />
       <B2BTrustStats totalRestaurants={totalRestaurants} totalReviews={totalReviews} />

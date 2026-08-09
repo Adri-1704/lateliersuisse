@@ -197,7 +197,7 @@ export async function handleSubscriptionWebhook(
         } else if (isLifetime) {
           // Lifetime: one-time payment -> subscription record with status active, no period end
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.from("subscriptions") as any).insert({
+          const { error: insertLifetimeError } = await (supabase.from("subscriptions") as any).insert({
             merchant_id: merchant.id,
             stripe_subscription_id: data.payment_intent || data.id,
             stripe_checkout_session_id: checkoutSessionId,
@@ -208,6 +208,12 @@ export async function handleSubscriptionWebhook(
             current_period_end: "2099-12-31T23:59:59.000Z",
             affiliate_ref: affiliateRef,
           });
+
+          if (insertLifetimeError) {
+            throw new Error(
+              `[Webhook] Échec de l'insertion de l'abonnement lifetime (checkout ${checkoutSessionId}): ${insertLifetimeError.message}`
+            );
+          }
 
           // Log payment + affiliate recruit events
           const amount = data.amount_total ? data.amount_total / 100 : null;
@@ -245,7 +251,7 @@ export async function handleSubscriptionWebhook(
           }
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.from("subscriptions") as any).insert({
+          const { error: insertSubError } = await (supabase.from("subscriptions") as any).insert({
             merchant_id: merchant.id,
             stripe_subscription_id: data.subscription || data.payment_intent,
             stripe_checkout_session_id: checkoutSessionId,
@@ -256,6 +262,12 @@ export async function handleSubscriptionWebhook(
             whatsapp_tier: metadata.whatsapp_tier ? Number(metadata.whatsapp_tier) : 100,
             current_period_start: new Date().toISOString(),
           });
+
+          if (insertSubError) {
+            throw new Error(
+              `[Webhook] Échec de l'insertion de l'abonnement (checkout ${checkoutSessionId}): ${insertSubError.message}`
+            );
+          }
 
           // Log payment + affiliate recruit events
           const amount = data.amount_total ? data.amount_total / 100 : null;
@@ -279,6 +291,11 @@ export async function handleSubscriptionWebhook(
         }
       } catch (err) {
         console.error("Supabase error in checkout.session.completed:", err);
+        // On ne doit PAS envoyer les emails de confirmation ni marquer
+        // l'événement comme traité (voir route.ts) si l'abonnement n'a pas
+        // été écrit en base : on propage l'erreur pour que le webhook
+        // réponde en non-2xx et que Stripe rejoue l'événement.
+        throw err;
       }
 
       // Send payment confirmation email
@@ -367,24 +384,57 @@ export async function handleSubscriptionWebhook(
 
       try {
         const supabase = createAdminClient();
+
+        // Depuis l'API Stripe 2025-03-31, current_period_start/end n'existent
+        // plus forcément à la racine de l'objet Subscription : ils sont
+        // déplacés sur items.data[0].current_period_*. On lit d'abord la
+        // valeur "moderne", avec repli sur l'ancienne pour rester compatible
+        // quelle que soit la version d'API configurée côté Stripe Dashboard.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from("subscriptions") as any)
-          .update({
-            status: mapStripeStatus(data.status),
-            current_period_start: new Date(
-              data.current_period_start * 1000
-            ).toISOString(),
-            current_period_end: new Date(
-              data.current_period_end * 1000
-            ).toISOString(),
-            cancel_at_period_end: data.cancel_at_period_end,
-          })
+        const firstItem = data.items?.data?.[0] as any;
+        const periodStartRaw = firstItem?.current_period_start ?? data.current_period_start;
+        const periodEndRaw = firstItem?.current_period_end ?? data.current_period_end;
+
+        const updatePayload: Record<string, unknown> = {
+          status: mapStripeStatus(data.status),
+          cancel_at_period_end: data.cancel_at_period_end,
+        };
+
+        // On ne construit une Date que si la valeur est un nombre fini —
+        // sinon on n'écrit pas le champ plutôt que de planter sur
+        // `new Date(NaN).toISOString()`. Le statut, lui, est TOUJOURS mis à
+        // jour, même si les dates de période sont indisponibles.
+        if (typeof periodStartRaw === "number" && Number.isFinite(periodStartRaw)) {
+          updatePayload.current_period_start = new Date(periodStartRaw * 1000).toISOString();
+        } else {
+          console.warn(
+            `[Webhook] current_period_start absent/invalide pour la subscription ${data.id} — champ non mis à jour.`
+          );
+        }
+        if (typeof periodEndRaw === "number" && Number.isFinite(periodEndRaw)) {
+          updatePayload.current_period_end = new Date(periodEndRaw * 1000).toISOString();
+        } else {
+          console.warn(
+            `[Webhook] current_period_end absent/invalide pour la subscription ${data.id} — champ non mis à jour.`
+          );
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error } = await (supabase.from("subscriptions") as any)
+          .update(updatePayload)
           .eq("stripe_subscription_id", data.id);
+
+        if (error) {
+          throw new Error(
+            `[Webhook] Échec de la mise à jour de la subscription ${data.id}: ${error.message}`
+          );
+        }
       } catch (err) {
         console.error(
           "Supabase error in customer.subscription.updated:",
           err
         );
+        throw err;
       }
 
       break;

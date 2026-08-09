@@ -5,5 +5,10 @@
  * calcul synchrone partagé entre plusieurs appelants (dashboard + webhook).
  */
 export function monthlyQuotaForTier(tier: number | null): number {
-  return (tier ?? 50) * 4; // 50→200, 100→400, 200→800 messages individuels/mois
+  // tier === null signifie explicitement "pas d'abonnement actif/en essai
+  // pour ce marchand" (voir getWhatsAppPlanTier) : dans ce cas, AUCUN envoi
+  // n'est autorisé — pas de quota gratuit par défaut. Un tier connu
+  // (50/100/200) donne 200/400/800 messages individuels/mois.
+  if (tier === null) return 0;
+  return tier * 4;
 }

@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getPriceId, EARLY_BIRD_LIMIT } from "@/lib/stripe";
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
 /**
@@ -71,42 +71,177 @@ export async function getMerchantSubscription(): Promise<{
   }
 }
 
+type CurrentSubRow = {
+  stripe_subscription_id: string | null;
+  plan_type: string;
+  status: string;
+  is_early_bird: boolean;
+  affiliate_ref: string | null;
+};
+
+/**
+ * Redirige vers l'ancien flux de checkout Stripe (nouvelle session, avec
+ * essai gratuit). N'est APPELÉE QUE lorsqu'on a déterminé qu'aucune mutation
+ * n'a encore été tentée sur un abonnement Stripe existant — voir
+ * createPlanChangeSession pour le détail du séquencement.
+ */
+async function fallbackToCheckout(
+  planType: "monthly" | "semiannual" | "annual",
+  whatsappTier: 50 | 100 | 200,
+  locale: string,
+  merchantId: string,
+  affiliateRef: string | null | undefined
+): Promise<{ url: string | null; error: string | null; updated?: boolean }> {
+  try {
+    const { createCheckoutSession } = await import("@/actions/subscriptions");
+    return await createCheckoutSession({
+      planType,
+      merchantId,
+      locale,
+      whatsappTier,
+      affiliateRef: affiliateRef || undefined,
+    });
+  } catch {
+    return { url: null, error: "Erreur lors de la création de la session" };
+  }
+}
+
 export async function createPlanChangeSession(
   planType: "monthly" | "semiannual" | "annual",
   whatsappTier: 50 | 100 | 200,
   locale: string = "fr"
-): Promise<{ url: string | null; error: string | null }> {
+): Promise<{ url: string | null; error: string | null; updated?: boolean }> {
+  // ── Phase 0 : lecture seule (aucune mutation) ────────────────────────────
+  let merchant: Merchant | null = null;
+  let currentSub: CurrentSubRow | null = null;
+
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { url: null, error: "Non authentifié" };
 
-    const merchant = await findMerchant(supabase, user.id, user.email || "");
+    merchant = await findMerchant(supabase, user.id, user.email || "");
     if (!merchant) return { url: null, error: "Marchand non trouvé" };
 
-    // Un changement de formule crée une toute nouvelle session/souscription
-    // Stripe — sans ça, l'attribution partenaire (ex. Aligro) de l'abonnement
-    // d'origine se perdait silencieusement à moins que le client ne retape
-    // manuellement le code promo sur la nouvelle page de paiement.
     const admin = createAdminClient();
-    const { data: currentSub } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
-      .select("affiliate_ref")
+    const { data } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
+      .select("stripe_subscription_id, plan_type, status, is_early_bird, affiliate_ref")
       .eq("merchant_id", merchant.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single() as { data: { affiliate_ref: string | null } | null };
-
-    const { createCheckoutSession } = await import("@/actions/subscriptions");
-    return createCheckoutSession({
-      planType,
-      merchantId: merchant.id,
-      locale,
-      whatsappTier,
-      affiliateRef: currentSub?.affiliate_ref || undefined,
-    });
+      .single() as { data: CurrentSubRow | null };
+    currentSub = data;
   } catch {
     return { url: null, error: "Erreur lors de la création de la session" };
   }
+
+  if (!merchant) return { url: null, error: "Marchand non trouvé" };
+
+  // Décision produit (validée) : un changement de formule ne doit PAS créer
+  // un second abonnement Stripe en parallèle — on met à jour l'abonnement
+  // Stripe existant vers le nouveau prix, avec proratisation, sans nouvel
+  // essai gratuit. On ne peut le faire que si l'abonnement local pointe vers
+  // un vrai abonnement Stripe "vivant" :
+  //  - stripe_subscription_id ressemble à un id de Subscription ("sub_…") —
+  //    les abonnements "lifetime" stockent ici un payment_intent/checkout
+  //    session id, pas un vrai abonnement à mettre à jour ;
+  //  - plan_type n'est pas "lifetime" ;
+  //  - le statut n'est pas déjà "canceled"/"incomplete" (rien à prolonger).
+  // Cette décision est prise AVANT toute mutation : le fallback checkout
+  // ci-dessous n'est atteignable QUE si on décide ici qu'il n'y a rien à
+  // mettre à jour, jamais après une tentative de mutation Stripe (voir
+  // phases 1/2/3 plus bas — bug de double facturation corrigé).
+  const hasLiveStripeSubscription =
+    !!currentSub?.stripe_subscription_id &&
+    currentSub.stripe_subscription_id.startsWith("sub_") &&
+    currentSub.plan_type !== "lifetime" &&
+    ["active", "trialing", "past_due"].includes(currentSub.status) &&
+    !!process.env.STRIPE_SECRET_KEY;
+
+  if (!hasLiveStripeSubscription) {
+    return fallbackToCheckout(planType, whatsappTier, locale, merchant.id, currentSub?.affiliate_ref);
+  }
+
+  // ── Phase 1 : préparation — AUCUNE mutation. Un échec ici ne signifie
+  // jamais qu'une mutation a été tentée : le fallback checkout reste sûr. ──
+  const subscriptionId = currentSub!.stripe_subscription_id as string;
+  let stripe: ReturnType<typeof getStripe>;
+  let itemId: string;
+  let newPriceId: string;
+
+  try {
+    stripe = getStripe();
+    const stripeSub = await stripe.subscriptions.retrieve(subscriptionId);
+    const currentItem = stripeSub.items?.data?.[0];
+
+    if (stripeSub.status === "canceled" || !currentItem) {
+      throw new Error(`Abonnement Stripe ${subscriptionId} introuvable, annulé ou sans item.`);
+    }
+
+    // On préserve la "phase" tarifaire (early bird verrouillé vs. catalogue)
+    // déjà appliquée à ce marchand plutôt que de la recalculer sur le
+    // compteur global d'early birds au moment du changement — pour ne pas
+    // faire perdre son tarif early bird à un client qui change juste de
+    // durée/quota. HYPOTHÈSE PRODUIT NON CONFIRMÉE — à valider.
+    const earlyBirdCountForPricing = currentSub!.is_early_bird ? 0 : EARLY_BIRD_LIMIT;
+    const priceId = getPriceId(planType, earlyBirdCountForPricing, whatsappTier);
+    if (!priceId) {
+      return { url: null, error: "Plan invalide ou prix Stripe non configuré" };
+    }
+
+    itemId = currentItem.id;
+    newPriceId = priceId;
+  } catch (err) {
+    console.error(
+      "[createPlanChangeSession] Impossible de préparer la mise à jour de l'abonnement Stripe existant (aucune mutation tentée) — fallback vers un nouveau checkout:",
+      err
+    );
+    return fallbackToCheckout(planType, whatsappTier, locale, merchant.id, currentSub?.affiliate_ref);
+  }
+
+  // ── Phase 2 : mutation Stripe. À PARTIR D'ICI, PLUS JAMAIS DE FALLBACK
+  // VERS UN NOUVEAU CHECKOUT — un doute sur le succès de cet appel (ex.
+  // timeout réseau après traitement côté Stripe) doit renvoyer une erreur
+  // explicite à l'utilisateur, jamais créer un second abonnement. ──
+  try {
+    await stripe.subscriptions.update(subscriptionId, {
+      items: [{ id: itemId, price: newPriceId }],
+      proration_behavior: "create_prorations",
+    });
+  } catch (err) {
+    console.error("[createPlanChangeSession] Échec de la mise à jour de l'abonnement Stripe:", err);
+    return {
+      url: null,
+      updated: false,
+      error: "Impossible de mettre à jour votre abonnement pour le moment. Réessayez dans quelques instants ou contactez le support avant de retenter — aucun nouvel abonnement n'a été créé.",
+    };
+  }
+
+  // ── Phase 3 : synchro locale. L'abonnement Stripe est déjà migré : même en
+  // cas d'échec ici, on ne doit JAMAIS retomber sur un checkout. ──
+  const admin = createAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: syncError } = await (admin.from("subscriptions") as any)
+    .update({
+      plan_type: planType,
+      whatsapp_tier: whatsappTier,
+      stripe_price_id: newPriceId,
+    })
+    .eq("stripe_subscription_id", subscriptionId);
+
+  if (syncError) {
+    console.error(
+      "[createPlanChangeSession] Abonnement Stripe migré avec succès mais synchro Supabase locale échouée:",
+      syncError
+    );
+    return {
+      url: null,
+      updated: false,
+      error: "Votre formule a bien été mise à jour côté paiement, mais son affichage n'a pas pu être synchronisé immédiatement. Rechargez la page dans quelques instants ; contactez le support si le problème persiste.",
+    };
+  }
+
+  return { url: null, error: null, updated: true };
 }
 
 export async function createBillingPortalSession(locale: string = "fr"): Promise<{

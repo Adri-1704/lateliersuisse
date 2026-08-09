@@ -271,10 +271,23 @@ async function handleTwilioWebhook(request: NextRequest) {
       return twimlResponse("✅ Vous avez été désabonné. Vous ne recevrez plus de messages Just-Tag.");
     }
 
+    // Sanitise avant toute utilisation dans un filtre PostgREST .or(...) — le
+    // lot 1 n'avait corrigé que la branche Meta (handleMetaWebhook) ; `from`
+    // provient directement du champ "From" fourni par Twilio et n'était pas
+    // nettoyé ici, ouvrant la même faille d'injection de filtre.
+    const safeNormalizedPhone = sanitizePhoneForFilter(normalizedPhone);
+    const safeFrom = sanitizePhoneForFilter(from);
+
+    if (!safeNormalizedPhone) {
+      return twimlResponse(
+        "❌ Numéro non reconnu. Contactez contact@just-tag.app pour lier votre numéro à votre restaurant."
+      );
+    }
+
     const { data: restaurant } = await supabase
       .from("restaurants")
       .select("id, name_fr, merchant_id")
-      .or(`whatsapp_phone.eq.${normalizedPhone},phone.eq.${normalizedPhone},phone.eq.${from}`)
+      .or(`whatsapp_phone.eq.${safeNormalizedPhone},phone.eq.${safeNormalizedPhone},phone.eq.${safeFrom ?? safeNormalizedPhone}`)
       .eq("is_published", true)
       .limit(1)
       .single() as { data: { id: string; name_fr: string; merchant_id: string | null } | null };

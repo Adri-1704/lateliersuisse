@@ -49,6 +49,7 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true);
   const [redirecting, setRedirecting] = useState(false);
   const [changingPlan, setChangingPlan] = useState<string | null>(null);
+  const [changePlanError, setChangePlanError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>("monthly");
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
 
@@ -76,9 +77,36 @@ export default function SubscriptionPage() {
   async function handleChangePlan(period: Period, tier: Tier) {
     const key = `${period}-${tier}`;
     setChangingPlan(key);
+    setChangePlanError(null);
     const result = await createPlanChangeSession(period, tier, locale);
-    if (result.url) window.location.href = result.url;
-    else setChangingPlan(null);
+
+    if (result.url) {
+      // Fallback : pas d'abonnement Stripe existant à mettre à jour, on
+      // redirige vers une session de checkout classique.
+      window.location.href = result.url;
+      return;
+    }
+
+    if (result.updated) {
+      // L'abonnement Stripe existant a été mis à jour en place (proratisé,
+      // pas de nouvelle session) — on recharge les données locales pour
+      // refléter la nouvelle formule sans recharger toute la page.
+      const refreshed = await getMerchantSubscription();
+      if (refreshed.success && refreshed.data) {
+        setSubscription(refreshed.data.subscription);
+        setMerchant(refreshed.data.merchant);
+      }
+      setChangingPlan(null);
+      return;
+    }
+
+    // Ni URL, ni mise à jour réussie : erreur explicite (ex. l'abonnement
+    // Stripe a été migré mais la synchro locale a échoué, ou l'update
+    // Stripe lui-même a échoué). On ne redirige JAMAIS vers un nouveau
+    // checkout dans ce cas — un second abonnement pourrait être créé en
+    // double d'un abonnement déjà migré.
+    setChangePlanError(result.error || "Une erreur est survenue. Veuillez réessayer.");
+    setChangingPlan(null);
   }
 
   if (loading) {
@@ -196,6 +224,11 @@ export default function SubscriptionPage() {
           </div>
 
           {/* Change plan */}
+          {changePlanError && (
+            <div className="rounded-2xl px-5 py-4 text-sm font-medium" style={{ border: "1.5px solid #fecaca", background: "#fef2f2", color: "#b91c1c" }}>
+              {changePlanError}
+            </div>
+          )}
           <div className="rounded-2xl bg-white" style={{ border: "1.5px solid #eaecf0" }}>
             <div className="px-6 py-4" style={{ borderBottom: "1px solid #f5f6fa" }}>
               <div className="flex items-center gap-2 mb-0.5">

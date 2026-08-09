@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/actions/admin/auth";
 
 export interface BlogPost {
   id: string;
@@ -85,6 +86,8 @@ function generateSlug(title: string): string {
 }
 
 export async function createPost(formData: FormData): Promise<{ success: boolean; error?: string; id?: string }> {
+  await requireAdmin();
+
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
   const excerpt = formData.get("excerpt") as string | null;
@@ -124,6 +127,8 @@ export async function createPost(formData: FormData): Promise<{ success: boolean
 }
 
 export async function updatePost(id: string, formData: FormData): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
   const excerpt = formData.get("excerpt") as string | null;
@@ -166,6 +171,8 @@ export async function updatePost(id: string, formData: FormData): Promise<{ succ
 }
 
 export async function deletePost(id: string): Promise<{ success: boolean; error?: string }> {
+  await requireAdmin();
+
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("blog_posts")
