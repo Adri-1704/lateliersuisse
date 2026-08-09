@@ -261,16 +261,31 @@ export async function deleteSubscriber(subscriberId: string): Promise<{ success:
 export async function getWhatsAppPlanTier(merchantId: string): Promise<50 | 100 | 200 | null> {
   try {
     const admin = createAdminClient();
-    const { data } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
+    // `.single()` sur zéro ligne renvoie `{ data: null, error }` SANS throw
+    // (supabase-js) : il faut donc bien tester `data`, pas seulement
+    // s'appuyer sur le try/catch. Si aucun abonnement actif/en essai
+    // n'existe pour ce marchand, on retourne null explicitement — voir
+    // monthlyQuotaForTier() qui traite null comme "0 message autorisé".
+    // Un ancien defaut à 100 accordait par erreur un quota payant (400
+    // messages/mois) à un restaurant SANS abonnement actif.
+    const { data, error } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
       .select("whatsapp_tier")
       .eq("merchant_id", merchantId)
       .in("status", ["active", "trialing"])
       .order("created_at", { ascending: false })
       .limit(1)
-      .single() as { data: { whatsapp_tier: number | null } | null };
-    const tier = data?.whatsapp_tier;
+      .single() as { data: { whatsapp_tier: number | null } | null; error: { code?: string } | null };
+
+    if (error || !data) {
+      return null;
+    }
+
+    const tier = data.whatsapp_tier;
     if (tier === 50 || tier === 100 || tier === 200) return tier;
-    return 100; // default
+    // Abonnement actif trouvé mais tier absent/invalide (donnée legacy) :
+    // ce n'est PAS une absence d'abonnement, donc pas de blocage — on
+    // retombe sur le tier standard.
+    return 100;
   } catch {
     return null;
   }
