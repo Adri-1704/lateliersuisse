@@ -77,8 +77,23 @@ export default function SubscriptionPage() {
     const key = `${period}-${tier}`;
     setChangingPlan(key);
     const result = await createPlanChangeSession(period, tier, locale);
-    if (result.url) window.location.href = result.url;
-    else setChangingPlan(null);
+    if (result.url) {
+      // Fallback : pas d'abonnement Stripe existant à mettre à jour, on
+      // redirige vers une session de checkout classique.
+      window.location.href = result.url;
+      return;
+    }
+    if (result.updated) {
+      // L'abonnement Stripe existant a été mis à jour en place (proratisé,
+      // pas de nouvelle session) — on recharge les données locales pour
+      // refléter la nouvelle formule sans recharger toute la page.
+      const refreshed = await getMerchantSubscription();
+      if (refreshed.success && refreshed.data) {
+        setSubscription(refreshed.data.subscription);
+        setMerchant(refreshed.data.merchant);
+      }
+    }
+    setChangingPlan(null);
   }
 
   if (loading) {

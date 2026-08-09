@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getPriceId, EARLY_BIRD_LIMIT } from "@/lib/stripe";
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
 /**
@@ -75,7 +75,7 @@ export async function createPlanChangeSession(
   planType: "monthly" | "semiannual" | "annual",
   whatsappTier: 50 | 100 | 200,
   locale: string = "fr"
-): Promise<{ url: string | null; error: string | null }> {
+): Promise<{ url: string | null; error: string | null; updated?: boolean }> {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -84,18 +84,95 @@ export async function createPlanChangeSession(
     const merchant = await findMerchant(supabase, user.id, user.email || "");
     if (!merchant) return { url: null, error: "Marchand non trouvé" };
 
-    // Un changement de formule crée une toute nouvelle session/souscription
-    // Stripe — sans ça, l'attribution partenaire (ex. Aligro) de l'abonnement
-    // d'origine se perdait silencieusement à moins que le client ne retape
-    // manuellement le code promo sur la nouvelle page de paiement.
     const admin = createAdminClient();
     const { data: currentSub } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
-      .select("affiliate_ref")
+      .select("stripe_subscription_id, plan_type, status, is_early_bird, affiliate_ref")
       .eq("merchant_id", merchant.id)
       .order("created_at", { ascending: false })
       .limit(1)
-      .single() as { data: { affiliate_ref: string | null } | null };
+      .single() as {
+        data: {
+          stripe_subscription_id: string | null;
+          plan_type: string;
+          status: string;
+          is_early_bird: boolean;
+          affiliate_ref: string | null;
+        } | null;
+      };
 
+    // Décision produit (validée) : un changement de formule ne doit PAS
+    // créer un second abonnement Stripe en parallèle — on met à jour
+    // l'abonnement Stripe existant vers le nouveau prix, avec proratisation,
+    // sans nouvel essai gratuit. On ne peut le faire que si l'abonnement
+    // local pointe vers un vrai abonnement Stripe "vivant" :
+    //  - stripe_subscription_id ressemble à un id de Subscription ("sub_…") —
+    //    les abonnements "lifetime" stockent ici un payment_intent/checkout
+    //    session id, pas un vrai abonnement à mettre à jour ;
+    //  - plan_type n'est pas "lifetime" ;
+    //  - le statut n'est pas déjà "canceled"/"incomplete" (rien à prolonger).
+    // Si une de ces conditions manque, on retombe sur l'ancien flux de
+    // checkout (fallback documenté plus bas).
+    const hasLiveStripeSubscription =
+      !!currentSub?.stripe_subscription_id &&
+      currentSub.stripe_subscription_id.startsWith("sub_") &&
+      currentSub.plan_type !== "lifetime" &&
+      ["active", "trialing", "past_due"].includes(currentSub.status);
+
+    if (hasLiveStripeSubscription && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const stripe = getStripe();
+        const stripeSub = await stripe.subscriptions.retrieve(
+          currentSub!.stripe_subscription_id as string
+        );
+        const currentItem = stripeSub.items?.data?.[0];
+
+        if (stripeSub.status !== "canceled" && currentItem) {
+          // On préserve la "phase" tarifaire (early bird verrouillé vs.
+          // catalogue) déjà appliquée à ce marchand plutôt que de la
+          // recalculer sur le compteur global d'early birds au moment du
+          // changement — pour ne pas faire perdre son tarif early bird à un
+          // client qui change juste de durée/quota.
+          // HYPOTHÈSE PRODUIT NON CONFIRMÉE PAR LE PROPRIÉTAIRE — à valider.
+          const earlyBirdCountForPricing = currentSub!.is_early_bird ? 0 : EARLY_BIRD_LIMIT;
+          const newPriceId = getPriceId(planType, earlyBirdCountForPricing, whatsappTier);
+
+          if (!newPriceId) {
+            return { url: null, error: "Plan invalide ou prix Stripe non configuré" };
+          }
+
+          await stripe.subscriptions.update(currentSub!.stripe_subscription_id as string, {
+            items: [{ id: currentItem.id, price: newPriceId }],
+            proration_behavior: "create_prorations",
+          });
+
+          // Synchronise immédiatement notre copie locale : le webhook
+          // customer.subscription.updated ne renvoie que statut/dates de
+          // période, jamais plan_type ni whatsapp_tier.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          await (admin.from("subscriptions") as any)
+            .update({
+              plan_type: planType,
+              whatsapp_tier: whatsappTier,
+              stripe_price_id: newPriceId,
+            })
+            .eq("stripe_subscription_id", currentSub!.stripe_subscription_id);
+
+          return { url: null, error: null, updated: true };
+        }
+      } catch (err) {
+        console.error(
+          "[createPlanChangeSession] Échec de la mise à jour de l'abonnement Stripe, fallback vers un nouveau checkout:",
+          err
+        );
+        // On retombe sur le flux de checkout classique ci-dessous plutôt que
+        // de faire échouer toute la demande de changement de formule.
+      }
+    }
+
+    // Fallback : pas d'abonnement Stripe "vivant" à mettre à jour (aucun
+    // abonnement, abonnement lifetime, ou déjà annulé/incomplet) — on garde
+    // l'ancien flux de création de session de checkout Stripe (avec essai
+    // gratuit, comme pour une toute première souscription).
     const { createCheckoutSession } = await import("@/actions/subscriptions");
     return createCheckoutSession({
       planType,
