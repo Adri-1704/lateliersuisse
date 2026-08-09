@@ -90,7 +90,7 @@ export function B2BHero({ totalRestaurants }: B2BHeroProps) {
               href={`/${locale}/espace-client/connexion`}
               className="text-sm font-medium text-gray-300 hover:text-white underline underline-offset-4 transition-colors"
             >
-              Déjà partenaire ? Se connecter →
+              {t("alreadyPartner")}
             </a>
           </div>
         </div>

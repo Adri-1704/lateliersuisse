@@ -27,7 +27,10 @@
     "login": "Anmelden",
     "pricing": "Preise",
     "search": "Suchen",
-    "searchPlaceholder": "Name, Stadt, Küche..."
+    "searchPlaceholder": "Name, Stadt, Küche...",
+    "nearby": "In meiner Nähe",
+    "ambiances": "Ambiente",
+    "blog": "Blog"
   },
   "hero": {
     "title": "Die Romandie zum Geniessen",
@@ -202,7 +205,12 @@
     "swissMade": "In der Schweiz entwickelt",
     "secureData": "Daten sicher in der Schweiz",
     "ctaTitle": "Sind Sie Restaurantbesitzer?",
-    "ctaSubtitle": "Registrieren Sie Ihr Restaurant und gewinnen Sie neue Kunden"
+    "ctaSubtitle": "Registrieren Sie Ihr Restaurant und gewinnen Sie neue Kunden",
+    "affiliation": "Affiliation",
+    "sponsorship": "Empfehlungsprogramm",
+    "partners": "Partner",
+    "app": "Die App",
+    "languages": "FR · DE · EN · ES · PT"
   },
   "b2b": {
     "hero": {

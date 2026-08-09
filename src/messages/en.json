@@ -27,7 +27,10 @@
     "login": "Log in",
     "pricing": "Pricing",
     "search": "Search",
-    "searchPlaceholder": "Name, city, cuisine..."
+    "searchPlaceholder": "Name, city, cuisine...",
+    "nearby": "Near me",
+    "ambiances": "Vibes",
+    "blog": "Blog"
   },
   "hero": {
     "title": "Taste Western Switzerland",
@@ -202,7 +205,12 @@
     "swissMade": "Made in Switzerland",
     "secureData": "Data secured in Switzerland",
     "ctaTitle": "Are you a restaurant owner?",
-    "ctaSubtitle": "Register your restaurant and attract new customers"
+    "ctaSubtitle": "Register your restaurant and attract new customers",
+    "affiliation": "Affiliation",
+    "sponsorship": "Referral program",
+    "partners": "Partners",
+    "app": "The app",
+    "languages": "FR · DE · EN · ES · PT"
   },
   "b2b": {
     "hero": {

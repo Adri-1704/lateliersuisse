@@ -27,7 +27,10 @@
     "login": "Se connecter",
     "pricing": "Tarifs",
     "search": "Rechercher",
-    "searchPlaceholder": "Nom, ville, cuisine..."
+    "searchPlaceholder": "Nom, ville, cuisine...",
+    "nearby": "Autour de moi",
+    "ambiances": "Ambiances",
+    "blog": "Blog"
   },
   "hero": {
     "title": "La Romandie se déguste",
@@ -202,7 +205,12 @@
     "swissMade": "Conçu en Suisse",
     "secureData": "Données sécurisées en Suisse",
     "ctaTitle": "Envoyez vos menus sur WhatsApp",
-    "ctaSubtitle": "Vos abonnés reçoivent vos offres directement sur leur téléphone — 98% de taux d'ouverture"
+    "ctaSubtitle": "Vos abonnés reçoivent vos offres directement sur leur téléphone — 98% de taux d'ouverture",
+    "affiliation": "Affiliation",
+    "sponsorship": "Parrainage",
+    "partners": "Partenaires",
+    "app": "L'application",
+    "languages": "FR · DE · EN · ES · PT"
   },
   "b2b": {
     "hero": {

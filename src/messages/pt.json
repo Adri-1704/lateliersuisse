@@ -27,7 +27,10 @@
     "login": "Iniciar sessão",
     "pricing": "Precos",
     "search": "Pesquisar",
-    "searchPlaceholder": "Nome, cidade, cozinha..."
+    "searchPlaceholder": "Nome, cidade, cozinha...",
+    "nearby": "Perto de mim",
+    "ambiances": "Ambientes",
+    "blog": "Blog"
   },
   "hero": {
     "title": "Saboreie a Suíça Romanda",
@@ -202,7 +205,12 @@
     "swissMade": "Concebido na Suíça Romanda",
     "secureData": "Dados seguros na Suíça",
     "ctaTitle": "É restaurador?",
-    "ctaSubtitle": "Inscreva o seu restaurante e atraia novos clientes"
+    "ctaSubtitle": "Inscreva o seu restaurante e atraia novos clientes",
+    "affiliation": "Afiliação",
+    "sponsorship": "Programa de indicação",
+    "partners": "Parceiros",
+    "app": "A aplicação",
+    "languages": "FR · DE · EN · ES · PT"
   },
   "b2b": {
     "hero": {

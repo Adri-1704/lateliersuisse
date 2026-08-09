@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 
 export function B2BWhatsAppStats() {
+  const t = useTranslations("b2bLanding.whatsappStats");
   const barsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,12 +30,12 @@ export function B2BWhatsAppStats() {
     <section className="border-b border-gray-100 bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.15em] text-[var(--color-just-tag)]">
-          Pourquoi WhatsApp ?
+          {t("eyebrow")}
         </p>
         <h2 className="mb-10 text-center font-condensed text-4xl font-black leading-tight tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
-          Vos clients <span className="text-[var(--color-just-tag)]">lisent vraiment</span>
+          {t("titlePrefix")} <span className="text-[var(--color-just-tag)]">{t("titleHighlight")}</span>
           <br />
-          vos messages.
+          {t("titleSuffix")}
         </h2>
 
         {/* Stats grid */}
@@ -42,20 +44,20 @@ export function B2BWhatsAppStats() {
             {
               number: "98",
               unit: "%",
-              label: "Taux d'ouverture",
-              desc: "Contre 20% pour un email. 5× plus de clients qui voient votre message.",
+              label: t("stats.openRate.label"),
+              desc: t("stats.openRate.desc"),
             },
             {
               number: "5",
               unit: " min",
-              label: "Temps de lecture moyen",
-              desc: "80% des messages sont lus dans les 5 minutes. Envoyez à 11h30, remplissez votre salle le midi.",
+              label: t("stats.readTime.label"),
+              desc: t("stats.readTime.desc"),
             },
             {
               number: "4",
               unit: "×",
-              label: "Plus efficace que l'email",
-              desc: "Un message WhatsApp a 4 à 5× plus de chances d'être lu qu'un email marketing traditionnel.",
+              label: t("stats.efficiency.label"),
+              desc: t("stats.efficiency.desc"),
             },
           ].map(({ number, unit, label, desc }) => (
             <div key={label} className="bg-white p-8 text-center">
@@ -72,25 +74,25 @@ export function B2BWhatsAppStats() {
         {/* Comparison bars */}
         <div ref={barsRef} className="rounded-2xl bg-gray-50 p-6 sm:p-8">
           <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.1em] text-gray-500">
-            Taux d&apos;ouverture par canal
+            {t("comparisonTitle")}
           </p>
           {[
             {
-              label: "WhatsApp",
+              label: t("channels.whatsapp"),
               pct: "98%",
               width: "98%",
               barClass: "bg-[#25D366]",
               textClass: "text-green-600 font-bold",
             },
             {
-              label: "Email",
+              label: t("channels.email"),
               pct: "~20%",
               width: "20%",
               barClass: "bg-slate-400",
               textClass: "text-gray-500",
             },
             {
-              label: "Réseaux sociaux",
+              label: t("channels.social"),
               pct: "~4%",
               width: "4%",
               barClass: "bg-slate-300",
@@ -112,7 +114,7 @@ export function B2BWhatsAppStats() {
         </div>
 
         <p className="mt-4 text-center text-[11px] text-gray-400">
-          Sources : Meta Business, France Num 2026 · Taux d&apos;ouverture mesuré sur messages opt-in Business API
+          {t("sourcesNote")}
         </p>
       </div>
     </section>
