@@ -21,6 +21,38 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 }
 
+/**
+ * Vérifie la signature HMAC-SHA256 envoyée par Meta dans le header
+ * `X-Hub-Signature-256` (format `sha256=<hex>`), calculée sur le corps brut
+ * de la requête avec l'app secret Meta comme clé.
+ * Doc: https://developers.facebook.com/docs/graph-api/webhooks/getting-started#validate-payloads
+ */
+function validateMetaSignature(rawBody: string, signatureHeader: string | null, appSecret: string): boolean {
+  if (!signatureHeader || !signatureHeader.startsWith("sha256=")) return false;
+  const providedHex = signatureHeader.slice("sha256=".length);
+  const expectedHex = crypto.createHmac("sha256", appSecret).update(rawBody, "utf8").digest("hex");
+  try {
+    const provided = Buffer.from(providedHex, "hex");
+    const expected = Buffer.from(expectedHex, "hex");
+    if (provided.length !== expected.length) return false;
+    return crypto.timingSafeEqual(provided, expected);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Normalise un numéro de téléphone brut avant toute utilisation dans un
+ * filtre PostgREST (.or(...)). N'autorise que les chiffres et le signe '+',
+ * et renvoie null si la valeur est vide ou anormalement longue — de quoi
+ * empêcher toute injection de filtre PostgREST (ex: "0,phone.not.is.null").
+ */
+function sanitizePhoneForFilter(raw: string): string | null {
+  const cleaned = (raw || "").replace(/[^0-9+]/g, "");
+  if (!cleaned || cleaned.length > 20) return null;
+  return cleaned;
+}
+
 function validateTwilioSignature(
   url: string,
   rawBody: string,
@@ -53,7 +85,15 @@ export async function POST(request: NextRequest) {
 
 async function handleMetaWebhook(request: NextRequest) {
   try {
-    const body = await request.json();
+    const rawBody = await request.text();
+
+    const appSecret = process.env.META_APP_SECRET;
+    const signatureHeader = request.headers.get("x-hub-signature-256");
+    if (!appSecret || !validateMetaSignature(rawBody, signatureHeader, appSecret)) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const body = JSON.parse(rawBody);
 
     if (body.object !== "whatsapp_business_account") {
       return NextResponse.json({ status: "ok" });
@@ -73,11 +113,18 @@ async function handleMetaWebhook(request: NextRequest) {
 
           const from = msg.from as string;
           const text = (msg.text?.body || "") as string;
+          const safeFrom = sanitizePhoneForFilter(from);
+
+          if (!safeFrom) {
+            // Numéro d'expéditeur anormal : on ignore ce message plutôt que
+            // de risquer une injection de filtre PostgREST.
+            continue;
+          }
 
           if (text.trim().toUpperCase() === "STOP") {
             await (supabase.from("whatsapp_subscribers") as ReturnType<typeof supabase.from>)
               .update({ is_active: false } as Record<string, unknown>)
-              .or(`phone.eq.${from},phone.eq.+${from}`);
+              .or(`phone.eq.${safeFrom},phone.eq.+${safeFrom}`);
 
             await sendFreeMetaMessage(
               phoneNumberId,
@@ -88,7 +135,7 @@ async function handleMetaWebhook(request: NextRequest) {
             await sendFreeMetaMessage(
               phoneNumberId,
               from,
-              await buildIncomingReplyMessage(supabase, from)
+              await buildIncomingReplyMessage(supabase, safeFrom)
             );
           }
         }
@@ -143,11 +190,15 @@ async function buildIncomingReplyMessage(
   const genericReply =
     "Ce numéro sert uniquement à recevoir des actus WhatsApp des restaurants abonnés — il n'est pas surveillé pour les réservations. Pour réserver, contactez directement le restaurant via le numéro affiché sur sa fiche just-tag.app.";
 
+  // Défense en profondeur : re-valide même si l'appelant a déjà sanitizé.
+  const safeFrom = sanitizePhoneForFilter(from);
+  if (!safeFrom) return genericReply;
+
   try {
     const { data: subs } = await (supabase.from("whatsapp_subscribers") as ReturnType<typeof supabase.from>)
       .select("restaurant_id")
       .eq("is_active", true)
-      .or(`phone.eq.${from},phone.eq.+${from}`) as { data: { restaurant_id: string }[] | null };
+      .or(`phone.eq.${safeFrom},phone.eq.+${safeFrom}`) as { data: { restaurant_id: string }[] | null };
 
     const restaurantIds = [...new Set((subs || []).map((s) => s.restaurant_id))];
     if (restaurantIds.length !== 1) return genericReply;
