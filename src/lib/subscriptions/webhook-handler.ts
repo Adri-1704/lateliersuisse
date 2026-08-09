@@ -197,7 +197,7 @@ export async function handleSubscriptionWebhook(
         } else if (isLifetime) {
           // Lifetime: one-time payment -> subscription record with status active, no period end
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.from("subscriptions") as any).insert({
+          const { error: insertLifetimeError } = await (supabase.from("subscriptions") as any).insert({
             merchant_id: merchant.id,
             stripe_subscription_id: data.payment_intent || data.id,
             stripe_checkout_session_id: checkoutSessionId,
@@ -208,6 +208,12 @@ export async function handleSubscriptionWebhook(
             current_period_end: "2099-12-31T23:59:59.000Z",
             affiliate_ref: affiliateRef,
           });
+
+          if (insertLifetimeError) {
+            throw new Error(
+              `[Webhook] Échec de l'insertion de l'abonnement lifetime (checkout ${checkoutSessionId}): ${insertLifetimeError.message}`
+            );
+          }
 
           // Log payment + affiliate recruit events
           const amount = data.amount_total ? data.amount_total / 100 : null;
@@ -245,7 +251,7 @@ export async function handleSubscriptionWebhook(
           }
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (supabase.from("subscriptions") as any).insert({
+          const { error: insertSubError } = await (supabase.from("subscriptions") as any).insert({
             merchant_id: merchant.id,
             stripe_subscription_id: data.subscription || data.payment_intent,
             stripe_checkout_session_id: checkoutSessionId,
@@ -256,6 +262,12 @@ export async function handleSubscriptionWebhook(
             whatsapp_tier: metadata.whatsapp_tier ? Number(metadata.whatsapp_tier) : 100,
             current_period_start: new Date().toISOString(),
           });
+
+          if (insertSubError) {
+            throw new Error(
+              `[Webhook] Échec de l'insertion de l'abonnement (checkout ${checkoutSessionId}): ${insertSubError.message}`
+            );
+          }
 
           // Log payment + affiliate recruit events
           const amount = data.amount_total ? data.amount_total / 100 : null;
@@ -279,6 +291,11 @@ export async function handleSubscriptionWebhook(
         }
       } catch (err) {
         console.error("Supabase error in checkout.session.completed:", err);
+        // On ne doit PAS envoyer les emails de confirmation ni marquer
+        // l'événement comme traité (voir route.ts) si l'abonnement n'a pas
+        // été écrit en base : on propage l'erreur pour que le webhook
+        // réponde en non-2xx et que Stripe rejoue l'événement.
+        throw err;
       }
 
       // Send payment confirmation email
