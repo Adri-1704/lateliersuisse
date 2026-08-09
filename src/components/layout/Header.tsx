@@ -105,6 +105,12 @@ export function Header() {
               <span className="hidden sm:inline">{t("search")}</span>
             </Button>
           )}
+          <Link
+            href={`/${locale}/espace-client/connexion`}
+            className="hidden text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 md:block"
+          >
+            {t("login")}
+          </Link>
           <Link href={`/${locale}/pour-restaurateurs`} className="hidden md:block">
             <Button
               size="sm"
@@ -135,9 +141,16 @@ export function Header() {
                   </Link>
                 ))}
                 <Link
+                  href={`/${locale}/espace-client/connexion`}
+                  onClick={() => setOpen(false)}
+                  className="mt-2 rounded-md px-4 py-3 text-center text-base font-medium text-gray-700 hover:bg-gray-100"
+                >
+                  {t("login")}
+                </Link>
+                <Link
                   href={`/${locale}/pour-restaurateurs`}
                   onClick={() => setOpen(false)}
-                  className="mt-4 rounded-md bg-[var(--color-just-tag)] px-4 py-3 text-center text-base font-medium text-white"
+                  className="rounded-md bg-[var(--color-just-tag)] px-4 py-3 text-center text-base font-medium text-white"
                 >
                   {t("forRestaurants")}
                 </Link>
