@@ -46,15 +46,53 @@ export async function generateMetadata({
   };
 }
 
+// Echappe les caracteres HTML dangereux pour rendre inerte tout balisage HTML brut
+// (ex: <script>, <img onerror=...>) present dans un contenu markdown non fiable.
+// Doit toujours etre applique AVANT les transformations markdown ci-dessous, pour
+// ne pas ré-échapper les balises que ces transformations generent elles-memes.
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// N'autorise que des protocoles surs (ou des liens relatifs/ancres) dans les hrefs
+// generes a partir des liens markdown, afin d'empecher les URLs `javascript:` (XSS).
+function sanitizeMarkdownUrl(rawUrl: string): string {
+  const decoded = rawUrl
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .trim();
+
+  const isSafe =
+    /^https?:\/\//i.test(decoded) ||
+    /^mailto:/i.test(decoded) ||
+    /^tel:/i.test(decoded) ||
+    decoded.startsWith("/") ||
+    decoded.startsWith("#") ||
+    decoded.startsWith("?");
+
+  return isSafe ? rawUrl : "#";
+}
+
 // Simple markdown to HTML (headings, bold, italic, links, lists, paragraphs)
 function markdownToHtml(md: string): string {
-  return md
+  return escapeHtml(md)
     .replace(/^### (.+)$/gm, '<h3 class="mt-8 mb-3 text-xl font-bold text-gray-900">$1</h3>')
     .replace(/^## (.+)$/gm, '<h2 class="mt-10 mb-4 text-2xl font-bold text-gray-900">$1</h2>')
     .replace(/^# (.+)$/gm, '<h1 class="mt-10 mb-4 text-3xl font-bold text-gray-900">$1</h1>')
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-[var(--color-just-tag)] underline hover:no-underline">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text: string, url: string) => {
+      const safeUrl = sanitizeMarkdownUrl(url);
+      return `<a href="${safeUrl}" class="text-[var(--color-just-tag)] underline hover:no-underline">${text}</a>`;
+    })
     .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc text-gray-700">$1</li>')
     .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-4 list-decimal text-gray-700">$2</li>')
     .replace(/(<li.*<\/li>\n?)+/g, (match) => `<ul class="my-4 space-y-1">${match}</ul>`)
