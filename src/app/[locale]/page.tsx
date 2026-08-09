@@ -11,31 +11,7 @@ import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { HappyHoursSection } from "@/components/home/HappyHoursSection";
 import { createAdminClient } from "@/lib/supabase/server";
 import { cantons } from "@/data/cantons";
-
-// Map display names (with accents, caps) to slugs: "Genève" -> "geneve", "Bâle-Ville" -> "bale-ville"
-function buildCantonNormalizer(): (raw: string) => string {
-  const map: Record<string, string> = {};
-  for (const c of cantons) {
-    // Add all label variants pointing to the slug
-    map[c.value] = c.value;
-    map[c.label.toLowerCase()] = c.value;
-    map[c.labelDe.toLowerCase()] = c.value;
-    map[c.labelEn.toLowerCase()] = c.value;
-    if ("labelPt" in c && c.labelPt) map[c.labelPt.toLowerCase()] = c.value;
-    if ("labelEs" in c && c.labelEs) map[c.labelEs.toLowerCase()] = c.value;
-  }
-  // Add common variants with accents
-  map["genève"] = "geneve";
-  map["bâle-ville"] = "bale-ville";
-  map["bâle-campagne"] = "bale-campagne";
-  map["neuchâtel"] = "neuchatel";
-  map["zürich"] = "zurich";
-
-  return (raw: string) => {
-    const lower = raw.toLowerCase().trim();
-    return map[lower] || lower;
-  };
-}
+import { cantonSlugToCode } from "@/lib/city-slug";
 
 async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, number>; cuisineCounts: Record<string, number>; totalReviews: number; totalRestaurantsOverride: number }> {
   try {
@@ -47,7 +23,24 @@ async function getRestaurantCounts(): Promise<{ cantonCounts: Record<string, num
       supabase.from("reviews").select("id", { count: "exact", head: true }),
     ]);
 
+    // Compteurs par canton pour la carte "Explorez par canton" de l'accueil.
+    // Bug corrigé (#34) : `cantonCounts` n'était jamais rempli (toujours {}),
+    // ce qui affichait "0 restaurants" sur les 7 cantons. Un count exact
+    // (head:true) par canton est peu coûteux (7 requêtes) et n'est pas
+    // affecté par le plafond PostgREST de 1000 lignes (#33), car aucune ligne
+    // n'est rapatriée.
     const cantonCounts: Record<string, number> = {};
+    await Promise.all(
+      cantons.map(async (c) => {
+        const code = cantonSlugToCode(c.value) ?? c.value.toUpperCase();
+        const { count } = await supabase
+          .from("restaurants")
+          .select("id", { count: "exact", head: true })
+          .eq("is_published", true)
+          .eq("canton", code);
+        cantonCounts[c.value] = count ?? 0;
+      })
+    );
 
     // Cuisine counts (use pagination to get all)
     const cuisineCounts: Record<string, number> = {};

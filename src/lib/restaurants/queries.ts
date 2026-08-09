@@ -24,6 +24,9 @@ export interface RestaurantListItem {
   price_range: PriceRange;
   avg_rating: number;
   review_count: number;
+  /** Note Google (source de vérité si présente — voir #34) */
+  google_rating: number | null;
+  google_review_count: number | null;
   cover_image: string | null;
   features: string[];
   is_featured: boolean;
@@ -88,6 +91,8 @@ const LIST_SELECT = [
   "price_range",
   "avg_rating",
   "review_count",
+  "google_rating",
+  "google_review_count",
   "cover_image",
   "features",
   "is_featured",
@@ -148,7 +153,10 @@ function applyFilters(query: any, filters: RestaurantFilters) {
     q = q.eq("cuisine_type", filters.cuisine);
   }
   if (filters.city) {
-    q = q.ilike("city", `%${filters.city}%`);
+    // Correspondance EXACTE (insensible à la casse) — un ilike avec jokers
+    // ("%Berne%") capturait aussi "Bernex" ou "Route de Berne 285", mélangeant
+    // des établissements d'autres communes dans la page /restaurants/ville/berne (#34).
+    q = q.ilike("city", escapeLikePattern(filters.city));
   }
   if (filters.priceMax != null && filters.priceMax >= 1 && filters.priceMax <= 4) {
     q = q.lte("price_range", String(filters.priceMax));

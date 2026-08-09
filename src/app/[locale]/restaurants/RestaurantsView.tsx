@@ -61,6 +61,8 @@ function listItemToRestaurant(item: RestaurantListItem, index: number): Restaura
     priceRange: parseInt(item.price_range || "2") as 1 | 2 | 3 | 4,
     avgRating: item.avg_rating || 0,
     reviewCount: item.review_count || 0,
+    googleRating: item.google_rating ?? null,
+    googleReviewCount: item.google_review_count ?? null,
     openingHours: (item.opening_hours as Record<string, { open: string; close: string }>) || {},
     features: item.features || [],
     coverImage: item.cover_image || placeholderImages[index % placeholderImages.length],
