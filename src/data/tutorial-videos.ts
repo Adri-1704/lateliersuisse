@@ -12,6 +12,12 @@ export interface TutorialVideo {
  * ou directement) à chaque nouvelle vidéo produite par Adrien.
  */
 export const TUTORIAL_VIDEOS: TutorialVideo[] = [
+  {
+    id: "prise-en-main",
+    title: "Prise en main de Just-Tag",
+    description: "Découvrez votre espace restaurant en quelques minutes : fiche, photos, offres et WhatsApp.",
+    url: "https://youtu.be/wEWoTI5gR3k",
+  },
   // Exemple, à dupliquer/adapter pour chaque nouvelle vidéo :
   // {
   //   id: "prise-en-main",
