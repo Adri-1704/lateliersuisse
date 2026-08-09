@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Check, ShieldCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -14,36 +15,28 @@ const PRICES = {
 type Billing = keyof typeof PRICES;
 type Tier = 50 | 100 | 200;
 
-const BILLING_TABS: { id: Billing; label: string; badge?: string }[] = [
-  { id: "monthly",    label: "Mensuel" },
-  { id: "semiannual", label: "Semestriel", badge: "−11%" },
-  { id: "annual",     label: "Annuel",     badge: "−17%" },
+const BILLING_TAB_IDS: { id: Billing; badge?: string }[] = [
+  { id: "monthly" },
+  { id: "semiannual", badge: "−11%" },
+  { id: "annual",     badge: "−17%" },
 ];
 
-const TIERS: { count: Tier; desc: string; highlight: boolean }[] = [
-  { count: 50,  desc: "Petits cafés, tables d'hôtes", highlight: false },
-  { count: 100, desc: "Restaurants familiaux",         highlight: true  },
-  { count: 200, desc: "Brasseries, pizzerias",         highlight: false },
-];
-
-const FEATURES = [
-  "Fiche établissement complète",
-  "Photos & vidéo",
-  "Menus & carte",
-  "Adresse, contact & plan",
-  "Horaires d'ouverture",
-  "Offres du moment",
-  "Opt-in géré pour vous",
-  "Inspiration IA",
+const TIER_CONFIG: { count: Tier; descKey: "small" | "medium" | "large"; highlight: boolean }[] = [
+  { count: 50,  descKey: "small",  highlight: false },
+  { count: 100, descKey: "medium", highlight: true  },
+  { count: 200, descKey: "large",  highlight: false },
 ];
 
 export function B2BPricing() {
+  const t = useTranslations("b2bLanding.pricing");
   const params = useParams();
   const locale = params.locale as string;
   const router = useRouter();
   const [billing, setBilling] = useState<Billing>("monthly");
 
   const phaseIdx = 0;
+
+  const features = t.raw("features") as string[];
 
   function handleCTA(tier: Tier) {
     router.push(`/${locale}/partenaire-inscription?plan=${billing}&subs=${tier}`);
@@ -56,14 +49,14 @@ export function B2BPricing() {
         {/* Header */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
-            Des prix clairs, WhatsApp inclus
+            {t("gridTitle")}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-            Choisissez votre plan selon la taille de votre restaurant. Jusqu&apos;à 800 messages WhatsApp/mois inclus.
+            {t("gridSubtitle", { count: 800 })}
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5 text-sm font-medium text-green-700">
             <ShieldCheck className="h-4 w-4" />
-            14 jours d&apos;essai gratuit
+            {t("trialBadge")}
           </div>
         </div>
 
@@ -71,7 +64,7 @@ export function B2BPricing() {
         <div className="mt-10 flex flex-col items-center gap-5">
           {/* Billing tabs */}
           <div className="flex gap-1 rounded-full bg-gray-200 p-1">
-            {BILLING_TABS.map(({ id, label, badge }) => (
+            {BILLING_TAB_IDS.map(({ id, badge }) => (
               <button
                 key={id}
                 onClick={() => setBilling(id)}
@@ -81,7 +74,7 @@ export function B2BPricing() {
                     : "text-gray-500 hover:text-gray-700"
                 }`}
               >
-                {label}
+                {t(`billingTabs.${id}`)}
                 {badge && (
                   <span className="absolute -right-1.5 -top-2 rounded-full bg-[var(--color-just-tag)] px-1.5 py-0.5 text-[9px] font-bold leading-none text-white">
                     {badge}
@@ -93,29 +86,29 @@ export function B2BPricing() {
 
           {/* Launch offer badge */}
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-200 px-4 py-1.5 text-sm font-medium text-amber-800">
-            🚀 Prix de lancement — offre limitée aux 100 premiers restaurants
+            🚀 {t("launchOfferBadge")}
           </div>
         </div>
 
         {/* Section subtitle */}
         <div className="mt-8 text-center">
           <p className="text-base font-semibold text-gray-900">
-            200, 400 ou 800 messages WhatsApp par mois inclus
+            {t("messagesIncludedTitle")}
           </p>
           <p className="mt-1 text-sm text-gray-500">
-            Choisissez votre plan selon le volume de messages à envoyer chaque mois
+            {t("messagesIncludedSubtitle")}
           </p>
         </div>
 
         {/* Cards */}
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
-          {TIERS.map(({ count, desc, highlight }) => {
+          {TIER_CONFIG.map(({ count, descKey, highlight }) => {
             const price = PRICES[billing][count][phaseIdx];
             const showTotal = billing !== "monthly";
             const totalAmount = billing === "semiannual"
               ? (price * 6).toFixed(2)
               : (price * 12).toFixed(2);
-            const totalPeriod = billing === "semiannual" ? "/ 6 mois" : "/ an";
+            const totalPeriod = billing === "semiannual" ? t("totalPeriodSemiannual") : t("totalPeriodAnnual");
 
             return (
               <div
@@ -130,7 +123,7 @@ export function B2BPricing() {
                 {highlight && (
                   <div className="absolute left-1/2 top-0 -translate-x-1/2">
                     <span className="rounded-b-lg bg-[var(--color-just-tag)] px-4 py-1 text-[10px] font-bold uppercase tracking-widest text-white">
-                      ⭐ Populaire
+                      ⭐ {t("popularBadge")}
                     </span>
                   </div>
                 )}
@@ -144,21 +137,21 @@ export function B2BPricing() {
                         : "bg-gray-100 text-gray-500"
                     }`}
                   >
-                    {count * 4} messages/mois
+                    {t("messagesPerMonthBadge", { count: count * 4 })}
                   </div>
                   <div className="font-condensed text-5xl font-black leading-none text-gray-900">{count * 4}</div>
-                  <p className="mt-0.5 text-sm font-semibold text-gray-400">messages / mois</p>
-                  <p className="mt-1 text-xs text-gray-500">{desc}</p>
+                  <p className="mt-0.5 text-sm font-semibold text-gray-400">{t("messagesPerMonthLabel")}</p>
+                  <p className="mt-1 text-xs text-gray-500">{t(`tierDescriptions.${descKey}`)}</p>
                 </div>
 
                 {/* Price */}
                 <div className="px-6">
                   <p className="whitespace-nowrap leading-none">
-                    <span className="font-condensed text-lg font-bold text-[var(--color-just-tag)] align-baseline">CHF </span><span className="font-condensed text-5xl font-black leading-none text-gray-900">{price.toFixed(2)}</span><span className="ml-1 text-xs text-gray-500 align-baseline"> /mois · tout inclus</span>
+                    <span className="font-condensed text-lg font-bold text-[var(--color-just-tag)] align-baseline">CHF </span><span className="font-condensed text-5xl font-black leading-none text-gray-900">{price.toFixed(2)}</span><span className="ml-1 text-xs text-gray-500 align-baseline"> {t("priceSuffix")}</span>
                   </p>
                   {showTotal && (
                     <p className="mt-1 text-xs text-gray-400">
-                      soit{" "}
+                      {t("totalPricePrefix")}{" "}
                       <span className="font-semibold text-gray-600">CHF {totalAmount}</span>{" "}
                       {totalPeriod}
                     </p>
@@ -170,9 +163,9 @@ export function B2BPricing() {
                   <div className="flex items-start gap-2">
                     <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#25D366]" />
                     <div>
-                      <p className="text-xs font-semibold text-green-800">WhatsApp inclus</p>
+                      <p className="text-xs font-semibold text-green-800">{t("whatsappIncludedTitle")}</p>
                       <p className="text-xs text-green-700">
-                        {count * 4} messages/mois inclus
+                        {t("whatsappIncludedDesc", { count: count * 4 })}
                       </p>
                     </div>
                   </div>
@@ -190,20 +183,20 @@ export function B2BPricing() {
                     }`}
                     onClick={() => handleCTA(count)}
                   >
-                    Essayer 14 jours gratuits
+                    {t("ctaButton")}
                   </Button>
                   <p className="mb-4 mt-1.5 text-center text-[10px] text-gray-400">
-                    Aucun débit · Annulable à tout moment
+                    {t("ctaNote")}
                   </p>
                 </div>
 
                 {/* Features */}
                 <div className="border-t border-gray-100 px-6 py-5">
                   <p className="mb-3 text-[9px] font-bold uppercase tracking-widest text-gray-400">
-                    Inclus dans chaque plan
+                    {t("includedInPlan")}
                   </p>
                   <ul className="space-y-2">
-                    {FEATURES.map((f) => (
+                    {features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-xs text-gray-600">
                         <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-100">
                           <Check className="h-2.5 w-2.5 text-green-600" />
@@ -220,14 +213,14 @@ export function B2BPricing() {
 
         {/* Footnote */}
         <p className="mt-10 text-center text-xs leading-relaxed text-gray-400">
-          Tous les prix sont en CHF · TTC · Aucune commission
+          {t("footnote1")}
           <br />
-          Au-delà des messages inclus, paliers supplémentaires disponibles sur demande
+          {t("footnote2")}
         </p>
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            Des questions ?{" "}
+            {t("questionsPrefix")}{" "}
             <a
               href="mailto:contact@just-tag.app"
               className="text-[var(--color-just-tag)] underline hover:text-[var(--color-just-tag-dark)]"

@@ -26,7 +26,11 @@
     "forRestaurants": "Para restauradores",
     "login": "Iniciar sessão",
     "pricing": "Precos",
-    "search": "Pesquisar"
+    "search": "Pesquisar",
+    "searchPlaceholder": "Nome, cidade, cozinha...",
+    "nearby": "Perto de mim",
+    "ambiances": "Ambientes",
+    "blog": "Blog"
   },
   "hero": {
     "title": "Saboreie a Suíça Romanda",
@@ -37,9 +41,10 @@
     "cuisineType": "Tipo de cozinha",
     "allCuisines": "Todas as cozinhas",
     "searchButton": "Pesquisar",
-    "swissBadge": "100% Romando",
+    "swissBadge": "100% Romanda",
     "popularSearches": "Pesquisas populares",
-    "statsCounter": "7 cantões, {count} restaurantes"
+    "statsCounter": "7 cantões, {count} restaurantes",
+    "nearbyButton": "Restaurantes perto de mim"
   },
   "featured": {
     "title": "Restaurantes do mês",
@@ -98,6 +103,8 @@
     "dietaryRestrictions": "Restrições alimentares",
     "ambiance": "Ambiente",
     "services": "Serviços e equipamentos",
+    "searchLabel": "Pesquisar um restaurante",
+    "searchPlaceholder": "Nome, cidade, cozinha...",
     "clearAll": "Limpar filtros",
     "showMore": "Mostrar mais",
     "map": "Ver no mapa",
@@ -199,7 +206,12 @@
     "swissMade": "Concebido na Suíça Romanda",
     "secureData": "Dados seguros na Suíça",
     "ctaTitle": "É restaurador?",
-    "ctaSubtitle": "Inscreva o seu restaurante e atraia novos clientes"
+    "ctaSubtitle": "Inscreva o seu restaurante e atraia novos clientes",
+    "affiliation": "Afiliação",
+    "sponsorship": "Programa de indicação",
+    "partners": "Parceiros",
+    "app": "A aplicação",
+    "languages": "FR · DE · EN · ES · PT"
   },
   "b2b": {
     "hero": {
@@ -406,13 +418,44 @@
       "benefit3": "Visível em 5 idiomas para alcançar também os turistas",
       "socialProof": "{count} restaurantes romandos já na plataforma",
       "cta": "Experimentar grátis durante 14 dias",
-      "ctaSecondary": "Ver uma ficha exemplo"
+      "ctaSecondary": "Ver uma ficha exemplo",
+      "headlineLine1": "As suas ofertas e menus",
+      "headlineLine2": "no",
+      "headlineHighlight": "WhatsApp dos seus subscritores.",
+      "alreadyPartner": "Já é parceiro? Iniciar sessão →"
     },
     "trustStats": {
       "restaurants": "Restaurantes registados",
       "cantons": "Cantões romandos cobertos",
       "reviews": "Avaliações Google verificadas",
       "commission": "Comissão sobre as suas reservas"
+    },
+    "whatsappStats": {
+      "eyebrow": "Porquê o WhatsApp?",
+      "titlePrefix": "Os seus clientes",
+      "titleHighlight": "leem mesmo",
+      "titleSuffix": "as suas mensagens.",
+      "stats": {
+        "openRate": {
+          "label": "Taxa de abertura",
+          "desc": "Contra 20% para um email. 5× mais clientes veem a sua mensagem."
+        },
+        "readTime": {
+          "label": "Tempo médio de leitura",
+          "desc": "80% das mensagens são lidas nos primeiros 5 minutos. Envie às 11h30 e encha a sua sala à hora de almoço."
+        },
+        "efficiency": {
+          "label": "Mais eficaz do que o email",
+          "desc": "Uma mensagem de WhatsApp tem 4 a 5× mais probabilidades de ser lida do que um email de marketing tradicional."
+        }
+      },
+      "comparisonTitle": "Taxa de abertura por canal",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "social": "Redes sociais"
+      },
+      "sourcesNote": "Fontes: Meta Business, France Num 2026 · Taxa de abertura medida em mensagens opt-in da Business API"
     },
     "problemSolution": {
       "title": "Tem um restaurante excelente,",
@@ -511,7 +554,48 @@
       "lifetimeDesc": "O cálculo é simples: a CHF 24.90/mês, atinge CHF 1 495 em 5 anos. Com a oferta vitalícia, poupa tudo o que vem depois. E os 500 tote bags personalizados (valor estimado de CHF 2 500) estão incluídos.",
       "lifetimeToteBags": "+ 500 tote bags personalizados oferecidos",
       "singlePayment": "pagamento único",
-      "contactNote": "Ainda não está pronto? Deixe-nos o seu número, nós ligamos:"
+      "contactNote": "Ainda não está pronto? Deixe-nos o seu número, nós ligamos:",
+      "gridTitle": "Preços claros, WhatsApp incluído",
+      "gridSubtitle": "Escolha o seu plano de acordo com o tamanho do seu restaurante. Até {count} mensagens de WhatsApp/mês incluídas.",
+      "trialBadge": "14 dias de teste grátis",
+      "billingTabs": {
+        "monthly": "Mensal",
+        "semiannual": "Semestral",
+        "annual": "Anual"
+      },
+      "launchOfferBadge": "Preço de lançamento — oferta limitada aos primeiros 100 restaurantes",
+      "messagesIncludedTitle": "200, 400 ou 800 mensagens de WhatsApp por mês incluídas",
+      "messagesIncludedSubtitle": "Escolha o seu plano de acordo com o volume de mensagens a enviar todos os meses",
+      "tierDescriptions": {
+        "small": "Pequenos cafés, mesas de hóspedes",
+        "medium": "Restaurantes familiares",
+        "large": "Cervejarias, pizarias"
+      },
+      "popularBadge": "Popular",
+      "messagesPerMonthBadge": "{count} mensagens/mês",
+      "messagesPerMonthLabel": "mensagens / mês",
+      "priceSuffix": "/mês · tudo incluído",
+      "totalPricePrefix": "ou seja",
+      "totalPeriodSemiannual": "/ 6 meses",
+      "totalPeriodAnnual": "/ ano",
+      "whatsappIncludedTitle": "WhatsApp incluído",
+      "whatsappIncludedDesc": "{count} mensagens/mês incluídas",
+      "ctaButton": "Experimentar 14 dias grátis",
+      "ctaNote": "Sem débito · Cancele quando quiser",
+      "includedInPlan": "Incluído em cada plano",
+      "features": [
+        "Ficha de estabelecimento completa",
+        "Fotos e vídeo",
+        "Menus e carta",
+        "Morada, contacto e mapa",
+        "Horários de funcionamento",
+        "Ofertas do momento",
+        "Opt-in gerido por nós",
+        "Inspiração com IA"
+      ],
+      "footnote1": "Todos os preços em CHF · IVA incluído · Zero comissão",
+      "footnote2": "Para além das mensagens incluídas, há níveis adicionais disponíveis mediante pedido",
+      "questionsPrefix": "Tem perguntas?"
     },
     "faq": {
       "title": "As suas perguntas, as nossas respostas",
@@ -721,7 +805,7 @@
   },
   "happyHours": {
     "title": "Happy Hours",
-    "subtitle": "Les offres flash des restaurants de Suisse Romande, en direct",
+    "subtitle": "As ofertas flash dos restaurantes da Suíça Romanda, em direto",
     "filters": {
       "now": "Maintenant",
       "today": "Ce soir",
@@ -729,8 +813,9 @@
       "canton": "Canton",
       "allCantons": "Tous les cantons"
     },
+    "activeLabel": "ativas",
     "badge": {
-      "ongoing": "En cours",
+      "ongoing": "Em curso",
       "upcoming": "Bientot"
     },
     "actions": {
@@ -739,7 +824,7 @@
       "copyLink": "Copier le lien",
       "copied": "Copie",
       "book": "Reserver",
-      "viewAll": "Voir toutes les Happy Hours"
+      "viewAll": "Ver todas as Happy Hours"
     },
     "empty": {
       "title": "Aucune Happy Hour pour cette selection",

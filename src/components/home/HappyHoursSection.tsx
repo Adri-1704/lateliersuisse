@@ -1,12 +1,21 @@
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { Sparkles, MapPin, ArrowRight, Clock } from "lucide-react";
 import { getActiveHappyHoursAllCantons } from "@/actions/happy-hours";
+
+const DATE_LOCALES: Record<string, string> = {
+  de: "de-CH",
+  en: "en-GB",
+  es: "es-ES",
+  pt: "pt-PT",
+  fr: "fr-CH",
+};
 
 function formatHour(iso: string, locale: string): string {
   try {
     return new Intl.DateTimeFormat(
-      locale === "de" ? "de-CH" : locale === "en" ? "en-GB" : "fr-CH",
+      DATE_LOCALES[locale] ?? "fr-CH",
       { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Zurich" },
     ).format(new Date(iso));
   } catch {
@@ -29,24 +38,10 @@ export async function HappyHoursSection({ locale }: { locale: string }) {
   // eslint-disable-next-line react-hooks/purity
   const nowSnapshot = Date.now();
 
-  const title =
-    locale === "de"
-      ? "Happy Hours"
-      : locale === "en"
-        ? "Happy Hours"
-        : "Happy Hours en cours";
-  const subtitle =
-    locale === "de"
-      ? "Blitzangebote jetzt in der Westschweiz"
-      : locale === "en"
-        ? "Flash deals right now across Western Switzerland"
-        : "Les offres flash des restaurants romands, en direct";
-  const cta =
-    locale === "de"
-      ? "Alle Happy Hours"
-      : locale === "en"
-        ? "All Happy Hours"
-        : "Voir toutes les Happy Hours";
+  const t = await getTranslations({ locale, namespace: "happyHours" });
+  const title = t("title");
+  const subtitle = t("subtitle");
+  const cta = t("actions.viewAll");
 
   return (
     <section className="bg-gradient-to-b from-rose-50 to-white py-16">
@@ -56,7 +51,7 @@ export async function HappyHoursSection({ locale }: { locale: string }) {
             <div className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-3 py-1 text-sm font-semibold text-rose-700 mb-3">
               <Sparkles className="h-4 w-4" />
               {happyHours.length}{" "}
-              {locale === "en" ? "active" : locale === "de" ? "aktiv" : "actives"}
+              {t("activeLabel")}
             </div>
             <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl">{title}</h2>
             <p className="mt-1 text-gray-500">{subtitle}</p>
@@ -98,13 +93,7 @@ export async function HappyHoursSection({ locale }: { locale: string }) {
                         isNow ? "bg-red-600" : "bg-gray-800/80"
                       }`}
                     >
-                      {isNow
-                        ? locale === "en"
-                          ? "Ongoing"
-                          : locale === "de"
-                            ? "Laufend"
-                            : "En cours"
-                        : formatHour(hh.starts_at, locale)}
+                      {isNow ? t("badge.ongoing") : formatHour(hh.starts_at, locale)}
                     </span>
                   </div>
                 )}

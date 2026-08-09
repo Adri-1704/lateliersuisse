@@ -86,27 +86,27 @@ export function Footer({ locale }: { locale: string }) {
               </li>
               <li>
                 <Link href={`/${locale}/affiliation`} className="text-sm text-gray-400 hover:text-white transition-colors">
-                  Affiliation
+                  {t("affiliation")}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/parrainage`} className="text-sm text-gray-400 hover:text-white transition-colors">
-                  Parrainage
+                  {t("sponsorship")}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/blog`} className="text-sm text-gray-400 hover:text-white transition-colors">
-                  Blog
+                  {nav("blog")}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/pour-partenaires`} className="text-sm text-gray-600 hover:text-gray-400 transition-colors">
-                  Partenaires
+                  {t("partners")}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/application`} className="text-sm text-gray-400 hover:text-white transition-colors">
-                  L&apos;application
+                  {t("app")}
                 </Link>
               </li>
             </ul>
@@ -139,7 +139,7 @@ export function Footer({ locale }: { locale: string }) {
           <div className="flex items-center gap-3 text-xs text-gray-500">
             <span>{t("secureData")}</span>
             <span className="text-gray-700">|</span>
-            <span>FR &middot; DE &middot; EN</span>
+            <span>{t("languages")}</span>
           </div>
         </div>
       </div>

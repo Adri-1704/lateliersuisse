@@ -26,7 +26,11 @@
     "forRestaurants": "For restaurants",
     "login": "Log in",
     "pricing": "Pricing",
-    "search": "Search"
+    "search": "Search",
+    "searchPlaceholder": "Name, city, cuisine...",
+    "nearby": "Near me",
+    "ambiances": "Vibes",
+    "blog": "Blog"
   },
   "hero": {
     "title": "Taste Western Switzerland",
@@ -37,9 +41,10 @@
     "cuisineType": "Cuisine type",
     "allCuisines": "All cuisines",
     "searchButton": "Search",
-    "swissBadge": "100% Romand",
+    "swissBadge": "100% Western Swiss",
     "popularSearches": "Popular searches",
-    "statsCounter": "7 cantons, {count} restaurants"
+    "statsCounter": "7 cantons, {count} restaurants",
+    "nearbyButton": "Restaurants near me"
   },
   "featured": {
     "title": "Restaurants of the Month",
@@ -98,6 +103,8 @@
     "dietaryRestrictions": "Dietary restrictions",
     "ambiance": "Ambiance",
     "services": "Services & amenities",
+    "searchLabel": "Search for a restaurant",
+    "searchPlaceholder": "Name, city, cuisine...",
     "clearAll": "Clear filters",
     "showMore": "Show more",
     "map": "View on map",
@@ -199,7 +206,12 @@
     "swissMade": "Made in Switzerland",
     "secureData": "Data secured in Switzerland",
     "ctaTitle": "Are you a restaurant owner?",
-    "ctaSubtitle": "Register your restaurant and attract new customers"
+    "ctaSubtitle": "Register your restaurant and attract new customers",
+    "affiliation": "Affiliation",
+    "sponsorship": "Referral program",
+    "partners": "Partners",
+    "app": "The app",
+    "languages": "FR · DE · EN · ES · PT"
   },
   "b2b": {
     "hero": {
@@ -406,13 +418,44 @@
       "benefit3": "Visible in 5 languages to reach tourists too",
       "socialProof": "{count} Western Swiss restaurants already on the platform",
       "cta": "Try free for 14 days",
-      "ctaSecondary": "See an example listing"
+      "ctaSecondary": "See an example listing",
+      "headlineLine1": "Your offers and menus",
+      "headlineLine2": "in your",
+      "headlineHighlight": "subscribers' WhatsApp.",
+      "alreadyPartner": "Already a partner? Log in →"
     },
     "trustStats": {
       "restaurants": "Registered restaurants",
       "cantons": "Western Swiss cantons covered",
       "reviews": "Verified Google reviews",
       "commission": "Commission on your bookings"
+    },
+    "whatsappStats": {
+      "eyebrow": "Why WhatsApp?",
+      "titlePrefix": "Your customers",
+      "titleHighlight": "actually read",
+      "titleSuffix": "your messages.",
+      "stats": {
+        "openRate": {
+          "label": "Open rate",
+          "desc": "Versus 20% for an email. 5× more customers see your message."
+        },
+        "readTime": {
+          "label": "Average reading time",
+          "desc": "80% of messages are read within 5 minutes. Send at 11:30am and fill your dining room at lunch."
+        },
+        "efficiency": {
+          "label": "More effective than email",
+          "desc": "A WhatsApp message is 4 to 5× more likely to be read than a traditional marketing email."
+        }
+      },
+      "comparisonTitle": "Open rate by channel",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "social": "Social media"
+      },
+      "sourcesNote": "Sources: Meta Business, France Num 2026 · Open rate measured on opt-in Business API messages"
     },
     "problemSolution": {
       "title": "You have a great restaurant,",
@@ -511,7 +554,48 @@
       "lifetimeDesc": "The maths is simple: at CHF 24.90/month, you reach CHF 1,495 in 5 years. With the lifetime offer, you save everything after that. And 500 personalised tote bags (estimated value CHF 2,500) are included.",
       "lifetimeToteBags": "+ 500 personalised tote bags included",
       "singlePayment": "one-time payment",
-      "contactNote": "Not ready? Leave us your number, we'll call you back:"
+      "contactNote": "Not ready? Leave us your number, we'll call you back:",
+      "gridTitle": "Clear pricing, WhatsApp included",
+      "gridSubtitle": "Choose your plan based on the size of your restaurant. Up to {count} WhatsApp messages/month included.",
+      "trialBadge": "14-day free trial",
+      "billingTabs": {
+        "monthly": "Monthly",
+        "semiannual": "Semi-annual",
+        "annual": "Annual"
+      },
+      "launchOfferBadge": "Launch price — offer limited to the first 100 restaurants",
+      "messagesIncludedTitle": "200, 400 or 800 WhatsApp messages per month included",
+      "messagesIncludedSubtitle": "Choose your plan based on the monthly message volume you need",
+      "tierDescriptions": {
+        "small": "Small cafés, table d'hôtes",
+        "medium": "Family restaurants",
+        "large": "Brasseries, pizzerias"
+      },
+      "popularBadge": "Popular",
+      "messagesPerMonthBadge": "{count} messages/month",
+      "messagesPerMonthLabel": "messages / month",
+      "priceSuffix": "/month · all inclusive",
+      "totalPricePrefix": "i.e.",
+      "totalPeriodSemiannual": "/ 6 months",
+      "totalPeriodAnnual": "/ year",
+      "whatsappIncludedTitle": "WhatsApp included",
+      "whatsappIncludedDesc": "{count} messages/month included",
+      "ctaButton": "Try free for 14 days",
+      "ctaNote": "No charge · Cancel anytime",
+      "includedInPlan": "Included in every plan",
+      "features": [
+        "Complete business listing",
+        "Photos & video",
+        "Menus",
+        "Address, contact & map",
+        "Opening hours",
+        "Current offers",
+        "Opt-in managed for you",
+        "AI inspiration"
+      ],
+      "footnote1": "All prices in CHF · VAT included · Zero commission",
+      "footnote2": "Beyond the included messages, extra tiers are available on request",
+      "questionsPrefix": "Questions?"
     },
     "faq": {
       "title": "Your questions, our answers",
@@ -721,7 +805,7 @@
   },
   "happyHours": {
     "title": "Happy Hours",
-    "subtitle": "Les offres flash des restaurants de Suisse Romande, en direct",
+    "subtitle": "Flash deals from Western Swiss restaurants, live",
     "filters": {
       "now": "Maintenant",
       "today": "Ce soir",
@@ -729,8 +813,9 @@
       "canton": "Canton",
       "allCantons": "Tous les cantons"
     },
+    "activeLabel": "active",
     "badge": {
-      "ongoing": "En cours",
+      "ongoing": "Ongoing",
       "upcoming": "Bientot"
     },
     "actions": {
@@ -739,7 +824,7 @@
       "copyLink": "Copier le lien",
       "copied": "Copie",
       "book": "Reserver",
-      "viewAll": "Voir toutes les Happy Hours"
+      "viewAll": "View all Happy Hours"
     },
     "empty": {
       "title": "Aucune Happy Hour pour cette selection",
