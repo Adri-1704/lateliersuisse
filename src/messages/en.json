@@ -412,13 +412,41 @@
       "ctaSecondary": "See an example listing",
       "headlineLine1": "Your offers and menus",
       "headlineLine2": "in your",
-      "headlineHighlight": "subscribers' WhatsApp."
+      "headlineHighlight": "subscribers' WhatsApp.",
+      "alreadyPartner": "Already a partner? Log in →"
     },
     "trustStats": {
       "restaurants": "Registered restaurants",
       "cantons": "Western Swiss cantons covered",
       "reviews": "Verified Google reviews",
       "commission": "Commission on your bookings"
+    },
+    "whatsappStats": {
+      "eyebrow": "Why WhatsApp?",
+      "titlePrefix": "Your customers",
+      "titleHighlight": "actually read",
+      "titleSuffix": "your messages.",
+      "stats": {
+        "openRate": {
+          "label": "Open rate",
+          "desc": "Versus 20% for an email. 5× more customers see your message."
+        },
+        "readTime": {
+          "label": "Average reading time",
+          "desc": "80% of messages are read within 5 minutes. Send at 11:30am and fill your dining room at lunch."
+        },
+        "efficiency": {
+          "label": "More effective than email",
+          "desc": "A WhatsApp message is 4 to 5× more likely to be read than a traditional marketing email."
+        }
+      },
+      "comparisonTitle": "Open rate by channel",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "social": "Social media"
+      },
+      "sourcesNote": "Sources: Meta Business, France Num 2026 · Open rate measured on opt-in Business API messages"
     },
     "problemSolution": {
       "title": "You have a great restaurant,",
@@ -517,7 +545,48 @@
       "lifetimeDesc": "The maths is simple: at CHF 24.90/month, you reach CHF 1,495 in 5 years. With the lifetime offer, you save everything after that. And 500 personalised tote bags (estimated value CHF 2,500) are included.",
       "lifetimeToteBags": "+ 500 personalised tote bags included",
       "singlePayment": "one-time payment",
-      "contactNote": "Not ready? Leave us your number, we'll call you back:"
+      "contactNote": "Not ready? Leave us your number, we'll call you back:",
+      "gridTitle": "Clear pricing, WhatsApp included",
+      "gridSubtitle": "Choose your plan based on the size of your restaurant. Up to {count} WhatsApp messages/month included.",
+      "trialBadge": "14-day free trial",
+      "billingTabs": {
+        "monthly": "Monthly",
+        "semiannual": "Semi-annual",
+        "annual": "Annual"
+      },
+      "launchOfferBadge": "Launch price — offer limited to the first 100 restaurants",
+      "messagesIncludedTitle": "200, 400 or 800 WhatsApp messages per month included",
+      "messagesIncludedSubtitle": "Choose your plan based on the monthly message volume you need",
+      "tierDescriptions": {
+        "small": "Small cafés, table d'hôtes",
+        "medium": "Family restaurants",
+        "large": "Brasseries, pizzerias"
+      },
+      "popularBadge": "Popular",
+      "messagesPerMonthBadge": "{count} messages/month",
+      "messagesPerMonthLabel": "messages / month",
+      "priceSuffix": "/month · all inclusive",
+      "totalPricePrefix": "i.e.",
+      "totalPeriodSemiannual": "/ 6 months",
+      "totalPeriodAnnual": "/ year",
+      "whatsappIncludedTitle": "WhatsApp included",
+      "whatsappIncludedDesc": "{count} messages/month included",
+      "ctaButton": "Try free for 14 days",
+      "ctaNote": "No charge · Cancel anytime",
+      "includedInPlan": "Included in every plan",
+      "features": [
+        "Complete business listing",
+        "Photos & video",
+        "Menus",
+        "Address, contact & map",
+        "Opening hours",
+        "Current offers",
+        "Opt-in managed for you",
+        "AI inspiration"
+      ],
+      "footnote1": "All prices in CHF · VAT included · Zero commission",
+      "footnote2": "Beyond the included messages, extra tiers are available on request",
+      "questionsPrefix": "Questions?"
     },
     "faq": {
       "title": "Your questions, our answers",

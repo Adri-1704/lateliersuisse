@@ -412,13 +412,41 @@
       "ctaSecondary": "Ver uma ficha exemplo",
       "headlineLine1": "As suas ofertas e menus",
       "headlineLine2": "no",
-      "headlineHighlight": "WhatsApp dos seus subscritores."
+      "headlineHighlight": "WhatsApp dos seus subscritores.",
+      "alreadyPartner": "Já é parceiro? Iniciar sessão →"
     },
     "trustStats": {
       "restaurants": "Restaurantes registados",
       "cantons": "Cantões romandos cobertos",
       "reviews": "Avaliações Google verificadas",
       "commission": "Comissão sobre as suas reservas"
+    },
+    "whatsappStats": {
+      "eyebrow": "Porquê o WhatsApp?",
+      "titlePrefix": "Os seus clientes",
+      "titleHighlight": "leem mesmo",
+      "titleSuffix": "as suas mensagens.",
+      "stats": {
+        "openRate": {
+          "label": "Taxa de abertura",
+          "desc": "Contra 20% para um email. 5× mais clientes veem a sua mensagem."
+        },
+        "readTime": {
+          "label": "Tempo médio de leitura",
+          "desc": "80% das mensagens são lidas nos primeiros 5 minutos. Envie às 11h30 e encha a sua sala à hora de almoço."
+        },
+        "efficiency": {
+          "label": "Mais eficaz do que o email",
+          "desc": "Uma mensagem de WhatsApp tem 4 a 5× mais probabilidades de ser lida do que um email de marketing tradicional."
+        }
+      },
+      "comparisonTitle": "Taxa de abertura por canal",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "social": "Redes sociais"
+      },
+      "sourcesNote": "Fontes: Meta Business, France Num 2026 · Taxa de abertura medida em mensagens opt-in da Business API"
     },
     "problemSolution": {
       "title": "Tem um restaurante excelente,",
@@ -517,7 +545,48 @@
       "lifetimeDesc": "O cálculo é simples: a CHF 24.90/mês, atinge CHF 1 495 em 5 anos. Com a oferta vitalícia, poupa tudo o que vem depois. E os 500 tote bags personalizados (valor estimado de CHF 2 500) estão incluídos.",
       "lifetimeToteBags": "+ 500 tote bags personalizados oferecidos",
       "singlePayment": "pagamento único",
-      "contactNote": "Ainda não está pronto? Deixe-nos o seu número, nós ligamos:"
+      "contactNote": "Ainda não está pronto? Deixe-nos o seu número, nós ligamos:",
+      "gridTitle": "Preços claros, WhatsApp incluído",
+      "gridSubtitle": "Escolha o seu plano de acordo com o tamanho do seu restaurante. Até {count} mensagens de WhatsApp/mês incluídas.",
+      "trialBadge": "14 dias de teste grátis",
+      "billingTabs": {
+        "monthly": "Mensal",
+        "semiannual": "Semestral",
+        "annual": "Anual"
+      },
+      "launchOfferBadge": "Preço de lançamento — oferta limitada aos primeiros 100 restaurantes",
+      "messagesIncludedTitle": "200, 400 ou 800 mensagens de WhatsApp por mês incluídas",
+      "messagesIncludedSubtitle": "Escolha o seu plano de acordo com o volume de mensagens a enviar todos os meses",
+      "tierDescriptions": {
+        "small": "Pequenos cafés, mesas de hóspedes",
+        "medium": "Restaurantes familiares",
+        "large": "Cervejarias, pizarias"
+      },
+      "popularBadge": "Popular",
+      "messagesPerMonthBadge": "{count} mensagens/mês",
+      "messagesPerMonthLabel": "mensagens / mês",
+      "priceSuffix": "/mês · tudo incluído",
+      "totalPricePrefix": "ou seja",
+      "totalPeriodSemiannual": "/ 6 meses",
+      "totalPeriodAnnual": "/ ano",
+      "whatsappIncludedTitle": "WhatsApp incluído",
+      "whatsappIncludedDesc": "{count} mensagens/mês incluídas",
+      "ctaButton": "Experimentar 14 dias grátis",
+      "ctaNote": "Sem débito · Cancele quando quiser",
+      "includedInPlan": "Incluído em cada plano",
+      "features": [
+        "Ficha de estabelecimento completa",
+        "Fotos e vídeo",
+        "Menus e carta",
+        "Morada, contacto e mapa",
+        "Horários de funcionamento",
+        "Ofertas do momento",
+        "Opt-in gerido por nós",
+        "Inspiração com IA"
+      ],
+      "footnote1": "Todos os preços em CHF · IVA incluído · Zero comissão",
+      "footnote2": "Para além das mensagens incluídas, há níveis adicionais disponíveis mediante pedido",
+      "questionsPrefix": "Tem perguntas?"
     },
     "faq": {
       "title": "As suas perguntas, as nossas respostas",

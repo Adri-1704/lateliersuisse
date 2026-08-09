@@ -411,13 +411,41 @@
       "ctaSecondary": "Voir une fiche exemple",
       "headlineLine1": "Vos offres et menus",
       "headlineLine2": "dans le",
-      "headlineHighlight": "WhatsApp de vos abonnés."
+      "headlineHighlight": "WhatsApp de vos abonnés.",
+      "alreadyPartner": "Déjà partenaire ? Se connecter →"
     },
     "trustStats": {
       "restaurants": "Restaurants inscrits",
       "cantons": "Cantons romands couverts",
       "reviews": "Avis Google vérifiés",
       "commission": "Commission sur vos réservations"
+    },
+    "whatsappStats": {
+      "eyebrow": "Pourquoi WhatsApp ?",
+      "titlePrefix": "Vos clients",
+      "titleHighlight": "lisent vraiment",
+      "titleSuffix": "vos messages.",
+      "stats": {
+        "openRate": {
+          "label": "Taux d'ouverture",
+          "desc": "Contre 20% pour un email. 5× plus de clients qui voient votre message."
+        },
+        "readTime": {
+          "label": "Temps de lecture moyen",
+          "desc": "80% des messages sont lus dans les 5 minutes. Envoyez à 11h30, remplissez votre salle le midi."
+        },
+        "efficiency": {
+          "label": "Plus efficace que l'email",
+          "desc": "Un message WhatsApp a 4 à 5× plus de chances d'être lu qu'un email marketing traditionnel."
+        }
+      },
+      "comparisonTitle": "Taux d'ouverture par canal",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "social": "Réseaux sociaux"
+      },
+      "sourcesNote": "Sources : Meta Business, France Num 2026 · Taux d'ouverture mesuré sur messages opt-in Business API"
     },
     "problemSolution": {
       "title": "Vous avez un super restaurant,",
@@ -516,7 +544,48 @@
       "lifetimeDesc": "Le calcul est simple : à CHF 24.90/mois, vous atteignez CHF 1 495 en 5 ans. Avec l'offre à vie, vous économisez tout ce qui vient après. Et les 500 tote-bags personnalisés (valeur estimée CHF 2 500) sont offerts.",
       "lifetimeToteBags": "+ 500 tote-bags personnalisés offerts",
       "singlePayment": "paiement unique",
-      "contactNote": "Pas prêt ? Laissez-nous votre numéro, on vous rappelle :"
+      "contactNote": "Pas prêt ? Laissez-nous votre numéro, on vous rappelle :",
+      "gridTitle": "Des prix clairs, WhatsApp inclus",
+      "gridSubtitle": "Choisissez votre plan selon la taille de votre restaurant. Jusqu'à {count} messages WhatsApp/mois inclus.",
+      "trialBadge": "14 jours d'essai gratuit",
+      "billingTabs": {
+        "monthly": "Mensuel",
+        "semiannual": "Semestriel",
+        "annual": "Annuel"
+      },
+      "launchOfferBadge": "Prix de lancement — offre limitée aux 100 premiers restaurants",
+      "messagesIncludedTitle": "200, 400 ou 800 messages WhatsApp par mois inclus",
+      "messagesIncludedSubtitle": "Choisissez votre plan selon le volume de messages à envoyer chaque mois",
+      "tierDescriptions": {
+        "small": "Petits cafés, tables d'hôtes",
+        "medium": "Restaurants familiaux",
+        "large": "Brasseries, pizzerias"
+      },
+      "popularBadge": "Populaire",
+      "messagesPerMonthBadge": "{count} messages/mois",
+      "messagesPerMonthLabel": "messages / mois",
+      "priceSuffix": "/mois · tout inclus",
+      "totalPricePrefix": "soit",
+      "totalPeriodSemiannual": "/ 6 mois",
+      "totalPeriodAnnual": "/ an",
+      "whatsappIncludedTitle": "WhatsApp inclus",
+      "whatsappIncludedDesc": "{count} messages/mois inclus",
+      "ctaButton": "Essayer 14 jours gratuits",
+      "ctaNote": "Aucun débit · Annulable à tout moment",
+      "includedInPlan": "Inclus dans chaque plan",
+      "features": [
+        "Fiche établissement complète",
+        "Photos & vidéo",
+        "Menus & carte",
+        "Adresse, contact & plan",
+        "Horaires d'ouverture",
+        "Offres du moment",
+        "Opt-in géré pour vous",
+        "Inspiration IA"
+      ],
+      "footnote1": "Tous les prix sont en CHF · TTC · Aucune commission",
+      "footnote2": "Au-delà des messages inclus, paliers supplémentaires disponibles sur demande",
+      "questionsPrefix": "Des questions ?"
     },
     "faq": {
       "title": "Vos questions, nos réponses",

@@ -412,13 +412,41 @@
       "ctaSecondary": "Beispielprofil ansehen",
       "headlineLine1": "Ihre Angebote und Speisekarten",
       "headlineLine2": "im",
-      "headlineHighlight": "WhatsApp Ihrer Abonnenten."
+      "headlineHighlight": "WhatsApp Ihrer Abonnenten.",
+      "alreadyPartner": "Bereits Partner? Anmelden →"
     },
     "trustStats": {
       "restaurants": "Registrierte Restaurants",
       "cantons": "Westschweizer Kantone abgedeckt",
       "reviews": "Verifizierte Google-Bewertungen",
       "commission": "Provision auf Ihre Reservierungen"
+    },
+    "whatsappStats": {
+      "eyebrow": "Warum WhatsApp?",
+      "titlePrefix": "Ihre Kunden",
+      "titleHighlight": "lesen wirklich",
+      "titleSuffix": "Ihre Nachrichten.",
+      "stats": {
+        "openRate": {
+          "label": "Öffnungsrate",
+          "desc": "Gegenüber 20% bei einer E-Mail. 5× mehr Kunden sehen Ihre Nachricht."
+        },
+        "readTime": {
+          "label": "Durchschnittliche Lesezeit",
+          "desc": "80% der Nachrichten werden innerhalb von 5 Minuten gelesen. Senden Sie um 11:30 Uhr und füllen Sie Ihren Saal am Mittag."
+        },
+        "efficiency": {
+          "label": "Effizienter als E-Mail",
+          "desc": "Eine WhatsApp-Nachricht hat 4 bis 5× mehr Chancen, gelesen zu werden als eine klassische E-Mail-Marketingnachricht."
+        }
+      },
+      "comparisonTitle": "Öffnungsrate nach Kanal",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "E-Mail",
+        "social": "Soziale Netzwerke"
+      },
+      "sourcesNote": "Quellen: Meta Business, France Num 2026 · Öffnungsrate gemessen anhand von Opt-in-Nachrichten der Business API"
     },
     "problemSolution": {
       "title": "Sie haben ein tolles Restaurant,",
@@ -517,7 +545,48 @@
       "lifetimeDesc": "Die Rechnung ist einfach: Bei CHF 24.90/Monat erreichen Sie CHF 1 495 in 5 Jahren. Mit dem Lebenslang-Angebot sparen Sie alles danach. Und 500 personalisierte Tote-Bags (geschätzter Wert CHF 2 500) sind inklusive.",
       "lifetimeToteBags": "+ 500 personalisierte Tote-Bags gratis",
       "singlePayment": "Einmalzahlung",
-      "contactNote": "Noch nicht bereit? Hinterlassen Sie Ihre Nummer, wir rufen Sie an:"
+      "contactNote": "Noch nicht bereit? Hinterlassen Sie Ihre Nummer, wir rufen Sie an:",
+      "gridTitle": "Klare Preise, WhatsApp inklusive",
+      "gridSubtitle": "Wählen Sie Ihren Plan nach der Größe Ihres Restaurants. Bis zu {count} WhatsApp-Nachrichten/Monat inklusive.",
+      "trialBadge": "14 Tage kostenlos testen",
+      "billingTabs": {
+        "monthly": "Monatlich",
+        "semiannual": "Halbjährlich",
+        "annual": "Jährlich"
+      },
+      "launchOfferBadge": "Einführungspreis — Angebot begrenzt auf die ersten 100 Restaurants",
+      "messagesIncludedTitle": "200, 400 oder 800 WhatsApp-Nachrichten pro Monat inklusive",
+      "messagesIncludedSubtitle": "Wählen Sie Ihren Plan nach dem monatlichen Nachrichtenvolumen",
+      "tierDescriptions": {
+        "small": "Kleine Cafés, Table d'hôtes",
+        "medium": "Familienrestaurants",
+        "large": "Brasserien, Pizzerien"
+      },
+      "popularBadge": "Beliebt",
+      "messagesPerMonthBadge": "{count} Nachrichten/Monat",
+      "messagesPerMonthLabel": "Nachrichten / Monat",
+      "priceSuffix": "/Monat · alles inklusive",
+      "totalPricePrefix": "das heisst",
+      "totalPeriodSemiannual": "/ 6 Monate",
+      "totalPeriodAnnual": "/ Jahr",
+      "whatsappIncludedTitle": "WhatsApp inklusive",
+      "whatsappIncludedDesc": "{count} Nachrichten/Monat inklusive",
+      "ctaButton": "14 Tage kostenlos testen",
+      "ctaNote": "Keine Abbuchung · Jederzeit kündbar",
+      "includedInPlan": "In jedem Plan enthalten",
+      "features": [
+        "Vollständiges Betriebsprofil",
+        "Fotos & Video",
+        "Speisekarte & Menüs",
+        "Adresse, Kontakt & Karte",
+        "Öffnungszeiten",
+        "Aktuelle Angebote",
+        "Opt-in für Sie verwaltet",
+        "KI-Inspiration"
+      ],
+      "footnote1": "Alle Preise in CHF · inkl. MwSt. · Keine Provision",
+      "footnote2": "Über die inkludierten Nachrichten hinaus sind weitere Stufen auf Anfrage verfügbar",
+      "questionsPrefix": "Fragen?"
     },
     "faq": {
       "title": "Ihre Fragen, unsere Antworten",

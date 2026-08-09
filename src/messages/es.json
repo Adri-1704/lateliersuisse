@@ -412,13 +412,41 @@
       "ctaSecondary": "Ver una ficha de ejemplo",
       "headlineLine1": "Sus ofertas y menús",
       "headlineLine2": "en el",
-      "headlineHighlight": "WhatsApp de sus suscriptores."
+      "headlineHighlight": "WhatsApp de sus suscriptores.",
+      "alreadyPartner": "¿Ya es partner? Iniciar sesión →"
     },
     "trustStats": {
       "restaurants": "Restaurantes registrados",
       "cantons": "Cantones romandos cubiertos",
       "reviews": "Reseñas de Google verificadas",
       "commission": "Comisión en sus reservas"
+    },
+    "whatsappStats": {
+      "eyebrow": "¿Por qué WhatsApp?",
+      "titlePrefix": "Sus clientes",
+      "titleHighlight": "leen de verdad",
+      "titleSuffix": "sus mensajes.",
+      "stats": {
+        "openRate": {
+          "label": "Tasa de apertura",
+          "desc": "Frente al 20% de un email. 5× más clientes ven su mensaje."
+        },
+        "readTime": {
+          "label": "Tiempo medio de lectura",
+          "desc": "El 80% de los mensajes se leen en los primeros 5 minutos. Envíe a las 11:30 y llene su sala a la hora de comer."
+        },
+        "efficiency": {
+          "label": "Más eficaz que el email",
+          "desc": "Un mensaje de WhatsApp tiene entre 4 y 5× más probabilidades de ser leído que un email de marketing tradicional."
+        }
+      },
+      "comparisonTitle": "Tasa de apertura por canal",
+      "channels": {
+        "whatsapp": "WhatsApp",
+        "email": "Email",
+        "social": "Redes sociales"
+      },
+      "sourcesNote": "Fuentes: Meta Business, France Num 2026 · Tasa de apertura medida en mensajes opt-in de la Business API"
     },
     "problemSolution": {
       "title": "Tiene un restaurante estupendo,",
@@ -517,7 +545,48 @@
       "lifetimeDesc": "El cálculo es sencillo: a CHF 24.90/mes, alcanza CHF 1 495 en 5 años. Con la oferta vitalicia, ahorra todo lo posterior. Y las 500 bolsas de tela personalizadas (valor estimado de CHF 2 500) están incluidas.",
       "lifetimeToteBags": "+ 500 bolsas de tela personalizadas incluidas",
       "singlePayment": "pago único",
-      "contactNote": "¿Aún no está listo? Déjenos su número, le llamamos:"
+      "contactNote": "¿Aún no está listo? Déjenos su número, le llamamos:",
+      "gridTitle": "Precios claros, WhatsApp incluido",
+      "gridSubtitle": "Elija su plan según el tamaño de su restaurante. Hasta {count} mensajes de WhatsApp/mes incluidos.",
+      "trialBadge": "14 días de prueba gratis",
+      "billingTabs": {
+        "monthly": "Mensual",
+        "semiannual": "Semestral",
+        "annual": "Anual"
+      },
+      "launchOfferBadge": "Precio de lanzamiento — oferta limitada a los 100 primeros restaurantes",
+      "messagesIncludedTitle": "200, 400 u 800 mensajes de WhatsApp al mes incluidos",
+      "messagesIncludedSubtitle": "Elija su plan según el volumen de mensajes que necesite enviar cada mes",
+      "tierDescriptions": {
+        "small": "Pequeños cafés, mesas de huéspedes",
+        "medium": "Restaurantes familiares",
+        "large": "Cervecerías, pizzerías"
+      },
+      "popularBadge": "Popular",
+      "messagesPerMonthBadge": "{count} mensajes/mes",
+      "messagesPerMonthLabel": "mensajes / mes",
+      "priceSuffix": "/mes · todo incluido",
+      "totalPricePrefix": "es decir",
+      "totalPeriodSemiannual": "/ 6 meses",
+      "totalPeriodAnnual": "/ año",
+      "whatsappIncludedTitle": "WhatsApp incluido",
+      "whatsappIncludedDesc": "{count} mensajes/mes incluidos",
+      "ctaButton": "Probar gratis 14 días",
+      "ctaNote": "Sin cargo · Cancele cuando quiera",
+      "includedInPlan": "Incluido en cada plan",
+      "features": [
+        "Ficha de establecimiento completa",
+        "Fotos y vídeo",
+        "Menús y carta",
+        "Dirección, contacto y mapa",
+        "Horarios de apertura",
+        "Ofertas del momento",
+        "Opt-in gestionado por nosotros",
+        "Inspiración con IA"
+      ],
+      "footnote1": "Todos los precios en CHF · IVA incluido · Cero comisión",
+      "footnote2": "Más allá de los mensajes incluidos, hay niveles adicionales disponibles bajo petición",
+      "questionsPrefix": "¿Tiene preguntas?"
     },
     "faq": {
       "title": "Sus preguntas, nuestras respuestas",
