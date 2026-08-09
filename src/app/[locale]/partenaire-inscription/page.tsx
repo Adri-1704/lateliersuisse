@@ -310,26 +310,29 @@ export default function MerchantSignupPage() {
       {/* ════════════════════════════════════════════════════════════════════ */}
       {currentStep === "signup" && (
         <form onSubmit={handleSignup} className="mt-8 space-y-5">
-          {/* Plan summary recap */}
-          {planParam && subsParam && (
-            <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-semibold text-green-800">
-                    {planParam === "monthly" ? "Mensuel" : planParam === "semiannual" ? "Semestriel" : "Annuel"}
-                    {" · "}{Number(subsParam) * 4} messages/mois WhatsApp
-                    {" · "}CHF {
-                      TIER_DISPLAY_PRICES[Number(subsParam) as 50 | 100 | 200]?.launch[
-                        planParam === "monthly" ? "monthly" : planParam === "semiannual" ? "semi" : "annual"
-                      ]
-                    }/mois
-                  </span>
+          {/* Plan summary recap — affiché quel que soit le chemin d'arrivée à
+              cette étape (#37 reliquat) : on se base sur l'état du composant
+              (selectedPlanId / selectedWhatsAppTier), pas sur les paramètres
+              d'URL que goToStep() n'écrit pas. */}
+          {selectedPlanId && (() => {
+            const selectedPlan = plans.find((p) => p.id === selectedPlanId);
+            if (!selectedPlan) return null;
+            return (
+              <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-green-600" />
+                    <span className="text-sm font-semibold text-green-800">
+                      {selectedPlanId === "monthly" ? "Mensuel" : selectedPlanId === "semiannual" ? "Semestriel" : "Annuel"}
+                      {" · "}{selectedWhatsAppTier * 4} messages/mois WhatsApp
+                      {" · "}CHF {selectedPlan.pricePerMonth}/mois
+                    </span>
+                  </div>
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">14j gratuits</span>
                 </div>
-                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700">14j gratuits</span>
               </div>
-            </div>
-          )}
+            );
+          })()}
           <div>
             <label htmlFor="signup-name" className="block text-sm font-medium text-gray-700">
               Nom complet *
