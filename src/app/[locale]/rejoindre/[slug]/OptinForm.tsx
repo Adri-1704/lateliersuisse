@@ -5,6 +5,7 @@ import { CheckCircle, Loader2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { isPlausiblePhoneNumber, normalizePhoneNumber } from "@/lib/phone";
 
 interface Labels {
   firstName: string;
@@ -38,8 +39,8 @@ export function OptinForm({ restaurantId, restaurantName, labels }: OptinFormPro
     e.preventDefault();
     setError(null);
 
-    const normalized = phone.replace(/[^0-9+]/g, "");
-    if (normalized.length < 10) {
+    const normalized = normalizePhoneNumber(phone);
+    if (!isPlausiblePhoneNumber(normalized)) {
       setError(labels.errorInvalid);
       return;
     }

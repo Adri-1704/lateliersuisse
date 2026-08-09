@@ -105,7 +105,7 @@ function RestaurantSlideCard({ restaurant, bestReview, locale }: { restaurant: R
             </div>
             <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-500">
               <MapPin className="h-3.5 w-3.5" />
-              {restaurant.city}, {restaurant.canton.toUpperCase().slice(0, 2)}
+              {restaurant.city ? `${restaurant.city}, ${restaurant.canton.toUpperCase().slice(0, 2)}` : restaurant.canton.toUpperCase().slice(0, 2)}
             </div>
             {/* Review snippet */}
             {bestReview && (
@@ -163,7 +163,7 @@ function RestaurantSlideCardCompact({ restaurant, bestReview, locale }: { restau
           <div className="mt-1.5 flex items-center gap-2">
             <div className="flex items-center gap-1 text-sm text-gray-500">
               <MapPin className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate">{restaurant.city}, {restaurant.canton.toUpperCase().slice(0, 2)}</span>
+              <span className="truncate">{restaurant.city ? `${restaurant.city}, ${restaurant.canton.toUpperCase().slice(0, 2)}` : restaurant.canton.toUpperCase().slice(0, 2)}</span>
             </div>
             <span className="text-gray-300">|</span>
             <PriceRange range={restaurant.priceRange} />

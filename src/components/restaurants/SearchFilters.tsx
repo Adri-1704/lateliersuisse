@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useId, useState } from "react";
 import { X, Star, Search, Navigation } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,11 @@ interface SearchFiltersProps {
 export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
   const t = useTranslations("search");
   const tHero = useTranslations("hero");
+  // Ce composant est monté deux fois en parallèle dans le DOM (tiroir mobile
+  // <SheetContent> + colonne desktop <aside>, cf. RestaurantsView.tsx) : des
+  // id fixes créeraient des doublons HTML invalides et des <label htmlFor>
+  // ambigus. useId() garantit un préfixe unique par instance.
+  const uid = useId();
   const params = useParams();
   const locale = params.locale as string;
   const router = useRouter();
@@ -98,7 +103,7 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
 
       {/* Search bar */}
       <form onSubmit={handleSearch}>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <label htmlFor={`${uid}-search`} className="mb-2 block text-sm font-medium text-gray-700">
           {t("searchLabel") || "Rechercher"}
         </label>
         <div className="relative">
@@ -106,6 +111,7 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
             <Search className="h-4 w-4 text-gray-400 hover:text-gray-600" />
           </button>
           <input
+            id={`${uid}-search`}
             type="text"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -135,10 +141,11 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
 
       {/* Establishment Type Filter */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <label htmlFor={`${uid}-type`} className="mb-2 block text-sm font-medium text-gray-700">
           {locale === "de" ? "Art des Betriebs" : locale === "en" ? "Type" : locale === "pt" ? "Tipo" : locale === "es" ? "Tipo" : "Type d'établissement"}
         </label>
         <select
+          id={`${uid}-type`}
           value={currentType}
           onChange={(e) => updateFilter("type", e.target.value)}
           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
@@ -153,10 +160,11 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
 
       {/* Canton Filter */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <label htmlFor={`${uid}-canton`} className="mb-2 block text-sm font-medium text-gray-700">
           {tHero("canton")}
         </label>
         <select
+          id={`${uid}-canton`}
           value={currentCanton}
           onChange={(e) => updateFilter("canton", e.target.value)}
           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"
@@ -172,10 +180,11 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
 
       {/* Cuisine Filter */}
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <label htmlFor={`${uid}-cuisine`} className="mb-2 block text-sm font-medium text-gray-700">
           {tHero("cuisineType")}
         </label>
         <select
+          id={`${uid}-cuisine`}
           value={currentCuisine}
           onChange={(e) => updateFilter("cuisine", e.target.value)}
           className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--color-just-tag)] focus:ring-2 focus:ring-[var(--color-just-tag)]/20"

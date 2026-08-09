@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { isPlausiblePhoneNumber, normalizePhoneNumber } from "@/lib/phone";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,8 +11,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Normalize phone: keep only digits and +
-    const normalizedPhone = phone.replace(/[^0-9+]/g, "");
-    if (normalizedPhone.length < 10) {
+    const normalizedPhone = normalizePhoneNumber(phone);
+    // Renforcement #36 : la validation client peut être contournée (appel
+    // direct à l'API) — on revalide le format plausible côté serveur pour
+    // éviter de créer des abonnés WhatsApp inexploitables (quota Meta facturé).
+    if (!isPlausiblePhoneNumber(normalizedPhone)) {
       return NextResponse.json({ error: "Numéro invalide" }, { status: 400 });
     }
 

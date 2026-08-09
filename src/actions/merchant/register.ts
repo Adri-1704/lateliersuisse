@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { claimRequestAdminNotification, claimApprovedNotification, newSignupAdminNotification } from "@/lib/email-templates";
 import { logConversionEvent } from "@/lib/analytics/conversion-events";
+import { isPlausiblePhoneNumber } from "@/lib/phone";
 
 interface RegisterParams {
   name: string;
@@ -27,6 +28,11 @@ export async function registerMerchant(params: RegisterParams): Promise<Register
   if (!name || name.length < 2) return { success: false, error: "Nom requis (2 caractères minimum)" };
   if (!email || !email.includes("@")) return { success: false, error: "Email invalide" };
   if (!password || password.length < 6) return { success: false, error: "Mot de passe requis (6 caractères minimum)" };
+  // Le numéro WhatsApp est optionnel, mais s'il est renseigné il doit être
+  // plausible (#36) : la validation client peut être contournée.
+  if (phone && !isPlausiblePhoneNumber(phone)) {
+    return { success: false, error: "Numéro de téléphone invalide" };
+  }
 
   const supabase = createAdminClient();
 

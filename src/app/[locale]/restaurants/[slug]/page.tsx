@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { featuresOptions } from "@/data/mock-restaurants";
 import type { Restaurant, Review } from "@/data/mock-restaurants";
-import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
+import { getLocalizedName, getLocalizedDescription, cleanDisplayText } from "@/lib/locale-helpers";
 import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { ClaimBanner } from "./ClaimBanner";
@@ -12,6 +12,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/supabase/types";
 import type { RestaurantPromotion } from "@/data/mock-restaurants";
 import { safeJsonLd } from "@/lib/json-ld";
+import { formatAddress, hasAddress } from "@/lib/address";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -290,24 +291,31 @@ export default async function RestaurantDetailPage({
   const displayReviewCount = enrichedRestaurant.googleReviewCount ?? enrichedRestaurant.reviewCount;
 
   // Structured data - Restaurant (Schema.org)
+  // #35 : on n'émet une propriété que si la donnée sous-jacente est
+  // renseignée — un JSON-LD avec streetAddress:"" / email:"" / image:[] est
+  // pire que l'absence de la propriété (Google peut pénaliser des données
+  // structurées manifestement incomplètes). `undefined` est simplement omis
+  // par JSON.stringify (voir safeJsonLd).
   const restaurantJsonLd = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
     name: getLocalizedName(enrichedRestaurant, locale),
     description: getLocalizedDescription(enrichedRestaurant, locale),
-    image: enrichedRestaurant.images,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: enrichedRestaurant.address,
-      addressLocality: enrichedRestaurant.city,
-      postalCode: enrichedRestaurant.postalCode,
-      addressRegion: enrichedRestaurant.canton,
-      addressCountry: "CH",
-    },
-    telephone: enrichedRestaurant.phone,
-    email: enrichedRestaurant.email,
-    url: enrichedRestaurant.website,
-    servesCuisine: enrichedRestaurant.cuisineType,
+    image: enrichedRestaurant.images.length > 0 ? enrichedRestaurant.images : undefined,
+    address: hasAddress(enrichedRestaurant)
+      ? {
+          "@type": "PostalAddress",
+          streetAddress: enrichedRestaurant.address || undefined,
+          addressLocality: enrichedRestaurant.city || undefined,
+          postalCode: enrichedRestaurant.postalCode || undefined,
+          addressRegion: enrichedRestaurant.canton || undefined,
+          addressCountry: "CH",
+        }
+      : undefined,
+    telephone: enrichedRestaurant.phone || undefined,
+    email: enrichedRestaurant.email || undefined,
+    url: enrichedRestaurant.website || undefined,
+    servesCuisine: enrichedRestaurant.cuisineType || undefined,
     priceRange: "$".repeat(enrichedRestaurant.priceRange),
     aggregateRating: displayReviewCount > 0
       ? {
@@ -384,6 +392,33 @@ export default async function RestaurantDetailPage({
     ],
   };
 
+  // Google Maps Embed URL — construite ici (server) pour ne pas exposer la
+  // logique de sélection de la clé. #35 : une adresse vide donnait une
+  // requête du type "Nom, ,  , Suisse" qui pointait Google vers un
+  // établissement quelconque. On préfère, dans l'ordre :
+  // 1. les coordonnées GPS (les plus fiables, cohérentes avec le lien
+  //    "Itinéraire" qui les utilise déjà) ;
+  // 2. l'adresse postale si elle est au moins partiellement renseignée ;
+  // 3. pas de carte du tout plutôt qu'une carte trompeuse.
+  const restaurantHasCoords =
+    !!enrichedRestaurant.latitude &&
+    !!enrichedRestaurant.longitude &&
+    enrichedRestaurant.latitude !== 0 &&
+    enrichedRestaurant.longitude !== 0;
+  const restaurantHasAddress = hasAddress(enrichedRestaurant);
+  // .trim() défensif : une clé d'env avec un retour à la ligne parasite
+  // cassait l'URL de l'iframe (retour à la ligne brut avant "&q=").
+  const googleMapsKey = process.env.GOOGLE_MAPS_KEY?.trim();
+  const mapsQuery = restaurantHasCoords
+    ? `${enrichedRestaurant.latitude},${enrichedRestaurant.longitude}`
+    : restaurantHasAddress
+      ? `${cleanDisplayText(enrichedRestaurant.nameFr)}, ${formatAddress(enrichedRestaurant)}, Suisse`
+      : null;
+  const mapsEmbedUrl =
+    googleMapsKey && mapsQuery
+      ? `https://www.google.com/maps/embed/v1/place?key=${googleMapsKey}&q=${encodeURIComponent(mapsQuery)}`
+      : null;
+
   return (
     <>
       <script
@@ -431,11 +466,7 @@ export default async function RestaurantDetailPage({
         reviews={reviews}
         locale={locale}
         featuresOptions={featuresOptions}
-        mapsEmbedUrl={
-          process.env.GOOGLE_MAPS_KEY
-            ? `https://www.google.com/maps/embed/v1/place?key=${process.env.GOOGLE_MAPS_KEY}&q=${encodeURIComponent(`${enrichedRestaurant.nameFr}, ${enrichedRestaurant.address}, ${enrichedRestaurant.postalCode} ${enrichedRestaurant.city}, Suisse`)}`
-            : null
-        }
+        mapsEmbedUrl={mapsEmbedUrl}
       />
     </>
   );

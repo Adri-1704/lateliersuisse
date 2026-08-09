@@ -38,6 +38,7 @@ import { getLocalizedName, getLocalizedDescription, getLocalizedLabelAlt } from 
 import { submitReview } from "@/actions/reviews";
 import { cantons } from "@/data/cantons";
 import { cantonCodeToSlug } from "@/lib/city-slug";
+import { formatAddress, hasAddress } from "@/lib/address";
 
 interface FeatureOption {
   value: string;
@@ -346,10 +347,16 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
   // Google Maps URLs (embed URL is pre-computed server-side and passed as prop)
   const hasCoords = restaurant.latitude && restaurant.longitude && restaurant.latitude !== 0 && restaurant.longitude !== 0;
+  const restaurantHasAddress = hasAddress(restaurant);
+  const formattedAddress = formatAddress(restaurant);
   const directionsUrl = hasCoords
     ? `https://www.google.com/maps/dir/?api=1&destination=${restaurant.latitude},${restaurant.longitude}`
-    : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${restaurant.address}, ${restaurant.postalCode} ${restaurant.city}`)}`;
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.nameFr} ${restaurant.address} ${restaurant.city}`)}`;
+    : restaurantHasAddress
+      ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formattedAddress)}`
+      : `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(name)}`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    restaurantHasAddress ? `${name} ${formattedAddress}` : name
+  )}`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -990,12 +997,12 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               <h3 className="text-lg font-semibold text-gray-900">{t("contact")}</h3>
 
               <div className="mt-4 space-y-3">
-                <div className="flex items-start gap-3 text-sm">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
-                  <span className="text-gray-700">
-                    {restaurant.address}, {restaurant.postalCode} {restaurant.city}
-                  </span>
-                </div>
+                {restaurantHasAddress && (
+                  <div className="flex items-start gap-3 text-sm">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+                    <span className="text-gray-700">{formattedAddress}</span>
+                  </div>
+                )}
                 {restaurant.phone && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="h-4 w-4 shrink-0 text-gray-400" />
@@ -1004,12 +1011,14 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                     </a>
                   </div>
                 )}
-                <div className="flex items-center gap-3 text-sm">
-                  <Mail className="h-4 w-4 shrink-0 text-gray-400" />
-                  <a href={`mailto:${restaurant.email}`} className="text-gray-700 hover:text-[var(--color-just-tag)]">
-                    {restaurant.email}
-                  </a>
-                </div>
+                {restaurant.email && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Mail className="h-4 w-4 shrink-0 text-gray-400" />
+                    <a href={`mailto:${restaurant.email}`} className="text-gray-700 hover:text-[var(--color-just-tag)]">
+                      {restaurant.email}
+                    </a>
+                  </div>
+                )}
                 {restaurant.website && (
                   <div className="flex items-center gap-3 text-sm">
                     <Globe className="h-4 w-4 shrink-0 text-gray-400" />
@@ -1080,18 +1089,22 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                     </a>
                   </Button>
                 )}
-                <Button asChild variant="outline" className="w-full">
-                  <a href={`mailto:${restaurant.email}`}>
-                    <Mail className="mr-2 h-4 w-4" />
-                    {t("email")}
-                  </a>
-                </Button>
+                {restaurant.email && (
+                  <Button asChild variant="outline" className="w-full">
+                    <a href={`mailto:${restaurant.email}`}>
+                      <Mail className="mr-2 h-4 w-4" />
+                      {t("email")}
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
 
-            {/* Google Maps */}
-            <div className="overflow-hidden rounded-xl border">
-              {mapsEmbedUrl && (
+            {/* Google Maps — pas de carte si on n'a ni coordonnées ni adresse
+                exploitable (#35) : une carte construite avec une adresse
+                vide/incomplète pointe sur un établissement au hasard. */}
+            {mapsEmbedUrl && (
+              <div className="overflow-hidden rounded-xl border">
                 <iframe
                   src={mapsEmbedUrl}
                   className="h-56 w-full border-0"
@@ -1100,22 +1113,22 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                   referrerPolicy="no-referrer-when-downgrade"
                   title={`${name} - ${t("location")}`}
                 />
-              )}
-              <div className="bg-white p-3">
-                <p className="text-xs text-gray-500">
-                  {restaurant.address}, {restaurant.postalCode} {restaurant.city}
-                </p>
-                <a
-                  href={directionsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-just-tag)] hover:underline"
-                >
-                  <Navigation className="h-3.5 w-3.5" />
-                  {{ de: "Route berechnen", en: "Get directions", pt: "Como chegar", es: "Cómo llegar" }[locale] || "Itinéraire"}
-                </a>
+                <div className="bg-white p-3">
+                  {restaurantHasAddress && (
+                    <p className="text-xs text-gray-500">{formattedAddress}</p>
+                  )}
+                  <a
+                    href={directionsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-just-tag)] hover:underline"
+                  >
+                    <Navigation className="h-3.5 w-3.5" />
+                    {{ de: "Route berechnen", en: "Get directions", pt: "Como chegar", es: "Cómo llegar" }[locale] || "Itinéraire"}
+                  </a>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -1132,7 +1145,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
           <div id="whatsapp" className="scroll-mt-24">
             <WhatsAppSubscribe
               restaurantId={restaurant.id}
-              restaurantName={restaurant.nameFr}
+              restaurantName={name}
             />
           </div>
         </div>

@@ -63,12 +63,18 @@ export function NewsletterSection() {
                   onSubmit={handleSubmit}
                   className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center"
                 >
+                  <label htmlFor="newsletter-email" className="sr-only">
+                    {t("placeholder")}
+                  </label>
                   <Input
+                    id="newsletter-email"
+                    name="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t("placeholder")}
                     required
+                    autoComplete="email"
                     className="h-12 w-full border-gray-700 bg-white/10 text-white placeholder:text-gray-500 sm:max-w-sm"
                   />
                   <Button
