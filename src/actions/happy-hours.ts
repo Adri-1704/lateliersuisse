@@ -4,6 +4,15 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import type { HappyHour, HappyHourPromoType } from "@/lib/supabase/types";
+import { endOfTodayZurich } from "@/lib/timezone";
+
+// Signature minimale pour appeler la RPC increment_happy_hour_stat (migration
+// 0031), absente des types Supabase générés tant que la migration n'a pas
+// été appliquée.
+type RpcCaller = (
+  fn: "increment_happy_hour_stat",
+  args: { p_happy_hour_id: string; p_field: "views_count" | "clicks_count" }
+) => Promise<{ error: { message: string } | null }>;
 
 // ============================================================
 // Happy Hours — Server actions (V1 Light, zero cout WhatsApp)
@@ -359,9 +368,10 @@ export async function getActiveHappyHoursAllCantons(
     // HH deja commencee et pas encore terminee
     endBoundaryIso = null;
   } else if (filters.timing === "today") {
-    const endOfDay = new Date(now);
-    endOfDay.setHours(23, 59, 59, 999);
-    startBoundaryIso = endOfDay.toISOString();
+    // "Aujourd'hui" doit s'entendre en heure suisse (Europe/Zurich), pas dans
+    // le fuseau du process serveur (UTC en production Vercel) — sinon la
+    // fenêtre 00h-02h heure suisse est calculée sur le mauvais jour (#39b).
+    startBoundaryIso = endOfTodayZurich(now).toISOString();
   } else if (filters.timing === "week") {
     const inAWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     startBoundaryIso = inAWeek.toISOString();
@@ -448,17 +458,19 @@ export async function getActiveHappyHoursAllCantons(
 export async function trackHappyHourClick(id: string): Promise<{ success: boolean }> {
   try {
     const admin = createAdminClient();
-    // Fetch + increment (pas de RPC disponible, on fait un lire-puis-ecrire minimaliste)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (admin.from("happy_hours") as any)
-      .select("clicks_count")
-      .eq("id", id)
-      .maybeSingle();
-    const current = (data?.clicks_count as number) || 0;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin.from("happy_hours") as any)
-      .update({ clicks_count: current + 1 })
-      .eq("id", id);
+    // Incrément atomique côté Postgres (RPC increment_happy_hour_stat, voir
+    // migration 0031) — un lire-puis-écrire applicatif fait perdre des
+    // incréments sous forte concurrence (deux requêtes lisant la même
+    // valeur N écrivent toutes deux N+1 au lieu de N+2). Cast : la RPC n'est
+    // pas encore dans les types générés (migration non appliquée).
+    const { error } = await (admin.rpc as unknown as RpcCaller)("increment_happy_hour_stat", {
+      p_happy_hour_id: id,
+      p_field: "clicks_count",
+    });
+    if (error) {
+      console.error("[trackHappyHourClick] Erreur RPC:", error.message);
+      return { success: false };
+    }
     return { success: true };
   } catch {
     return { success: false };
@@ -468,16 +480,15 @@ export async function trackHappyHourClick(id: string): Promise<{ success: boolea
 export async function trackHappyHourView(id: string): Promise<{ success: boolean }> {
   try {
     const admin = createAdminClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (admin.from("happy_hours") as any)
-      .select("views_count")
-      .eq("id", id)
-      .maybeSingle();
-    const current = (data?.views_count as number) || 0;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin.from("happy_hours") as any)
-      .update({ views_count: current + 1 })
-      .eq("id", id);
+    // Incrément atomique côté Postgres — voir commentaire de trackHappyHourClick.
+    const { error } = await (admin.rpc as unknown as RpcCaller)("increment_happy_hour_stat", {
+      p_happy_hour_id: id,
+      p_field: "views_count",
+    });
+    if (error) {
+      console.error("[trackHappyHourView] Erreur RPC:", error.message);
+      return { success: false };
+    }
     return { success: true };
   } catch {
     return { success: false };

@@ -2,7 +2,9 @@ import type { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase/server";
 import { cantons } from "@/data/cantons";
 import { collections } from "@/data/collections";
-import { slugifyCity, VALID_CANTON_CODES } from "@/lib/city-slug";
+import { VALID_CANTON_CODES } from "@/lib/city-slug";
+import { fetchAllRows } from "@/lib/supabase/paginate";
+import { buildCityAggregate } from "@/lib/restaurants/city-canton";
 
 // SEO long-tail : abaissé de 5 à 1 pour rendre indexables toutes les villes
 // avec au moins 1 resto. Évite les 404 quand Google découvre une ville via
@@ -129,29 +131,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // City landing pages (SEO long-tail : "restaurants Lausanne", "restaurants Sion", etc.)
   try {
     const supabase = createAdminClient();
-    const { data: cityData } = await supabase
-      .from("restaurants")
-      .select("city, canton")
-      .eq("is_published", true)
-      .not("city", "is", null)
-      .neq("city", "")
-      .in("canton", VALID_CANTON_CODES)
-      .limit(15000);
+    // PostgREST plafonne toute réponse à 1000 lignes : le .limit(15000)
+    // ci-dessous était silencieusement écrasé par ce plafond serveur, ne
+    // couvrant qu'un échantillon non déterministe (~9% de la base). On
+    // pagine par lots de 1000, comme pour les fiches restaurant plus bas.
+    const cityData = await fetchAllRows<{ city: string; canton: string }>(
+      ({ from, to }) =>
+        supabase
+          .from("restaurants")
+          .select("city, canton")
+          .eq("is_published", true)
+          .not("city", "is", null)
+          .neq("city", "")
+          .in("canton", VALID_CANTON_CODES)
+          .order("id", { ascending: true })
+          .range(from, to),
+      { onError: (msg) => console.error("Error fetching cities batch for sitemap:", msg) }
+    );
 
     if (cityData) {
-      // Group and count cities
-      const cityCounts = new Map<string, number>();
-      for (const row of cityData as { city: string; canton: string }[]) {
-        const slug = slugifyCity(row.city);
-        if (!slug) continue;
-        cityCounts.set(slug, (cityCounts.get(slug) || 0) + 1);
-      }
+      // Regroupement normalisé ville/canton (voir lib/restaurants/city-canton) :
+      // exclut les codes postaux et les communes étrangères/hors périmètre,
+      // fusionne les doublons (Bern/Berne, Bienne/Biel-Bienne...). Le slug
+      // généré ici est EXACTEMENT celui que résoudra la page ville
+      // (resolveCitySlug), garantissant l'absence de lien mort dans le
+      // sitemap (#40 — 23 liens canton→ville en 404, notamment pour
+      // Neuchâtel où des codes postaux étaient traités comme des villes).
+      const cityAggregate = buildCityAggregate(cityData);
 
-      for (const [slug, count] of cityCounts.entries()) {
-        if (count < MIN_RESTAURANTS_FOR_CITY_PAGE) continue;
+      for (const entry of cityAggregate.values()) {
+        if (entry.count < MIN_RESTAURANTS_FOR_CITY_PAGE) continue;
         for (const locale of locales) {
           entries.push({
-            url: `${baseUrl}/${locale}/restaurants/ville/${slug}`,
+            url: `${baseUrl}/${locale}/restaurants/ville/${entry.slug}`,
             lastModified: now,
             changeFrequency: "weekly",
             priority: 0.8,

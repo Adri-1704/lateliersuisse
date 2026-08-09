@@ -159,7 +159,7 @@ export default async function HappyHoursPage({
             <Sparkles className="h-4 w-4" />
             {new Date().toLocaleDateString(
               locale === "de" ? "de-CH" : locale === "en" ? "en-GB" : "fr-CH",
-              { weekday: "long", day: "numeric", month: "long" },
+              { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Zurich" },
             )}
           </div>
           <h1 className="text-4xl font-bold text-white sm:text-5xl">{h1}</h1>

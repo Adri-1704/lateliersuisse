@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { PriceRange } from "@/lib/supabase/types";
 import { cantonSlugToCode } from "@/lib/city-slug";
+import { fetchAllRows } from "@/lib/supabase/paginate";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -23,6 +24,9 @@ export interface RestaurantListItem {
   price_range: PriceRange;
   avg_rating: number;
   review_count: number;
+  /** Note Google (source de vérité si présente — voir #34) */
+  google_rating: number | null;
+  google_review_count: number | null;
   cover_image: string | null;
   features: string[];
   is_featured: boolean;
@@ -56,7 +60,13 @@ export type RestaurantFilters = {
   establishmentType?: string;
   canton?: string;
   cuisine?: string;
-  city?: string;
+  /**
+   * Filtre ville. Une chaîne fait une correspondance EXACTE (insensible à la
+   * casse) sur `city`. Un tableau fait un `.in("city", [...])` : utilisé pour
+   * matcher toutes les variantes brutes d'une même commune canonicalisée
+   * (ex. ["Bern", "Berne"]) — voir lib/restaurants/city-canton.ts.
+   */
+  city?: string | string[];
   /** 1..4 — filters price_range <= priceMax (string enum comparison) */
   priceMax?: number;
   /** filters avg_rating >= ratingMin */
@@ -87,6 +97,8 @@ const LIST_SELECT = [
   "price_range",
   "avg_rating",
   "review_count",
+  "google_rating",
+  "google_review_count",
   "cover_image",
   "features",
   "is_featured",
@@ -107,6 +119,16 @@ const MAP_SELECT = [
   "city",
   "canton",
 ].join(",");
+
+// ---------------------------------------------------------------------------
+// LIKE/ILIKE helpers — les jokers SQL % et _ doivent être échappés quand ils
+// proviennent d'une saisie utilisateur, sinon "%" renvoie tout le catalogue
+// et "_" matche n'importe quel caractère.
+// ---------------------------------------------------------------------------
+
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (c) => `\\${c}`);
+}
 
 // ---------------------------------------------------------------------------
 // Shared filter helper (DRY)
@@ -137,7 +159,20 @@ function applyFilters(query: any, filters: RestaurantFilters) {
     q = q.eq("cuisine_type", filters.cuisine);
   }
   if (filters.city) {
-    q = q.ilike("city", `%${filters.city}%`);
+    if (Array.isArray(filters.city)) {
+      // Plusieurs variantes brutes d'une même commune canonicalisée
+      // (ex. ["Bern", "Berne"]) — un simple ilike sur le nom fusionné ne
+      // matcherait aucune ligne dont `city` est une variante différente,
+      // vidant la grille malgré un compteur non nul (#34, bloquant sécurité).
+      if (filters.city.length > 0) {
+        q = q.in("city", filters.city);
+      }
+    } else {
+      // Correspondance EXACTE (insensible à la casse) — un ilike avec jokers
+      // ("%Berne%") capturait aussi "Bernex" ou "Route de Berne 285", mélangeant
+      // des établissements d'autres communes dans la page /restaurants/ville/berne (#34).
+      q = q.ilike("city", escapeLikePattern(filters.city));
+    }
   }
   if (filters.priceMax != null && filters.priceMax >= 1 && filters.priceMax <= 4) {
     q = q.lte("price_range", String(filters.priceMax));
@@ -156,7 +191,15 @@ function applyFilters(query: any, filters: RestaurantFilters) {
       .normalize("NFD")
       .replace(/[̀-ͯ]/g, "")
       .toLowerCase();
-    q = q.ilike("name_search", `%${normalized}%`);
+    // Échappe les jokers LIKE (% et _) : une recherche littérale sur "%" ne
+    // doit pas renvoyer tout le catalogue. On échappe aussi les guillemets
+    // doubles pour pouvoir citer la valeur ci-dessous (syntaxe .or() de
+    // PostgREST : toute valeur contenant une virgule ou une parenthèse doit
+    // être entourée de guillemets doubles).
+    const escaped = escapeLikePattern(normalized).replace(/"/g, '\\"');
+    // Le placeholder du champ promet "Nom, ville, cuisine..." — on cherche
+    // donc aussi dans cuisine_type (name_search ne couvre que nom + ville).
+    q = q.or(`name_search.ilike."%${escaped}%",cuisine_type.ilike."%${escaped}%"`);
   }
 
   return q;
@@ -243,21 +286,25 @@ export async function fetchFilteredRestaurants(
 export async function fetchCuisineCounts(): Promise<Record<string, number>> {
   try {
     const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from("restaurants")
-      .select("cuisine_type")
-      .eq("is_published", true)
-      .not("cuisine_type", "is", null)
-      .neq("cuisine_type", "");
-
-    if (error) {
-      console.error("[fetchCuisineCounts] Erreur:", error);
-      return {};
-    }
-    if (!data) return {};
+    // PostgREST plafonne toute réponse à 1000 lignes (max_rows) — avec ~11k
+    // restaurants publiés, un simple .select() sans pagination ne voit que
+    // ~9% de la base, sur un sous-ensemble non déterministe (pas de .order()).
+    // On pagine par lots de 1000 pour obtenir un comptage exhaustif.
+    const rows = await fetchAllRows<{ cuisine_type: string }>(
+      ({ from, to }) =>
+        supabase
+          .from("restaurants")
+          .select("cuisine_type")
+          .eq("is_published", true)
+          .not("cuisine_type", "is", null)
+          .neq("cuisine_type", "")
+          .order("id", { ascending: true })
+          .range(from, to),
+      { onError: (msg) => console.error("[fetchCuisineCounts] Erreur:", msg) }
+    );
 
     const counts: Record<string, number> = {};
-    for (const row of data as { cuisine_type: string }[]) {
+    for (const row of rows) {
       counts[row.cuisine_type] = (counts[row.cuisine_type] || 0) + 1;
     }
     return counts;
@@ -271,31 +318,48 @@ export async function fetchCuisineCounts(): Promise<Record<string, number>> {
 // Map-specific query — all matching restaurants, minimal columns
 // ---------------------------------------------------------------------------
 
+// Garde-fou pour éviter de rapatrier un nombre déraisonnable de marqueurs
+// côté client (rendu Leaflet) si un filtre très large est appliqué.
+const MAP_MAX_MARKERS = 5000;
+
 export async function fetchAllFilteredForMap(
   filters: RestaurantFilters
 ): Promise<RestaurantMapItem[]> {
   try {
     const supabase = createAdminClient();
 
-    let query = supabase
-      .from("restaurants")
-      .select(MAP_SELECT)
-      .eq("is_published", true)
-      .not("latitude", "is", null)
-      .not("longitude", "is", null);
+    // PostgREST plafonne les réponses à 1000 lignes : un .limit(2000) est
+    // silencieusement écrasé par ce plafond serveur. On pagine par lots de
+    // 1000 pour renvoyer tous les établissements filtrés (jusqu'à
+    // MAP_MAX_MARKERS, au-delà duquel la carte deviendrait de toute façon
+    // illisible).
+    const rows = await fetchAllRows<RestaurantMapItem>(
+      ({ from, to }) => {
+        let query = supabase
+          .from("restaurants")
+          .select(MAP_SELECT)
+          .eq("is_published", true)
+          .not("latitude", "is", null)
+          .not("longitude", "is", null);
 
-    query = applyFilters(query, filters);
-    query = query.order("avg_rating", { ascending: false });
-    query = query.limit(2000);
+        query = applyFilters(query, filters);
+        query = query
+          .order("avg_rating", { ascending: false })
+          .order("id", { ascending: true })
+          .range(from, to);
 
-    const { data, error } = await query;
+        return query as unknown as PromiseLike<{
+          data: RestaurantMapItem[] | null;
+          error: { message: string } | null;
+        }>;
+      },
+      {
+        maxRows: MAP_MAX_MARKERS,
+        onError: (msg) => console.error("[fetchAllFilteredForMap] Supabase error:", msg),
+      }
+    );
 
-    if (error) {
-      console.error("[fetchAllFilteredForMap] Supabase error:", error.message);
-      return [];
-    }
-
-    return (data ?? []) as RestaurantMapItem[];
+    return rows;
   } catch (err) {
     console.error("[fetchAllFilteredForMap] Unexpected error:", err);
     return [];

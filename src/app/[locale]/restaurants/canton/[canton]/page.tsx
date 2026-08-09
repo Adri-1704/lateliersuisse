@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cantons, type Canton } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
-import { createAdminClient } from "@/lib/supabase/server";
-import { slugifyCity, cantonSlugToCode } from "@/lib/city-slug";
+import { getCitiesForCanton } from "@/lib/restaurants/city-canton";
 import { safeJsonLd } from "@/lib/json-ld";
 import { MapPin, Star } from "lucide-react";
 
@@ -15,34 +14,19 @@ export const dynamic = "force-static";
 export const revalidate = 1800;
 export const dynamicParams = true;
 
-// Récupère les top villes du canton pour internal linking
+// Récupère les top villes du canton pour internal linking.
+// Le regroupement passe par `getCitiesForCanton`, qui pagine sur
+// l'intégralité des restaurants publiés (pas de plafond PostgREST — #33) et
+// normalise ville/canton (dédoublonnage Bern/Berne, exclusion des codes
+// postaux et des communes étrangères, correction des rattachements erronés
+// — #34/#40). Les slugs renvoyés correspondent exactement à ceux résolus par
+// la page ville, garantissant l'absence de lien mort (#40).
 async function getTopCitiesInCanton(canton: string, limit = 10): Promise<{ slug: string; name: string; count: number }[]> {
-  const supabase = createAdminClient();
-  // La colonne `canton` en base stocke des codes à 2 lettres ("VD"), pas le
-  // slug reçu de l'URL ("vaud").
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select("city")
-    .eq("is_published", true)
-    .eq("canton", cantonSlugToCode(canton) ?? canton)
-    .not("city", "is", null)
-    .neq("city", "")
-    .limit(5000);
-  if (error) console.error("[getTopCitiesInCanton] Erreur:", error);
-  if (!data) return [];
-  const cityCounts = new Map<string, { name: string; count: number }>();
-  for (const row of data as { city: string }[]) {
-    const slug = slugifyCity(row.city);
-    if (!slug) continue;
-    const existing = cityCounts.get(slug);
-    if (existing) existing.count++;
-    else cityCounts.set(slug, { name: row.city, count: 1 });
-  }
-  return Array.from(cityCounts.entries())
-    .filter(([, v]) => v.count >= MIN_RESTAURANTS_FOR_CITY_PAGE)
-    .sort(([, a], [, b]) => b.count - a.count)
+  const cities = await getCitiesForCanton(canton);
+  return cities
+    .filter((c) => c.count >= MIN_RESTAURANTS_FOR_CITY_PAGE)
     .slice(0, limit)
-    .map(([slug, v]) => ({ slug, name: v.name, count: v.count }));
+    .map((c) => ({ slug: c.slug, name: c.name, count: c.count }));
 }
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";

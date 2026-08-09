@@ -3,14 +3,20 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cantons } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
-import { createAdminClient } from "@/lib/supabase/server";
-import { slugifyCity, VALID_CANTON_CODES, cantonCodeToSlug, cantonSlugToCode } from "@/lib/city-slug";
+import { getCitiesForCanton, resolveCitySlug } from "@/lib/restaurants/city-canton";
 import { safeJsonLd } from "@/lib/json-ld";
 import { MapPin, Star } from "lucide-react";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
-// Aligné avec sitemap.ts : seuil à 1 pour rendre indexables toutes les villes
-// avec au moins 1 resto (évite les 404 sur les liens internes canton → ville).
+// Seuil d'EXISTENCE de la page (≠ seuil d'indexation) : toute ville ayant au
+// moins 1 restaurant publié doit répondre 200, faute de quoi un lien interne
+// canton → ville (ou une entrée sitemap) pointerait vers un 404. Les seuils
+// des autres pages sont volontairement plus élevés car ils répondent à un
+// besoin différent : sitemap.ts (=3) n'indexe que les villes avec assez de
+// contenu pour être pertinentes pour Google ; la page canton (=5) ne met en
+// avant que les villes les plus fournies dans son bloc "Par ville :". Ces
+// trois seuils ne doivent PAS être égaux — seul celui-ci gouverne l'existence
+// réelle de la page.
 const MIN_RESTAURANTS_FOR_CITY_PAGE = 1;
 
 // SEO Quick Win: ISR (30 min) sur les pages villes — pages SEO critiques.
@@ -23,55 +29,41 @@ export const dynamicParams = true;
 // ---------------------------------------------------------------------------
 
 interface ResolvedCity {
-  name: string;           // original case: "Genève", "La Chaux-de-Fonds"
-  slug: string;           // "geneve", "la-chaux-de-fonds"
+  name: string;           // canonical display name: "Genève", "Biel/Bienne"
+  slug: string;           // "geneve", "biel-bienne"
   canton: string;         // canton value from cantons.ts
-  count: number;
+  count: number;          // compteur agrégat (utilisé uniquement comme garde d'existence — voir plus bas)
+  /**
+   * Valeurs BRUTES de `restaurants.city` regroupées sous ce nom canonique
+   * (ex. ["Bern", "Berne"]). À utiliser avec `fetchFilteredRestaurants({ city: variants })`
+   * — un filtre sur le seul nom canonique fusionné ne matcherait aucune ligne
+   * dont `city` est une variante brute différente (bloquant sécurité #34 :
+   * la page annonçait un compteur non nul mais affichait une grille vide).
+   */
+  variants: string[];
 }
 
+// La résolution passe par `resolveCitySlug`, qui pagine sur l'intégralité
+// des restaurants publiés (pas de plafond PostgREST — #33) et normalise
+// ville/canton (dédoublonnage, exclusion des codes postaux et des communes
+// étrangères, correction des rattachements erronés — #34).
+//
+// IMPORTANT : `entry.count` (agrégat calculé en JS) ne sert ici QUE de garde
+// d'existence (notFound si aucun restaurant). Le compteur réellement AFFICHÉ
+// (titre, sous-titre, JSON-LD) provient exclusivement du `totalCount` exact
+// renvoyé par `fetchFilteredRestaurants({ city: variants })` — c'est-à-dire
+// littéralement le nombre de lignes que la même requête utilise pour remplir
+// la grille, garantissant que compteur et liste ne peuvent plus diverger.
 async function resolveCity(slug: string): Promise<ResolvedCity | null> {
-  const supabase = createAdminClient();
+  const entry = await resolveCitySlug(slug);
+  if (!entry || entry.count < MIN_RESTAURANTS_FOR_CITY_PAGE) return null;
+  return { name: entry.name, slug: entry.slug, canton: entry.cantonSlug, count: entry.count, variants: entry.variants };
+}
 
-  // Fetch distinct cities with counts using a light query. La colonne
-  // `canton` en base stocke des codes à 2 lettres ("VD"), pas les slugs
-  // ("vaud") — on filtre sur les codes puis on reconvertit en slug ci-dessous
-  // pour préserver le format attendu par le reste de la page (liens, i18n).
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select("city, canton")
-    .eq("is_published", true)
-    .not("city", "is", null)
-    .neq("city", "")
-    .in("canton", VALID_CANTON_CODES)
-    .limit(15000);
-
-  if (error) console.error("[resolveCity] Erreur:", error);
-  if (!data) return null;
-
-  // Group by normalized city+canton
-  const cityMap = new Map<string, { name: string; canton: string; count: number }>();
-  for (const row of data as { city: string; canton: string }[]) {
-    const citySlug = slugifyCity(row.city);
-    if (!citySlug) continue;
-    const cantonSlug = cantonCodeToSlug(row.canton) ?? row.canton;
-    const key = `${citySlug}::${cantonSlug}`;
-    const existing = cityMap.get(key);
-    if (existing) existing.count++;
-    else cityMap.set(key, { name: row.city, canton: cantonSlug, count: 1 });
-  }
-
-  // Find the first city matching the slug (preferring the most populated one if multiple cantons have same slug)
-  let best: ResolvedCity | null = null;
-  for (const [key, info] of cityMap.entries()) {
-    const [citySlugFromMap] = key.split("::");
-    if (citySlugFromMap === slug && info.count >= MIN_RESTAURANTS_FOR_CITY_PAGE) {
-      if (!best || info.count > best.count) {
-        best = { name: info.name, slug: citySlugFromMap, canton: info.canton, count: info.count };
-      }
-    }
-  }
-
-  return best;
+/** Compte exact des restaurants publiés correspondant à toutes les variantes brutes d'une ville. */
+async function countCityRestaurants(variants: string[]): Promise<number> {
+  const { totalCount } = await fetchFilteredRestaurants({ city: variants }, 1, 1);
+  return totalCount;
 }
 
 // ---------------------------------------------------------------------------
@@ -79,34 +71,11 @@ async function resolveCity(slug: string): Promise<ResolvedCity | null> {
 // ---------------------------------------------------------------------------
 
 async function getOtherCitiesInCanton(canton: string, currentCitySlug: string, limit = 8): Promise<{ slug: string; name: string; count: number }[]> {
-  const supabase = createAdminClient();
-  // `canton` ici est un slug ("vaud") — la colonne en base stocke un code ("VD").
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select("city")
-    .eq("is_published", true)
-    .eq("canton", cantonSlugToCode(canton) ?? canton)
-    .not("city", "is", null)
-    .neq("city", "")
-    .limit(5000);
-
-  if (error) console.error("[getOtherCitiesInCanton] Erreur:", error);
-  if (!data) return [];
-
-  const cityCounts = new Map<string, { name: string; count: number }>();
-  for (const row of data as { city: string }[]) {
-    const slug = slugifyCity(row.city);
-    if (!slug || slug === currentCitySlug) continue;
-    const existing = cityCounts.get(slug);
-    if (existing) existing.count++;
-    else cityCounts.set(slug, { name: row.city, count: 1 });
-  }
-
-  return Array.from(cityCounts.entries())
-    .filter(([, v]) => v.count >= MIN_RESTAURANTS_FOR_CITY_PAGE)
-    .sort(([, a], [, b]) => b.count - a.count)
+  const cities = await getCitiesForCanton(canton);
+  return cities
+    .filter((c) => c.slug !== currentCitySlug && c.count >= MIN_RESTAURANTS_FOR_CITY_PAGE)
     .slice(0, limit)
-    .map(([slug, v]) => ({ slug, name: v.name, count: v.count }));
+    .map((c) => ({ slug: c.slug, name: c.name, count: c.count }));
 }
 
 // ---------------------------------------------------------------------------
@@ -122,12 +91,24 @@ export async function generateMetadata({
   const resolved = await resolveCity(city);
   if (!resolved) return {};
 
+  // Compteur EXACT (même requête que la grille — voir countCityRestaurants),
+  // pas l'agrégat JS `resolved.count` : garantit que le <title> annonce
+  // exactement le nombre de restaurants réellement affichés sur la page.
+  const total = await countCityRestaurants(resolved.variants);
+
+  // Accord singulier/pluriel (évite "1 adresses")
+  const fr_adresse = total === 1 ? "adresse" : "adresses";
+  const de_adresse = total === 1 ? "Adresse" : "Adressen";
+  const en_place = total === 1 ? "place" : "places";
+  const pt_endereco = total === 1 ? "endereço" : "endereços";
+  const es_direccion = total === 1 ? "dirección" : "direcciones";
+
   const titles: Record<string, string> = {
-    fr: `Restaurants à ${resolved.name} — ${resolved.count} adresses | Just-Tag`,
-    de: `Restaurants in ${resolved.name} — ${resolved.count} Adressen | Just-Tag`,
-    en: `Restaurants in ${resolved.name} — ${resolved.count} places | Just-Tag`,
-    pt: `Restaurantes em ${resolved.name} — ${resolved.count} endereços | Just-Tag`,
-    es: `Restaurantes en ${resolved.name} — ${resolved.count} direcciones | Just-Tag`,
+    fr: `Restaurants à ${resolved.name} — ${total} ${fr_adresse} | Just-Tag`,
+    de: `Restaurants in ${resolved.name} — ${total} ${de_adresse} | Just-Tag`,
+    en: `Restaurants in ${resolved.name} — ${total} ${en_place} | Just-Tag`,
+    pt: `Restaurantes em ${resolved.name} — ${total} ${pt_endereco} | Just-Tag`,
+    es: `Restaurantes en ${resolved.name} — ${total} ${es_direccion} | Just-Tag`,
   };
 
   const descriptions: Record<string, string> = {
@@ -240,10 +221,16 @@ export default async function CityRestaurantsPage({
     notFound();
   }
 
-  // Fetch the 24 top-rated restaurants in this city
+  // Fetch the 24 top-rated restaurants in this city — filtré sur TOUTES les
+  // variantes brutes de la ville (ex. ["Bern", "Berne"]), pas seulement le
+  // nom canonique fusionné, sinon la grille resterait vide pour les villes
+  // dédupliquées malgré un compteur non nul (bloquant sécurité #34).
+  // `total` (exact, renvoyé par cette même requête) est LA source de vérité
+  // unique utilisée pour le sous-titre et le JSON-LD : il correspond par
+  // construction au nombre de restaurants que cette requête peut renvoyer.
   const { data: items, totalCount: total } = await fetchFilteredRestaurants(
     {
-      city: resolved.name,
+      city: resolved.variants,
       sort: "rating",
     },
     1,
@@ -306,15 +293,20 @@ export default async function CityRestaurantsPage({
     numberOfItems: total,
   };
 
+  // Évite le doublon "Genève › Genève" quand la ville porte le nom du canton.
+  const breadcrumbItems = [
+    { "@type": "ListItem", position: 1, name: "Just-Tag", item: `${baseUrl}/${locale}` },
+    { "@type": "ListItem", position: 2, name: breadcrumbLabel, item: `${baseUrl}/${locale}/restaurants` },
+    ...(cantonLabel !== resolved.name
+      ? [{ "@type": "ListItem", position: 3, name: cantonLabel, item: `${baseUrl}/${locale}/restaurants/canton/${resolved.canton}` }]
+      : []),
+    { "@type": "ListItem", position: cantonLabel !== resolved.name ? 4 : 3, name: resolved.name, item: `${baseUrl}/${locale}/restaurants/ville/${city}` },
+  ];
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Just-Tag", item: `${baseUrl}/${locale}` },
-      { "@type": "ListItem", position: 2, name: breadcrumbLabel, item: `${baseUrl}/${locale}/restaurants` },
-      { "@type": "ListItem", position: 3, name: cantonLabel, item: `${baseUrl}/${locale}/restaurants/canton/${resolved.canton}` },
-      { "@type": "ListItem", position: 4, name: resolved.name, item: `${baseUrl}/${locale}/restaurants/ville/${city}` },
-    ],
+    itemListElement: breadcrumbItems,
   };
 
   return (
@@ -335,10 +327,16 @@ export default async function CityRestaurantsPage({
             <Link href={`/${locale}`} className="hover:text-white">Just-Tag</Link>
             <span className="mx-2">›</span>
             <Link href={`/${locale}/restaurants`} className="hover:text-white">{breadcrumbLabel}</Link>
-            <span className="mx-2">›</span>
-            <Link href={`/${locale}/restaurants/canton/${resolved.canton}`} className="hover:text-white">
-              {cantonLabel}
-            </Link>
+            {/* Ville portant le même nom que son canton (Genève, Berne, Fribourg) :
+                on évite le doublon "Genève › Genève" dans le fil d'Ariane. */}
+            {cantonLabel !== resolved.name && (
+              <>
+                <span className="mx-2">›</span>
+                <Link href={`/${locale}/restaurants/canton/${resolved.canton}`} className="hover:text-white">
+                  {cantonLabel}
+                </Link>
+              </>
+            )}
             <span className="mx-2">›</span>
             <span>{resolved.name}</span>
           </nav>
@@ -406,7 +404,11 @@ export default async function CityRestaurantsPage({
               {total > items.length && (
                 <div className="mt-10 text-center">
                   <Link
-                    href={`/${locale}/restaurants?city=${encodeURIComponent(resolved.name)}`}
+                    // Chaque variante est encodée individuellement puis jointe par une
+                    // virgule LITTÉRALE (non encodée) qui sert de séparateur — le
+                    // parsing côté /restaurants (searchParams déjà décodé par Next)
+                    // sépare simplement sur "," pour retrouver la liste de variantes.
+                    href={`/${locale}/restaurants?city=${resolved.variants.map((v) => encodeURIComponent(v)).join(",")}`}
                     className="inline-block rounded-xl bg-[var(--color-just-tag)] px-8 py-3 font-semibold text-white shadow-md transition hover:scale-105"
                   >
                     {seeAllLabels[locale] || seeAllLabels.fr} ({total.toLocaleString("fr-CH")})

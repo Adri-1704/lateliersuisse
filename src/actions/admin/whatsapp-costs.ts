@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/actions/admin/auth";
+import { fetchAllRows } from "@/lib/supabase/paginate";
 
 // Meta Cloud API pricing — marketing messages, Switzerland ("Rest of Western Europe")
 // Model: per-message (since July 1, 2025 — replaced per-conversation billing)
@@ -38,6 +39,7 @@ export interface WhatsAppCostsData {
 }
 
 interface BroadcastRow {
+  id: string;
   restaurant_id: string;
   sent_count: number;
   created_at: string;
@@ -64,21 +66,27 @@ export async function getWhatsAppCosts(): Promise<WhatsAppCostsData> {
     pricePerMessageUsd: META_MARKETING_PRICE_USD,
   };
 
-  // whatsapp_broadcasts is not in generated types — cast explicitly
-  const broadcastsQuery = (supabase as ReturnType<typeof createAdminClient>)
-    .from("whatsapp_broadcasts")
-    .select("restaurant_id, sent_count, created_at")
-    .order("created_at", { ascending: false });
+  // whatsapp_broadcasts is not in generated types — cast explicitly.
+  // PostgREST plafonne toute réponse à 1000 lignes (max_rows) : un .select()
+  // sans pagination tronquait silencieusement l'historique dès qu'il dépasse
+  // 1000 envois, sous-estimant tous les totaux (coût, classement...). On
+  // pagine par lots de 1000, triés par id pour un ordre stable.
+  const rawRows = await fetchAllRows<BroadcastRow>(
+    ({ from, to }) =>
+      (supabase as ReturnType<typeof createAdminClient>)
+        .from("whatsapp_broadcasts")
+        .select("id, restaurant_id, sent_count, created_at")
+        .order("id", { ascending: true })
+        .range(from, to) as unknown as PromiseLike<{
+        data: BroadcastRow[] | null;
+        error: { message: string } | null;
+      }>,
+    {
+      onError: (msg) =>
+        console.error("[admin/whatsapp-costs] Erreur requête whatsapp_broadcasts:", msg),
+    }
+  );
 
-  const { data: rawRows, error } = await broadcastsQuery as unknown as {
-    data: BroadcastRow[] | null;
-    error: unknown;
-  };
-
-  if (error) {
-    console.error("[admin/whatsapp-costs] Erreur requête whatsapp_broadcasts:", error);
-    return empty;
-  }
   if (!rawRows || rawRows.length === 0) return empty;
 
   // Fetch restaurant names for restaurants that have broadcasts

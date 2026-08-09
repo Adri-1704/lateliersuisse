@@ -190,7 +190,7 @@ export async function generateMetadata({
   const description = getLocalizedDescription(restaurant, locale);
 
   return {
-    title: `${name} - ${restaurant.city}`,
+    title: restaurant.city ? `${name} - ${restaurant.city}` : name,
     description: description.slice(0, 160),
     alternates: {
       canonical: `/${locale}/restaurants/${slug}`,
@@ -280,6 +280,15 @@ export default async function RestaurantDetailPage({
     }
   }
 
+  // Source de vérité unique pour la note affichée (#34) : la note Google
+  // prévaut sur la note interne (avg_rating/review_count) quand elle est
+  // disponible, pour l'affichage ET pour le JSON-LD (évite qu'un
+  // aggregateRating "5/5 (5 avis)" contredise la note Google citée dans la
+  // description et expose le site à une pénalité Google pour sélection
+  // favorable d'avis).
+  const displayRating = enrichedRestaurant.googleRating ?? enrichedRestaurant.avgRating;
+  const displayReviewCount = enrichedRestaurant.googleReviewCount ?? enrichedRestaurant.reviewCount;
+
   // Structured data - Restaurant (Schema.org)
   const restaurantJsonLd = {
     "@context": "https://schema.org",
@@ -300,11 +309,11 @@ export default async function RestaurantDetailPage({
     url: enrichedRestaurant.website,
     servesCuisine: enrichedRestaurant.cuisineType,
     priceRange: "$".repeat(enrichedRestaurant.priceRange),
-    aggregateRating: enrichedRestaurant.reviewCount > 0
+    aggregateRating: displayReviewCount > 0
       ? {
           "@type": "AggregateRating",
-          ratingValue: enrichedRestaurant.avgRating,
-          reviewCount: enrichedRestaurant.reviewCount,
+          ratingValue: displayRating,
+          reviewCount: displayReviewCount,
           bestRating: 5,
           worstRating: 1,
         }

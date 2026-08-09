@@ -5,6 +5,7 @@ import { sendWhatsAppBroadcast } from "@/lib/whatsapp/broadcast";
 import {
   getMonthlyBroadcastUsage,
   getWhatsAppPlanTier,
+  getWhatsAppSubscriberCount,
   recordBroadcast,
 } from "@/actions/merchant/whatsapp-broadcast";
 import { monthlyQuotaForTier } from "@/lib/whatsapp/quota";
@@ -349,6 +350,21 @@ async function handleTwilioWebhook(request: NextRequest) {
     if (used >= quota) {
       return twimlResponse(
         `⚠️ Quota WhatsApp mensuel atteint (${quota} messages/mois) pour ${restaurant.name_fr}. Le plat du jour a bien été mis à jour sur just-tag.app, mais aucun message n'a été envoyé aux abonnés. Renouvellement le 1er du mois prochain.`
+      );
+    }
+
+    // Ce webhook ne bloquait que sur le cumul déjà consommé (used >= quota),
+    // sans tenir compte du nombre de destinataires de l'envoi en cours : un
+    // restaurateur proche du plafond pouvait déclencher un envoi à tous ses
+    // abonnés et dépasser le quota d'un palier complet (jusqu'à ~tierLimit
+    // messages facturés en trop par Meta). On applique désormais le même
+    // contrôle que le flow dashboard (broadcastWhatsApp) : bloquer si le
+    // nombre de destinataires prévus dépasse le quota restant.
+    const remaining = quota - used;
+    const plannedCount = Math.min(await getWhatsAppSubscriberCount(restaurant.id), tier ?? 50);
+    if (plannedCount > remaining) {
+      return twimlResponse(
+        `⚠️ Quota WhatsApp insuffisant pour ${restaurant.name_fr} : il reste ${remaining} message${remaining > 1 ? "s" : ""} ce mois pour ${plannedCount} abonné${plannedCount > 1 ? "s" : ""} à notifier. Le plat du jour a bien été mis à jour sur just-tag.app, mais aucun message n'a été envoyé. Renouvellement le 1er du mois prochain.`
       );
     }
 

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import Image from "next/image";
 import { UtensilsCrossed, MapPin, Clock } from "lucide-react";
+import { startOfTodayZurich } from "@/lib/timezone";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -55,14 +56,15 @@ export default async function PlatsDuJourPage({ params }: { params: Promise<{ lo
   const { locale } = await params;
   const supabase = createAdminClient();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // "Aujourd'hui" doit s'entendre en heure suisse (Europe/Zurich), pas dans
+  // le fuseau du process serveur (UTC en production Vercel) — #39b.
+  const startOfDay = startOfTodayZurich();
 
   const { data: plats } = await supabase
     .from("plat_du_jour")
     .select("id, text, image_url, price, posted_at, restaurants(name_fr, slug, city, canton, cuisine_type)")
     .eq("is_active", true)
-    .gte("posted_at", today.toISOString())
+    .gte("posted_at", startOfDay.toISOString())
     .order("posted_at", { ascending: false })
     .limit(50) as { data: PlatRow[] | null };
 
@@ -79,7 +81,7 @@ export default async function PlatsDuJourPage({ params }: { params: Promise<{ lo
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm mb-6">
             <UtensilsCrossed className="h-4 w-4" />
-            {new Date().toLocaleDateString(locale === "de" ? "de-CH" : locale === "en" ? "en-GB" : "fr-CH", { weekday: "long", day: "numeric", month: "long" })}
+            {new Date().toLocaleDateString(locale === "de" ? "de-CH" : locale === "en" ? "en-GB" : "fr-CH", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Zurich" })}
           </div>
           <h1 className="text-4xl font-bold text-white sm:text-5xl">{h1}</h1>
           <p className="mt-4 text-lg text-white/80">{subtitle}</p>

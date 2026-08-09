@@ -37,6 +37,13 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
 
   const open = isOpenNow(restaurant.openingHours);
 
+  // Source de vérité unique pour la note affichée (#34) : la note Google
+  // (avis vérifiés, volume réel) prévaut sur la note interne quand elle est
+  // disponible, pour éviter la contradiction "5/5 (5 avis)" affichée en
+  // façade d'un établissement décrit comme "noté 4.3/5 sur Google avec 255 avis".
+  const displayRating = restaurant.googleRating ?? restaurant.avgRating;
+  const displayReviewCount = restaurant.googleReviewCount ?? restaurant.reviewCount;
+
   return (
     <Link href={`/${locale}/restaurants/${restaurant.slug}`} className="block w-full">
       <div className="group h-full overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
@@ -109,16 +116,16 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
             {/* Rating badge */}
             <div className="flex shrink-0 items-center gap-1 rounded-lg bg-orange-50 px-2 py-1">
               <Star className="h-3.5 w-3.5 fill-[var(--color-just-tag)] text-[var(--color-just-tag)]" />
-              <span className="text-sm font-bold text-[var(--color-just-tag)]">{restaurant.avgRating}</span>
+              <span className="text-sm font-bold text-[var(--color-just-tag)]">{displayRating}</span>
             </div>
           </div>
           <div className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-500">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
             <span className="line-clamp-1">
-              {restaurant.city}, {restaurant.canton}
+              {restaurant.city ? `${restaurant.city}, ${restaurant.canton}` : restaurant.canton}
             </span>
             <span className="text-gray-300">|</span>
-            <span className="text-gray-400">({restaurant.reviewCount})</span>
+            <span className="text-gray-400">({displayReviewCount})</span>
           </div>
           <p className="mt-2 text-sm text-gray-500 line-clamp-2">
             {description}

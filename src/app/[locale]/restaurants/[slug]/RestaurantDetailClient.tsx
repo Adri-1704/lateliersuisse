@@ -36,6 +36,8 @@ import { SubRatingBar } from "@/components/restaurants/SubRatingBar";
 import type { Restaurant, Review } from "@/data/mock-restaurants";
 import { getLocalizedName, getLocalizedDescription, getLocalizedLabelAlt } from "@/lib/locale-helpers";
 import { submitReview } from "@/actions/reviews";
+import { cantons } from "@/data/cantons";
+import { cantonCodeToSlug } from "@/lib/city-slug";
 
 interface FeatureOption {
   value: string;
@@ -221,6 +223,24 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   const [localAvgRating, setLocalAvgRating] = useState(restaurant.avgRating);
   const [localReviewCount, setLocalReviewCount] = useState(restaurant.reviewCount);
 
+  // Source de vérité unique pour la note affichée (#34) : la note Google
+  // prévaut sur la note interne quand elle est disponible (même logique que
+  // le JSON-LD généré côté serveur — voir [slug]/page.tsx).
+  const headerRating = restaurant.googleRating ?? localAvgRating;
+  const headerReviewCount = restaurant.googleReviewCount ?? localReviewCount;
+
+  // `restaurant.canton` stocke un code à 2 lettres ("VS", "GE"...), pas un
+  // nom lisible — le fil d'Ariane affichait donc "VS" au lieu de "Valais" (#34).
+  const cantonSlug = cantonCodeToSlug(restaurant.canton) ?? restaurant.canton.toLowerCase();
+  const cantonData = cantons.find((c) => c.value === cantonSlug);
+  const cantonLabel = cantonData
+    ? (locale === "de" ? cantonData.labelDe
+      : locale === "en" ? cantonData.labelEn
+      : locale === "pt" ? cantonData.labelPt
+      : locale === "es" ? cantonData.labelEs
+      : cantonData.label)
+    : restaurant.canton;
+
   // Track page view (once per session per restaurant)
   useEffect(() => {
     const sessionKey = `view_${restaurant.id}`;
@@ -344,10 +364,10 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
         </Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <Link
-          href={`/${locale}/restaurants?canton=${restaurant.canton}`}
+          href={`/${locale}/restaurants?canton=${cantonSlug}`}
           className="hover:text-[var(--color-just-tag)] transition-colors"
         >
-          {restaurant.canton.charAt(0).toUpperCase() + restaurant.canton.slice(1)}
+          {cantonLabel}
         </Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-gray-900 font-medium truncate">{name}</span>
@@ -449,7 +469,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               {/* Rating circle */}
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-just-tag)] text-white font-bold text-sm">
-                  {localAvgRating}
+                  {headerRating.toFixed(1)}
                 </div>
                 <div>
                   <div className="flex items-center gap-0.5">
@@ -457,14 +477,14 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                       <Star
                         key={i}
                         className={`h-3.5 w-3.5 ${
-                          i < Math.round(localAvgRating)
+                          i < Math.round(headerRating)
                             ? "fill-yellow-400 text-yellow-400"
                             : "text-gray-200"
                         }`}
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-gray-500">({localReviewCount} {t("reviews")})</span>
+                  <span className="text-xs text-gray-500">({headerReviewCount} {t("reviews")})</span>
                 </div>
               </div>
               <span className="text-gray-300">|</span>
