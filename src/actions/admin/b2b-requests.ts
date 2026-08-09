@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import type { B2BContactRequest, B2BContactStatus } from "@/lib/supabase/types";
+import { requireAdmin } from "@/actions/admin/auth";
 
 const mockB2BRequests: B2BContactRequest[] = [
   { id: "1", first_name: "Marco", last_name: "Bernasconi", email: "marco@trattoria.ch", phone: "+41 91 123 45 67", restaurant_name: "Trattoria da Marco", city: "Lugano", message: "Nous aimerions rejoindre votre plateforme.", status: "new", locale: "fr", notes: null, created_at: "2026-02-20T10:00:00Z" },
@@ -12,6 +13,7 @@ const mockB2BRequests: B2BContactRequest[] = [
 ];
 
 export async function getB2BRequest(id: string): Promise<{ success: boolean; error: string | null; data?: B2BContactRequest }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase.from("b2b_contact_requests").select("*").eq("id", id).single();
@@ -31,6 +33,7 @@ export async function listB2BRequests(params: {
   search?: string;
   status?: string;
 }): Promise<{ success: boolean; error: string | null; data?: { requests: B2BContactRequest[]; total: number } }> {
+  await requireAdmin();
   const { page = 1, limit = 20, search, status } = params;
 
   try {
@@ -75,6 +78,7 @@ export async function updateB2BRequestStatus(
   id: string,
   newStatus: B2BContactStatus
 ): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

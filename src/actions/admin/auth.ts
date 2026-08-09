@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isAdminUser } from "@/lib/admin";
 
 export async function loginAdmin(email: string, password: string) {
   const supabase = await createClient();
@@ -56,4 +57,27 @@ export async function getAdminUser() {
   } catch {
     return null;
   }
+}
+
+/**
+ * Garde d'autorisation pour les Server Actions admin.
+ *
+ * Récupère l'utilisateur authentifié via getAdminUser(), vérifie qu'il est
+ * bien admin via isAdminUser() (whitelist ADMIN_EMAILS ou profiles.is_admin),
+ * et lève une erreur sinon. À appeler en première ligne de toute Server
+ * Action admin qui mute ou lit des données sensibles.
+ *
+ * @throws {Error} si l'utilisateur n'est pas authentifié ou n'est pas admin.
+ * @returns L'utilisateur Supabase authentifié (garanti admin).
+ */
+export async function requireAdmin() {
+  const user = await getAdminUser();
+  if (!user) {
+    throw new Error("Non autorisé : authentification requise");
+  }
+  const admin = await isAdminUser(user.id, user.email || "");
+  if (!admin) {
+    throw new Error("Non autorisé : privilèges administrateur requis");
+  }
+  return user;
 }

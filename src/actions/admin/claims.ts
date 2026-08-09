@@ -6,6 +6,7 @@ import {
   claimApprovedNotification,
   claimRejectedNotification,
 } from "@/lib/email-templates";
+import { requireAdmin } from "@/actions/admin/auth";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -39,6 +40,7 @@ export async function listClaimRequests(params?: {
   error: string | null;
   data?: ClaimRequestWithDetails[];
 }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const statusFilter = params?.status || "pending";
@@ -102,6 +104,7 @@ export async function getClaimRequest(id: string): Promise<{
   error: string | null;
   data?: ClaimRequestWithDetails;
 }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 
@@ -157,6 +160,7 @@ export async function approveClaim(
   claimId: string,
   adminNotes?: string
 ): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 
@@ -241,6 +245,7 @@ export async function rejectClaim(
   claimId: string,
   adminNotes: string
 ): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 

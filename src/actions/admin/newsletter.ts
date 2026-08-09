@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import type { NewsletterSubscriber } from "@/lib/supabase/types";
+import { requireAdmin } from "@/actions/admin/auth";
 
 const mockSubscribers: NewsletterSubscriber[] = [
   { id: "n1", email: "jean@example.com", locale: "fr", is_active: true, created_at: "2026-02-20T10:00:00Z" },
@@ -16,6 +17,7 @@ export async function listNewsletterSubscribers(params: {
   limit?: number;
   search?: string;
 }): Promise<{ success: boolean; error: string | null; data?: { subscribers: NewsletterSubscriber[]; total: number } }> {
+  await requireAdmin();
   const { page = 1, limit = 20, search } = params;
 
   try {

@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DbReview } from "@/lib/supabase/types";
+import { requireAdmin } from "@/actions/admin/auth";
 
 interface ReviewWithRestaurant extends DbReview {
   restaurant_name?: string;
@@ -20,6 +21,7 @@ export async function listReviews(params: {
   limit?: number;
   search?: string;
 }): Promise<{ success: boolean; error: string | null; data?: { reviews: ReviewWithRestaurant[]; total: number } }> {
+  await requireAdmin();
   const { page = 1, limit = 20, search } = params;
 
   try {
@@ -59,6 +61,7 @@ export async function listReviews(params: {
 }
 
 export async function deleteReview(id: string): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const { error } = await supabase.from("reviews").delete().eq("id", id);

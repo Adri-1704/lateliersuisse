@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { mockRestaurants } from "@/data/mock-restaurants";
 import type { DbRestaurant } from "@/lib/supabase/types";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/actions/admin/auth";
 
 interface ListResult {
   success: boolean;
@@ -17,6 +18,7 @@ export async function listRestaurants(params: {
   search?: string;
   published?: string;
 }): Promise<ListResult> {
+  await requireAdmin();
   const { page = 1, limit = 20, search, published } = params;
 
   try {
@@ -103,6 +105,7 @@ export async function listRestaurants(params: {
 }
 
 export async function getRestaurant(id: string): Promise<{ success: boolean; error: string | null; data?: DbRestaurant }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase.from("restaurants").select("*").eq("id", id).single();
@@ -149,6 +152,7 @@ export async function createRestaurant(params: {
   price_range?: string;
   description_fr?: string;
 }): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const slug = params.name_fr
@@ -197,6 +201,7 @@ export async function updateRestaurant(
     promotion_type?: string; promotion_value?: string; promotion_active?: boolean;
   }
 ): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -212,6 +217,7 @@ export async function updateRestaurant(
 }
 
 export async function deleteRestaurant(id: string): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const { error } = await supabase.from("restaurants").delete().eq("id", id);
@@ -225,6 +231,7 @@ export async function deleteRestaurant(id: string): Promise<{ success: boolean; 
 }
 
 export async function togglePublishRestaurant(id: string, isPublished: boolean): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -243,6 +250,7 @@ export async function togglePublishRestaurant(id: string, isPublished: boolean):
  * Rejette les claim_requests pending associés.
  */
 export async function unlinkMerchantFromRestaurant(restaurantId: string): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 

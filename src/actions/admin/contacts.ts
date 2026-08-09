@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import type { ContactSubmission } from "@/lib/supabase/types";
+import { requireAdmin } from "@/actions/admin/auth";
 
 const mockContacts: ContactSubmission[] = [
   { id: "c1", first_name: "Jean", last_name: "Dupont", email: "jean@example.com", subject: "Question sur la plateforme", message: "Bonjour, je voudrais en savoir plus sur vos services.", is_read: false, created_at: "2026-02-21T10:00:00Z" },
@@ -14,6 +15,7 @@ export async function listContacts(params: {
   limit?: number;
   search?: string;
 }): Promise<{ success: boolean; error: string | null; data?: { contacts: ContactSubmission[]; total: number } }> {
+  await requireAdmin();
   const { page = 1, limit = 20, search } = params;
 
   try {
@@ -46,6 +48,7 @@ export async function listContacts(params: {
 }
 
 export async function markContactAsRead(id: string): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

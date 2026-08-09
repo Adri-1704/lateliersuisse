@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireAdmin } from "@/actions/admin/auth";
 
 export interface FeaturedRestaurantRow {
   id: string;
@@ -18,6 +19,7 @@ export async function listFeaturedRestaurants(): Promise<{
   error: string | null;
   data?: { restaurants: FeaturedRestaurantRow[]; total: number };
 }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const { data, error, count } = await supabase
@@ -48,6 +50,7 @@ export async function toggleFeatured(
   restaurantId: string,
   isFeatured: boolean
 ): Promise<{ success: boolean; error: string | null }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
 
@@ -98,6 +101,7 @@ export async function searchRestaurants(query: string): Promise<{
   error: string | null;
   data?: { id: string; name: string; city: string | null; canton: string | null; is_featured: boolean }[];
 }> {
+  await requireAdmin();
   try {
     const supabase = createAdminClient();
     const { data, error } = await supabase
