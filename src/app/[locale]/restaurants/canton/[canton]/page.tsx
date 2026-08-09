@@ -5,6 +5,7 @@ import { cantons, type Canton } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
 import { createAdminClient } from "@/lib/supabase/server";
 import { slugifyCity, cantonSlugToCode } from "@/lib/city-slug";
+import { safeJsonLd } from "@/lib/json-ld";
 import { MapPin, Star } from "lucide-react";
 
 const MIN_RESTAURANTS_FOR_CITY_PAGE = 5;
@@ -277,11 +278,11 @@ export default async function CantonRestaurantsPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(collectionJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
 
       {/* Hero */}

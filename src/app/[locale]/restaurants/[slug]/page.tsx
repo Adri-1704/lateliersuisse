@@ -11,6 +11,7 @@ import { getActiveHappyHoursForRestaurant } from "@/actions/happy-hours";
 import { createAdminClient } from "@/lib/supabase/server";
 import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/supabase/types";
 import type { RestaurantPromotion } from "@/data/mock-restaurants";
+import { safeJsonLd } from "@/lib/json-ld";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -378,11 +379,11 @@ export default async function RestaurantDetailPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(restaurantJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
       {/* Bandeau revendication — affiché uniquement si restaurant non revendiqué et pas de claim pending */}
       {!merchantId && claimStatus !== "pending" && (

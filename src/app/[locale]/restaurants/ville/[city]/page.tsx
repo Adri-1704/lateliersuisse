@@ -5,6 +5,7 @@ import { cantons } from "@/data/cantons";
 import { fetchFilteredRestaurants, type RestaurantListItem } from "@/lib/restaurants/queries";
 import { createAdminClient } from "@/lib/supabase/server";
 import { slugifyCity, VALID_CANTON_CODES, cantonCodeToSlug, cantonSlugToCode } from "@/lib/city-slug";
+import { safeJsonLd } from "@/lib/json-ld";
 import { MapPin, Star } from "lucide-react";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
@@ -320,11 +321,11 @@ export default async function CityRestaurantsPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(collectionJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbJsonLd) }}
       />
 
       {/* Hero */}

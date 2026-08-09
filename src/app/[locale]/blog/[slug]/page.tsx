@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getPostBySlug } from "@/actions/blog";
 import { Calendar, ArrowLeft, Tag, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { safeJsonLd } from "@/lib/json-ld";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -136,7 +137,7 @@ export default async function BlogPostPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(articleJsonLd) }}
       />
 
       <article className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
