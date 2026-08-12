@@ -38,13 +38,30 @@ export async function generateMetadata({
   };
 }
 
+const POSTS_PER_PAGE = 20;
+
 export default async function BlogIndexPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await params;
-  const { posts, total } = await getPublishedPosts(20, 0);
+  const sp = await searchParams;
+
+  const requestedPage =
+    typeof sp.page === "string" && sp.page ? Math.max(1, parseInt(sp.page, 10) || 1) : 1;
+
+  // On borne la page demandée à la dernière page réelle (au lieu de renvoyer
+  // "0 article" sur une page hors limites, comme sur /restaurants — #40) :
+  // on récupère d'abord le total, puis on ajuste la page avant de charger
+  // les articles correspondants.
+  const { total: totalCount } = await getPublishedPosts(1, 0);
+  const totalPages = Math.max(1, Math.ceil(totalCount / POSTS_PER_PAGE));
+  const page = Math.min(requestedPage, totalPages);
+
+  const { posts, total } = await getPublishedPosts(POSTS_PER_PAGE, (page - 1) * POSTS_PER_PAGE);
 
   return (
     <>
@@ -141,11 +158,49 @@ export default async function BlogIndexPage({
                   </Link>
                 ))}
               </div>
-              {total > 20 && (
-                <p className="mt-8 text-center text-sm text-gray-500">
-                  {total} articles au total.
-                </p>
+              {/* Pagination — indispensable dès que le catalogue dépasse
+                  POSTS_PER_PAGE articles : sans elle, seuls les 20 plus
+                  récents étaient jamais atteignables (#40). */}
+              {totalPages > 1 && (
+                <nav
+                  aria-label={
+                    locale === "de" ? "Seitennavigation" : locale === "en" ? "Pagination" : locale === "pt" ? "Paginação" : locale === "es" ? "Paginación" : "Pagination"
+                  }
+                  className="mt-10 flex items-center justify-center gap-2"
+                >
+                  <Link
+                    href={`/${locale}/blog${page > 2 ? `?page=${page - 1}` : ""}`}
+                    aria-disabled={page === 1}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                      page === 1
+                        ? "pointer-events-none border-gray-200 text-gray-300"
+                        : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {locale === "de" ? "Zurück" : locale === "en" ? "Previous" : locale === "pt" ? "Anterior" : locale === "es" ? "Anterior" : "Précédent"}
+                  </Link>
+
+                  <span className="px-2 text-sm text-gray-600">
+                    {page} / {totalPages}
+                  </span>
+
+                  <Link
+                    href={`/${locale}/blog?page=${page + 1}`}
+                    aria-disabled={page === totalPages}
+                    className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                      page === totalPages
+                        ? "pointer-events-none border-gray-200 text-gray-300"
+                        : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {locale === "de" ? "Weiter" : locale === "en" ? "Next" : locale === "pt" ? "Seguinte" : locale === "es" ? "Siguiente" : "Suivant"}
+                  </Link>
+                </nav>
               )}
+
+              <p className="mt-4 text-center text-sm text-gray-500">
+                {total} articles au total.
+              </p>
             </>
           )}
         </div>
