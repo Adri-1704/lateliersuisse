@@ -63,6 +63,12 @@ export function toTelHref(raw: string | null | undefined): string | null {
  */
 export function toE164(raw: string | null | undefined): string | null {
   if (!raw) return null;
+  // Rejette toute saisie dont le nombre de chiffres n'est pas plausible pour
+  // un numéro E.164 (#40) : évite de générer un lien `tel:` absurde
+  // (ex. toE164("123") -> "+123") à partir d'une saisie trop courte, trop
+  // longue, ou non numérique.
+  if (!isPlausiblePhoneNumber(raw)) return null;
+
   let digits = normalizePhoneNumber(raw.trim());
   if (!digits) return null;
 
