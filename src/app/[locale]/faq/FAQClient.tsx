@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
@@ -11,8 +12,8 @@ const faqs = [
     questionEn: "How do I find a restaurant on Just-Tag?",
     questionPt: "Como encontrar um restaurante no Just-Tag?",
     questionEs: "¿Cómo encontrar un restaurante en Just-Tag?",
-    answerFr: "Utilisez notre barre de recherche en page d'accueil pour filtrer par canton, type de cuisine ou mot-cle. Vous pouvez aussi explorer par categorie de cuisine ou consulter nos restaurants du mois.",
-    answerDe: "Nutzen Sie unsere Suchleiste auf der Startseite, um nach Kanton, Kuechenart oder Stichwort zu filtern. Sie koennen auch nach Kuechenkategorien durchstoeebern oder unsere Restaurants des Monats ansehen.",
+    answerFr: "Utilisez notre barre de recherche en page d'accueil pour filtrer par canton, type de cuisine ou mot-clé. Vous pouvez aussi explorer par catégorie de cuisine ou consulter nos restaurants du mois.",
+    answerDe: "Nutzen Sie unsere Suchleiste auf der Startseite, um nach Kanton, Küchenart oder Stichwort zu filtern. Sie können auch nach Küchenkategorien durchstöbern oder unsere Restaurants des Monats ansehen.",
     answerEn: "Use our search bar on the homepage to filter by canton, cuisine type or keyword. You can also browse by cuisine category or check out our restaurants of the month.",
     answerPt: "Use a nossa barra de pesquisa na página inicial para filtrar por cantão, tipo de cozinha ou palavra-chave. Também pode explorar por categoria de cozinha ou consultar os nossos restaurantes do mês.",
     answerEs: "Utilice nuestra barra de búsqueda en la página de inicio para filtrar por cantón, tipo de cocina o palabra clave. También puede explorar por categoría de cocina o consultar nuestros restaurantes del mes.",
@@ -23,20 +24,20 @@ const faqs = [
     questionEn: "How can I register my restaurant on the platform?",
     questionPt: "Como inscrever o meu restaurante na plataforma?",
     questionEs: "¿Cómo registrar mi restaurante en la plataforma?",
-    answerFr: "Contactez-nous directement pour obtenir le lien d'inscription. Nous proposons des abonnements mensuels, semestriels, annuels et a vie pour mettre en valeur votre etablissement.",
-    answerDe: "Kontaktieren Sie uns direkt, um den Registrierungslink zu erhalten. Wir bieten monatliche, halbjaeehrliche, jaehrliche und lebenslange Abonnements an, um Ihre Einrichtung hervorzuheben.",
+    answerFr: "Contactez-nous directement pour obtenir le lien d'inscription. Nous proposons des abonnements mensuels, semestriels, annuels et à vie pour mettre en valeur votre établissement.",
+    answerDe: "Kontaktieren Sie uns direkt, um den Registrierungslink zu erhalten. Wir bieten monatliche, halbjährliche, jährliche und lebenslange Abonnements an, um Ihre Einrichtung hervorzuheben.",
     answerEn: "Contact us directly to get the registration link. We offer monthly, semi-annual, annual and lifetime subscriptions to showcase your establishment.",
     answerPt: "Contacte-nos diretamente para obter o link de inscrição. Oferecemos assinaturas mensais, semestrais, anuais e vitalícias para destacar o seu estabelecimento.",
     answerEs: "Contáctenos directamente para obtener el enlace de registro. Ofrecemos suscripciones mensuales, semestrales, anuales y vitalicias para destacar su establecimiento.",
   },
   {
-    questionFr: "Les avis sont-ils verifies ?",
-    questionDe: "Werden die Bewertungen ueberprueft?",
+    questionFr: "Les avis sont-ils vérifiés ?",
+    questionDe: "Werden die Bewertungen überprüft?",
     questionEn: "Are the reviews verified?",
     questionPt: "As avaliações são verificadas?",
     questionEs: "¿Las reseñas están verificadas?",
-    answerFr: "Oui, tous les avis sont moderes par notre equipe pour garantir leur authenticite et leur fiabilite.",
-    answerDe: "Ja, alle Bewertungen werden von unserem Team moderiert, um ihre Authentizitaet und Zuverlaessigkeit zu gewaehrleisten.",
+    answerFr: "Oui, tous les avis sont modérés par notre équipe pour garantir leur authenticité et leur fiabilité.",
+    answerDe: "Ja, alle Bewertungen werden von unserem Team moderiert, um ihre Authentizität und Zuverlässigkeit zu gewährleisten.",
     answerEn: "Yes, all reviews are moderated by our team to ensure their authenticity and reliability.",
     answerPt: "Sim, todas as avaliações são moderadas pela nossa equipa para garantir a sua autenticidade e fiabilidade.",
     answerEs: "Sí, todas las reseñas son moderadas por nuestro equipo para garantizar su autenticidad y fiabilidad.",
@@ -47,20 +48,20 @@ const faqs = [
     questionEn: "Which cantons does Just-Tag cover?",
     questionPt: "Que cantões o Just-Tag cobre?",
     questionEs: "¿Qué cantones cubre Just-Tag?",
-    answerFr: "Just-Tag couvre les 7 cantons de Suisse Romande : Geneve, Vaud, Fribourg, Neuchatel, Valais, Jura et Berne. Notre focus est 100% romand pour offrir la meilleure couverture possible.",
+    answerFr: "Just-Tag couvre les 7 cantons de Suisse Romande : Genève, Vaud, Fribourg, Neuchâtel, Valais, Jura et Berne. Notre focus est 100% romand pour offrir la meilleure couverture possible.",
     answerDe: "Just-Tag deckt die 7 Kantone der Westschweiz ab: Genf, Waadt, Freiburg, Neuenburg, Wallis, Jura und Bern. Unser Fokus liegt zu 100% auf der Romandie.",
     answerEn: "Just-Tag covers the 7 cantons of Western Switzerland: Geneva, Vaud, Fribourg, Neuchatel, Valais, Jura and Bern. Our focus is 100% on the Romand region.",
-    answerPt: "O Just-Tag cobre os 7 cantoes da Suica Romanda: Genebra, Vaud, Friburgo, Neuchatel, Valais, Jura e Berna. O nosso foco e 100% na regiao romanda.",
-    answerEs: "Just-Tag cubre los 7 cantones de la Suiza Romanda: Ginebra, Vaud, Friburgo, Neuchatel, Valais, Jura y Berna. Nuestro enfoque es 100% en la region romanda.",
+    answerPt: "O Just-Tag cobre os 7 cantões da Suíça Romanda: Genebra, Vaud, Friburgo, Neuchâtel, Valais, Jura e Berna. O nosso foco é 100% na região romanda.",
+    answerEs: "Just-Tag cubre los 7 cantones de la Suiza Romanda: Ginebra, Vaud, Friburgo, Neuchâtel, Valais, Jura y Berna. Nuestro enfoque es 100% en la región romanda.",
   },
   {
-    questionFr: "Puis-je reserverf directement via Just-Tag ?",
-    questionDe: "Kann ich direkt ueber Just-Tag reservieren?",
+    questionFr: "Puis-je réserver directement via Just-Tag ?",
+    questionDe: "Kann ich direkt über Just-Tag reservieren?",
     questionEn: "Can I book directly through Just-Tag?",
     questionPt: "Posso reservar diretamente pelo Just-Tag?",
     questionEs: "¿Puedo reservar directamente a través de Just-Tag?",
     answerFr: "Pour le moment, Just-Tag vous fournit toutes les informations de contact du restaurant. Vous pouvez les appeler ou leur envoyer un email directement depuis la fiche du restaurant.",
-    answerDe: "Derzeit stellt Just-Tag Ihnen alle Kontaktinformationen des Restaurants zur Verfuegung. Sie koennen sie anrufen oder ihnen direkt von der Restaurantseite aus eine E-Mail senden.",
+    answerDe: "Derzeit stellt Just-Tag Ihnen alle Kontaktinformationen des Restaurants zur Verfügung. Sie können sie anrufen oder ihnen direkt von der Restaurantseite aus eine E-Mail senden.",
     answerEn: "Currently, Just-Tag provides you with all the restaurant's contact information. You can call them or send them an email directly from the restaurant page.",
     answerPt: "Atualmente, o Just-Tag fornece-lhe todas as informações de contacto do restaurante. Pode ligar ou enviar um email diretamente a partir da ficha do restaurante.",
     answerEs: "Actualmente, Just-Tag le proporciona toda la información de contacto del restaurante. Puede llamar o enviar un correo electrónico directamente desde la ficha del restaurante.",
@@ -77,7 +78,7 @@ export default function FAQClient() {
           {t("faq")}
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-gray-600">
-          Questions frequemment posees
+          Questions fréquemment posées
         </p>
       </div>
 
@@ -96,8 +97,12 @@ function FAQItem({
   faq: (typeof faqs)[number];
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  // Simple locale detection from URL
-  const locale = typeof window !== "undefined" ? window.location.pathname.split("/")[1] : "fr";
+  // Locale déduite du segment de route [locale] (identique sur le serveur et
+  // le client, contrairement à un parsing de window.location.pathname qui ne
+  // renvoyait un résultat correct qu'après hydratation et provoquait un
+  // écart de texte entre le rendu serveur et client sur /de, /en, /pt, /es.
+  const params = useParams();
+  const locale = (params?.locale as string) || "fr";
 
   const questionMap: Record<string, string> = { de: faq.questionDe, en: faq.questionEn, pt: faq.questionPt, es: faq.questionEs };
   const answerMap: Record<string, string> = { de: faq.answerDe, en: faq.answerEn, pt: faq.answerPt, es: faq.answerEs };
