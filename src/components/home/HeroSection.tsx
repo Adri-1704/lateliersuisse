@@ -173,7 +173,7 @@ export function HeroSection({ totalRestaurants, cuisineCounts }: HeroSectionProp
                   <button
                     key={tag.key}
                     onClick={() => handleTagClick(tag.label[locale as keyof typeof tag.label] || tag.label.en)}
-                    className="rounded-full border border-white/20 px-3 py-1 text-xs text-gray-300 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
+                    className="inline-flex min-h-11 items-center rounded-full border border-white/20 px-3 py-1 text-xs text-gray-300 transition-colors hover:border-white/40 hover:bg-white/10 hover:text-white"
                   >
                     {tag.label[locale as keyof typeof tag.label] || tag.label.en}
                   </button>

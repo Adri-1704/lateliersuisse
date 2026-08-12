@@ -96,8 +96,13 @@ export default function MerchantSignupClient() {
   const subsParam = searchParams.get("subs");
   const canceled = searchParams.get("canceled");
 
-  // If plan pre-selected from URL, go straight to signup; otherwise show plan picker
-  const initialStep: Step = stepParam === "plan" ? "plan"
+  // If plan pre-selected from URL, go straight to signup; otherwise show plan picker.
+  // `stepParam === "signup"` doit être reconnu explicitement : c'est la
+  // valeur que goToStep("signup") écrit dans l'URL en cliquant "Continuer"
+  // depuis l'étape 1 — sans ce cas, ?step=signup retombait sur "plan" au
+  // rechargement et effaçait la saisie (#40).
+  const initialStep: Step = stepParam === "signup" ? "signup"
+    : stepParam === "plan" ? "plan"
     : planParam ? "signup"
     : "plan";
 
@@ -147,11 +152,20 @@ export default function MerchantSignupClient() {
 
   // ── Navigation helpers ──
   const goToStep = useCallback(
-    (step: Step) => {
+    (step: Step, extraParams?: Record<string, string>) => {
       setCurrentStep(step);
       setError("");
       const url = new URL(window.location.href);
       url.searchParams.set("step", step);
+      // Écrit aussi le plan/l'offre WhatsApp choisis dans l'URL : sans ça,
+      // ?step=signup seul ne suffisait pas à restaurer l'étape 2 sur un
+      // rechargement (le plan sélectionné n'était connu que par l'état React,
+      // perdu au reload) — #40.
+      if (extraParams) {
+        for (const [key, value] of Object.entries(extraParams)) {
+          url.searchParams.set(key, value);
+        }
+      }
       window.history.replaceState({}, "", url.toString());
     },
     []
@@ -566,7 +580,14 @@ export default function MerchantSignupClient() {
 
           <Button
             disabled={!selectedPlanId}
-            onClick={() => goToStep("signup")}
+            onClick={() =>
+              goToStep(
+                "signup",
+                selectedPlanId
+                  ? { plan: selectedPlanId, subs: String(selectedWhatsAppTier) }
+                  : undefined
+              )
+            }
             className="w-full bg-[var(--color-just-tag)] text-white hover:opacity-90 py-3"
           >
             Continuer

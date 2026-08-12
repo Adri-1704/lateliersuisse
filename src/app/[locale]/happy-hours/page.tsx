@@ -34,7 +34,7 @@ export async function generateMetadata({
       ? "Entdecken Sie die Happy Hours der Restaurants in der Westschweiz. Blitzangebote jetzt und heute Abend."
       : locale === "en"
         ? "Discover Happy Hours at Swiss restaurants. Flash deals now and tonight."
-        : "Decouvrez les Happy Hours des restaurants de Suisse Romande. Offres flash maintenant et ce soir.";
+        : "Découvrez les Happy Hours des restaurants de Suisse Romande. Offres flash maintenant et ce soir.";
   return {
     title,
     description,

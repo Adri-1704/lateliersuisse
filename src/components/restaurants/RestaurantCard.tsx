@@ -11,20 +11,7 @@ import type { Restaurant } from "@/data/mock-restaurants";
 import { DistinctionBadges } from "@/components/restaurants/DistinctionBadges";
 import { PromotionBadge } from "@/components/restaurants/PromotionBadge";
 import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
-
-function isOpenNow(openingHours: Restaurant["openingHours"]): boolean | null {
-  if (!openingHours) return null;
-  const now = new Date();
-  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
-  const today = days[now.getDay()];
-  const hours = openingHours[today];
-  if (!hours || typeof hours.open !== "string" || typeof hours.close !== "string" || hours.open === "undefined" || hours.close === "undefined") return null;
-  const currentTime = now.getHours() * 100 + now.getMinutes();
-  const [openH, openM] = hours.open.split(":").map(Number);
-  const [closeH, closeM] = hours.close.split(":").map(Number);
-  if (isNaN(openH) || isNaN(openM) || isNaN(closeH) || isNaN(closeM)) return null;
-  return currentTime >= openH * 100 + openM && currentTime <= closeH * 100 + closeM;
-}
+import { useIsOpenNow } from "@/lib/use-is-open-now";
 
 export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   const params = useParams();
@@ -35,7 +22,7 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   const name = getLocalizedName(restaurant, locale);
   const description = getLocalizedDescription(restaurant, locale);
 
-  const open = isOpenNow(restaurant.openingHours);
+  const open = useIsOpenNow(restaurant.openingHours);
 
   // Source de vérité unique pour la note affichée (#34) : la note Google
   // (avis vérifiés, volume réel) prévaut sur la note interne quand elle est
@@ -48,7 +35,13 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
     <Link href={`/${locale}/restaurants/${restaurant.slug}`} className="block w-full">
       <div className="group h-full overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
         <div className="relative h-44 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center px-4">
-          <h4 className="relative z-10 text-center text-lg font-bold text-white leading-snug line-clamp-3">{name}</h4>
+          {/* Bandeau décoratif utilisé comme visuel de remplacement quand le
+              restaurant n'a pas de photo de couverture : le nom y est répété
+              visuellement, mais ce n'est pas un titre de page (le vrai titre
+              est le <h3> ci-dessous) — évite un h4 fantôme dans la hiérarchie
+              des titres et la double annonce du nom aux lecteurs d'écran
+              (#42, #43). */}
+          <p aria-hidden="true" className="relative z-10 text-center text-lg font-bold text-white leading-snug line-clamp-3">{name}</p>
 
           {/* Top left: Featured badge or cuisine */}
           <div className="absolute left-3 top-3 flex flex-col gap-1.5">
@@ -66,10 +59,12 @@ export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
             )}
           </div>
 
-          {/* Top right: Heart icon */}
+          {/* Top right: Heart icon — zone tactile 44x44 (#43) ; visible par
+              défaut sur mobile (pas de :hover), révélé au survol sur
+              desktop pour ne pas surcharger visuellement la carte. */}
           <FavoriteButton
             restaurantId={restaurant.id}
-            className="absolute right-3 top-3 h-8 w-8 bg-white/80 opacity-0 group-hover:opacity-100 hover:bg-white"
+            className="absolute right-3 top-3 h-11 w-11 bg-white/80 opacity-100 hover:bg-white sm:opacity-0 sm:group-hover:opacity-100"
           />
 
           {/* Bottom left: Canton badge */}

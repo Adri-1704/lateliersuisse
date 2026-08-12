@@ -26,7 +26,7 @@ export default function NotFound() {
           </h2>
 
           <p className="text-gray-500 mb-8 leading-relaxed">
-            La page que vous recherchez n&apos;existe pas ou a ete deplacee.
+            La page que vous recherchez n&apos;existe pas ou a été déplacée.
           </p>
 
           <Link
@@ -46,7 +46,7 @@ export default function NotFound() {
                 clipRule="evenodd"
               />
             </svg>
-            Retour a l&apos;accueil
+            Retour à l&apos;accueil
           </Link>
 
           <p className="mt-12 text-sm text-gray-400">

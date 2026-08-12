@@ -1008,5 +1008,11 @@
       "manageBillingDescription": "Zahlungsmethode andern oder Abonnement kundigen",
       "manageButton": "Zahlungsportal"
     }
+  },
+  "notFoundPage": {
+    "title": "Seite nicht gefunden",
+    "code": "404",
+    "description": "Die gesuchte Seite existiert nicht mehr oder wurde verschoben.",
+    "cta": "Zurück zur Startseite"
   }
 }

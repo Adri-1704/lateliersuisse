@@ -93,7 +93,7 @@ export function SearchFilters({ cuisineCounts, basePath = "restaurants" }: Searc
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{t("filters")}</h3>
+        <h2 className="text-lg font-semibold">{t("filters")}</h2>
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearAll} className="text-[var(--color-just-tag)]">
             <X className="mr-1 h-3 w-3" />

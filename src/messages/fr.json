@@ -1007,5 +1007,11 @@
       "manageBillingDescription": "Modifier votre moyen de paiement ou annuler votre abonnement",
       "manageButton": "Portail de paiement"
     }
+  },
+  "notFoundPage": {
+    "title": "Page introuvable",
+    "code": "404",
+    "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "cta": "Retour à l'accueil"
   }
 }

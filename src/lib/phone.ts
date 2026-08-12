@@ -38,3 +38,43 @@ export function isPlausiblePhoneNumber(raw: string | null | undefined): boolean 
 export function normalizePhoneNumber(raw: string): string {
   return raw.replace(/[^0-9+]/g, "");
 }
+
+/**
+ * Construit un href `tel:` normalisé (sans espaces, préfixe international)
+ * à partir d'un numéro affiché tel quel dans l'UI (ex. "022 300 16 12").
+ * Les espaces bruts dans un schéma `tel:` échouent sur certains combinés et
+ * l'absence d'indicatif international empêche de composer depuis l'étranger
+ * (#40). Le texte affiché à l'utilisateur n'est pas modifié — seul le href
+ * est reconstruit.
+ *
+ * - "022 300 16 12" (format national suisse, 0 initial) → "tel:+41223001612"
+ * - "0041 22 300 16 12" / "0041223001612" → "tel:+41223001612"
+ * - "+41 22 300 16 12" → "tel:+41223001612"
+ */
+export function toTelHref(raw: string | null | undefined): string | null {
+  const e164 = toE164(raw);
+  return e164 ? `tel:${e164}` : null;
+}
+
+/**
+ * Convertit un numéro affiché (format national suisse ou international) en
+ * E.164 (`+41223001612`), sans le préfixe `tel:`. Utile pour le JSON-LD
+ * (`telephone`) en plus du href `tel:` des liens cliquables.
+ */
+export function toE164(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  let digits = normalizePhoneNumber(raw.trim());
+  if (!digits) return null;
+
+  if (digits.startsWith("00")) {
+    digits = `+${digits.slice(2)}`;
+  } else if (digits.startsWith("0")) {
+    // Format national suisse (0XX XXX XX XX) : le 0 initial est remplacé
+    // par l'indicatif international suisse.
+    digits = `+41${digits.slice(1)}`;
+  } else if (!digits.startsWith("+")) {
+    digits = `+${digits}`;
+  }
+
+  return digits;
+}

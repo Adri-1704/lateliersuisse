@@ -39,6 +39,8 @@ import { submitReview } from "@/actions/reviews";
 import { cantons } from "@/data/cantons";
 import { cantonCodeToSlug } from "@/lib/city-slug";
 import { formatAddress, hasAddress } from "@/lib/address";
+import { toTelHref } from "@/lib/phone";
+import { useIsOpenNow, useCurrentDayKey } from "@/lib/use-is-open-now";
 
 interface FeatureOption {
   value: string;
@@ -67,20 +69,6 @@ function PriceRange({ range }: { range: number }) {
       ))}
     </span>
   );
-}
-
-function isOpenNow(openingHours: Record<string, { open: string; close: string } | null>): boolean | null {
-  if (!openingHours) return null;
-  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-  const now = new Date();
-  const dayName = days[now.getDay()];
-  const hours = openingHours[dayName];
-  if (!hours || typeof hours.open !== "string" || typeof hours.close !== "string" || hours.open === "undefined" || hours.close === "undefined") return null;
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const [openH, openM] = hours.open.split(":").map(Number);
-  const [closeH, closeM] = hours.close.split(":").map(Number);
-  if (isNaN(openH) || isNaN(openM) || isNaN(closeH) || isNaN(closeM)) return null;
-  return currentMinutes >= openH * 60 + openM && currentMinutes <= closeH * 60 + closeM;
 }
 
 function relativeDate(dateStr: string, locale: string): string {
@@ -325,10 +313,19 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
   const name = getLocalizedName(restaurant, locale);
   const description = getLocalizedDescription(restaurant, locale);
-  const open = isOpenNow(restaurant.openingHours);
+  // `open` reste `null` jusqu'au montage côté client (voir useIsOpenNow) :
+  // cette page est en force-static + revalidate=3600, donc le mismatch entre
+  // le HTML servi (potentiellement généré des heures plus tôt, dans un autre
+  // fuseau) et le calcul refait à l'hydratation était quasi systématique
+  // (#418) — c'est le cas le plus visible puisque c'est la page la plus
+  // visitée du site.
+  const open = useIsOpenNow(restaurant.openingHours);
   const isSwissCuisine = restaurant.cuisineType === "suisse";
 
   const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
+  // Idem : "aujourd'hui" ne doit être déterminé qu'après le montage pour ne
+  // pas dépendre du fuseau du serveur au moment du (pré-)rendu (#418).
+  const todayDayKey = useCurrentDayKey();
 
   const getFeatureLabel = (value: string) => {
     const feature = featuresOptions.find((f) => f.value === value);
@@ -357,6 +354,9 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     restaurantHasAddress ? `${name} ${formattedAddress}` : name
   )}`;
+  // href tel: normalisé (sans espaces, indicatif international) — le texte
+  // affiché reste le numéro tel que saisi (#40).
+  const telHref = toTelHref(restaurant.phone);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -380,9 +380,14 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
         <span className="text-gray-900 font-medium truncate">{name}</span>
       </nav>
 
-      {/* Restaurant Name Banner - toujours en premier */}
+      {/* Restaurant Name Banner - toujours en premier.
+          Bandeau décoratif (tient lieu de photo de couverture) : le nom y
+          est répété visuellement, mais ce n'est pas un titre de page — le
+          <h1> plus bas reste le premier titre du document. Un <h2> ici
+          précédait le <h1> dans le flux et dupliquait l'annonce du nom aux
+          lecteurs d'écran (#42, #43). */}
       <div className="relative h-48 md:h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
-        <h2 className="relative z-10 px-8 text-center text-3xl md:text-5xl font-bold text-white leading-tight">{name}</h2>
+        <p aria-hidden="true" className="relative z-10 px-8 text-center text-3xl md:text-5xl font-bold text-white leading-tight">{name}</p>
       </div>
 
       {/* Photos ajoutées par le restaurateur (si disponibles) */}
@@ -535,7 +540,8 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
           {/* Tabs */}
           <Tabs defaultValue="menu" className="w-full">
-            <TabsList className="w-full justify-start">
+            {/* h-11 : cible tactile >= 44px pour les onglets Menu/Avis/Horaires (#43) */}
+            <TabsList className="h-11 w-full justify-start">
               <TabsTrigger value="menu">{t("menu")}</TabsTrigger>
               <TabsTrigger value="reviews">{t("reviews")} ({localReviews.length})</TabsTrigger>
               <TabsTrigger value="hours">{t("hours")}</TabsTrigger>
@@ -965,9 +971,11 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 {dayKeys.map((day) => {
                   const hours = restaurant.openingHours[day];
                   const hasValidHours = hours && typeof hours.open === "string" && typeof hours.close === "string" && hours.open !== "undefined" && hours.close !== "undefined";
-                  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-                  const todayName = days[new Date().getDay()];
-                  const isToday = day === todayName;
+                  // todayDayKey (calculé via useCurrentDayKey, voir plus haut)
+                  // reste `null` avant le montage : aucune ligne n'est mise en
+                  // avant tant que le jour courant n'est pas connu côté
+                  // client, ce qui évite un mismatch d'hydratation (#418).
+                  const isToday = todayDayKey !== null && day === todayDayKey;
                   return (
                     <div
                       key={day}
@@ -1006,7 +1014,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 {restaurant.phone && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="h-4 w-4 shrink-0 text-gray-400" />
-                    <a href={`tel:${restaurant.phone}`} className="text-gray-700 hover:text-[var(--color-just-tag)]">
+                    <a href={telHref ?? undefined} className="text-gray-700 hover:text-[var(--color-just-tag)]">
                       {restaurant.phone}
                     </a>
                   </div>
@@ -1083,7 +1091,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                     asChild
                     className="w-full bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)]"
                   >
-                    <a href={`tel:${restaurant.phone}`}>
+                    <a href={telHref ?? undefined}>
                       <Phone className="mr-2 h-4 w-4" />
                       {t("call")}
                     </a>

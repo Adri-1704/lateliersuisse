@@ -55,57 +55,57 @@ export function Footer({ locale }: { locale: string }) {
             </h3>
             <ul className="mt-4 space-y-3">
               <li>
-                <Link href={`/${locale}`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("home")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/restaurants`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/restaurants`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("restaurants")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/a-propos`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/a-propos`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("about")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/contact`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/contact`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("contact")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/faq`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/faq`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("faq")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/pour-restaurateurs`} className="text-sm text-[var(--color-just-tag)] hover:text-white transition-colors">
+                <Link href={`/${locale}/pour-restaurateurs`} className="flex min-h-11 items-center text-sm text-[var(--color-just-tag)] hover:text-white transition-colors">
                   {nav("forRestaurants")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/affiliation`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/affiliation`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {t("affiliation")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/parrainage`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/parrainage`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {t("sponsorship")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/blog`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/blog`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("blog")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/pour-partenaires`} className="text-sm text-gray-600 hover:text-gray-400 transition-colors">
+                <Link href={`/${locale}/pour-partenaires`} className="flex min-h-11 items-center text-sm text-gray-600 hover:text-gray-400 transition-colors">
                   {t("partners")}
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/application`} className="text-sm text-gray-400 hover:text-white transition-colors">
+                <Link href={`/${locale}/application`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {t("app")}
                 </Link>
               </li>
@@ -119,13 +119,13 @@ export function Footer({ locale }: { locale: string }) {
             </h3>
             <ul className="mt-4 space-y-3">
               <li>
-                <Link href={`/${locale}/politique-de-confidentialite`} className="text-sm text-gray-400 hover:text-white transition-colors">{t("privacy")}</Link>
+                <Link href={`/${locale}/politique-de-confidentialite`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">{t("privacy")}</Link>
               </li>
               <li>
-                <Link href={`/${locale}/conditions-generales`} className="text-sm text-gray-400 hover:text-white transition-colors">{t("terms")}</Link>
+                <Link href={`/${locale}/conditions-generales`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">{t("terms")}</Link>
               </li>
               <li>
-                <Link href={`/${locale}/mentions-legales`} className="text-sm text-gray-400 hover:text-white transition-colors">{t("imprint")}</Link>
+                <Link href={`/${locale}/mentions-legales`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">{t("imprint")}</Link>
               </li>
             </ul>
           </div>
