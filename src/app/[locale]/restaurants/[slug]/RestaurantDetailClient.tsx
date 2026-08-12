@@ -1011,10 +1011,10 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                     <span className="text-gray-700">{formattedAddress}</span>
                   </div>
                 )}
-                {restaurant.phone && (
+                {restaurant.phone && telHref && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="h-4 w-4 shrink-0 text-gray-400" />
-                    <a href={telHref ?? undefined} className="text-gray-700 hover:text-[var(--color-just-tag)]">
+                    <a href={telHref} className="text-gray-700 hover:text-[var(--color-just-tag)]">
                       {restaurant.phone}
                     </a>
                   </div>
@@ -1086,12 +1086,12 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
               </div>
 
               <div className="mt-6 space-y-2">
-                {restaurant.phone && (
+                {restaurant.phone && telHref && (
                   <Button
                     asChild
                     className="w-full bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)]"
                   >
-                    <a href={telHref ?? undefined}>
+                    <a href={telHref}>
                       <Phone className="mr-2 h-4 w-4" />
                       {t("call")}
                     </a>

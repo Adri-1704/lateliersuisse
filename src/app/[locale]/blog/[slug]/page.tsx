@@ -75,7 +75,10 @@ function sanitizeMarkdownUrl(rawUrl: string): string {
     /^https?:\/\//i.test(decoded) ||
     /^mailto:/i.test(decoded) ||
     /^tel:/i.test(decoded) ||
-    decoded.startsWith("/") ||
+    // Chemin interne "/..." : on exclut explicitement "//..." (URL
+    // protocol-relative, ex. "//evil.com") qui redirige vers un domaine
+    // externe tout en ayant l'apparence d'un lien interne.
+    (decoded.startsWith("/") && !decoded.startsWith("//")) ||
     decoded.startsWith("#") ||
     decoded.startsWith("?");
 
