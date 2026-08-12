@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import { getPublishedPosts } from "@/actions/blog";
 import { Calendar, ArrowRight, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +61,20 @@ export default async function BlogIndexPage({
   const { total: totalCount } = await getPublishedPosts(1, 0);
   const totalPages = Math.max(1, Math.ceil(totalCount / POSTS_PER_PAGE));
   const page = Math.min(requestedPage, totalPages);
+
+  if (page !== requestedPage) {
+    // Redirige vers la dernière page valide plutôt que de rendre
+    // silencieusement une autre page sous l'URL demandée (?page=99 affichant
+    // le contenu de la page 2 sans que l'URL ne le reflète) — même
+    // comportement que /restaurants pour rester cohérent.
+    const clampedParams = new URLSearchParams(
+      Object.entries(sp).flatMap(([key, value]) =>
+        value == null ? [] : Array.isArray(value) ? value.map((v) => [key, v]) : [[key, value]]
+      )
+    );
+    clampedParams.set("page", String(page));
+    redirect(`/${locale}/blog?${clampedParams.toString()}`);
+  }
 
   const { posts, total } = await getPublishedPosts(POSTS_PER_PAGE, (page - 1) * POSTS_PER_PAGE);
 
