@@ -67,7 +67,8 @@ export type RestaurantFilters = {
    * (ex. ["Bern", "Berne"]) — voir lib/restaurants/city-canton.ts.
    */
   city?: string | string[];
-  /** 1..4 — filters price_range <= priceMax (string enum comparison) */
+  /** 1..4 — filters on the exact price tier (les boutons $ / $$ / $$$ / $$$$
+   * représentent chacun une tranche précise, pas un plafond — voir #43) */
   priceMax?: number;
   /** filters avg_rating >= ratingMin */
   ratingMin?: number;
@@ -175,7 +176,11 @@ function applyFilters(query: any, filters: RestaurantFilters) {
     }
   }
   if (filters.priceMax != null && filters.priceMax >= 1 && filters.priceMax <= 4) {
-    q = q.lte("price_range", String(filters.priceMax));
+    // Correspondance exacte sur la tranche sélectionnée : les boutons
+    // $ / $$ / $$$ / $$$$ du filtre représentent chacun une tranche précise
+    // (pas un plafond) — un .lte() faisait que "$$$$" ne retirait aucun
+    // résultat (#43).
+    q = q.eq("price_range", String(filters.priceMax));
   }
   if (filters.ratingMin != null) {
     q = q.gte("avg_rating", filters.ratingMin);

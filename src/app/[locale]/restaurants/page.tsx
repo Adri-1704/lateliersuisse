@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { RestaurantCardSkeletonGrid } from "@/components/restaurants/RestaurantCardSkeleton";
 import {
   fetchFilteredRestaurants,
@@ -101,18 +102,42 @@ export default async function RestaurantsPage({
 
   const filters = parseRestaurantFilters(sp);
 
-  const page =
+  const requestedPage =
     typeof sp.page === "string" && sp.page ? Math.max(1, parseInt(sp.page, 10) || 1) : 1;
 
   const viewIsMap = sp.view === "map";
+  const PAGE_SIZE = 24;
 
   // ---- Fetch data ----
 
-  const [listResult, mapData, cuisineCounts] = await Promise.all([
-    fetchFilteredRestaurants(filters, page, 24),
+  const [firstAttempt, mapData, cuisineCounts] = await Promise.all([
+    fetchFilteredRestaurants(filters, requestedPage, PAGE_SIZE),
     viewIsMap ? fetchAllFilteredForMap(filters) : Promise.resolve(null),
     fetchCuisineCounts(),
   ]);
+
+  // Une page au-delà de la dernière (ex. ?page=520 pour 519 pages réelles)
+  // renvoyait "0 restaurant trouvé" et un compteur à 0 au lieu du vrai total
+  // (#40). Le count exact renvoyé par Supabase reste correct même quand la
+  // plage demandée est hors bornes (.range() ne l'affecte pas) : on peut
+  // donc détecter le dépassement et re-fetcher la dernière page valide.
+  const totalPages = Math.max(1, Math.ceil(firstAttempt.totalCount / PAGE_SIZE));
+  const page = Math.min(requestedPage, totalPages);
+
+  if (page !== requestedPage) {
+    // Redirige vers la dernière page valide plutôt que d'afficher un
+    // cul-de-sac "0 restaurant trouvé" — garde aussi l'URL affichée
+    // cohérente avec le contenu réellement rendu.
+    const clampedParams = new URLSearchParams(
+      Object.entries(sp).flatMap(([key, value]) =>
+        value == null ? [] : Array.isArray(value) ? value.map((v) => [key, v]) : [[key, value]]
+      )
+    );
+    clampedParams.set("page", String(page));
+    redirect(`/${locale}/restaurants?${clampedParams.toString()}`);
+  }
+
+  const listResult = firstAttempt;
 
   // ---- Render ----
 
