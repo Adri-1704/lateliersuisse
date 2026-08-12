@@ -14,6 +14,7 @@ import type { DbMenuItem, DbReview, DbPromotion, RestaurantImage } from "@/lib/s
 import type { RestaurantPromotion } from "@/data/mock-restaurants";
 import { safeJsonLd } from "@/lib/json-ld";
 import { formatAddress, hasAddress } from "@/lib/address";
+import { toE164 } from "@/lib/phone";
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 
@@ -341,7 +342,7 @@ export default async function RestaurantDetailPage({
           addressCountry: "CH",
         }
       : undefined,
-    telephone: enrichedRestaurant.phone || undefined,
+    telephone: toE164(enrichedRestaurant.phone) || undefined,
     email: enrichedRestaurant.email || undefined,
     url: enrichedRestaurant.website || undefined,
     servesCuisine: enrichedRestaurant.cuisineType || undefined,

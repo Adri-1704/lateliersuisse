@@ -39,6 +39,7 @@ import { submitReview } from "@/actions/reviews";
 import { cantons } from "@/data/cantons";
 import { cantonCodeToSlug } from "@/lib/city-slug";
 import { formatAddress, hasAddress } from "@/lib/address";
+import { toTelHref } from "@/lib/phone";
 
 interface FeatureOption {
   value: string;
@@ -357,6 +358,9 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     restaurantHasAddress ? `${name} ${formattedAddress}` : name
   )}`;
+  // href tel: normalisé (sans espaces, indicatif international) — le texte
+  // affiché reste le numéro tel que saisi (#40).
+  const telHref = toTelHref(restaurant.phone);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -380,9 +384,14 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
         <span className="text-gray-900 font-medium truncate">{name}</span>
       </nav>
 
-      {/* Restaurant Name Banner - toujours en premier */}
+      {/* Restaurant Name Banner - toujours en premier.
+          Bandeau décoratif (tient lieu de photo de couverture) : le nom y
+          est répété visuellement, mais ce n'est pas un titre de page — le
+          <h1> plus bas reste le premier titre du document. Un <h2> ici
+          précédait le <h1> dans le flux et dupliquait l'annonce du nom aux
+          lecteurs d'écran (#42, #43). */}
       <div className="relative h-48 md:h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
-        <h2 className="relative z-10 px-8 text-center text-3xl md:text-5xl font-bold text-white leading-tight">{name}</h2>
+        <p aria-hidden="true" className="relative z-10 px-8 text-center text-3xl md:text-5xl font-bold text-white leading-tight">{name}</p>
       </div>
 
       {/* Photos ajoutées par le restaurateur (si disponibles) */}
@@ -535,7 +544,8 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
           {/* Tabs */}
           <Tabs defaultValue="menu" className="w-full">
-            <TabsList className="w-full justify-start">
+            {/* h-11 : cible tactile >= 44px pour les onglets Menu/Avis/Horaires (#43) */}
+            <TabsList className="h-11 w-full justify-start">
               <TabsTrigger value="menu">{t("menu")}</TabsTrigger>
               <TabsTrigger value="reviews">{t("reviews")} ({localReviews.length})</TabsTrigger>
               <TabsTrigger value="hours">{t("hours")}</TabsTrigger>
@@ -1006,7 +1016,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 {restaurant.phone && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="h-4 w-4 shrink-0 text-gray-400" />
-                    <a href={`tel:${restaurant.phone}`} className="text-gray-700 hover:text-[var(--color-just-tag)]">
+                    <a href={telHref ?? undefined} className="text-gray-700 hover:text-[var(--color-just-tag)]">
                       {restaurant.phone}
                     </a>
                   </div>
@@ -1083,7 +1093,7 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                     asChild
                     className="w-full bg-[var(--color-just-tag)] hover:bg-[var(--color-just-tag-dark)]"
                   >
-                    <a href={`tel:${restaurant.phone}`}>
+                    <a href={telHref ?? undefined}>
                       <Phone className="mr-2 h-4 w-4" />
                       {t("call")}
                     </a>
