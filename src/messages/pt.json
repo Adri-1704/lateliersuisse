@@ -1008,5 +1008,11 @@
       "manageBillingDescription": "Alterar o metodo de pagamento ou cancelar a assinatura",
       "manageButton": "Portal de pagamento"
     }
+  },
+  "notFoundPage": {
+    "title": "Página não encontrada",
+    "code": "404",
+    "description": "A página que procura não existe ou foi movida.",
+    "cta": "Voltar ao início"
   }
 }
