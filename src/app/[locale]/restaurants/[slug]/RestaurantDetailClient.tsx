@@ -40,6 +40,7 @@ import { cantons } from "@/data/cantons";
 import { cantonCodeToSlug } from "@/lib/city-slug";
 import { formatAddress, hasAddress } from "@/lib/address";
 import { toTelHref } from "@/lib/phone";
+import { useIsOpenNow, useCurrentDayKey } from "@/lib/use-is-open-now";
 
 interface FeatureOption {
   value: string;
@@ -68,20 +69,6 @@ function PriceRange({ range }: { range: number }) {
       ))}
     </span>
   );
-}
-
-function isOpenNow(openingHours: Record<string, { open: string; close: string } | null>): boolean | null {
-  if (!openingHours) return null;
-  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-  const now = new Date();
-  const dayName = days[now.getDay()];
-  const hours = openingHours[dayName];
-  if (!hours || typeof hours.open !== "string" || typeof hours.close !== "string" || hours.open === "undefined" || hours.close === "undefined") return null;
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const [openH, openM] = hours.open.split(":").map(Number);
-  const [closeH, closeM] = hours.close.split(":").map(Number);
-  if (isNaN(openH) || isNaN(openM) || isNaN(closeH) || isNaN(closeM)) return null;
-  return currentMinutes >= openH * 60 + openM && currentMinutes <= closeH * 60 + closeM;
 }
 
 function relativeDate(dateStr: string, locale: string): string {
@@ -326,10 +313,19 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
 
   const name = getLocalizedName(restaurant, locale);
   const description = getLocalizedDescription(restaurant, locale);
-  const open = isOpenNow(restaurant.openingHours);
+  // `open` reste `null` jusqu'au montage côté client (voir useIsOpenNow) :
+  // cette page est en force-static + revalidate=3600, donc le mismatch entre
+  // le HTML servi (potentiellement généré des heures plus tôt, dans un autre
+  // fuseau) et le calcul refait à l'hydratation était quasi systématique
+  // (#418) — c'est le cas le plus visible puisque c'est la page la plus
+  // visitée du site.
+  const open = useIsOpenNow(restaurant.openingHours);
   const isSwissCuisine = restaurant.cuisineType === "suisse";
 
   const dayKeys = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
+  // Idem : "aujourd'hui" ne doit être déterminé qu'après le montage pour ne
+  // pas dépendre du fuseau du serveur au moment du (pré-)rendu (#418).
+  const todayDayKey = useCurrentDayKey();
 
   const getFeatureLabel = (value: string) => {
     const feature = featuresOptions.find((f) => f.value === value);
@@ -975,9 +971,11 @@ export function RestaurantDetailClient({ restaurant, reviews, locale, featuresOp
                 {dayKeys.map((day) => {
                   const hours = restaurant.openingHours[day];
                   const hasValidHours = hours && typeof hours.open === "string" && typeof hours.close === "string" && hours.open !== "undefined" && hours.close !== "undefined";
-                  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-                  const todayName = days[new Date().getDay()];
-                  const isToday = day === todayName;
+                  // todayDayKey (calculé via useCurrentDayKey, voir plus haut)
+                  // reste `null` avant le montage : aucune ligne n'est mise en
+                  // avant tant que le jour courant n'est pas connu côté
+                  // client, ce qui évite un mismatch d'hydratation (#418).
+                  const isToday = todayDayKey !== null && day === todayDayKey;
                   return (
                     <div
                       key={day}

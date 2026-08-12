@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
 import { Star, MapPin, Clock } from "lucide-react";
 import { FavoriteButton } from "@/components/restaurants/FavoriteButton";
 import { Badge } from "@/components/ui/badge";
@@ -12,41 +11,7 @@ import type { Restaurant } from "@/data/mock-restaurants";
 import { DistinctionBadges } from "@/components/restaurants/DistinctionBadges";
 import { PromotionBadge } from "@/components/restaurants/PromotionBadge";
 import { getLocalizedName, getLocalizedDescription } from "@/lib/locale-helpers";
-
-function isOpenNow(openingHours: Restaurant["openingHours"]): boolean | null {
-  if (!openingHours) return null;
-  const now = new Date();
-  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] as const;
-  const today = days[now.getDay()];
-  const hours = openingHours[today];
-  if (!hours || typeof hours.open !== "string" || typeof hours.close !== "string" || hours.open === "undefined" || hours.close === "undefined") return null;
-  const currentTime = now.getHours() * 100 + now.getMinutes();
-  const [openH, openM] = hours.open.split(":").map(Number);
-  const [closeH, closeM] = hours.close.split(":").map(Number);
-  if (isNaN(openH) || isNaN(openM) || isNaN(closeH) || isNaN(closeM)) return null;
-  return currentTime >= openH * 100 + openM && currentTime <= closeH * 100 + closeM;
-}
-
-/**
- * Calcule l'état ouvert/fermé uniquement après le montage côté client.
- *
- * `new Date()` renvoie l'heure/jour dans le fuseau du runtime qui l'exécute :
- * sur Vercel le serveur tourne en UTC, alors que le navigateur utilise le
- * fuseau local de l'internaute (Europe/Zurich, etc.). Calculer `isOpenNow`
- * pendant le rendu serveur puis le recalculer immédiatement à l'hydratation
- * peut donc produire un texte différent ("Ouvert" / "Fermé") entre les deux
- * passes — c'est l'erreur React #418 constatée sur /fr/restaurants (#43).
- * En ne calculant l'état qu'après le montage (défaut `null`, identique sur
- * le HTML serveur et la première passe client), on garantit que le rendu
- * hydraté correspond toujours au HTML serveur.
- */
-function useIsOpenNow(openingHours: Restaurant["openingHours"]): boolean | null {
-  const [open, setOpen] = useState<boolean | null>(null);
-  useEffect(() => {
-    setOpen(isOpenNow(openingHours));
-  }, [openingHours]);
-  return open;
-}
+import { useIsOpenNow } from "@/lib/use-is-open-now";
 
 export function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   const params = useParams();
