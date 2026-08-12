@@ -135,7 +135,11 @@ function RestaurantSlideCardCompact({ restaurant, bestReview, locale }: { restau
     <Link href={`/${locale}/restaurants/${restaurant.slug}`}>
       <div className="group overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-lg">
         <div className="relative h-40 overflow-hidden bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center px-4">
-          <h4 className="relative z-10 text-center text-base font-bold text-white leading-snug line-clamp-3">{name}</h4>
+          {/* Bandeau décoratif (remplace la photo manquante) : le nom y est
+              répété visuellement mais ce n'est pas un titre — le vrai titre
+              de la carte est le <h3> ci-dessous (#42, #43 : évite le saut
+              h2 → h4 → h3 et la double annonce du nom). */}
+          <p aria-hidden="true" className="relative z-10 text-center text-base font-bold text-white leading-snug line-clamp-3">{name}</p>
           {restaurant.isFeatured && (
             <Badge className="absolute left-3 top-3 bg-[var(--color-just-tag)] text-white border-0 text-xs px-2.5 py-0.5 animate-pulse-gentle">
               {t("badge")}
