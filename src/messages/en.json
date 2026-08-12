@@ -17,6 +17,27 @@
     "title": "Just-Tag | The Best Restaurants in Western Switzerland",
     "description": "Discover the best restaurants in Western Switzerland. Search by canton, cuisine and budget to find your ideal restaurant."
   },
+  "pageMeta": {
+    "faqTitle": "FAQ — Frequently asked questions about Just-Tag",
+    "faqDescription": "All the answers to your questions about Just-Tag: finding restaurants, registering your establishment, customer reviews and covered cantons.",
+    "contactTitle": "Contact — Just-Tag",
+    "contactDescription": "A question or suggestion? Contact the Just-Tag team by email, phone or through our contact form.",
+    "favorisTitle": "My favorite restaurants",
+    "favorisDescription": "Find here all the Western Swiss restaurants you have added to your favorites on Just-Tag.",
+    "whatsUpTitle": "Whats-up — WhatsApp marketing for Swiss businesses",
+    "whatsUpDescription": "Send your offers and news directly to your customers on WhatsApp. 98% open rate, no commission, hosted in Switzerland.",
+    "pitchTitle": "Just-Tag pitch — How to fill your restaurant's tables",
+    "pitchDescription": "See in pictures how Just-Tag helps Swiss restaurants connect directly with their customers, without any algorithm.",
+    "applicationTitle": "The Just-Tag app for restaurant owners",
+    "applicationDescription": "Dashboard, QR code, happy hours, online menu: discover the Just-Tag app designed for Swiss restaurant owners.",
+    "partenaireInscriptionTitle": "Become a Just-Tag partner",
+    "partenaireInscriptionDescription": "Register your restaurant on Just-Tag in a few minutes: choose your plan and enjoy a 14-day free trial.",
+    "legalMentionsDescription": "Legal notice of Just-Tag.app: website publisher, hosting, intellectual property and applicable law.",
+    "legalConditionsDescription": "Terms and conditions of the Just-Tag.app platform for restaurant owners and visitors.",
+    "legalPrivacyDescription": "Privacy policy of Just-Tag.app: data collected, purposes of processing and users' rights (Swiss FADP/GDPR).",
+    "pourPartenairesTitle": "Partners — Just-Tag",
+    "pourPartenairesDescription": "Do you work with Swiss restaurants? Discover how a partnership with Just-Tag can bring value to your clients."
+  },
   "nav": {
     "home": "Home",
     "restaurants": "Restaurants",

@@ -1,4 +1,43 @@
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+
+export const revalidate = 86400;
+
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "pageMeta" });
+
+  const title = t("applicationTitle");
+  const description = t("applicationDescription");
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/application`,
+      languages: {
+        fr: "/fr/application",
+        de: "/de/application",
+        en: "/en/application",
+        pt: "/pt/application",
+        es: "/es/application",
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}/${locale}/application`,
+      type: "website",
+    },
+  };
+}
 
 const slides = [
   {

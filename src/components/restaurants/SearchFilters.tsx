@@ -14,9 +14,10 @@ import { getLocalizedLabel, getLocalizedName, getLocalizedLabelAlt } from "@/lib
 
 interface SearchFiltersProps {
   cuisineCounts?: Record<string, number>;
+  basePath?: string;
 }
 
-export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
+export function SearchFilters({ cuisineCounts, basePath = "restaurants" }: SearchFiltersProps = {}) {
   const t = useTranslations("search");
   const tHero = useTranslations("hero");
   // Ce composant est monté deux fois en parallèle dans le DOM (tiroir mobile
@@ -50,9 +51,9 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
       } else {
         newParams.delete(key);
       }
-      router.push(`/${locale}/restaurants?${newParams.toString()}`);
+      router.push(`/${locale}/${basePath}?${newParams.toString()}`);
     },
-    [searchParams, router, locale]
+    [searchParams, router, locale, basePath]
   );
 
   const toggleFeature = useCallback(
@@ -66,13 +67,13 @@ export function SearchFilters({ cuisineCounts }: SearchFiltersProps = {}) {
       } else {
         newParams.delete("features");
       }
-      router.push(`/${locale}/restaurants?${newParams.toString()}`);
+      router.push(`/${locale}/${basePath}?${newParams.toString()}`);
     },
-    [currentFeatures, searchParams, router, locale]
+    [currentFeatures, searchParams, router, locale, basePath]
   );
 
   const clearAll = () => {
-    router.push(`/${locale}/restaurants`);
+    router.push(`/${locale}/${basePath}`);
   };
 
   const hasActiveFilters = currentQuery || currentType || currentCanton || currentCuisine || currentPrice || currentRating || currentFeatures.length > 0;

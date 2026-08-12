@@ -1,10 +1,48 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  title: "Mentions légales - Just-Tag.app",
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+const LEGAL_TITLES: Record<string, string> = {
+  fr: "Mentions légales",
+  de: "Impressum",
+  en: "Legal Notice",
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "pageMeta" });
+
+  const title = LEGAL_TITLES[locale] || LEGAL_TITLES.fr;
+  const description = t("legalMentionsDescription");
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/mentions-legales`,
+      languages: {
+        fr: "/fr/mentions-legales",
+        de: "/de/mentions-legales",
+        en: "/en/mentions-legales",
+        pt: "/pt/mentions-legales",
+        es: "/es/mentions-legales",
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}/${locale}/mentions-legales`,
+      type: "website",
+    },
+  };
+}
 
 export default async function LegalNoticePage({
   params,

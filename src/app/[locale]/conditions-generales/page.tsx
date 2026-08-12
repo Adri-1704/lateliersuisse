@@ -1,10 +1,48 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  title: "Conditions générales - Just-Tag.app",
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+const LEGAL_TITLES: Record<string, string> = {
+  fr: "Conditions générales d'utilisation",
+  de: "Allgemeine Geschäftsbedingungen",
+  en: "Terms and Conditions",
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "pageMeta" });
+
+  const title = LEGAL_TITLES[locale] || LEGAL_TITLES.fr;
+  const description = t("legalConditionsDescription");
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/${locale}/conditions-generales`,
+      languages: {
+        fr: "/fr/conditions-generales",
+        de: "/de/conditions-generales",
+        en: "/en/conditions-generales",
+        pt: "/pt/conditions-generales",
+        es: "/es/conditions-generales",
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}/${locale}/conditions-generales`,
+      type: "website",
+    },
+  };
+}
 
 export default async function TermsPage({
   params,

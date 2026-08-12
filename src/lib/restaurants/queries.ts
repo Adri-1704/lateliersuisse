@@ -280,6 +280,40 @@ export async function fetchFilteredRestaurants(
 }
 
 // ---------------------------------------------------------------------------
+// Lightweight count-only query — single source of truth for the number of
+// published restaurants shown in <title>/meta description on /restaurants
+// (#41 : le <title>, la meta description et le compteur affichaient trois
+// volumes différents car chacun utilisait un chiffre codé en dur). On
+// applique les mêmes filtres que la liste pour rester cohérent lorsqu'une
+// vue filtrée est demandée (ex. ?canton=vaud).
+// ---------------------------------------------------------------------------
+
+export async function fetchPublishedRestaurantCount(
+  filters: RestaurantFilters = {}
+): Promise<number> {
+  noStore();
+  try {
+    const supabase = createAdminClient();
+    let query = supabase
+      .from("restaurants")
+      .select("id", { count: "exact", head: true })
+      .eq("is_published", true);
+
+    query = applyFilters(query, filters);
+
+    const { count, error } = await query;
+    if (error) {
+      console.error("[fetchPublishedRestaurantCount] Supabase error:", error.message);
+      return 0;
+    }
+    return count ?? 0;
+  } catch (err) {
+    console.error("[fetchPublishedRestaurantCount] Unexpected error:", err);
+    return 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Cuisine counts — for filtering out empty categories in dropdowns/grids
 // ---------------------------------------------------------------------------
 

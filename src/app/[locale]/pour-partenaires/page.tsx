@@ -1,13 +1,44 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { ArrowRight, MessageCircle, Sparkles, Store, CheckCircle, Mail } from "lucide-react";
 import { SwissCross } from "@/components/ui/swiss-cross";
 
-export const metadata: Metadata = {
-  title: "Partenaires — Just-Tag",
-  description: "Vous fournissez des restaurants suisses ? Découvrez comment une collaboration avec Just-Tag peut apporter de la valeur à vos clients.",
-  robots: { index: false },
-};
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "pageMeta" });
+
+  const title = t("pourPartenairesTitle");
+  const description = t("pourPartenairesDescription");
+
+  return {
+    title,
+    description,
+    robots: { index: false },
+    alternates: {
+      canonical: `/${locale}/pour-partenaires`,
+      languages: {
+        fr: "/fr/pour-partenaires",
+        de: "/de/pour-partenaires",
+        en: "/en/pour-partenaires",
+        pt: "/pt/pour-partenaires",
+        es: "/es/pour-partenaires",
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      url: `${baseUrl}/${locale}/pour-partenaires`,
+      type: "website",
+    },
+  };
+}
 
 const features = [
   {

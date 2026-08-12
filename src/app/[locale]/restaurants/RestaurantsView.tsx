@@ -123,6 +123,18 @@ interface RestaurantsViewProps {
   mapRestaurants: RestaurantMapItem[] | null;
   locale: string;
   cuisineCounts?: Record<string, number>;
+  /**
+   * Chemin de base (sans locale ni slash de tête) utilisé pour la pagination,
+   * le tri et le bascule liste/carte. Par défaut "restaurants". Permet de
+   * réutiliser ce composant sur /collections/[slug] tout en restant sur
+   * l'URL de la collection (#41 : la page de collection ne doit pas
+   * disparaître dès la première interaction).
+   */
+  basePath?: string;
+  /** Titre (h1) personnalisé — sinon le titre générique "Trouver un restaurant". */
+  heading?: string;
+  /** Texte optionnel affiché sous le h1, avant le compteur de résultats. */
+  subheading?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -136,6 +148,9 @@ export default function RestaurantsView({
   mapRestaurants,
   locale,
   cuisineCounts,
+  basePath = "restaurants",
+  heading,
+  subheading,
 }: RestaurantsViewProps) {
   const t = useTranslations("search");
   const searchParams = useSearchParams();
@@ -162,10 +177,10 @@ export default function RestaurantsView({
       } else {
         newParams.set("page", String(page));
       }
-      router.push(`/${locale}/restaurants?${newParams.toString()}`);
+      router.push(`/${locale}/${basePath}?${newParams.toString()}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    [searchParams, router, locale]
+    [searchParams, router, locale, basePath]
   );
 
   // Toggle view mode — push view param to URL so server knows to fetch map data
@@ -178,9 +193,9 @@ export default function RestaurantsView({
       } else {
         newParams.delete("view");
       }
-      router.push(`/${locale}/restaurants?${newParams.toString()}`);
+      router.push(`/${locale}/${basePath}?${newParams.toString()}`);
     },
-    [searchParams, router, locale]
+    [searchParams, router, locale, basePath]
   );
 
   return (
@@ -189,8 +204,11 @@ export default function RestaurantsView({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-            {t("title")}
+            {heading || t("title")}
           </h1>
+          {subheading && (
+            <p className="mt-1 text-sm text-gray-600">{subheading}</p>
+          )}
           <p className="mt-1 text-sm text-gray-500">
             {t("results", { count: totalCount })}
           </p>
@@ -204,7 +222,7 @@ export default function RestaurantsView({
               const newParams = new URLSearchParams(searchParams.toString());
               newParams.set("sort", e.target.value);
               newParams.delete("page");
-              router.push(`/${locale}/restaurants?${newParams.toString()}`);
+              router.push(`/${locale}/${basePath}?${newParams.toString()}`);
             }}
             className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none"
           >
@@ -243,7 +261,7 @@ export default function RestaurantsView({
             </SheetTrigger>
             <SheetContent side="left" className="w-[320px] overflow-y-auto">
               <div className="mt-6">
-                <SearchFilters cuisineCounts={cuisineCounts} />
+                <SearchFilters cuisineCounts={cuisineCounts} basePath={basePath} />
               </div>
             </SheetContent>
           </Sheet>
@@ -254,7 +272,7 @@ export default function RestaurantsView({
         {/* Desktop Sidebar Filters */}
         <aside className="hidden w-72 shrink-0 lg:block">
           <div className="sticky top-24 rounded-xl border bg-white p-5">
-            <SearchFilters cuisineCounts={cuisineCounts} />
+            <SearchFilters cuisineCounts={cuisineCounts} basePath={basePath} />
           </div>
         </aside>
 
@@ -313,7 +331,7 @@ export default function RestaurantsView({
                 variant="outline"
                 className="mt-4"
                 onClick={() => {
-                  router.push(`/${locale}/restaurants`);
+                  router.push(`/${locale}/${basePath}`);
                 }}
               >
                 {t("clearAll")}

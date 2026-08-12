@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { featuresOptions } from "@/data/mock-restaurants";
 import type { Restaurant, Review } from "@/data/mock-restaurants";
 import { getLocalizedName, getLocalizedDescription, cleanDisplayText } from "@/lib/locale-helpers";
+import { getRestaurantSeoDescription } from "@/lib/restaurants/seo-description";
 import { notFound } from "next/navigation";
 import { RestaurantDetailClient } from "./RestaurantDetailClient";
 import { ClaimBanner } from "./ClaimBanner";
@@ -29,6 +30,19 @@ const placeholderImages = [
   "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=800&q=80",
   "https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=800&q=80",
 ];
+
+// Index déterministe basé sur le slug — utilisé pour faire tourner les
+// placeholders lorsqu'un restaurant n'a pas de cover_image. #41 : getRestaurant()
+// appelait toujours mapDbToRestaurant(row, 0), figeant l'index à 0 pour tous
+// les restaurants et exposant donc la même og:image (placeholderImages[0])
+// sur toutes les fiches sans photo.
+function hashSlugToIndex(slug: string, modulo: number): number {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
+  }
+  return hash % modulo;
+}
 
 function mapDbToRestaurant(row: Record<string, unknown>, index: number): Restaurant {
   return {
@@ -97,9 +111,10 @@ async function getRestaurant(slug: string): Promise<{ restaurant: Restaurant; in
   if (error) console.error("[getRestaurant] Erreur:", error);
   if (error || !data) return null;
   const row = data as Record<string, unknown>;
+  const index = hashSlugToIndex((row.slug as string) || slug, placeholderImages.length);
   return {
-    restaurant: mapDbToRestaurant(row, 0),
-    index: 0,
+    restaurant: mapDbToRestaurant(row, index),
+    index,
     merchantId: (row.merchant_id as string) || null,
     claimStatus: (row.claim_status as string) || null,
   };
@@ -188,11 +203,23 @@ export async function generateMetadata({
 
   const { restaurant } = result;
   const name = getLocalizedName(restaurant, locale);
-  const description = getLocalizedDescription(restaurant, locale);
+  // #41 : le texte libre description_fr/de/en stocké en base est parfois
+  // identique entre locales (non traduit) ou fautif ("Restaurant en Geneve.",
+  // canton sans accent). La meta description et le JSON-LD utilisent donc une
+  // description reconstruite à partir de colonnes fiables (ville/canton),
+  // correctement traduite et accentuée dans les 5 langues.
+  const description = getRestaurantSeoDescription(restaurant, locale);
+
+  // og:image propre à la fiche : la première photo réellement uploadée par
+  // le restaurateur si elle existe, sinon le placeholder déterministe par
+  // slug (restaurant.coverImage — voir hashSlugToIndex) plutôt que toujours
+  // le même placeholder générique pour toutes les fiches sans photo.
+  const galleryImages = await getRestaurantImages(restaurant.id);
+  const ogImage = galleryImages[0] || restaurant.coverImage;
 
   return {
     title: restaurant.city ? `${name} - ${restaurant.city}` : name,
-    description: description.slice(0, 160),
+    description,
     alternates: {
       canonical: `/${locale}/restaurants/${slug}`,
       languages: {
@@ -205,12 +232,12 @@ export async function generateMetadata({
     },
     openGraph: {
       title: `${name} - Restaurant ${restaurant.cuisineType} a ${restaurant.city}`,
-      description: description.slice(0, 200),
+      description,
       url: `${baseUrl}/${locale}/restaurants/${slug}`,
       type: "article",
       images: [
         {
-          url: restaurant.coverImage,
+          url: ogImage,
           width: 800,
           height: 600,
           alt: name,
@@ -300,7 +327,9 @@ export default async function RestaurantDetailPage({
     "@context": "https://schema.org",
     "@type": "Restaurant",
     name: getLocalizedName(enrichedRestaurant, locale),
-    description: getLocalizedDescription(enrichedRestaurant, locale),
+    // #41 : même description reconstruite (ville/canton) que la meta
+    // description, pour éviter un JSON-LD "description" non traduit/fautif.
+    description: getRestaurantSeoDescription(enrichedRestaurant, locale),
     image: enrichedRestaurant.images.length > 0 ? enrichedRestaurant.images : undefined,
     address: hasAddress(enrichedRestaurant)
       ? {
