@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { Menu, X, Search, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,7 @@ export function Header() {
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center gap-2" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
           <Logo size={36} />
-          <span className="text-xl font-bold tracking-tight">
+          <span className="whitespace-nowrap text-lg font-bold tracking-tight sm:text-xl">
             Just<span className="text-[var(--color-just-tag)]">-Tag</span>
           </span>
         </Link>
@@ -65,12 +65,21 @@ export function Header() {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          <LanguageSwitcher />
+          {/* useSearchParams() (préservation de la query au changement de
+              langue, #40) impose un Suspense boundary pour ne pas bloquer
+              le rendu statique des pages qui n'en avaient pas besoin. */}
+          <Suspense fallback={<div className="h-7 w-[168px] rounded-full bg-gray-100" />}>
+            <LanguageSwitcher />
+          </Suspense>
           {/* Desktop search — inline in header */}
           {searchOpen ? (
             <form onSubmit={handleSearchSubmit} className="hidden sm:flex items-center gap-1">
               <div className="relative">
-                <button type="submit" className="absolute left-2.5 top-1/2 -translate-y-1/2 p-0 border-0 bg-transparent cursor-pointer">
+                <button
+                  type="submit"
+                  aria-label={t("search") || "Rechercher"}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 p-0 border-0 bg-transparent cursor-pointer"
+                >
                   <Search className="h-4 w-4 text-gray-400 hover:text-gray-600" />
                 </button>
                 <input
@@ -85,6 +94,9 @@ export function Header() {
                 <button
                   type="button"
                   onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                  aria-label={
+                    locale === "de" ? "Suche schliessen" : locale === "en" ? "Close search" : locale === "pt" ? "Fechar pesquisa" : locale === "es" ? "Cerrar búsqueda" : "Fermer la recherche"
+                  }
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <X className="h-4 w-4" />
@@ -95,7 +107,8 @@ export function Header() {
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              aria-label={t("search") || "Rechercher"}
+              className="flex h-11 min-w-11 items-center gap-2"
               onClick={() => {
                 setSearchOpen(true);
                 setTimeout(() => searchInputRef.current?.focus(), 50);
@@ -124,7 +137,16 @@ export function Header() {
           {/* Mobile menu */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-11 w-11 lg:hidden"
+                aria-label={
+                  open
+                    ? (locale === "de" ? "Menü schliessen" : locale === "en" ? "Close menu" : locale === "pt" ? "Fechar menu" : locale === "es" ? "Cerrar menú" : "Fermer le menu")
+                    : (locale === "de" ? "Menü öffnen" : locale === "en" ? "Open menu" : locale === "pt" ? "Abrir menu" : locale === "es" ? "Abrir menú" : "Ouvrir le menu")
+                }
+              >
                 {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </SheetTrigger>
@@ -178,14 +200,17 @@ export function Header() {
             </div>
             <button
               type="submit"
-              className="h-10 shrink-0 rounded-md bg-[var(--color-just-tag)] px-4 text-sm font-semibold text-white"
+              className="h-11 shrink-0 rounded-md bg-[var(--color-just-tag)] px-4 text-sm font-semibold text-white"
             >
               {t("search")}
             </button>
             <button
               type="button"
               onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-              className="text-gray-400 hover:text-gray-600"
+              aria-label={
+                locale === "de" ? "Suche schliessen" : locale === "en" ? "Close search" : locale === "pt" ? "Fechar pesquisa" : locale === "es" ? "Cerrar búsqueda" : "Fermer la recherche"
+              }
+              className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-400 hover:text-gray-600"
             >
               <X className="h-5 w-5" />
             </button>
