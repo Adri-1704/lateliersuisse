@@ -23,7 +23,7 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://just-tag.app";
 export async function generateMetadata(): Promise<Metadata> {
   const title = "Clients Aligro — Just-Tag";
   const description =
-    "Offre partenaire réservée aux clients Aligro : donnez à votre restaurant une fiche professionnelle visible sur Google, un canal WhatsApp direct avec vos clients et des avis mis en valeur, sans commission sur vos réservations.";
+    "Offre partenaire réservée aux clients Aligro : donnez à votre établissement une fiche professionnelle visible sur Google, un canal WhatsApp direct avec vos clients et des avis mis en valeur, sans commission sur vos réservations.";
 
   return {
     title,

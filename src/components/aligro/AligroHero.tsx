@@ -48,7 +48,7 @@ export function AligroHero({ totalRestaurants }: AligroHeroProps) {
           <h1 className="font-condensed text-5xl font-black leading-[0.93] tracking-tight text-white sm:text-6xl md:text-7xl">
             Client Aligro ?
             <br />
-            Faites rayonner votre restaurant{" "}
+            Faites rayonner votre établissement{" "}
             <em className="not-italic text-[var(--color-just-tag)]">
               sans commission.
             </em>
@@ -57,8 +57,8 @@ export function AligroHero({ totalRestaurants }: AligroHeroProps) {
           <p className="mt-6 max-w-2xl text-lg text-gray-300">
             Just-Tag, c&apos;est votre fiche professionnelle visible sur Google,
             un canal WhatsApp direct avec vos clients et vos avis mis en valeur
-            — la plateforme pensée pour les restaurateurs indépendants de
-            Suisse romande.
+            — la plateforme pensée pour les restaurants, bars, cafés, traiteurs
+            et hôtels-restaurants indépendants de Suisse romande.
           </p>
 
           {/* Bénéfices clés */}
@@ -72,13 +72,13 @@ export function AligroHero({ totalRestaurants }: AligroHeroProps) {
             <li className="flex items-center gap-3 text-white">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
               <span className="text-base sm:text-lg">
-                Vos menus et offres envoyés directement sur WhatsApp
+                Vos offres et nouveautés envoyées directement sur WhatsApp
               </span>
             </li>
             <li className="flex items-center gap-3 text-white">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
               <span className="text-base sm:text-lg">
-                Zéro commission sur vos réservations, toujours
+                Zéro commission sur vos réservations et commandes, toujours
               </span>
             </li>
           </ul>
@@ -91,7 +91,7 @@ export function AligroHero({ totalRestaurants }: AligroHeroProps) {
           {totalRestaurants > 0 && (
             <div className="mt-4 flex items-center gap-2 text-sm text-gray-400">
               <Users className="h-4 w-4" />
-              Déjà {totalRestaurants.toLocaleString("fr-CH")}+ restaurants
+              Déjà {totalRestaurants.toLocaleString("fr-CH")}+ établissements
               romands sur Just-Tag
             </div>
           )}
