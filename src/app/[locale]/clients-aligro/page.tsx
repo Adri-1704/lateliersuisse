@@ -64,7 +64,7 @@ export default async function ClientsAligroPage() {
 
   return (
     <>
-      <AligroHero totalRestaurants={totalRestaurants} />
+      <AligroHero />
       <AligroOfferBanner />
       <B2BTrustStats totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <B2BWhatsAppStats />
