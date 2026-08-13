@@ -85,6 +85,11 @@ export function Footer({ locale }: { locale: string }) {
                 </Link>
               </li>
               <li>
+                <Link href={`/${locale}/clients-aligro`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
+                  Clients Aligro
+                </Link>
+              </li>
+              <li>
                 <Link href={`/${locale}/affiliation`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {t("affiliation")}
                 </Link>
