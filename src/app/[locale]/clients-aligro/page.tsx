@@ -3,10 +3,10 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { AligroHero } from "@/components/aligro/AligroHero";
 import { AligroOfferBanner } from "@/components/aligro/AligroOfferBanner";
 import { AligroFinalCTA } from "@/components/aligro/AligroFinalCTA";
+import { AligroFeatures } from "@/components/aligro/AligroFeatures";
+import { AligroProblemSolution } from "@/components/aligro/AligroProblemSolution";
 import { B2BTrustStats } from "@/components/b2b/B2BTrustStats";
 import { B2BWhatsAppStats } from "@/components/b2b/B2BWhatsAppStats";
-import { B2BFeatures } from "@/components/b2b/B2BFeatures";
-import { B2BProblemSolution } from "@/components/b2b/B2BProblemSolution";
 import { B2BHowItWorks } from "@/components/b2b/B2BHowItWorks";
 
 /**
@@ -68,8 +68,8 @@ export default async function ClientsAligroPage() {
       <AligroOfferBanner />
       <B2BTrustStats totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <B2BWhatsAppStats />
-      <B2BFeatures />
-      <B2BProblemSolution />
+      <AligroFeatures />
+      <AligroProblemSolution />
       <B2BHowItWorks />
       <AligroFinalCTA />
     </>

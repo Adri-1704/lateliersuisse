@@ -1,7 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SwissCrossIcon } from "@/components/ui/swiss-cross";
 import { getAligroOfferLabel } from "@/config/aligro";
 
 interface AligroHeroProps {
@@ -39,10 +39,19 @@ export function AligroHero({ totalRestaurants }: AligroHeroProps) {
 
       <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-32">
         <div className="max-w-3xl">
-          {/* Badge partenariat Aligro */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white">
-            <SwissCrossIcon size={14} />
-            Partenaire Aligro
+          {/* Badge partenariat Aligro : pastille blanche pour le logo (fond
+              blanc) sur le hero sombre, + libellé "Partenaire" à côté. */}
+          <div className="mb-6 inline-flex items-center gap-2.5 rounded-full bg-white py-1.5 pl-2.5 pr-4 shadow-sm">
+            <Image
+              src="/partners/aligro-logo.png"
+              alt="Aligro"
+              width={900}
+              height={500}
+              className="h-6 w-auto rounded-sm object-contain"
+            />
+            <span className="text-sm font-semibold text-gray-700">
+              Partenaire
+            </span>
           </div>
 
           <h1 className="font-condensed text-5xl font-black leading-[0.93] tracking-tight text-white sm:text-6xl md:text-7xl">
