@@ -53,7 +53,7 @@ export function Footer({ locale }: { locale: string }) {
             <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
               {t("quickLinks")}
             </h3>
-            <ul className="mt-4 space-y-3">
+            <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-1">
               <li>
                 <Link href={`/${locale}`} className="flex min-h-11 items-center text-sm text-gray-400 hover:text-white transition-colors">
                   {nav("home")}
