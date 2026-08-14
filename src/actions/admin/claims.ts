@@ -182,14 +182,30 @@ export async function approveClaim(
       return { success: false, error: "Cette demande a déjà été traitée" };
     }
 
-    // 2. Link restaurant to merchant
-    await (supabase.from("restaurants") as ReturnType<typeof supabase.from>)
+    // 2. Link restaurant to merchant — UPDATE atomique conditionnel : on ne
+    // rattache la fiche QUE si elle est encore libre (merchant_id IS NULL).
+    // Empêche un vol de fiche si deux claims 'pending' existaient sur le
+    // même restaurant (ex: données historiques antérieures au verrou côté
+    // création, ou situation de course déjà en cours au moment du fix).
+    const { data: lockedRows, error: lockError } = await (supabase
+      .from("restaurants") as ReturnType<typeof supabase.from>)
       .update({
         merchant_id: claimData.merchant_id,
         claimed_at: new Date().toISOString(),
         claim_status: "claimed",
       } as Record<string, unknown>)
-      .eq("id", claimData.restaurant_id);
+      .eq("id", claimData.restaurant_id)
+      .is("merchant_id", null)
+      .select("id");
+
+    if (lockError) {
+      console.error("approveClaim lock error:", lockError);
+      return { success: false, error: "Erreur lors de l'approbation" };
+    }
+
+    if (!lockedRows || lockedRows.length === 0) {
+      return { success: false, error: "Cette fiche est déjà rattachée à un autre compte" };
+    }
 
     // 3. Update claim request
     await (supabase.from("claim_requests") as ReturnType<typeof supabase.from>)
@@ -199,6 +215,54 @@ export async function approveClaim(
         admin_notes: adminNotes || null,
       } as Record<string, unknown>)
       .eq("id", claimId);
+
+    // 3bis. Auto-rejeter les autres demandes 'pending' restantes sur cette
+    // même fiche : elles sont désormais caduques (la fiche vient d'être
+    // rattachée à un autre marchand) et ne doivent pas rester ouvertes.
+    const { data: otherPendingClaims } = await (supabase
+      .from("claim_requests") as ReturnType<typeof supabase.from>)
+      .select("id, merchant_id")
+      .eq("restaurant_id", claimData.restaurant_id)
+      .eq("status", "pending")
+      .neq("id", claimId) as { data: { id: string; merchant_id: string }[] | null; error: unknown };
+
+    if (otherPendingClaims && otherPendingClaims.length > 0) {
+      await (supabase.from("claim_requests") as ReturnType<typeof supabase.from>)
+        .update({
+          status: "rejected",
+          resolved_at: new Date().toISOString(),
+          admin_notes: "Rejeté automatiquement : cette fiche a été attribuée à un autre compte",
+        } as Record<string, unknown>)
+        .eq("restaurant_id", claimData.restaurant_id)
+        .eq("status", "pending")
+        .neq("id", claimId);
+
+      // Notifier (best-effort) les marchands dont la demande vient d'être
+      // auto-rejetée, pour ne pas les laisser sans réponse.
+      for (const otherClaim of otherPendingClaims) {
+        try {
+          const { data: otherMerchant } = await supabase
+            .from("merchants")
+            .select("name, email")
+            .eq("id", otherClaim.merchant_id)
+            .single() as { data: { name: string; email: string } | null; error: unknown };
+
+          if (otherMerchant?.email) {
+            const template = claimRejectedNotification({
+              merchantName: otherMerchant.name,
+              restaurantName: "cette fiche restaurant (déjà attribuée à un autre compte)",
+            });
+            await sendEmail({
+              to: otherMerchant.email,
+              subject: template.subject,
+              html: template.html,
+            });
+          }
+        } catch (emailErr) {
+          console.error("Failed to send auto-rejection email:", emailErr);
+        }
+      }
+    }
 
     // 4. Get merchant info for email
     const { data: merchant } = await supabase

@@ -945,6 +945,32 @@
       "save": "Save",
       "saved": "Changes saved!"
     },
+    "claim": {
+      "title": "Find your restaurant",
+      "subtitle": "Search our directory for your restaurant to claim its listing, or create a new one if it isn't listed yet.",
+      "searchLabel": "Your restaurant's name",
+      "searchPlaceholder": "E.g. Le Petit Prince",
+      "searchHint": "Type at least 2 characters to search",
+      "searching": "Searching...",
+      "claimButton": "This is my restaurant",
+      "claiming": "Sending your request...",
+      "noResults": "No results for “{query}”. Your restaurant may not be listed yet.",
+      "emptyState": "Start typing your restaurant's name to find it in our directory.",
+      "confirmTitle": "Confirm claim",
+      "confirmDescription": "Do you confirm that “{name}”, in {city}, is your restaurant? Our team will review your request before approving it.",
+      "confirmCancel": "Cancel",
+      "confirmSubmit": "Confirm request",
+      "claimError": "An error occurred while sending your request",
+      "notInList": "My restaurant isn't in the list",
+      "backToSearch": "Back to search"
+    },
+    "pending": {
+      "title": "Request pending validation",
+      "description": "We're reviewing your claim request for {name}. You'll receive an email as soon as it's approved.",
+      "descriptionGeneric": "We're reviewing your claim request. You'll receive an email as soon as it's approved.",
+      "submittedOn": "Request sent on {date}",
+      "reassurance": "This manual review ensures every listing is managed by its true owner. Thank you for your patience!"
+    },
     "menu": {
       "title": "Menu",
       "subtitle": "Manage your menu items",

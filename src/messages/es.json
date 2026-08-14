@@ -945,6 +945,32 @@
       "save": "Guardar",
       "saved": "Cambios guardados!"
     },
+    "claim": {
+      "title": "Encuentre su restaurante",
+      "subtitle": "Busque su restaurante en nuestro directorio para reclamar su ficha, o cree una nueva si aún no está registrado.",
+      "searchLabel": "Nombre de su restaurante",
+      "searchPlaceholder": "Ej. Le Petit Prince",
+      "searchHint": "Escriba al menos 2 caracteres para buscar",
+      "searching": "Buscando...",
+      "claimButton": "Este es mi restaurante",
+      "claiming": "Enviando la solicitud...",
+      "noResults": "Sin resultados para «{query}». Puede que su restaurante aún no esté registrado.",
+      "emptyState": "Empiece a escribir el nombre de su restaurante para encontrarlo en nuestro directorio.",
+      "confirmTitle": "Confirmar la reclamación",
+      "confirmDescription": "¿Confirma que «{name}», en {city}, es su restaurante? Nuestro equipo verificará su solicitud antes de validarla.",
+      "confirmCancel": "Cancelar",
+      "confirmSubmit": "Confirmar solicitud",
+      "claimError": "Se produjo un error al enviar su solicitud",
+      "notInList": "Mi restaurante no está en la lista",
+      "backToSearch": "Volver a la búsqueda"
+    },
+    "pending": {
+      "title": "Solicitud pendiente de validación",
+      "description": "Estamos verificando su solicitud de reclamación para {name}. Recibirá un correo en cuanto sea validada.",
+      "descriptionGeneric": "Estamos verificando su solicitud de reclamación. Recibirá un correo en cuanto sea validada.",
+      "submittedOn": "Solicitud enviada el {date}",
+      "reassurance": "Esta verificación manual nos permite garantizar que cada ficha sea gestionada por su verdadero propietario. ¡Gracias por su paciencia!"
+    },
     "menu": {
       "title": "Carta",
       "subtitle": "Gestione los platos de su carta",
