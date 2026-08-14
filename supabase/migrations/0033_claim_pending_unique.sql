@@ -1,0 +1,37 @@
+-- ============================================
+-- Migration: Garde-fou anti-vol de fiche (claim_requests)
+-- ============================================
+--
+-- Contexte (review sécurité) : sans protection, deux marchands pouvaient
+-- chacun créer un claim_request 'pending' sur LA MÊME fiche restaurant
+-- (merchant_id diffère entre les deux lignes, donc la contrainte
+-- UNIQUE(restaurant_id, merchant_id) posée par la migration 0008 ne bloque
+-- rien). Si l'admin approuvait les deux demandes l'une après l'autre, la
+-- seconde approbation écrasait silencieusement restaurants.merchant_id :
+-- la fiche était "volée" au premier marchand approuvé.
+--
+-- Le correctif principal est côté application :
+--   - `createClaimRequestCore` (src/actions/merchant/register.ts) verrouille
+--     désormais restaurants.claim_status de façon ATOMIQUE (UPDATE ... WHERE
+--     claim_status = 'unclaimed' AND merchant_id IS NULL) AVANT de créer le
+--     claim_request. Si 0 ligne affectée, aucun claim n'est créé.
+--   - `approveClaim` (src/actions/admin/claims.ts) revérifie et verrouille
+--     de la même façon (UPDATE ... WHERE merchant_id IS NULL) avant
+--     d'écraser restaurants.merchant_id, et auto-rejette les éventuels
+--     autres claims 'pending' restants sur la même fiche.
+--
+-- Cet index unique partiel est un garde-fou redondant AU NIVEAU BASE DE
+-- DONNÉES : même si un futur appelant oubliait le verrou applicatif, il
+-- serait physiquement impossible d'avoir deux claim_requests 'pending'
+-- simultanés sur le même restaurant_id.
+--
+-- Note sur la contrainte UNIQUE(restaurant_id, merchant_id) de la migration
+-- 0008 : elle est CONSERVÉE telle quelle. Elle empêche un même marchand de
+-- créer deux fois un claim sur la même fiche. Le retry après rejet (même
+-- couple restaurant/merchant) est géré côté application : le claim
+-- 'rejected' précédent est supprimé (DELETE) juste avant l'INSERT du
+-- nouveau claim, donc cette contrainte ne bloque jamais un retry légitime
+-- après un rejet admin.
+CREATE UNIQUE INDEX IF NOT EXISTS claim_requests_one_pending_per_restaurant
+  ON claim_requests(restaurant_id)
+  WHERE status = 'pending';

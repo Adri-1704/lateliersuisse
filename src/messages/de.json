@@ -945,6 +945,32 @@
       "save": "Speichern",
       "saved": "Anderungen gespeichert!"
     },
+    "claim": {
+      "title": "Finden Sie Ihr Restaurant",
+      "subtitle": "Suchen Sie Ihr Restaurant in unserem Verzeichnis, um dessen Eintrag zu beanspruchen, oder erstellen Sie einen neuen, falls es noch nicht gelistet ist.",
+      "searchLabel": "Name Ihres Restaurants",
+      "searchPlaceholder": "Z. B. Le Petit Prince",
+      "searchHint": "Geben Sie mindestens 2 Zeichen ein, um die Suche zu starten",
+      "searching": "Suche läuft...",
+      "claimButton": "Das ist mein Restaurant",
+      "claiming": "Anfrage wird gesendet...",
+      "noResults": "Keine Ergebnisse für „{query}“. Ihr Restaurant ist möglicherweise noch nicht gelistet.",
+      "emptyState": "Beginnen Sie, den Namen Ihres Restaurants einzugeben, um es in unserem Verzeichnis zu finden.",
+      "confirmTitle": "Beanspruchung bestätigen",
+      "confirmDescription": "Bestätigen Sie, dass „{name}“ in {city} Ihr Restaurant ist? Unser Team prüft Ihre Anfrage, bevor sie freigegeben wird.",
+      "confirmCancel": "Abbrechen",
+      "confirmSubmit": "Anfrage bestätigen",
+      "claimError": "Beim Senden Ihrer Anfrage ist ein Fehler aufgetreten",
+      "notInList": "Mein Restaurant ist nicht in der Liste",
+      "backToSearch": "Zurück zur Suche"
+    },
+    "pending": {
+      "title": "Anfrage wartet auf Freigabe",
+      "description": "Wir prüfen Ihre Beanspruchungsanfrage für {name}. Sie erhalten eine E-Mail, sobald sie freigegeben wurde.",
+      "descriptionGeneric": "Wir prüfen Ihre Beanspruchungsanfrage. Sie erhalten eine E-Mail, sobald sie freigegeben wurde.",
+      "submittedOn": "Anfrage gesendet am {date}",
+      "reassurance": "Diese manuelle Prüfung stellt sicher, dass jeder Eintrag vom tatsächlichen Inhaber verwaltet wird. Danke für Ihre Geduld!"
+    },
     "menu": {
       "title": "Speisekarte",
       "subtitle": "Verwalten Sie die Gerichte Ihres Menus",

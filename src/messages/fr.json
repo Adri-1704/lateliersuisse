@@ -944,6 +944,32 @@
       "save": "Enregistrer",
       "saved": "Modifications enregistrees !"
     },
+    "claim": {
+      "title": "Trouvez votre restaurant",
+      "subtitle": "Recherchez votre établissement dans notre annuaire pour en revendiquer la fiche, ou créez-en une nouvelle s'il n'existe pas encore.",
+      "searchLabel": "Nom de votre restaurant",
+      "searchPlaceholder": "Ex. Le Petit Prince",
+      "searchHint": "Tapez au moins 2 caractères pour lancer la recherche",
+      "searching": "Recherche en cours...",
+      "claimButton": "C'est mon restaurant",
+      "claiming": "Envoi de la demande...",
+      "noResults": "Aucun résultat pour « {query} ». Votre restaurant n'est peut-être pas encore référencé.",
+      "emptyState": "Commencez à taper le nom de votre restaurant pour le retrouver dans notre annuaire.",
+      "confirmTitle": "Confirmer la revendication",
+      "confirmDescription": "Vous confirmez que « {name} », à {city}, est bien votre restaurant ? Notre équipe vérifiera votre demande avant de la valider.",
+      "confirmCancel": "Annuler",
+      "confirmSubmit": "Confirmer la demande",
+      "claimError": "Une erreur est survenue lors de l'envoi de votre demande",
+      "notInList": "Mon restaurant n'est pas dans la liste",
+      "backToSearch": "Retour à la recherche"
+    },
+    "pending": {
+      "title": "Demande en attente de validation",
+      "description": "Nous vérifions votre demande de revendication pour {name}. Vous recevrez un email dès qu'elle sera validée.",
+      "descriptionGeneric": "Nous vérifions votre demande de revendication. Vous recevrez un email dès qu'elle sera validée.",
+      "submittedOn": "Demande envoyée le {date}",
+      "reassurance": "Ce contrôle manuel nous permet de garantir que chaque fiche est gérée par son véritable propriétaire. Merci de votre patience !"
+    },
     "menu": {
       "title": "Ma carte",
       "subtitle": "Gerez les plats de votre menu",

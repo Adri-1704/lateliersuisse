@@ -945,6 +945,32 @@
       "save": "Guardar",
       "saved": "Alteracoes guardadas!"
     },
+    "claim": {
+      "title": "Encontre o seu restaurante",
+      "subtitle": "Procure o seu restaurante no nosso diretório para reivindicar a ficha, ou crie uma nova se ainda não estiver referenciado.",
+      "searchLabel": "Nome do seu restaurante",
+      "searchPlaceholder": "Ex. Le Petit Prince",
+      "searchHint": "Escreva pelo menos 2 caracteres para pesquisar",
+      "searching": "A pesquisar...",
+      "claimButton": "Este é o meu restaurante",
+      "claiming": "A enviar o pedido...",
+      "noResults": "Sem resultados para «{query}». O seu restaurante pode ainda não estar referenciado.",
+      "emptyState": "Comece a escrever o nome do seu restaurante para o encontrar no nosso diretório.",
+      "confirmTitle": "Confirmar a reivindicação",
+      "confirmDescription": "Confirma que «{name}», em {city}, é o seu restaurante? A nossa equipa irá verificar o seu pedido antes de o validar.",
+      "confirmCancel": "Cancelar",
+      "confirmSubmit": "Confirmar pedido",
+      "claimError": "Ocorreu um erro ao enviar o seu pedido",
+      "notInList": "O meu restaurante não está na lista",
+      "backToSearch": "Voltar à pesquisa"
+    },
+    "pending": {
+      "title": "Pedido a aguardar validação",
+      "description": "Estamos a verificar o seu pedido de reivindicação para {name}. Receberá um email assim que for validado.",
+      "descriptionGeneric": "Estamos a verificar o seu pedido de reivindicação. Receberá um email assim que for validado.",
+      "submittedOn": "Pedido enviado em {date}",
+      "reassurance": "Esta verificação manual permite-nos garantir que cada ficha é gerida pelo seu verdadeiro proprietário. Obrigado pela sua paciência!"
+    },
     "menu": {
       "title": "Menu",
       "subtitle": "Gerir os pratos do seu menu",
