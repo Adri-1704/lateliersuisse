@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { createAdminClient } from "@/lib/supabase/server";
 import { AligroHero } from "@/components/aligro/AligroHero";
 import { AligroOfferBanner } from "@/components/aligro/AligroOfferBanner";
 import { AligroFinalCTA } from "@/components/aligro/AligroFinalCTA";
 import { AligroFeatures } from "@/components/aligro/AligroFeatures";
 import { AligroProblemSolution } from "@/components/aligro/AligroProblemSolution";
-import { B2BTrustStats } from "@/components/b2b/B2BTrustStats";
 import { B2BWhatsAppStats } from "@/components/b2b/B2BWhatsAppStats";
 import { B2BHowItWorks } from "@/components/b2b/B2BHowItWorks";
 
@@ -43,30 +41,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function ClientsAligroPage() {
-  // Chiffres réels de la plateforme (même logique que /pour-restaurateurs)
-  let totalRestaurants = 0;
-  let totalReviews = 0;
-  try {
-    const supabase = createAdminClient();
-    const [{ count: restaurantsCount }, { count: reviewsCount }] = await Promise.all([
-      supabase
-        .from("restaurants")
-        .select("id", { count: "exact", head: true })
-        .eq("is_published", true),
-      supabase.from("reviews").select("id", { count: "exact", head: true }),
-    ]);
-    totalRestaurants = restaurantsCount ?? 0;
-    totalReviews = reviewsCount ?? 0;
-  } catch {
-    // Fallback à 0 si Supabase est indisponible
-  }
-
+export default function ClientsAligroPage() {
   return (
     <>
       <AligroHero />
       <AligroOfferBanner />
-      <B2BTrustStats totalRestaurants={totalRestaurants} totalReviews={totalReviews} />
       <B2BWhatsAppStats />
       <AligroFeatures />
       <AligroProblemSolution />

@@ -37,11 +37,11 @@ export function AligroFinalCTA() {
         <Button
           asChild
           size="lg"
-          className="mt-8 bg-[var(--color-just-tag)] px-10 py-6 text-lg font-semibold hover:bg-[var(--color-just-tag-dark)]"
+          className="group mt-8 bg-[var(--color-just-tag)] px-10 py-6 text-lg font-semibold shadow-lg shadow-[var(--color-just-tag)]/20 transition-transform hover:-translate-y-0.5 hover:bg-[var(--color-just-tag-dark)]"
         >
           <Link href="/fr/partenaire-inscription?ref=aligro">
             Profiter de l&apos;offre
-            <ArrowRight className="ml-2 h-5 w-5" />
+            <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </Button>
 

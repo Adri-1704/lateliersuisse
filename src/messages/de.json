@@ -405,7 +405,7 @@
       "title": "Häufig gestellte Fragen",
       "q1": {
         "question": "Was kostet die Registrierung bei Just-Tag?",
-        "answer": "Wir bieten 3 Formeln an (monatlich, halbjährlich, jährlich) mit einem Einführungspreis ab CHF 24.90/Monat für die ersten 100 registrierten Restaurants. Danach gelten Standardpreise. Ein Lebenslang-Angebot für CHF 1 495 ist ebenfalls verfügbar. Alle Halbjahres- und Jahrespläne beinhalten kostenlose personalisierte Tote-Bags."
+        "answer": "Wir bieten 3 Formeln an (monatlich, halbjährlich, jährlich) mit einem Einführungspreis für die ersten 100 registrierten Restaurants. Danach gelten Standardpreise. Ein Lebenslang-Angebot für CHF 1 495 ist ebenfalls verfügbar. Alle Halbjahres- und Jahrespläne beinhalten kostenlose personalisierte Tote-Bags."
       },
       "q2": {
         "question": "Bin ich an eine Mindestlaufzeit gebunden?",
@@ -502,7 +502,7 @@
         },
         "commission": {
           "title": "Keine Provision, keine versteckten Kosten",
-          "text": "Gäste kontaktieren Sie direkt per Telefon oder E-Mail. Sie zahlen nur ein festes Abonnement ab CHF 24.90/Monat — Sie wissen genau, was es kostet."
+          "text": "Keine Kommission, keine versteckten Kosten: Sie zahlen nur Ihr Just-Tag-Abonnement."
         },
         "reviews": {
           "title": "Verifizierte und moderierte Bewertungen",
@@ -572,7 +572,7 @@
       },
       "startTrial": "Kostenlos testen",
       "lifetimeExclusive": "Exklusiv",
-      "lifetimeDesc": "Die Rechnung ist einfach: Bei CHF 24.90/Monat erreichen Sie CHF 1 495 in 5 Jahren. Mit dem Lebenslang-Angebot sparen Sie alles danach. Und 500 personalisierte Tote-Bags (geschätzter Wert CHF 2 500) sind inklusive.",
+      "lifetimeDesc": "Mit dem Lebenslang-Angebot zahlen Sie einmalig und sparen sich alle zukünftigen Abonnements. Und 500 personalisierte Tote-Bags (geschätzter Wert CHF 2 500) sind inklusive.",
       "lifetimeToteBags": "+ 500 personalisierte Tote-Bags gratis",
       "singlePayment": "Einmalzahlung",
       "contactNote": "Noch nicht bereit? Hinterlassen Sie Ihre Nummer, wir rufen Sie an:",
@@ -623,7 +623,7 @@
       "items": {
         "q1": {
           "question": "Was bringt es mir konkret?",
-          "answer": "Einen genauen Betrag zu versprechen, ist schwierig — das hängt von Ihrem Standort, Ihrer Küche und Ihrem Durchschnittsbon ab. Was wir wissen: Restaurants mit einem vollständigen Profil (Fotos, Speisekarte, aktuelle Öffnungszeiten) auf Just-Tag erhalten im Durchschnitt mehr Besuche als solche ohne Profil. Bei CHF 24.90/Monat genügt bereits ein einziger zusätzlicher Gast pro Monat, um Ihr Abonnement zu amortisieren. (Schätzung basierend auf einem durchschnittlichen Bon von CHF 30-40 in der Westschweizer Gastronomie.)"
+          "answer": "Einen genauen Betrag zu versprechen, ist schwierig — das hängt von Ihrem Standort, Ihrer Küche und Ihrem Durchschnittsbon ab. Was wir wissen: Restaurants mit einem vollständigen Profil (Fotos, Speisekarte, aktuelle Öffnungszeiten) auf Just-Tag erhalten im Durchschnitt mehr Besuche als solche ohne Profil. Es genügt bereits ein einziger zusätzlicher Gast pro Monat, um Ihr Abonnement zu amortisieren. (Schätzung basierend auf einem durchschnittlichen Bon von CHF 30-40 in der Westschweizer Gastronomie.)"
         },
         "q2": {
           "question": "Wie überprüfen Sie, dass ich tatsächlich der Inhaber bin?",
@@ -681,7 +681,7 @@
       "faqSchema": {
         "q1": {
           "q": "Was bringt es mir konkret?",
-          "a": "Bei CHF 24.90/Monat genügt ein einziger zusätzlicher Gast pro Monat, um Ihr Abonnement zu amortisieren."
+          "a": "Ein einziger zusätzlicher Gast pro Monat genügt, um Ihr Abonnement zu amortisieren."
         },
         "q2": {
           "q": "Wie überprüfen Sie, dass ich der Inhaber bin?",

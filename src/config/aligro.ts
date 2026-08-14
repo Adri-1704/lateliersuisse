@@ -9,8 +9,14 @@
  * >>> Le jour où le pourcentage est décidé, il suffit de changer UNE SEULE LIGNE
  * >>> ci-dessous (ex: `ALIGRO_DISCOUNT_PERCENT = 20`) pour que toute la page se
  * >>> mette à jour automatiquement.
+ *
+ * Valeurs possibles :
+ * - un nombre (ex. `40`) : affiche « -40% sur tous vos abonnements »
+ * - `"X"` : placeholder pour présenter la maquette à un partenaire (affiche
+ *   « -X% ») avant que le pourcentage ne soit arrêté
+ * - `null` : texte générique sans chiffre
  */
-export const ALIGRO_DISCOUNT_PERCENT: number | null = null;
+export const ALIGRO_DISCOUNT_PERCENT: number | "X" | null = "X";
 
 /**
  * Libellé de l'offre à afficher sur la page, dérivé de `ALIGRO_DISCOUNT_PERCENT`.
@@ -21,5 +27,5 @@ export function getAligroOfferLabel(): string {
   if (ALIGRO_DISCOUNT_PERCENT === null) {
     return "Offre exclusive réservée aux clients Aligro";
   }
-  return `${ALIGRO_DISCOUNT_PERCENT}% de remise sur votre abonnement Just-Tag`;
+  return `-${ALIGRO_DISCOUNT_PERCENT}% sur tous vos abonnements`;
 }
