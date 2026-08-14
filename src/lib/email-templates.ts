@@ -645,6 +645,12 @@ export function claimApprovedNotification(data: ClaimResultEmailData): {
   subject: string;
   html: string;
 } {
+  // La revendication de fiche n'est accessible qu'aux comptes deja abonnes
+  // (page "Mon restaurant" protegee par le route group (subscribed) — voir
+  // src/app/[locale]/espace-client/(dashboard)/(subscribed)/layout.tsx).
+  // Un marchand qui recoit cet email est donc toujours deja abonne : on ne
+  // lui propose jamais de "choisir un abonnement", uniquement de gerer sa
+  // fiche.
   const content = [
     heading("Votre fiche a ete validee ! 🎉"),
     paragraph(
@@ -654,9 +660,9 @@ export function claimApprovedNotification(data: ClaimResultEmailData): {
       `Votre demande pour <strong>${data.restaurantName}</strong> a ete approuvee. Votre fiche restaurant est maintenant liee a votre compte.`
     ),
     paragraph(
-      `Prochaine etape : choisissez votre abonnement pour beneficier de toutes les fonctionnalites et donner un maximum de visibilite a votre restaurant.`
+      `Vous pouvez des maintenant la personnaliser (photos, description, horaires, happy hours...) depuis votre espace client.`
     ),
-    button(`${siteUrl}/fr/partenaire-inscription`, "Choisir mon abonnement"),
+    button(`${siteUrl}/fr/espace-client/mon-restaurant`, "Gerer ma fiche"),
   ].join("");
 
   return {
