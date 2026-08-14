@@ -405,7 +405,7 @@
       "title": "Preguntas frecuentes",
       "q1": {
         "question": "Cuanto cuesta registrarse en Just-Tag?",
-        "answer": "Ofrecemos 3 planes (mensual, semestral, anual) con una tarifa de lanzamiento a partir de CHF 24,90/mes para los primeros 100 restaurantes registrados. Despues se aplican las tarifas estandar. Tambien esta disponible una oferta de por vida a CHF 1.495. Todos los planes semestrales y anuales incluyen bolsas de tela personalizadas de regalo."
+        "answer": "Ofrecemos 3 planes (mensual, semestral, anual) con una tarifa de lanzamiento para los primeros 100 restaurantes registrados. Despues se aplican las tarifas estandar. Tambien esta disponible una oferta de por vida a CHF 1.495. Todos los planes semestrales y anuales incluyen bolsas de tela personalizadas de regalo."
       },
       "q2": {
         "question": "Estoy sujeto a una duracion minima?",
@@ -502,7 +502,7 @@
         },
         "commission": {
           "title": "Cero comisión, cero costes ocultos",
-          "text": "Los clientes le contactan directamente por teléfono o correo electrónico. Solo paga una suscripción fija desde CHF 24.90/mes: sabe exactamente lo que cuesta."
+          "text": "Sin comisión, sin costes ocultos: solo paga su suscripción a Just-Tag."
         },
         "reviews": {
           "title": "Reseñas verificadas y moderadas",
@@ -572,7 +572,7 @@
       },
       "startTrial": "Comenzar prueba gratis",
       "lifetimeExclusive": "Exclusivo",
-      "lifetimeDesc": "El cálculo es sencillo: a CHF 24.90/mes, alcanza CHF 1 495 en 5 años. Con la oferta vitalicia, ahorra todo lo posterior. Y las 500 bolsas de tela personalizadas (valor estimado de CHF 2 500) están incluidas.",
+      "lifetimeDesc": "Con la oferta vitalicia, paga una sola vez y se ahorra todas sus futuras suscripciones. Y las 500 bolsas de tela personalizadas (valor estimado de CHF 2 500) están incluidas.",
       "lifetimeToteBags": "+ 500 bolsas de tela personalizadas incluidas",
       "singlePayment": "pago único",
       "contactNote": "¿Aún no está listo? Déjenos su número, le llamamos:",
@@ -623,7 +623,7 @@
       "items": {
         "q1": {
           "question": "¿Cuánto me aporta en concreto?",
-          "answer": "Es difícil prometer una cifra exacta: depende de su ubicación, tipo de cocina y precio medio. Lo que sabemos: los restaurantes con una ficha completa (fotos, carta, horarios actualizados) en Just-Tag reciben de media más visitas que los que no la tienen. A CHF 24.90/mes, basta con un solo cliente adicional al mes para rentabilizar su suscripción. (Estimación basada en un ticket medio de CHF 30-40 en la restauración romanda.)"
+          "answer": "Es difícil prometer una cifra exacta: depende de su ubicación, tipo de cocina y precio medio. Lo que sabemos: los restaurantes con una ficha completa (fotos, carta, horarios actualizados) en Just-Tag reciben de media más visitas que los que no la tienen. Basta con un solo cliente adicional al mes para rentabilizar su suscripción. (Estimación basada en un ticket medio de CHF 30-40 en la restauración romanda.)"
         },
         "q2": {
           "question": "¿Cómo verifican que soy realmente el propietario?",
@@ -681,7 +681,7 @@
       "faqSchema": {
         "q1": {
           "q": "¿Cuánto me aporta en concreto?",
-          "a": "A CHF 24.90/mes, basta un solo cliente adicional al mes para rentabilizar su suscripción."
+          "a": "Basta un solo cliente adicional al mes para rentabilizar su suscripción."
         },
         "q2": {
           "q": "¿Cómo verifican que soy el propietario?",

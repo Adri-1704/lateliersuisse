@@ -404,7 +404,7 @@
       "title": "Questions fréquentes",
       "q1": {
         "question": "Combien coûte l'inscription sur Just-Tag ?",
-        "answer": "Nous proposons 3 formules (mensuelle, semestrielle, annuelle) avec un tarif de lancement réservé aux 100 premiers inscrits à partir de CHF 24.90/mois. Un tarif standard s'applique ensuite. Une offre à vie à CHF 1 495 est également disponible. Tous les plans semestriels et annuels incluent des tote-bags personnalisés offerts."
+        "answer": "Nous proposons 3 formules (mensuelle, semestrielle, annuelle) avec un tarif de lancement réservé aux 100 premiers inscrits. Un tarif standard s'applique ensuite. Une offre à vie à CHF 1 495 est également disponible. Tous les plans semestriels et annuels incluent des tote-bags personnalisés offerts."
       },
       "q2": {
         "question": "Suis-je engagé sur une durée minimum ?",
@@ -501,7 +501,7 @@
         },
         "commission": {
           "title": "Zéro commission, zéro frais cachés",
-          "text": "Les clients vous contactent directement par téléphone ou email. Vous ne payez qu'un abonnement fixe à partir de CHF 24.90/mois — vous savez exactement ce que ça coûte."
+          "text": "Pas de commission, pas de frais caché : vous ne payez que votre abonnement Just-Tag."
         },
         "reviews": {
           "title": "Avis vérifiés et modérés",
@@ -571,7 +571,7 @@
       },
       "startTrial": "Commencer l'essai gratuit",
       "lifetimeExclusive": "Exclusif",
-      "lifetimeDesc": "Le calcul est simple : à CHF 24.90/mois, vous atteignez CHF 1 495 en 5 ans. Avec l'offre à vie, vous économisez tout ce qui vient après. Et les 500 tote-bags personnalisés (valeur estimée CHF 2 500) sont offerts.",
+      "lifetimeDesc": "Avec l'offre à vie, vous payez une seule fois et vous économisez tous vos abonnements futurs. Et les 500 tote-bags personnalisés (valeur estimée CHF 2 500) sont offerts.",
       "lifetimeToteBags": "+ 500 tote-bags personnalisés offerts",
       "singlePayment": "paiement unique",
       "contactNote": "Pas prêt ? Laissez-nous votre numéro, on vous rappelle :",
@@ -680,7 +680,7 @@
       "faqSchema": {
         "q1": {
           "q": "Combien ça me rapporte concrètement ?",
-          "a": "À CHF 24.90/mois, il suffit d'un seul client supplémentaire par mois pour rentabiliser votre abonnement."
+          "a": "Il suffit d'un seul client supplémentaire par mois pour rentabiliser votre abonnement."
         },
         "q2": {
           "q": "Comment vous vérifiez que je suis bien le propriétaire ?",

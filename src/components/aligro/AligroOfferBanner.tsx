@@ -9,14 +9,15 @@ import { getAligroOfferLabel } from "@/config/aligro";
  */
 export function AligroOfferBanner() {
   return (
-    <div className="border-y border-[var(--color-just-tag-dark)] bg-[var(--color-just-tag)] py-4">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 text-center sm:flex-row sm:gap-3">
-        <Gift className="h-5 w-5 shrink-0 text-white" aria-hidden="true" />
+    <div className="relative overflow-hidden border-y border-[var(--color-just-tag-dark)] bg-gradient-to-r from-[var(--color-just-tag)] to-[var(--color-just-tag-dark)] py-4">
+      <div className="animate-shimmer absolute inset-0 opacity-40" aria-hidden="true" />
+      <div className="relative mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 text-center sm:flex-row sm:gap-3">
+        <Gift className="h-5 w-5 shrink-0 animate-pulse-gentle text-white" aria-hidden="true" />
         <p className="text-sm font-semibold text-white sm:text-base">
           <span className="uppercase tracking-wide text-white/80">
             Offre partenaire{" "}
           </span>
-          <span className="mx-1 inline-flex items-center rounded-full bg-white px-2 py-0.5 align-middle">
+          <span className="mx-1 inline-flex items-center rounded-full bg-white px-2 py-0.5 align-middle shadow-sm">
             <Image
               src="/partners/aligro-logo.png"
               alt="Aligro"

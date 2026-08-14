@@ -163,7 +163,7 @@ export default async function ParrainagePage({
               </div>
               <p className="text-lg leading-relaxed">
                 Vous parrainez <strong className="text-amber-300">5 restaurants</strong>,
-                ils deviennent abonnés Early Bird à 24.90 CHF/mois.
+                ils deviennent abonnés Early Bird.
               </p>
               <div className="my-6 h-px bg-gray-700" />
               <div className="space-y-3 text-sm">

@@ -405,7 +405,7 @@
       "title": "Frequently asked questions",
       "q1": {
         "question": "How much does it cost to register on Just-Tag?",
-        "answer": "We offer 3 plans (monthly, semi-annual, annual) with a launch rate starting at CHF 24.90/month for the first 100 registered restaurants. Standard rates apply thereafter. A lifetime offer at CHF 1,495 is also available. All semi-annual and annual plans include free personalized tote bags."
+        "answer": "We offer 3 plans (monthly, semi-annual, annual) with a launch rate for the first 100 registered restaurants. Standard rates apply thereafter. A lifetime offer at CHF 1,495 is also available. All semi-annual and annual plans include free personalized tote bags."
       },
       "q2": {
         "question": "Am I tied to a minimum duration?",
@@ -502,7 +502,7 @@
         },
         "commission": {
           "title": "Zero commission, zero hidden fees",
-          "text": "Customers contact you directly by phone or email. You only pay a fixed subscription from CHF 24.90/month — you know exactly what it costs."
+          "text": "No commission, no hidden fees: you only pay for your Just-Tag subscription."
         },
         "reviews": {
           "title": "Verified and moderated reviews",
@@ -572,7 +572,7 @@
       },
       "startTrial": "Start free trial",
       "lifetimeExclusive": "Exclusive",
-      "lifetimeDesc": "The maths is simple: at CHF 24.90/month, you reach CHF 1,495 in 5 years. With the lifetime offer, you save everything after that. And 500 personalised tote bags (estimated value CHF 2,500) are included.",
+      "lifetimeDesc": "With the lifetime offer, you pay once and save on all your future subscriptions. And 500 personalised tote bags (estimated value CHF 2,500) are included.",
       "lifetimeToteBags": "+ 500 personalised tote bags included",
       "singlePayment": "one-time payment",
       "contactNote": "Not ready? Leave us your number, we'll call you back:",
@@ -623,7 +623,7 @@
       "items": {
         "q1": {
           "question": "What does it actually bring me in concrete terms?",
-          "answer": "It's hard to promise an exact figure — it depends on your location, cuisine type and average spend. What we do know: restaurants with a complete listing (photos, menu, up-to-date hours) on Just-Tag receive more visits on average than those without. At CHF 24.90/month, just one extra customer per month is enough to recoup your subscription. (Based on an average spend of CHF 30-40 in Western Swiss restaurants.)"
+          "answer": "It's hard to promise an exact figure — it depends on your location, cuisine type and average spend. What we do know: restaurants with a complete listing (photos, menu, up-to-date hours) on Just-Tag receive more visits on average than those without. Just one extra customer per month is enough to recoup your subscription. (Based on an average spend of CHF 30-40 in Western Swiss restaurants.)"
         },
         "q2": {
           "question": "How do you verify I'm the actual owner?",
@@ -681,7 +681,7 @@
       "faqSchema": {
         "q1": {
           "q": "What does it actually bring me?",
-          "a": "At CHF 24.90/month, just one extra customer per month is enough to recoup your subscription."
+          "a": "Just one extra customer per month is enough to recoup your subscription."
         },
         "q2": {
           "q": "How do you verify I'm the actual owner?",

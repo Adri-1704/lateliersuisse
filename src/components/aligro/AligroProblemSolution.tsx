@@ -27,7 +27,7 @@ const painPoints = [
     },
     solution: {
       title: "Zéro commission, zéro frais cachés",
-      text: "Les clients vous contactent directement par téléphone ou email. Vous ne payez qu'un abonnement fixe à partir de CHF 24.90/mois — vous savez exactement ce que ça coûte.",
+      text: "Pas de commission, pas de frais caché : vous ne payez que votre abonnement Just-Tag.",
     },
   },
   {
@@ -48,7 +48,10 @@ export function AligroProblemSolution() {
     <section className="py-16 sm:py-24 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
+          <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--color-just-tag)]">
+            Avant / après Just-Tag
+          </p>
+          <h2 className="mt-3 text-2xl font-bold text-gray-900 sm:text-3xl lg:text-4xl">
             Vous avez un super établissement,
             <br />
             <span className="text-[var(--color-just-tag)]">
@@ -66,7 +69,7 @@ export function AligroProblemSolution() {
                 className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto_1fr] lg:items-center"
               >
                 {/* Problem */}
-                <div className="rounded-2xl border border-red-100 bg-red-50/50 p-6 sm:p-8">
+                <div className="rounded-2xl border border-red-100 bg-red-50/50 p-6 transition-shadow duration-300 hover:shadow-md sm:p-8">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
                       <AlertTriangle className="h-5 w-5 text-red-600" />
@@ -93,7 +96,7 @@ export function AligroProblemSolution() {
                 </div>
 
                 {/* Solution */}
-                <div className="rounded-2xl border border-green-100 bg-green-50/50 p-6 sm:p-8">
+                <div className="rounded-2xl border border-green-100 bg-green-50/50 p-6 transition-shadow duration-300 hover:shadow-md sm:p-8">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
                       <CheckCircle2 className="h-5 w-5 text-green-600" />

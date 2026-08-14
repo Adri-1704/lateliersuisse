@@ -2,11 +2,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getAligroOfferLabel } from "@/config/aligro";
+import { ALIGRO_DISCOUNT_PERCENT, getAligroOfferLabel } from "@/config/aligro";
+import {
+  WhatsAppOfferMockup,
+  HAPPY_HOUR_MOCKUP,
+  MENU_DU_JOUR_MOCKUP,
+} from "@/components/aligro/WhatsAppOfferMockup";
 
 /**
  * Hero dédié aux clients Aligro. Contenu 100% en français en dur (pas de
  * traduction via next-intl) : cette page cible uniquement la Suisse romande.
+ *
+ * La colonne de droite met en scène une paire de mockups WhatsApp
+ * (WhatsAppOfferMockup) — Happy Hour au premier plan, Menu du jour en second
+ * plan, légèrement décalé — cœur de la proposition de valeur Just-Tag, avec
+ * le logo Aligro relégué à un badge discret "Partenaire officiel" en
+ * dessous. Sur mobile, les deux téléphones se replient en une pile verticale
+ * (léger chevauchement) pour ne jamais provoquer de débordement horizontal.
  */
 export function AligroHero() {
   return (
@@ -36,8 +48,8 @@ export function AligroHero() {
       <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-32">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Colonne texte */}
-          <div>
-            {/* Eyebrow partenariat (le logo est mis en avant à droite) */}
+          <div className="animate-fade-in-up">
+            {/* Eyebrow partenariat (le mockup WhatsApp est mis en avant à droite) */}
             <div className="mb-6 inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-white ring-1 ring-white/20">
               Offre partenaire Aligro
             </div>
@@ -61,19 +73,19 @@ export function AligroHero() {
             {/* Bénéfices clés */}
             <ul className="mt-8 space-y-3">
               <li className="flex items-center gap-3 text-white">
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#25D366]" />
                 <span className="text-base sm:text-lg">
                   Plus de visibilité en ligne, sans effort
                 </span>
               </li>
               <li className="flex items-center gap-3 text-white">
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#25D366]" />
                 <span className="text-base sm:text-lg">
                   Vos offres et nouveautés envoyées directement sur WhatsApp
                 </span>
               </li>
               <li className="flex items-center gap-3 text-white">
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--color-just-tag)]" />
+                <CheckCircle2 className="h-5 w-5 shrink-0 text-[#25D366]" />
                 <span className="text-base sm:text-lg">
                   Zéro commission sur vos réservations et commandes, toujours
                 </span>
@@ -81,39 +93,74 @@ export function AligroHero() {
             </ul>
 
             {/* Offre Aligro */}
-            <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-just-tag)]/15 px-4 py-2 text-sm font-semibold text-[var(--color-just-tag)]">
-              {getAligroOfferLabel()}
-            </p>
+            {ALIGRO_DISCOUNT_PERCENT !== null ? (
+              <div className="mt-6 inline-flex items-center gap-4 rounded-2xl bg-[var(--color-just-tag)] px-6 py-4 shadow-xl shadow-[var(--color-just-tag)]/30 ring-1 ring-white/10">
+                <span className="font-condensed text-5xl font-black leading-none text-white sm:text-6xl">
+                  -{ALIGRO_DISCOUNT_PERCENT}%
+                </span>
+                <span className="text-sm font-bold uppercase leading-tight tracking-wide text-white">
+                  sur tous
+                  <br />
+                  vos abonnements
+                </span>
+              </div>
+            ) : (
+              <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-just-tag)]/15 px-4 py-2 text-sm font-semibold text-[var(--color-just-tag)]">
+                {getAligroOfferLabel()}
+              </p>
+            )}
 
             {/* CTA principal */}
             <div className="mt-10">
               <Button
                 asChild
                 size="lg"
-                className="bg-[var(--color-just-tag)] px-8 py-6 text-base font-semibold hover:bg-[var(--color-just-tag-dark)]"
+                className="group bg-[var(--color-just-tag)] px-8 py-6 text-base font-semibold shadow-lg shadow-[var(--color-just-tag)]/20 transition-transform hover:-translate-y-0.5 hover:bg-[var(--color-just-tag-dark)]"
               >
                 <Link href="/fr/partenaire-inscription?ref=aligro">
                   Profiter de l&apos;offre
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
             </div>
           </div>
 
-          {/* Colonne logo — grand, à droite, bien en évidence */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-black/5 sm:p-12">
-              <Image
-                src="/partners/aligro-logo.png"
-                alt="Aligro"
-                width={900}
-                height={500}
-                priority
-                className="h-auto w-full object-contain"
-              />
-              <p className="mt-6 text-center text-sm font-semibold uppercase tracking-wide text-gray-500">
+          {/* Colonne visuel — paire de mockups WhatsApp en vedette + badge partenaire Aligro */}
+          <div className="flex flex-col items-center gap-8 overflow-x-hidden px-2 sm:overflow-visible sm:px-0 lg:items-end">
+            {/* Paire de téléphones : Menu du jour en second plan, Happy Hour au premier plan */}
+            <div className="flex flex-col items-center sm:flex-row sm:items-end sm:justify-center lg:justify-end">
+              {/* Happy Hour — premier plan */}
+              <div className="animate-fade-in-up animate-delay-200 relative z-10">
+                <WhatsAppOfferMockup
+                  content={HAPPY_HOUR_MOCKUP}
+                  className="w-[220px] sm:w-[240px] lg:w-[260px]"
+                />
+              </div>
+
+              {/* Menu du jour — second plan, décalé et incliné à l'opposé */}
+              <div className="animate-fade-in-up animate-delay-400 relative z-0 -mt-14 scale-[0.9] opacity-95 sm:-ml-14 sm:mt-0 sm:scale-90 sm:opacity-100 lg:-ml-16 lg:scale-95">
+                <WhatsAppOfferMockup
+                  content={MENU_DU_JOUR_MOCKUP}
+                  showFloatingBadge={false}
+                  frameClassName="rotate-3 hover:rotate-0"
+                  className="w-[200px] sm:w-[220px] lg:w-[240px]"
+                />
+              </div>
+            </div>
+
+            <div className="animate-fade-in-up animate-delay-400 inline-flex items-center gap-3 rounded-full bg-white/95 px-4 py-2 shadow-lg ring-1 ring-black/5 backdrop-blur">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-black/10">
+                <Image
+                  src="/partners/aligro-logo.png"
+                  alt="Aligro"
+                  width={900}
+                  height={500}
+                  className="h-4 w-auto object-contain"
+                />
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-600">
                 Partenaire officiel de Just-Tag
-              </p>
+              </span>
             </div>
           </div>
         </div>
