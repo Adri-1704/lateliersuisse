@@ -30,10 +30,17 @@ export async function sendEmail(
     return { success: true };
   }
 
+  // `to` accepte une liste séparée par des virgules (ex. ADMIN_EMAIL =
+  // "contact@just-tag.app,adrien@gmail.com") → envoyée à tous les destinataires.
+  const recipients = params.to
+    .split(",")
+    .map((addr) => addr.trim())
+    .filter(Boolean);
+
   try {
     const { error } = await resend.emails.send({
       from: process.env.FROM_EMAIL || "Just-Tag <contact@just-tag.app>",
-      to: params.to,
+      to: recipients,
       subject: params.subject,
       html: params.html,
       ...(params.replyTo ? { replyTo: params.replyTo } : {}),
