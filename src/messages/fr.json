@@ -123,7 +123,7 @@
     "features": "Caractéristiques",
     "dietaryRestrictions": "Restrictions alimentaires",
     "ambiance": "Ambiance",
-    "services": "Services et equipements",
+    "services": "Services et équipements",
     "searchLabel": "Rechercher un restaurant",
     "searchPlaceholder": "Nom, ville, cuisine...",
     "clearAll": "Effacer les filtres",
@@ -836,38 +836,38 @@
     "activeLabel": "actives",
     "badge": {
       "ongoing": "En cours",
-      "upcoming": "Bientot"
+      "upcoming": "Bientôt"
     },
     "actions": {
       "share": "Partager",
       "shareWhatsapp": "Partager sur WhatsApp",
       "copyLink": "Copier le lien",
-      "copied": "Copie",
-      "book": "Reserver",
+      "copied": "Copié",
+      "book": "Réserver",
       "viewAll": "Voir toutes les Happy Hours"
     },
     "empty": {
-      "title": "Aucune Happy Hour pour cette selection",
+      "title": "Aucune Happy Hour pour cette sélection",
       "subtitle": "Essayez un autre filtre ou revenez plus tard."
     },
     "merchant": {
       "title": "Happy Hours",
-      "subtitle": "Creez des offres flash pour remplir vos creneaux creux.",
-      "create": "Creer une Happy Hour",
+      "subtitle": "Créez des offres flash pour remplir vos créneaux creux.",
+      "create": "Créer une Happy Hour",
       "newTitle": "Nouvelle Happy Hour",
       "editTitle": "Modifier la Happy Hour",
       "form": {
         "title": "Titre",
         "description": "Description",
         "promoType": "Type de promotion",
-        "promoValue": "Valeur affichee",
-        "startsAt": "Debut",
+        "promoValue": "Valeur affichée",
+        "startsAt": "Début",
         "endsAt": "Fin",
-        "placesLimited": "Places limitees",
+        "placesLimited": "Places limitées",
         "placesTotal": "Nombre de places",
         "publish": "Publier",
         "save": "Publier la Happy Hour",
-        "update": "Mettre a jour",
+        "update": "Mettre à jour",
         "delete": "Supprimer",
         "cancel": "Annuler"
       },
@@ -878,14 +878,14 @@
       "qr": {
         "title": "QR Code pour vos tables",
         "subtitle": "Imprimez ce QR et posez-le sur vos tables : les clients scannent et arrivent directement sur votre fiche.",
-        "download": "Telecharger HD",
+        "download": "Télécharger HD",
         "copyLink": "Copier le lien"
       },
       "status": {
         "active": "En cours",
-        "upcoming": "A venir",
-        "past": "Passees",
-        "disabled": "Desactivee"
+        "upcoming": "À venir",
+        "past": "Passées",
+        "disabled": "Désactivée"
       }
     }
   },
@@ -896,16 +896,16 @@
       "password": "Mot de passe",
       "submit": "Se connecter",
       "loading": "Connexion...",
-      "forgotPassword": "Mot de passe oublie ?",
+      "forgotPassword": "Mot de passe oublié ?",
       "noAccount": "Pas encore inscrit ?",
       "register": "Devenir partenaire"
     },
     "forgotPassword": {
-      "title": "Mot de passe oublie",
-      "description": "Entrez votre email pour recevoir un lien de reinitialisation.",
+      "title": "Mot de passe oublié",
+      "description": "Entrez votre email pour recevoir un lien de réinitialisation.",
       "submit": "Envoyer le lien",
-      "success": "Un email de reinitialisation a ete envoye. Verifiez votre boite mail.",
-      "backToLogin": "Retour a la connexion"
+      "success": "Un email de réinitialisation a été envoyé. Vérifiez votre boîte mail.",
+      "backToLogin": "Retour à la connexion"
     },
     "sidebar": {
       "navigation": "Navigation",
@@ -915,13 +915,13 @@
       "photos": "Photos",
       "reviews": "Avis",
       "subscription": "Abonnement",
-      "logout": "Deconnexion",
+      "logout": "Déconnexion",
       "clientArea": "Espace client"
     },
     "restaurant": {
       "title": "Mon restaurant",
       "subtitle": "Modifiez les informations de votre restaurant",
-      "notFound": "Aucun restaurant associe a votre compte",
+      "notFound": "Aucun restaurant associé à votre compte",
       "names": "Noms",
       "descriptions": "Descriptions",
       "location": "Localisation et contact",
@@ -935,14 +935,14 @@
       "cuisineAndPrice": "Cuisine et prix",
       "cuisineType": "Type de cuisine",
       "priceRange": "Gamme de prix",
-      "features": "Services et equipements",
+      "features": "Services et équipements",
       "openingHours": "Horaires d'ouverture",
-      "socialMedia": "Reseaux sociaux",
+      "socialMedia": "Réseaux sociaux",
       "instagram": "Instagram",
       "facebook": "Facebook",
       "tiktok": "TikTok",
       "save": "Enregistrer",
-      "saved": "Modifications enregistrees !"
+      "saved": "Modifications enregistrées !"
     },
     "claim": {
       "title": "Trouvez votre restaurant",
@@ -972,26 +972,26 @@
     },
     "menu": {
       "title": "Ma carte",
-      "subtitle": "Gerez les plats de votre menu",
+      "subtitle": "Gérez les plats de votre menu",
       "add": "Ajouter un plat",
       "edit": "Modifier le plat",
-      "create": "Creer",
-      "update": "Mettre a jour",
+      "create": "Créer",
+      "update": "Mettre à jour",
       "cancel": "Annuler",
       "price": "Prix",
-      "category": "Categorie",
+      "category": "Catégorie",
       "available": "Disponible",
-      "saved": "Enregistre !",
+      "saved": "Enregistré !",
       "empty": "Aucun plat",
       "emptyDescription": "Ajoutez vos premiers plats pour les afficher sur votre fiche"
     },
     "photos": {
       "title": "Photos",
-      "subtitle": "Gerez les photos de votre restaurant",
+      "subtitle": "Gérez les photos de votre restaurant",
       "upload": "Ajouter une photo",
-      "uploaded": "Photo ajoutee !",
-      "deleted": "Photo supprimee",
-      "coverSet": "Image de couverture mise a jour",
+      "uploaded": "Photo ajoutée !",
+      "deleted": "Photo supprimée",
+      "coverSet": "Image de couverture mise à jour",
       "formats": "JPG, PNG ou WebP",
       "maxSize": "5 Mo maximum",
       "empty": "Aucune photo",
@@ -1019,29 +1019,29 @@
     },
     "subscription": {
       "title": "Mon abonnement",
-      "subtitle": "Gerez votre abonnement Just-Tag",
+      "subtitle": "Gérez votre abonnement Just-Tag",
       "currentPlan": "Plan actuel",
       "plan": "Plan",
       "status": "Statut",
-      "period": "Periode",
-      "startDate": "Debut",
+      "period": "Période",
+      "startDate": "Début",
       "endDate": "Fin",
-      "cancelAtEnd": "Votre abonnement sera annule a la fin de la periode",
+      "cancelAtEnd": "Votre abonnement sera annulé à la fin de la période",
       "noSubscription": "Aucun abonnement",
       "noSubscriptionDescription": "Vous n'avez pas encore d'abonnement actif",
-      "manageBilling": "Gerer la facturation",
+      "manageBilling": "Gérer la facturation",
       "manageBillingDescription": "Modifier votre moyen de paiement ou annuler votre abonnement",
       "manageButton": "Portail de paiement"
     },
     "aligro": {
-      "title": "Numero de client Aligro",
-      "description": "Vous etes client Aligro ? Renseignez votre numero de client Aligro pour beneficier de l'offre partenaire.",
-      "label": "Numero de client Aligro",
+      "title": "Numéro de client Aligro",
+      "description": "Vous êtes client Aligro ? Renseignez votre numéro de client Aligro pour bénéficier de l'offre partenaire.",
+      "label": "Numéro de client Aligro",
       "placeholder": "Ex. 123456",
       "save": "Enregistrer",
-      "saved": "Enregistre",
-      "error": "Une erreur est survenue. Veuillez reessayer.",
-      "hint": "Optionnel. Laissez le champ vide puis enregistrez pour effacer votre numero."
+      "saved": "Enregistré",
+      "error": "Une erreur est survenue. Veuillez réessayer.",
+      "hint": "Optionnel. Laissez le champ vide puis enregistrez pour effacer votre numéro."
     }
   },
   "notFoundPage": {
