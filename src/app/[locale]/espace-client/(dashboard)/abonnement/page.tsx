@@ -3,8 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Loader2, CreditCard, Calendar, ExternalLink, Check, Zap, Users, MessageSquare, Gift } from "lucide-react";
-import { getMerchantSubscription, createBillingPortalSession, createPlanChangeSession } from "@/actions/merchant/subscription";
+import { Loader2, CreditCard, Calendar, ExternalLink, Check, Zap, Users, MessageSquare, Gift, Tag } from "lucide-react";
+import {
+  getMerchantSubscription,
+  createBillingPortalSession,
+  createPlanChangeSession,
+  updateAligroCustomerNumber,
+} from "@/actions/merchant/subscription";
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
 const planLabels: Record<string, string> = {
@@ -52,6 +57,10 @@ export default function SubscriptionPage() {
   const [changePlanError, setChangePlanError] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>("monthly");
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
+  const [aligroValue, setAligroValue] = useState("");
+  const [aligroSaving, setAligroSaving] = useState(false);
+  const [aligroSaved, setAligroSaved] = useState(false);
+  const [aligroError, setAligroError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -59,6 +68,7 @@ export default function SubscriptionPage() {
       if (result.success && result.data) {
         setSubscription(result.data.subscription);
         setMerchant(result.data.merchant);
+        setAligroValue(result.data.merchant.aligro_customer_number ?? "");
         const pt = result.data.subscription.plan_type;
         if (pt === "monthly" || pt === "semiannual" || pt === "annual") setSelectedPeriod(pt);
       }
@@ -107,6 +117,22 @@ export default function SubscriptionPage() {
     // double d'un abonnement déjà migré.
     setChangePlanError(result.error || "Une erreur est survenue. Veuillez réessayer.");
     setChangingPlan(null);
+  }
+
+  async function handleSaveAligroNumber() {
+    setAligroSaving(true);
+    setAligroError(null);
+    setAligroSaved(false);
+    const result = await updateAligroCustomerNumber(aligroValue);
+    if (result.success) {
+      const trimmed = aligroValue.trim();
+      setAligroValue(trimmed);
+      setMerchant((prev) => (prev ? { ...prev, aligro_customer_number: trimmed.length > 0 ? trimmed : null } : prev));
+      setAligroSaved(true);
+    } else {
+      setAligroError(result.error || t("aligro.error"));
+    }
+    setAligroSaving(false);
   }
 
   if (loading) {
@@ -386,6 +412,67 @@ export default function SubscriptionPage() {
             {redirecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ExternalLink className="h-4 w-4" />}
             {t("subscription.manageButton")}
           </button>
+        </div>
+      )}
+
+      {/* Numéro de client Aligro */}
+      {merchant && (
+        <div className="rounded-2xl bg-white p-5" style={{ border: "1.5px solid #eaecf0" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Tag className="h-4 w-4" style={{ color: "#6366f1" }} />
+            <h3 className="font-bold text-gray-900">{t("aligro.title")}</h3>
+          </div>
+          <p className="text-[13px] text-gray-400 mb-4">{t("aligro.description")}</p>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label htmlFor="aligro-customer-number" className="mb-1.5 block text-sm font-medium text-gray-700">
+                {t("aligro.label")}
+              </label>
+              <input
+                id="aligro-customer-number"
+                type="text"
+                inputMode="text"
+                maxLength={100}
+                value={aligroValue}
+                onChange={(e) => {
+                  setAligroValue(e.target.value);
+                  setAligroSaved(false);
+                  setAligroError(null);
+                }}
+                placeholder={t("aligro.placeholder")}
+                aria-describedby="aligro-customer-number-hint"
+                className="w-full rounded-xl px-3.5 py-2.5 text-sm text-gray-900 outline-none transition-colors focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/20"
+                style={{ border: "1.5px solid #eaecf0" }}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleSaveAligroNumber}
+              disabled={aligroSaving}
+              className="flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              style={{ background: "#6366f1" }}
+            >
+              {aligroSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {t("aligro.save")}
+            </button>
+          </div>
+
+          <p id="aligro-customer-number-hint" className="mt-2 text-[11px] text-gray-400">
+            {t("aligro.hint")}
+          </p>
+
+          {aligroSaved && (
+            <p className="mt-2 flex items-center gap-1.5 text-sm font-semibold" style={{ color: "#16a34a" }} role="status">
+              <Check className="h-4 w-4" />
+              {t("aligro.saved")}
+            </p>
+          )}
+          {aligroError && (
+            <p className="mt-2 text-sm font-medium" style={{ color: "#dc2626" }} role="alert">
+              {aligroError}
+            </p>
+          )}
         </div>
       )}
     </div>

@@ -1033,6 +1033,16 @@
       "manageBilling": "Manage billing",
       "manageBillingDescription": "Change your payment method or cancel your subscription",
       "manageButton": "Billing portal"
+    },
+    "aligro": {
+      "title": "Aligro customer number",
+      "description": "Are you an Aligro customer? Enter your Aligro customer number to benefit from the partner offer.",
+      "label": "Aligro customer number",
+      "placeholder": "E.g. 123456",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "Something went wrong. Please try again.",
+      "hint": "Optional. Leave the field empty and save to clear your number."
     }
   },
   "notFoundPage": {
