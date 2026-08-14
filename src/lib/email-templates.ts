@@ -617,9 +617,9 @@ export function claimRequestAdminNotification(data: ClaimRequestEmailData): {
     ),
     divider(),
     label("Restaurant", data.restaurantName),
-    label("Nom du commercant", data.merchantName),
+    label("Nom du commerçant", data.merchantName),
     label("Email", data.merchantEmail),
-    label("Telephone", data.merchantPhone),
+    label("Téléphone", data.merchantPhone),
     divider(),
     button(adminUrl, "Voir dans l'admin"),
     paragraph(
@@ -652,21 +652,21 @@ export function claimApprovedNotification(data: ClaimResultEmailData): {
   // lui propose jamais de "choisir un abonnement", uniquement de gerer sa
   // fiche.
   const content = [
-    heading("Votre fiche a ete validee ! 🎉"),
+    heading("Votre fiche a été validée ! 🎉"),
     paragraph(
       `Bonjour ${data.merchantName},`
     ),
     paragraph(
-      `Votre demande pour <strong>${data.restaurantName}</strong> a ete approuvee. Votre fiche restaurant est maintenant liee a votre compte.`
+      `Votre demande pour <strong>${data.restaurantName}</strong> a été approuvée. Votre fiche restaurant est maintenant liée à votre compte.`
     ),
     paragraph(
-      `Vous pouvez des maintenant la personnaliser (photos, description, horaires, happy hours...) depuis votre espace client.`
+      `Vous pouvez dès maintenant la personnaliser (photos, description, horaires, happy hours...) depuis votre espace client.`
     ),
-    button(`${siteUrl}/fr/espace-client/mon-restaurant`, "Gerer ma fiche"),
+    button(`${siteUrl}/fr/espace-client/mon-restaurant`, "Gérer ma fiche"),
   ].join("");
 
   return {
-    subject: `Votre fiche ${data.restaurantName} est validee — Just-Tag`,
+    subject: `Votre fiche ${data.restaurantName} est validée — Just-Tag`,
     html: emailLayout(content),
   };
 }
@@ -679,15 +679,15 @@ export function claimRejectedNotification(data: ClaimResultEmailData): {
   html: string;
 } {
   const content = [
-    heading("Votre demande n'a pas pu etre validee"),
+    heading("Votre demande n'a pas pu être validée"),
     paragraph(
       `Bonjour ${data.merchantName},`
     ),
     paragraph(
-      `Nous n'avons pas pu valider votre demande pour <strong>${data.restaurantName}</strong>. Cela peut etre du a un manque d'informations ou a une verification incomplete.`
+      `Nous n'avons pas pu valider votre demande pour <strong>${data.restaurantName}</strong>. Cela peut être dû à un manque d'informations ou à une vérification incomplète.`
     ),
     paragraph(
-      `N'hesitez pas a nous contacter pour en discuter et soumettre une nouvelle demande.`
+      `N'hésitez pas à nous contacter pour en discuter et soumettre une nouvelle demande.`
     ),
     button(`mailto:contact@just-tag.app`, "Nous contacter"),
   ].join("");

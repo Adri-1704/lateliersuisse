@@ -21,7 +21,7 @@ export default async function EditHappyHourPage({
     return (
       <div className="rounded-xl border border-dashed p-8 text-center">
         <p className="text-sm text-gray-600">
-          Aucun restaurant associe a votre compte.
+          Aucun restaurant associé à votre compte.
         </p>
       </div>
     );

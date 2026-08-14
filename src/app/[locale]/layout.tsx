@@ -131,7 +131,7 @@ export default async function LocaleLayout({
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
     description:
-      "Just-Tag.app est l'annuaire de reference pour decouvrir les meilleurs restaurants de Suisse Romande. Trouvez des restaurants par ville, cuisine et avis.",
+      "Just-Tag.app est l'annuaire de référence pour découvrir les meilleurs restaurants de Suisse Romande. Trouvez des restaurants par ville, cuisine et avis.",
     address: {
       "@type": "PostalAddress",
       addressCountry: "CH",

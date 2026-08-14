@@ -85,7 +85,7 @@ async function assertMerchantOwnsRestaurant(restaurantId: string): Promise<{
   merchantId: string;
 } | { ok: false; error: string }> {
   const merchantId = await findMerchantIdForCurrentUser();
-  if (!merchantId) return { ok: false, error: "Non authentifie" };
+  if (!merchantId) return { ok: false, error: "Non authentifié" };
 
   const admin = createAdminClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -95,7 +95,7 @@ async function assertMerchantOwnsRestaurant(restaurantId: string): Promise<{
     .eq("merchant_id", merchantId)
     .maybeSingle();
 
-  if (!data) return { ok: false, error: "Acces refuse" };
+  if (!data) return { ok: false, error: "Accès refusé" };
   return { ok: true, merchantId };
 }
 
@@ -105,7 +105,7 @@ async function assertMerchantOwnsHappyHour(id: string): Promise<{
   restaurantId: string;
 } | { ok: false; error: string }> {
   const merchantId = await findMerchantIdForCurrentUser();
-  if (!merchantId) return { ok: false, error: "Non authentifie" };
+  if (!merchantId) return { ok: false, error: "Non authentifié" };
 
   const admin = createAdminClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,7 +121,7 @@ async function assertMerchantOwnsHappyHour(id: string): Promise<{
     .eq("id", hh.restaurant_id)
     .eq("merchant_id", merchantId)
     .maybeSingle();
-  if (!resto) return { ok: false, error: "Acces refuse" };
+  if (!resto) return { ok: false, error: "Accès refusé" };
 
   return { ok: true, merchantId, restaurantId: hh.restaurant_id as string };
 }
@@ -152,11 +152,11 @@ function validateWindow(starts_at: string, ends_at: string): string | null {
     return "Dates invalides";
   }
   if (e.getTime() <= s.getTime()) {
-    return "La fin doit etre posterieure au debut";
+    return "La fin doit être postérieure au début";
   }
   // On autorise une HH commencant jusqu'a 2 min dans le passe (decalage horloge)
   if (s.getTime() < Date.now() - 2 * 60 * 1000) {
-    return "La date de debut doit etre dans le futur";
+    return "La date de début doit être dans le futur";
   }
   return null;
 }
@@ -172,7 +172,7 @@ export async function createHappyHour(
   try {
     const parsed = happyHourInputSchema.safeParse(input);
     if (!parsed.success) {
-      return { success: false, error: parsed.error.issues[0]?.message || "Donnees invalides" };
+      return { success: false, error: parsed.error.issues[0]?.message || "Données invalides" };
     }
     const windowError = validateWindow(parsed.data.starts_at, parsed.data.ends_at);
     if (windowError) return { success: false, error: windowError };
@@ -198,7 +198,7 @@ export async function createHappyHour(
       .single();
 
     if (error || !data) {
-      return { success: false, error: "Erreur lors de la creation" };
+      return { success: false, error: "Erreur lors de la création" };
     }
 
     const slug = await getRestaurantSlug(restaurantId);
@@ -246,7 +246,7 @@ export async function updateHappyHour(
       .update(partial)
       .eq("id", id);
 
-    if (error) return { success: false, error: "Erreur lors de la mise a jour" };
+    if (error) return { success: false, error: "Erreur lors de la mise à jour" };
 
     const slug = await getRestaurantSlug(auth.restaurantId);
     revalidateAfterMutation(slug);

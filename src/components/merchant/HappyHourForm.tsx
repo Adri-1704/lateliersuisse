@@ -251,7 +251,7 @@ export function HappyHourForm({ restaurantId, existing, basePath }: Props) {
           </div>
         </div>
         <p className="text-xs text-gray-500">
-          Heure Europe/Zurich. Vos visiteurs verront un badge &quot;En cours&quot; pendant le creneau.
+          Heure Europe/Zurich. Vos visiteurs verront un badge &quot;En cours&quot; pendant le créneau.
         </p>
       </section>
 
