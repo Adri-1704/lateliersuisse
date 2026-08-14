@@ -32,15 +32,15 @@ export default async function EditRestaurantPage({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rAny = r as any;
-  let merchant: { id: string; name: string; email: string } | null = null;
+  let merchant: { id: string; name: string; email: string; aligro_customer_number: string | null } | null = null;
   if (rAny.merchant_id) {
     const supabase = createAdminClient();
     const { data } = await supabase
       .from("merchants")
-      .select("id, name, email")
+      .select("id, name, email, aligro_customer_number")
       .eq("id", rAny.merchant_id)
       .single();
-    merchant = data as { id: string; name: string; email: string } | null;
+    merchant = data as { id: string; name: string; email: string; aligro_customer_number: string | null } | null;
   }
 
   const claimStatus = (rAny.claim_status as string) || "unclaimed";
@@ -88,6 +88,12 @@ export default async function EditRestaurantPage({
             <div>
               <p className="font-medium text-gray-900">{merchant.name}</p>
               <p className="text-sm text-gray-500">{merchant.email}</p>
+              <p className="text-sm text-gray-500">
+                N° client Aligro :{" "}
+                <span className={merchant.aligro_customer_number ? "font-medium text-gray-700" : "text-gray-400"}>
+                  {merchant.aligro_customer_number || "Non renseigné"}
+                </span>
+              </p>
               <span
                 className="mt-1.5 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                 style={{ background: "#eef2ff", color: "#4f46e5" }}

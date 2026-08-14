@@ -244,6 +244,54 @@ export async function createPlanChangeSession(
   return { url: null, error: null, updated: true };
 }
 
+const ALIGRO_CUSTOMER_NUMBER_MAX_LENGTH = 100;
+
+/**
+ * Met à jour le numéro de client Aligro du marchand CONNECTÉ (session-safe :
+ * le merchantId est toujours dérivé de la session, jamais d'un paramètre
+ * client). Une chaîne vide efface la valeur (NULL) — le numéro est optionnel
+ * et sert uniquement à l'admin pour une vérification manuelle auprès
+ * d'Aligro.
+ */
+export async function updateAligroCustomerNumber(value: string): Promise<{
+  success: boolean;
+  error: string | null;
+}> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Non authentifié" };
+
+    const merchant = await findMerchant(supabase, user.id, user.email || "");
+    if (!merchant) return { success: false, error: "Marchand non trouvé" };
+
+    const trimmed = (value ?? "").trim();
+    if (trimmed.length > ALIGRO_CUSTOMER_NUMBER_MAX_LENGTH) {
+      return { success: false, error: `Le numéro client Aligro ne doit pas dépasser ${ALIGRO_CUSTOMER_NUMBER_MAX_LENGTH} caractères.` };
+    }
+
+    // Client admin (service role) : on bypasse le RLS legacy de la table
+    // merchants (qui compare auth.uid() à merchants.id, incompatible avec le
+    // modèle auth_user_id/email utilisé ici), mais la mise à jour reste
+    // strictement scoped à `merchant.id`, dérivé de la session ci-dessus —
+    // jamais d'un id fourni par le client.
+    const admin = createAdminClient();
+    const { error } = await (admin.from("merchants") as ReturnType<typeof admin.from>)
+      .update({ aligro_customer_number: trimmed.length > 0 ? trimmed : null } as Record<string, unknown>)
+      .eq("id", merchant.id);
+
+    if (error) {
+      console.error("[updateAligroCustomerNumber] Échec de la mise à jour:", error);
+      return { success: false, error: "Impossible d'enregistrer le numéro client Aligro." };
+    }
+
+    return { success: true, error: null };
+  } catch (err) {
+    console.error("[updateAligroCustomerNumber] Erreur inattendue:", err);
+    return { success: false, error: "Erreur inattendue" };
+  }
+}
+
 export async function createBillingPortalSession(locale: string = "fr"): Promise<{
   url: string | null;
   error: string | null;

@@ -1033,6 +1033,16 @@
       "manageBilling": "Abrechnung verwalten",
       "manageBillingDescription": "Zahlungsmethode andern oder Abonnement kundigen",
       "manageButton": "Zahlungsportal"
+    },
+    "aligro": {
+      "title": "Aligro-Kundennummer",
+      "description": "Sind Sie Aligro-Kunde? Geben Sie Ihre Aligro-Kundennummer an, um vom Partnerangebot zu profitieren.",
+      "label": "Aligro-Kundennummer",
+      "placeholder": "z. B. 123456",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "hint": "Optional. Lassen Sie das Feld leer und speichern Sie, um Ihre Nummer zu loschen."
     }
   },
   "notFoundPage": {

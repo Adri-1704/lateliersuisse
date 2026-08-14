@@ -1033,6 +1033,16 @@
       "manageBilling": "Gerir faturacao",
       "manageBillingDescription": "Alterar o metodo de pagamento ou cancelar a assinatura",
       "manageButton": "Portal de pagamento"
+    },
+    "aligro": {
+      "title": "Numero de cliente Aligro",
+      "description": "E cliente Aligro? Indique o seu numero de cliente Aligro para beneficiar da oferta parceira.",
+      "label": "Numero de cliente Aligro",
+      "placeholder": "Ex. 123456",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "error": "Ocorreu um erro. Tente novamente.",
+      "hint": "Opcional. Deixe o campo vazio e guarde para apagar o seu numero."
     }
   },
   "notFoundPage": {

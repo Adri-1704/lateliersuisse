@@ -25,6 +25,7 @@ export interface Merchant {
   name: string;
   phone: string | null;
   stripe_customer_id: string | null;
+  aligro_customer_number: string | null;
   created_at: string;
   updated_at: string;
 }

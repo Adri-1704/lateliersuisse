@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getMerchant } from "@/actions/admin/merchants";
-import { ArrowLeft, Mail, Phone, Calendar, CreditCard } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, CreditCard, Tag } from "lucide-react";
 import { DeleteMerchantButton } from "./DeleteMerchantButton";
 
 const statusColors: Record<string, { bg: string; color: string }> = {
@@ -87,6 +87,12 @@ export default async function MerchantDetailPage({
                   month: "long",
                   year: "numeric",
                 })}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <Tag className="h-4 w-4 text-gray-400" />
+              <span className={m.aligro_customer_number ? "text-gray-700" : "text-gray-400"}>
+                N° client Aligro : {m.aligro_customer_number || "Non renseigné"}
               </span>
             </div>
           </div>
