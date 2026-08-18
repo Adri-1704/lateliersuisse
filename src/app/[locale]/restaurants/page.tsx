@@ -118,9 +118,13 @@ export default async function RestaurantsPage({
 
   // Une page au-delà de la dernière (ex. ?page=520 pour 519 pages réelles)
   // renvoyait "0 restaurant trouvé" et un compteur à 0 au lieu du vrai total
-  // (#40). Le count exact renvoyé par Supabase reste correct même quand la
-  // plage demandée est hors bornes (.range() ne l'affecte pas) : on peut
-  // donc détecter le dépassement et re-fetcher la dernière page valide.
+  // (#40, cas 3) : un .range() qui démarre après la dernière ligne filtrée
+  // fait échouer TOUTE la requête côté PostgREST (416 "Range Not
+  // Satisfiable"), y compris le count. fetchFilteredRestaurants() se
+  // rattrape en re-demandant le total via une requête count-only (jamais
+  // hors bornes, voir src/lib/restaurants/queries.ts) quand ça arrive : le
+  // totalCount reçu ici est donc fiable même quand `requestedPage` dépasse,
+  // et on peut détecter le dépassement pour re-fetcher la dernière page valide.
   const totalPages = Math.max(1, Math.ceil(firstAttempt.totalCount / PAGE_SIZE));
   const page = Math.min(requestedPage, totalPages);
 
