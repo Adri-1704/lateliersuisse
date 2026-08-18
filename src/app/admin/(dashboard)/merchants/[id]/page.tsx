@@ -92,7 +92,7 @@ export default async function MerchantDetailPage({
             <div className="flex items-center gap-3 text-sm">
               <Tag className="h-4 w-4 text-gray-400" />
               <span className={m.aligro_customer_number ? "text-gray-700" : "text-gray-400"}>
-                N° client Aligro : {m.aligro_customer_number || "Non renseigné"}
+                N° client ALIGRO : {m.aligro_customer_number || "Non renseigné"}
               </span>
             </div>
           </div>

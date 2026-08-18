@@ -1035,9 +1035,9 @@
       "manageButton": "Billing portal"
     },
     "aligro": {
-      "title": "Aligro customer number",
-      "description": "Are you an Aligro customer? Enter your Aligro customer number to benefit from the partner offer.",
-      "label": "Aligro customer number",
+      "title": "ALIGRO customer number",
+      "description": "Are you an ALIGRO customer? Enter your ALIGRO customer number to benefit from the partner offer.",
+      "label": "ALIGRO customer number",
       "placeholder": "E.g. 123456",
       "save": "Save",
       "saved": "Saved",

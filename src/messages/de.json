@@ -1035,9 +1035,9 @@
       "manageButton": "Zahlungsportal"
     },
     "aligro": {
-      "title": "Aligro-Kundennummer",
-      "description": "Sind Sie Aligro-Kunde? Geben Sie Ihre Aligro-Kundennummer an, um vom Partnerangebot zu profitieren.",
-      "label": "Aligro-Kundennummer",
+      "title": "ALIGRO-Kundennummer",
+      "description": "Sind Sie ALIGRO-Kunde? Geben Sie Ihre ALIGRO-Kundennummer an, um vom Partnerangebot zu profitieren.",
+      "label": "ALIGRO-Kundennummer",
       "placeholder": "z. B. 123456",
       "save": "Speichern",
       "saved": "Gespeichert",

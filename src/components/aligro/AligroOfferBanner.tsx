@@ -20,7 +20,7 @@ export function AligroOfferBanner() {
           <span className="mx-1 inline-flex items-center rounded-full bg-white px-2 py-0.5 align-middle shadow-sm">
             <Image
               src="/partners/aligro-logo.png"
-              alt="Aligro"
+              alt="ALIGRO"
               width={900}
               height={500}
               className="h-4 w-auto object-contain"

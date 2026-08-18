@@ -24,7 +24,7 @@ export function AligroFinalCTA() {
 
       <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
         <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-[var(--color-just-tag)]">
-          Offre partenaire Aligro
+          Offre partenaire ALIGRO
         </p>
         <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
           Prêt à faire décoller votre visibilité ?

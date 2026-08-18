@@ -120,9 +120,9 @@ export default async function AffiliationsAdminPage() {
           <Link2 className="h-5 w-5 text-indigo-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-gray-900">Clients Aligro</h1>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Clients ALIGRO</h1>
           <p className="text-[13px] text-gray-400 mt-0.5">
-            Suivi des restaurateurs venus via le code promo Aligro — remise accordée, aucune commission due
+            Suivi des restaurateurs venus via le code promo ALIGRO — remise accordée, aucune commission due
           </p>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default async function AffiliationsAdminPage() {
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {[
-          { title: "Clients Aligro abonnés", value: totals.subscriptions, icon: <Users className="h-5 w-5 text-indigo-600" /> },
+          { title: "Clients ALIGRO abonnés", value: totals.subscriptions, icon: <Users className="h-5 w-5 text-indigo-600" /> },
           { title: "Revenu généré", value: `${totals.revenue.toFixed(2)} CHF`, icon: <TrendingUp className="h-5 w-5 text-indigo-600" /> },
         ].map((kpi) => (
           <div key={kpi.title} className="rounded-2xl border border-[#eaecf0] bg-white p-5">
@@ -148,17 +148,17 @@ export default async function AffiliationsAdminPage() {
       {noData ? (
         <div className="rounded-2xl border border-[#eaecf0] bg-white py-12 text-center">
           <Link2 className="mx-auto mb-4 h-10 w-10 text-gray-200" />
-          <h3 className="text-lg font-bold text-gray-900">Aucun client Aligro pour l&apos;instant</h3>
+          <h3 className="text-lg font-bold text-gray-900">Aucun client ALIGRO pour l&apos;instant</h3>
           <p className="mt-2 text-sm text-gray-400">
-            Quand un restaurateur s&apos;abonnera avec le code promo Aligro, il apparaîtra ici automatiquement.
+            Quand un restaurateur s&apos;abonnera avec le code promo ALIGRO, il apparaîtra ici automatiquement.
           </p>
           <div className="mx-auto mt-6 max-w-md rounded-xl border border-[#eaecf0] bg-[#f8fafc] p-4 text-left text-sm">
             <p className="font-semibold text-gray-700">Comment ça marche :</p>
             <ol className="mt-2 list-decimal space-y-1 pl-5 text-gray-500">
-              <li>Aligro communique le code promo (ex. <code className="rounded bg-gray-100 px-1 text-xs">ALIGRO20</code>) directement à ses clients restaurateurs</li>
+              <li>ALIGRO communique le code promo (ex. <code className="rounded bg-gray-100 px-1 text-xs">ALIGRO20</code>) directement à ses clients restaurateurs</li>
               <li>Le restaurateur entre le code sur la page de paiement Just-Tag et obtient la remise</li>
               <li>Le restaurateur s&apos;inscrit et paie → le code est attaché à l&apos;abonnement</li>
-              <li>Tu vois ici quel client est venu via ce code — aucune commission n&apos;est due à Aligro</li>
+              <li>Tu vois ici quel client est venu via ce code — aucune commission n&apos;est due à ALIGRO</li>
             </ol>
           </div>
         </div>

@@ -89,7 +89,7 @@ export default async function EditRestaurantPage({
               <p className="font-medium text-gray-900">{merchant.name}</p>
               <p className="text-sm text-gray-500">{merchant.email}</p>
               <p className="text-sm text-gray-500">
-                N° client Aligro :{" "}
+                N° client ALIGRO :{" "}
                 <span className={merchant.aligro_customer_number ? "font-medium text-gray-700" : "text-gray-400"}>
                   {merchant.aligro_customer_number || "Non renseigné"}
                 </span>

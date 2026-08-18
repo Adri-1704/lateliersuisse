@@ -25,7 +25,7 @@ export const ALIGRO_DISCOUNT_PERCENT: number | "X" | null = "X";
  */
 export function getAligroOfferLabel(): string {
   if (ALIGRO_DISCOUNT_PERCENT === null) {
-    return "Offre exclusive réservée aux clients Aligro";
+    return "Offre exclusive réservée aux clients ALIGRO";
   }
   return `-${ALIGRO_DISCOUNT_PERCENT}% sur tous vos abonnements`;
 }
