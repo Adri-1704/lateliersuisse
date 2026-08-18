@@ -267,7 +267,7 @@ export async function updateAligroCustomerNumber(value: string): Promise<{
 
     const trimmed = (value ?? "").trim();
     if (trimmed.length > ALIGRO_CUSTOMER_NUMBER_MAX_LENGTH) {
-      return { success: false, error: `Le numéro client Aligro ne doit pas dépasser ${ALIGRO_CUSTOMER_NUMBER_MAX_LENGTH} caractères.` };
+      return { success: false, error: `Le numéro client ALIGRO ne doit pas dépasser ${ALIGRO_CUSTOMER_NUMBER_MAX_LENGTH} caractères.` };
     }
 
     // Client admin (service role) : on bypasse le RLS legacy de la table
@@ -282,7 +282,7 @@ export async function updateAligroCustomerNumber(value: string): Promise<{
 
     if (error) {
       console.error("[updateAligroCustomerNumber] Échec de la mise à jour:", error);
-      return { success: false, error: "Impossible d'enregistrer le numéro client Aligro." };
+      return { success: false, error: "Impossible d'enregistrer le numéro client ALIGRO." };
     }
 
     return { success: true, error: null };

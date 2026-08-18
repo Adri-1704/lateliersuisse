@@ -51,11 +51,11 @@ export function AligroHero() {
           <div className="animate-fade-in-up">
             {/* Eyebrow partenariat (le mockup WhatsApp est mis en avant à droite) */}
             <div className="mb-6 inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.15em] text-white ring-1 ring-white/20">
-              Offre partenaire Aligro
+              Offre partenaire ALIGRO
             </div>
 
             <h1 className="font-condensed text-5xl font-black leading-[0.93] tracking-tight text-white sm:text-6xl md:text-7xl">
-              Client Aligro ?
+              Client ALIGRO ?
               <br />
               Faites rayonner votre établissement{" "}
               <em className="not-italic text-[var(--color-just-tag)]">
@@ -152,7 +152,7 @@ export function AligroHero() {
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-black/10">
                 <Image
                   src="/partners/aligro-logo.png"
-                  alt="Aligro"
+                  alt="ALIGRO"
                   width={900}
                   height={500}
                   className="h-4 w-auto object-contain"

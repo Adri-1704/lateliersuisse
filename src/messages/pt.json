@@ -1035,9 +1035,9 @@
       "manageButton": "Portal de pagamento"
     },
     "aligro": {
-      "title": "Numero de cliente Aligro",
-      "description": "E cliente Aligro? Indique o seu numero de cliente Aligro para beneficiar da oferta parceira.",
-      "label": "Numero de cliente Aligro",
+      "title": "Numero de cliente ALIGRO",
+      "description": "E cliente ALIGRO? Indique o seu numero de cliente ALIGRO para beneficiar da oferta parceira.",
+      "label": "Numero de cliente ALIGRO",
       "placeholder": "Ex. 123456",
       "save": "Guardar",
       "saved": "Guardado",

@@ -171,12 +171,12 @@ export default function SubscriptionPage() {
               <div>
                 <p className="text-sm font-bold text-gray-900">
                   {subscription.affiliate_ref.toLowerCase().includes("aligro")
-                    ? "Remise partenaire Aligro"
+                    ? "Remise partenaire ALIGRO"
                     : "Code promo appliqué"}
                 </p>
                 <p className="text-xs text-gray-500">
                   {subscription.affiliate_ref.toLowerCase().includes("aligro")
-                    ? "Votre abonnement bénéficie d'une remise grâce à votre partenariat avec Aligro."
+                    ? "Votre abonnement bénéficie d'une remise grâce à votre partenariat avec ALIGRO."
                     : "Votre abonnement bénéficie d'une remise partenaire."}
                   {" "}Code : <span className="font-mono font-semibold text-gray-700">{subscription.affiliate_ref}</span>
                 </p>
