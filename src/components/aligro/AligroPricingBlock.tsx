@@ -17,7 +17,7 @@ import { MESSAGE_TIERS, BASE_PRICES, messagesPerMonth, type MessageTier } from "
  */
 const TIER_INFO: Record<MessageTier, { desc: string; popular: boolean }> = {
   50: { desc: "Petits établissements, tables d'hôtes", popular: false },
-  100: { desc: "Le plus populaire", popular: true },
+  100: { desc: "Restaurants familiaux, bars de quartier", popular: true },
   200: { desc: "Grands volumes, brasseries, traiteurs", popular: false },
 };
 
