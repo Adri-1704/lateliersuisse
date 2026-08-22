@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/server";
-import { PLAN_DETAILS, EARLY_BIRD_LIMIT } from "@/lib/stripe";
+import { PLAN_DETAILS } from "@/lib/stripe";
 import type { Subscription, DbRestaurant } from "@/lib/supabase/types";
 import { requireAdmin } from "@/actions/admin/auth";
 
@@ -10,7 +10,6 @@ export interface SaaSMetrics {
   // Revenue
   mrr: number;
   arr: number;
-  revenueLifetime: number;
   revenueTotalEstime: number;
 
   // Growth
@@ -37,28 +36,32 @@ export interface SaaSMetrics {
     monthly: number;
     semiannual: number;
     annual: number;
-    lifetime: number;
   };
-  earlyBirdCount: number;
-  standardCount: number;
   subscribersByCanton: { canton: string; count: number }[];
 
   // Operational
-  earlyBirdSpotsRemaining: number;
   totalPublishedRestaurants: number;
   claimedRestaurants: number;
   claimRate: number;
 }
 
 // ── Helper: monthly revenue for a single subscription ─────────
+// Grille tarifaire unique par palier d'abonnés WhatsApp (50/100/200) — voir
+// PLAN_DETAILS dans src/lib/stripe.ts. NB : les éventuels abonnés legacy
+// encore sur l'ancien prix "catalogue" (is_early_bird = false, avant le
+// 2026-08-22) sont ici estimés au tarif unique en vigueur, potentiellement
+// inférieur à ce qu'ils paient réellement sur leur abonnement Stripe existant
+// (leur prix Stripe n'est pas modifié par ce changement — voir rapport) : le
+// MRR calculé ici peut donc légèrement sous-estimer la réalité tant que de
+// tels abonnés existent. À vérifier en recette (nombre d'abonnés
+// is_early_bird = false actifs/trialing).
 function computeMonthlyRevenue(
   planType: string,
-  isEarlyBird: boolean
+  whatsappTier: 50 | 100 | 200
 ): number {
-  const plan = PLAN_DETAILS[planType as keyof typeof PLAN_DETAILS];
-  if (!plan) return 0;
-
-  const price = isEarlyBird ? plan.priceEarly : plan.price;
+  const tierPlans = PLAN_DETAILS[whatsappTier];
+  const price = tierPlans?.[planType as keyof typeof tierPlans];
+  if (typeof price !== "number") return 0;
 
   switch (planType) {
     case "monthly":
@@ -67,8 +70,6 @@ function computeMonthlyRevenue(
       return price / 6;
     case "annual":
       return price / 12;
-    case "lifetime":
-      return 0; // one-time, not recurring
     default:
       return 0;
   }
@@ -187,9 +188,7 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
 
     // MRR
     let mrr = 0;
-    const byPlan = { monthly: 0, semiannual: 0, annual: 0, lifetime: 0 };
-    let earlyBirdCount = 0;
-    let standardCount = 0;
+    const byPlan = { monthly: 0, semiannual: 0, annual: 0 };
     let activeCount = 0;
     let trialingCount = 0;
 
@@ -201,12 +200,9 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
         byPlan[sub.plan_type as keyof typeof byPlan]++;
       }
 
-      if (sub.is_early_bird) earlyBirdCount++;
-      else standardCount++;
-
       // Only count subscriptions with a confirmed Stripe payment in MRR
       if (sub.status === "active" && sub.stripe_subscription_id) {
-        mrr += computeMonthlyRevenue(sub.plan_type, sub.is_early_bird);
+        mrr += computeMonthlyRevenue(sub.plan_type, sub.whatsapp_tier ?? 100);
       }
     }
 
@@ -215,12 +211,8 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
     // ARR
     const arr = mrr * 12;
 
-    // Lifetime revenue
-    const lifetimeCount = byPlan.lifetime;
-    const revenueLifetime = lifetimeCount * PLAN_DETAILS.lifetime.price;
-
     // Revenue total estimé
-    const revenueTotalEstime = arr + revenueLifetime;
+    const revenueTotalEstime = arr;
 
     // MoM: we need last month's MRR — approximate from new subscribers
     // Better approach: compare current new vs prev month new
@@ -277,9 +269,6 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
       .filter((c) => c.count > 0)
       .sort((a, b) => b.count - a.count);
 
-    // Early bird spots
-    const earlyBirdSpotsRemaining = Math.max(0, EARLY_BIRD_LIMIT - earlyBirdCount);
-
     // Restaurant stats
     const totalPublished = publishedRestaurants.count || 0;
     const totalClaimed = claimedRestaurants.count || 0;
@@ -290,7 +279,6 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
     return {
       mrr: Math.round(mrr * 100) / 100,
       arr: Math.round(arr * 100) / 100,
-      revenueLifetime,
       revenueTotalEstime: Math.round(revenueTotalEstime * 100) / 100,
       mom: Math.round(mom * 10) / 10,
       newSubscribersThisMonth: newThisMonthCount,
@@ -306,10 +294,7 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
       claimsRejected,
       claimToSubscriberRate: Math.round(claimToSub * 10) / 10,
       subscribersByPlan: byPlan,
-      earlyBirdCount,
-      standardCount,
       subscribersByCanton,
-      earlyBirdSpotsRemaining,
       totalPublishedRestaurants: totalPublished,
       claimedRestaurants: totalClaimed,
       claimRate: Math.round(claimRate * 10) / 10,
@@ -317,14 +302,13 @@ export async function getSaaSMetrics(): Promise<SaaSMetrics> {
   } catch {
     // Fallback: return zeroes when Supabase is not configured
     return {
-      mrr: 0, arr: 0, revenueLifetime: 0, revenueTotalEstime: 0,
+      mrr: 0, arr: 0, revenueTotalEstime: 0,
       mom: 0, newSubscribersThisMonth: 0, newSubscribersPrevMonth: 0,
       churnRate: 0, activeSubscribers: 0, trialingSubscribers: 0, trialConversionRate: 0,
       totalMerchants: 0, totalClaimRequests: 0,
       claimsApproved: 0, claimsPending: 0, claimsRejected: 0, claimToSubscriberRate: 0,
-      subscribersByPlan: { monthly: 0, semiannual: 0, annual: 0, lifetime: 0 },
-      earlyBirdCount: 0, standardCount: 0, subscribersByCanton: [],
-      earlyBirdSpotsRemaining: EARLY_BIRD_LIMIT,
+      subscribersByPlan: { monthly: 0, semiannual: 0, annual: 0 },
+      subscribersByCanton: [],
       totalPublishedRestaurants: 0, claimedRestaurants: 0, claimRate: 0,
     };
   }

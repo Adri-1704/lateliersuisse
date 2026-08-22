@@ -2,7 +2,7 @@
 // Database Types - Auto-generated from schema
 // ============================================
 
-export type SubscriptionPlan = "monthly" | "semiannual" | "annual" | "lifetime";
+export type SubscriptionPlan = "monthly" | "semiannual" | "annual";
 export type SubscriptionStatus = "active" | "past_due" | "canceled" | "incomplete" | "trialing";
 export type PriceRange = "1" | "2" | "3" | "4";
 

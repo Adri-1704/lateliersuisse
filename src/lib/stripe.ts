@@ -22,68 +22,65 @@ export function getStripe(): Stripe {
 }
 
 /**
- * Stripe Price IDs — new tiered model (3 billing × 3 subscriber tiers × 2 phases)
- * Phase "launch" = early bird (first 100 restaurants), "catalogue" = standard
+ * Stripe Price IDs — grille tarifaire unique et définitive (décision produit
+ * du 2026-08-22) : le tarif de lancement ("Early Bird", places limitées aux
+ * 100 premiers restaurants) devient LE tarif, pour tout le monde et pour
+ * toujours. Le tarif "catalogue" (plus cher) est abandonné.
+ *
+ * Les variables d'environnement gardent leur suffixe historique "_LAUNCH" —
+ * ce sont les IDs de prix Stripe déjà configurés en prod, on ne les renomme
+ * pas pour éviter toute rupture. Les variables "_CATALOGUE" existent encore
+ * potentiellement dans l'environnement Stripe/Vercel mais ne sont plus lues
+ * par le code : il n'y a plus de notion de phase.
  */
 const e = (key: string) => (process.env[key] || "").trim();
 
-const TIER_PRICES: Record<string, Record<number, Record<string, string>>> = {
+const TIER_PRICES: Record<"monthly" | "semiannual" | "annual", Record<number, string>> = {
   monthly: {
-    50:  { launch: e("STRIPE_PRICE_MONTHLY_50_LAUNCH"),    catalogue: e("STRIPE_PRICE_MONTHLY_50_CATALOGUE") },
-    100: { launch: e("STRIPE_PRICE_MONTHLY_100_LAUNCH"),   catalogue: e("STRIPE_PRICE_MONTHLY_100_CATALOGUE") },
-    200: { launch: e("STRIPE_PRICE_MONTHLY_200_LAUNCH"),   catalogue: e("STRIPE_PRICE_MONTHLY_200_CATALOGUE") },
+    50:  e("STRIPE_PRICE_MONTHLY_50_LAUNCH"),
+    100: e("STRIPE_PRICE_MONTHLY_100_LAUNCH"),
+    200: e("STRIPE_PRICE_MONTHLY_200_LAUNCH"),
   },
   semiannual: {
-    50:  { launch: e("STRIPE_PRICE_SEMIANNUAL_50_LAUNCH"),  catalogue: e("STRIPE_PRICE_SEMIANNUAL_50_CATALOGUE") },
-    100: { launch: e("STRIPE_PRICE_SEMIANNUAL_100_LAUNCH"), catalogue: e("STRIPE_PRICE_SEMIANNUAL_100_CATALOGUE") },
-    200: { launch: e("STRIPE_PRICE_SEMIANNUAL_200_LAUNCH"), catalogue: e("STRIPE_PRICE_SEMIANNUAL_200_CATALOGUE") },
+    50:  e("STRIPE_PRICE_SEMIANNUAL_50_LAUNCH"),
+    100: e("STRIPE_PRICE_SEMIANNUAL_100_LAUNCH"),
+    200: e("STRIPE_PRICE_SEMIANNUAL_200_LAUNCH"),
   },
   annual: {
-    50:  { launch: e("STRIPE_PRICE_ANNUAL_50_LAUNCH"),    catalogue: e("STRIPE_PRICE_ANNUAL_50_CATALOGUE") },
-    100: { launch: e("STRIPE_PRICE_ANNUAL_100_LAUNCH"),   catalogue: e("STRIPE_PRICE_ANNUAL_100_CATALOGUE") },
-    200: { launch: e("STRIPE_PRICE_ANNUAL_200_LAUNCH"),   catalogue: e("STRIPE_PRICE_ANNUAL_200_CATALOGUE") },
+    50:  e("STRIPE_PRICE_ANNUAL_50_LAUNCH"),
+    100: e("STRIPE_PRICE_ANNUAL_100_LAUNCH"),
+    200: e("STRIPE_PRICE_ANNUAL_200_LAUNCH"),
   },
 };
-
-export const LIFETIME_PRICE_ID = process.env.STRIPE_PRICE_LIFETIME || "";
-export const LIFETIME_PRICE_EARLY_ID = process.env.STRIPE_PRICE_LIFETIME_EARLY || "";
-
-// Used by admin dashboard for MRR/ARR estimates (based on 100-subscriber tier)
-export const PLAN_DETAILS = {
-  monthly:    { price: 149.95, priceEarly: 89.95,  interval: "month" as const,     label: "Mensuel" },
-  semiannual: { price: 132.95, priceEarly: 79.95,  interval: "6 months" as const,  label: "Semestriel" },
-  annual:     { price: 124.95, priceEarly: 74.95,  interval: "year" as const,       label: "Annuel" },
-  lifetime:   { price: 1495,   priceEarly: 1495,   interval: "one-time" as const,   label: "Lifetime" },
-};
-
-export const EARLY_BIRD_LIMIT = 100;
-export const TRIAL_DAYS = 14;
 
 export type WhatsAppTier = 50 | 100 | 200;
 
 /**
- * Returns the Stripe price ID for a given plan/tier/early-bird combination.
- * - planType: billing period (monthly/semiannual/annual/lifetime)
+ * Grille tarifaire unique (CHF, prix "mensuel équivalent"), par palier
+ * d'abonnés WhatsApp (50/100/200 en interne = 200/400/800 messages affichés
+ * côté UI, voir MerchantSignupClient.tsx) et par périodicité.
+ * Sert aux estimations MRR/ARR de l'admin (src/actions/admin/stats.ts).
+ * Source : src/app/[locale]/partenaire-inscription/MerchantSignupClient.tsx
+ * (tableau TIER_DISPLAY_PRICES.launch).
+ */
+export const PLAN_DETAILS: Record<WhatsAppTier, Record<"monthly" | "semiannual" | "annual", number>> = {
+  50:  { monthly: 59.95,  semiannual: 52.95,  annual: 49.95 },
+  100: { monthly: 89.95,  semiannual: 79.95,  annual: 74.95 },
+  200: { monthly: 149.95, semiannual: 132.95, annual: 124.95 },
+};
+
+export const TRIAL_DAYS = 14;
+
+/**
+ * Returns the Stripe price ID for a given plan/tier combination.
+ * - planType: billing period (monthly/semiannual/annual)
  * - whatsappTier: subscriber count chosen by restaurant (50/100/200)
- * - earlyBirdCount: number of existing early-bird subscriptions (determines launch vs catalogue)
+ * Il n'y a plus qu'une seule grille tarifaire : le prix ne dépend plus du
+ * nombre d'abonnés déjà en portefeuille (ex-mécanisme "Early Bird", retiré).
  */
 export function getPriceId(
-  planType: "monthly" | "semiannual" | "annual" | "lifetime",
-  earlyBirdCount: number,
+  planType: "monthly" | "semiannual" | "annual",
   whatsappTier: WhatsAppTier = 100,
 ): string {
-  if (planType === "lifetime") {
-    if (earlyBirdCount < EARLY_BIRD_LIMIT && LIFETIME_PRICE_EARLY_ID) {
-      return LIFETIME_PRICE_EARLY_ID;
-    }
-    return LIFETIME_PRICE_ID;
-  }
-
-  const phase = earlyBirdCount < EARLY_BIRD_LIMIT ? "launch" : "catalogue";
-  const tier = TIER_PRICES[planType]?.[whatsappTier];
-  return tier?.[phase] || "";
-}
-
-export function isEarlyBirdAvailable(subscriberCount: number): boolean {
-  return subscriberCount < EARLY_BIRD_LIMIT;
+  return TIER_PRICES[planType]?.[whatsappTier] || "";
 }

@@ -3,21 +3,16 @@
 import { useState, useMemo } from "react";
 import { MessageCircle } from "lucide-react";
 
+// Grille unique et définitive depuis le 2026-08-22 (fin de l'offre de
+// lancement Early Bird : ces tarifs sont désormais les prix de base, pour
+// tout le monde et pour toujours).
 const PRICES = {
-  early: {
-    monthly:    { 50: 59.95,  100: 89.95,  200: 149.95 },
-    semiannual: { 50: 52.95,  100: 79.95,  200: 132.95 },
-    annual:     { 50: 49.95,  100: 74.95,  200: 124.95 },
-  },
-  standard: {
-    monthly:    { 50: 89.95,  100: 149.95, 200: 249.95 },
-    semiannual: { 50: 79.95,  100: 132.95, 200: 219.95 },
-    annual:     { 50: 74.95,  100: 124.95, 200: 204.95 },
-  },
+  monthly:    { 50: 59.95,  100: 89.95,  200: 149.95 },
+  semiannual: { 50: 52.95,  100: 79.95,  200: 132.95 },
+  annual:     { 50: 49.95,  100: 74.95,  200: 124.95 },
 } as const;
 
-type Phase  = keyof typeof PRICES;
-type Period = keyof (typeof PRICES)["early"];
+type Period = keyof typeof PRICES;
 type Tier   = 50 | 100 | 200;
 
 function fmt(n: number) {
@@ -65,14 +60,13 @@ function ControlLabel({ label, hint }: { label: string; hint?: string }) {
 }
 
 export function B2BSimulator() {
-  const [phase, setPhase]       = useState<Phase>("early");
   const [period, setPeriod]     = useState<Period>("monthly");
   const [tier, setTier]         = useState<Tier>(100);
   const [convRate, setConvRate] = useState(15);
   const [basket, setBasket]     = useState(80);
 
   const r = useMemo(() => {
-    const monthlyPrice  = PRICES[phase][period][tier];
+    const monthlyPrice  = PRICES[period][tier];
     const monthlyVisits = tier * (convRate / 100);
     const monthlyRevenue = monthlyVisits * basket;
     const netGain       = monthlyRevenue - monthlyPrice;
@@ -88,7 +82,7 @@ export function B2BSimulator() {
     if (period === "annual")     billingNote = `soit CHF ${fmt(monthlyPrice * 12)} / an`;
 
     return { monthlyPrice, monthlyVisits, monthlyRevenue, netGain, roi, annualCost, annualRevenue, annualNet, breakevenVisits, totalMsgs, billingNote };
-  }, [phase, period, tier, convRate, basket]);
+  }, [period, tier, convRate, basket]);
 
   const roiColor =
     r.roi >= 500 ? "text-green-600" :
@@ -115,18 +109,6 @@ export function B2BSimulator() {
 
           {/* ── Controls ─────────────────────────────────── */}
           <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 space-y-6">
-
-            <div>
-              <ControlLabel label="Tarif" />
-              <PillGroup<Phase>
-                options={[
-                  { label: "🚀 Early Bird (offre limitée)", value: "early" },
-                  { label: "Standard", value: "standard" },
-                ]}
-                value={phase}
-                onChange={setPhase}
-              />
-            </div>
 
             <div>
               <ControlLabel label="Durée de l'abonnement" />

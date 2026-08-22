@@ -1,42 +1,17 @@
 "use server";
 
-import { getStripe, getPriceId, TRIAL_DAYS, EARLY_BIRD_LIMIT, type WhatsAppTier } from "@/lib/stripe";
+import { getStripe, getPriceId, TRIAL_DAYS, type WhatsAppTier } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email";
 import { freeTrialWelcome, freeTrialAdminNotification } from "@/lib/email-templates";
 import { logConversionEvent } from "@/lib/analytics/conversion-events";
 
 // ────────────────────────────────────────────────────────────────────────────
-// Early Bird seats counter (used by signup flow + landing page)
-// ────────────────────────────────────────────────────────────────────────────
-
-/**
- * Returns how many Early Bird seats are still available (out of 100).
- * Counts subscriptions with is_early_bird = true AND status active/trialing.
- */
-export async function getEarlyBirdSeatsAvailable(): Promise<number> {
-  try {
-    const supabase = createAdminClient();
-    const { count } = await supabase
-      .from("subscriptions")
-      .select("id", { count: "exact", head: true })
-      .eq("is_early_bird", true)
-      .in("status", ["active", "trialing"]);
-
-    const taken = count || 0;
-    return Math.max(0, EARLY_BIRD_LIMIT - taken);
-  } catch {
-    // If query fails, assume seats available (don't block sales)
-    return EARLY_BIRD_LIMIT;
-  }
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// Checkout session (unified: subscription + lifetime)
+// Checkout session
 // ────────────────────────────────────────────────────────────────────────────
 
 interface CreateCheckoutParams {
-  planType: "monthly" | "semiannual" | "annual" | "lifetime";
+  planType: "monthly" | "semiannual" | "annual";
   merchantId: string;
   locale: string;
   restaurantId?: string;
@@ -53,8 +28,7 @@ interface CheckoutResult {
 
 /**
  * Create a Stripe Checkout session for an EXISTING merchant.
- * - Subscriptions (monthly/semiannual/annual) -> mode "subscription" with 14-day trial
- * - Lifetime -> mode "payment" (one-time)
+ * Mode "subscription" with a 14-day trial (monthly/semiannual/annual).
  * The merchant must already exist in DB (created during signup step).
  */
 export async function createCheckoutSession(
@@ -88,28 +62,18 @@ export async function createCheckoutSession(
       return { url: null, error: "Marchand introuvable" };
     }
 
-    // Count active subscribers to determine Early Bird eligibility
-    const { count } = await supabase
-      .from("subscriptions")
-      .select("id", { count: "exact", head: true })
-      .eq("is_early_bird", true)
-      .in("status", ["active", "trialing"]);
-
-    const subscriberCount = count || 0;
-    const isEarlyBird = subscriberCount < EARLY_BIRD_LIMIT;
-    const priceId = getPriceId(planType, subscriberCount, whatsappTier);
+    // Grille tarifaire unique — le prix ne dépend plus du nombre d'abonnés
+    // déjà en portefeuille (ex-mécanisme "Early Bird", retiré).
+    const priceId = getPriceId(planType, whatsappTier);
 
     if (!priceId) {
       return { url: null, error: "Plan invalide ou prix Stripe non configuré" };
     }
 
-    const isLifetime = planType === "lifetime";
-
     const metadata: Record<string, string> = {
       merchant_id: merchantId,
       plan_type: planType,
       locale: locale,
-      is_early_bird: isEarlyBird ? "true" : "false",
       whatsapp_tier: String(whatsappTier),
     };
     if (restaurantId) {
@@ -128,7 +92,7 @@ export async function createCheckoutSession(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sessionParams: any = {
-      mode: isLifetime ? "payment" : "subscription",
+      mode: "subscription",
       payment_method_types: ["card"],
       customer_email: merchant.email,
       line_items: [{ price: priceId, quantity: 1 }],
@@ -143,13 +107,10 @@ export async function createCheckoutSession(
       locale: stripeLocale,
     };
 
-    // Only add trial for subscriptions (not lifetime)
-    if (!isLifetime) {
-      sessionParams.subscription_data = {
-        trial_period_days: TRIAL_DAYS,
-        metadata,
-      };
-    }
+    sessionParams.subscription_data = {
+      trial_period_days: TRIAL_DAYS,
+      metadata,
+    };
 
     // Reassurance messages on the Stripe checkout page
     sessionParams.custom_text = {
@@ -169,7 +130,7 @@ export async function createCheckoutSession(
       merchantId,
       affiliateRef: affiliateRef || null,
       planType,
-      metadata: { is_early_bird: isEarlyBird, restaurant_id: restaurantId || null },
+      metadata: { restaurant_id: restaurantId || null },
     });
 
     return { url: session.url, error: null };
@@ -213,16 +174,8 @@ export async function createLegacyCheckoutSession(
     }
 
     const stripe = getStripe();
-    const supabase = createAdminClient();
 
-    const { count } = await supabase
-      .from("subscriptions")
-      .select("id", { count: "exact", head: true })
-      .eq("is_early_bird", true)
-      .in("status", ["active", "trialing"]);
-
-    const subscriberCount = count || 0;
-    const priceId = getPriceId(planType, subscriberCount);
+    const priceId = getPriceId(planType);
 
     if (!priceId) {
       return { url: null, error: "Invalid plan type or missing price configuration" };
@@ -244,7 +197,6 @@ export async function createLegacyCheckoutSession(
         restaurant_city: params.restaurantCity,
         plan_type: planType,
         locale: locale,
-        early_bird: subscriberCount < EARLY_BIRD_LIMIT ? "true" : "false",
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription/succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/partenaire-inscription`,

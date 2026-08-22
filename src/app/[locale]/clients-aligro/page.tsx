@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AligroHero } from "@/components/aligro/AligroHero";
 import { AligroOfferBanner } from "@/components/aligro/AligroOfferBanner";
+import { AligroPricingBlock } from "@/components/aligro/AligroPricingBlock";
 import { AligroFinalCTA } from "@/components/aligro/AligroFinalCTA";
 import { AligroFeatures } from "@/components/aligro/AligroFeatures";
 import { AligroProblemSolution } from "@/components/aligro/AligroProblemSolution";
@@ -46,6 +47,7 @@ export default function ClientsAligroPage() {
     <>
       <AligroHero />
       <AligroOfferBanner />
+      <AligroPricingBlock />
       <B2BWhatsAppStats />
       <AligroFeatures />
       <AligroProblemSolution />

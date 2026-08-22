@@ -181,11 +181,9 @@
     "monthly": "Monthly",
     "semiannual": "Semi-annual",
     "annual": "Annual",
-    "lifetime": "Lifetime",
     "perMonth": "/month",
     "perSemester": "/6 months",
     "perYear": "/year",
-    "oneTime": "one-time payment",
     "popular": "Most popular",
     "bestValue": "Best value",
     "subscribe": "Subscribe",
@@ -349,22 +347,14 @@
     "pricing": {
       "title": "Pricing for every need",
       "subtitle": "Choose the plan that suits you and start attracting new customers",
-      "earlyBirdTab": "Launch offer",
-      "earlyBirdBadge": "-40%",
-      "earlyBirdNote": "Exclusive rates for the first 100 registered restaurants",
       "standardTab": "Standard rates",
       "perMonthLabel": "/month",
       "totalLabel": "i.e. CHF {price} total",
       "toteBags": "+ {count} personalized tote bags included",
       "bestValue": "Best value",
-      "lifetimeTitle": "Lifetime offer",
-      "lifetimeExclusive": "Exclusive",
-      "lifetimeDesc": "A one-time payment for unlimited access to all features, forever.",
-      "oneTimePayment": "one-time payment",
       "cta": "View details and subscribe",
       "note": "No commitment on the monthly plan. Cancel anytime.",
       "guarantee": "14-day free trial — satisfaction guaranteed",
-      "spotsLeft": "{count} Early Bird spots remaining",
       "includedTitle": "Included in all plans",
       "included": {
         "presence": "Your establishment listing",
@@ -405,7 +395,7 @@
       "title": "Frequently asked questions",
       "q1": {
         "question": "How much does it cost to register on Just-Tag?",
-        "answer": "We offer 3 plans (monthly, semi-annual, annual) with a launch rate for the first 100 registered restaurants. Standard rates apply thereafter. A lifetime offer at CHF 1,495 is also available. All semi-annual and annual plans include free personalized tote bags."
+        "answer": "We offer 3 plans (monthly, semi-annual, annual) with a single, identical rate for all restaurants, from the very first sign-up. All semi-annual and annual plans include free personalized tote bags."
       },
       "q2": {
         "question": "Am I tied to a minimum duration?",
@@ -421,7 +411,7 @@
       },
       "q5": {
         "question": "What kind of support do you offer?",
-        "answer": "All plans include email support. Annual and Lifetime plans benefit from dedicated and priority support with a personal advisor."
+        "answer": "All plans include email support. The Annual plan benefits from dedicated and priority support with a personal advisor."
       },
       "q6": {
         "question": "Can I update my profile at any time?",
@@ -552,12 +542,8 @@
       "title": "Clear pricing, no surprises",
       "subtitle": "All plans include the same features. The only difference: the commitment length and the price.",
       "guarantee": "14-day free trial — satisfaction guaranteed",
-      "earlyBirdLabel": "Launch offer",
-      "earlyBirdBannerActive": "Launch offer: -40% for the first 100 restaurants. Only {count} spots left. These rates won't come back.",
-      "earlyBirdBannerExpiring": "Early Bird offer ending soon. Sign up before it's too late.",
       "bestValue": "Best value",
       "perMonth": "/month",
-      "afterHundred": "after 100 sign-ups",
       "totalPrice": "i.e. CHF {price} total",
       "freeTrial": "14 days free",
       "toteBags": "+ {count} personalised tote bags included",
@@ -571,10 +557,6 @@
         "offers": "Current offers"
       },
       "startTrial": "Start free trial",
-      "lifetimeExclusive": "Exclusive",
-      "lifetimeDesc": "With the lifetime offer, you pay once and save on all your future subscriptions. And 500 personalised tote bags (estimated value CHF 2,500) are included.",
-      "lifetimeToteBags": "+ 500 personalised tote bags included",
-      "singlePayment": "one-time payment",
       "contactNote": "Not ready? Leave us your number, we'll call you back:",
       "gridTitle": "Clear pricing, WhatsApp included",
       "gridSubtitle": "Choose your plan based on the size of your restaurant. Up to {count} WhatsApp messages/month included.",
@@ -584,7 +566,6 @@
         "semiannual": "Semi-annual",
         "annual": "Annual"
       },
-      "launchOfferBadge": "Launch price — offer limited to the first 100 restaurants",
       "messagesIncludedTitle": "200, 400 or 800 WhatsApp messages per month included",
       "messagesIncludedSubtitle": "Choose your plan based on the monthly message volume you need",
       "tierDescriptions": {
@@ -656,15 +637,10 @@
       }
     },
     "finalCta": {
-      "spotsLeft": "Only {count} Early Bird spots left",
       "joinNow": "Join Just-Tag now",
       "subtitle": "14 days free. Zero commission. Cancel anytime.",
       "cta": "Start my free trial",
       "contactNote": "Have a question? Write to us at"
-    },
-    "earlyBirdBanner": {
-      "active": "Early Bird offer: -40% for the first 100 subscribers.",
-      "expired": "Early Bird offer ending soon"
     },
     "findRestaurant": {
       "title": "Your restaurant may already be on Just-Tag",
@@ -674,7 +650,7 @@
       "foundSubtitle": "Claim your listing to personalise it and attract more customers.",
       "claimCta": "Claim my listing",
       "notFoundTitle": "Your restaurant is not yet on Just-Tag.",
-      "notFoundSubtitle": "Add it and take advantage of the Early Bird offer!",
+      "notFoundSubtitle": "Add it and start gaining visibility today!",
       "addCta": "Add my restaurant"
     },
     "meta": {
@@ -762,8 +738,6 @@
       "continue": "Continue"
     },
     "plan": {
-      "earlyBirdTitle": "Early Bird Offer",
-      "earlyBirdSeats": "Only {count} spot(s) left at the preferential rate!",
       "trialInfo": "14-day free trial on all subscriptions. No commitment.",
       "monthly": "Monthly",
       "semiannual": "Semi-annual",
@@ -772,14 +746,8 @@
       "totalLabel": "i.e. CHF {price} {period}",
       "freeTrial": "14 days free",
       "bestValue": "Best value",
-      "lifetimeTitle": "Lifetime",
-      "lifetimeExclusive": "Exclusive",
-      "lifetimeDesc": "One-time payment, lifetime access. No recurring subscription.",
-      "lifetimePrice": "CHF 1,495",
-      "lifetimeSingle": "One-time payment",
       "back": "Back",
       "checkoutLoading": "Redirecting to payment...",
-      "checkoutLifetime": "Pay CHF 1,495",
       "checkoutTrial": "Start free trial (14 days)"
     },
     "redirecting": {

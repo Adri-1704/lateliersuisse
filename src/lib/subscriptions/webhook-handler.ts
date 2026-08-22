@@ -53,10 +53,26 @@ export async function handleSubscriptionWebhook(
     case "checkout.session.completed": {
       console.log("Checkout completed:", data.id);
 
+      // L'offre "à vie" (paiement unique, mode "payment") a été retirée du
+      // catalogue — aucun restaurateur ne l'a jamais souscrite. Le code ne
+      // crée plus JAMAIS de session en mode "payment" (voir
+      // src/actions/subscriptions.ts), mais Stripe peut en théorie encore
+      // émettre un tel événement pour un vieux Payment Link créé manuellement
+      // dans le Dashboard ou un test. On l'ignore explicitement plutôt que de
+      // planter ou d'insérer un abonnement incohérent (plan_type "lifetime"
+      // n'a d'ailleurs plus de sens applicatif) : on logue un avertissement
+      // et on répond 2xx (voir route.ts) pour que Stripe ne rejoue pas
+      // indéfiniment un événement qu'on ne saura jamais traiter.
+      if (data.mode === "payment") {
+        console.warn(
+          `[Webhook] checkout.session.completed en mode "payment" reçu (session ${data.id}) — l'offre à vie n'est plus commercialisée, cet événement est ignoré. Si ce n'est pas un test manuel, vérifier qu'aucun ancien Payment Link Stripe n'est encore actif.`
+        );
+        return;
+      }
+
       try {
         const supabase = createAdminClient();
         const metadata = data.metadata || {};
-        const isLifetime = data.mode === "payment";
         const merchantId = metadata.merchant_id;
 
         // ── Resolve merchant ──
@@ -160,8 +176,7 @@ export async function handleSubscriptionWebhook(
         }
 
         // ── Create subscription record (idempotent — C3 fix) ──
-        const isEarlyBird = metadata.is_early_bird === "true" || metadata.early_bird === "true";
-        const planType = metadata.plan_type || (isLifetime ? "lifetime" : "monthly");
+        const planType = metadata.plan_type || "monthly";
         const checkoutSessionId: string = data.id; // cs_xxx — unique per checkout
 
         // Skip if we already processed this checkout session (idempotence guard)
@@ -194,46 +209,6 @@ export async function handleSubscriptionWebhook(
 
         if (existingSub) {
           console.log(`[Webhook] Subscription for checkout ${checkoutSessionId} already exists — skipping (idempotent).`);
-        } else if (isLifetime) {
-          // Lifetime: one-time payment -> subscription record with status active, no period end
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { error: insertLifetimeError } = await (supabase.from("subscriptions") as any).insert({
-            merchant_id: merchant.id,
-            stripe_subscription_id: data.payment_intent || data.id,
-            stripe_checkout_session_id: checkoutSessionId,
-            plan_type: "lifetime",
-            status: "active",
-            is_early_bird: isEarlyBird,
-            current_period_start: new Date().toISOString(),
-            current_period_end: "2099-12-31T23:59:59.000Z",
-            affiliate_ref: affiliateRef,
-          });
-
-          if (insertLifetimeError) {
-            throw new Error(
-              `[Webhook] Échec de l'insertion de l'abonnement lifetime (checkout ${checkoutSessionId}): ${insertLifetimeError.message}`
-            );
-          }
-
-          // Log payment + affiliate recruit events
-          const amount = data.amount_total ? data.amount_total / 100 : null;
-          void logConversionEvent({
-            eventType: "payment_success",
-            merchantId: merchant.id,
-            affiliateRef,
-            planType: "lifetime",
-            amountChf: amount,
-            metadata: { is_early_bird: isEarlyBird, mode: "lifetime" },
-          });
-          if (affiliateRef) {
-            void logConversionEvent({
-              eventType: "affiliate_recruit",
-              merchantId: merchant.id,
-              affiliateRef,
-              planType: "lifetime",
-              amountChf: amount,
-            });
-          }
         } else {
           // Subscription mode — le statut réel (souvent "trialing" si
           // TRIAL_DAYS est configuré) doit venir de Stripe, pas être forcé
@@ -257,7 +232,10 @@ export async function handleSubscriptionWebhook(
             stripe_checkout_session_id: checkoutSessionId,
             plan_type: planType,
             status: initialStatus,
-            is_early_bird: isEarlyBird,
+            // Le tarif de lancement réservé aux 100 premiers a été retiré :
+            // il n'existe plus qu'une grille unique. La colonne est conservée
+            // pour les abonnés historiques, mais n'est plus jamais vraie.
+            is_early_bird: false,
             affiliate_ref: affiliateRef,
             whatsapp_tier: metadata.whatsapp_tier ? Number(metadata.whatsapp_tier) : 100,
             current_period_start: new Date().toISOString(),
@@ -277,7 +255,7 @@ export async function handleSubscriptionWebhook(
             affiliateRef,
             planType,
             amountChf: amount,
-            metadata: { is_early_bird: isEarlyBird, mode: "subscription" },
+            metadata: { mode: "subscription" },
           });
           if (affiliateRef) {
             void logConversionEvent({
@@ -336,8 +314,7 @@ export async function handleSubscriptionWebhook(
       // Notifier l'admin du paiement
       try {
         const metadata = data.metadata || {};
-        const isEarlyBird = metadata.is_early_bird === "true" || metadata.early_bird === "true";
-        const planType = metadata.plan_type || (data.mode === "payment" ? "lifetime" : "monthly");
+        const planType = metadata.plan_type || "monthly";
 
         // Récupérer les infos merchant (nouveau flow ou metadata legacy)
         let merchantName = metadata.merchant_name || "";
@@ -362,7 +339,6 @@ export async function handleSubscriptionWebhook(
           merchantEmail,
           restaurantName,
           planType,
-          isEarlyBird,
           amount: amountFormatted,
         });
         const adminEmailAddress = process.env.ADMIN_EMAIL || "contact@just-tag.app";

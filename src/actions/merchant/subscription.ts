@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { getStripe, getPriceId, EARLY_BIRD_LIMIT } from "@/lib/stripe";
+import { getStripe, getPriceId } from "@/lib/stripe";
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
 /**
@@ -75,7 +75,6 @@ type CurrentSubRow = {
   stripe_subscription_id: string | null;
   plan_type: string;
   status: string;
-  is_early_bird: boolean;
   affiliate_ref: string | null;
 };
 
@@ -125,7 +124,7 @@ export async function createPlanChangeSession(
 
     const admin = createAdminClient();
     const { data } = await (admin.from("subscriptions") as ReturnType<typeof admin.from>)
-      .select("stripe_subscription_id, plan_type, status, is_early_bird, affiliate_ref")
+      .select("stripe_subscription_id, plan_type, status, affiliate_ref")
       .eq("merchant_id", merchant.id)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -143,9 +142,9 @@ export async function createPlanChangeSession(
   // essai gratuit. On ne peut le faire que si l'abonnement local pointe vers
   // un vrai abonnement Stripe "vivant" :
   //  - stripe_subscription_id ressemble à un id de Subscription ("sub_…") —
-  //    les abonnements "lifetime" stockent ici un payment_intent/checkout
-  //    session id, pas un vrai abonnement à mettre à jour ;
-  //  - plan_type n'est pas "lifetime" ;
+  //    un ancien abonnement en mode paiement unique (offre "à vie", retirée
+  //    du catalogue) stockerait ici un payment_intent/checkout session id,
+  //    pas un vrai abonnement à mettre à jour ;
   //  - le statut n'est pas déjà "canceled"/"incomplete" (rien à prolonger).
   // Cette décision est prise AVANT toute mutation : le fallback checkout
   // ci-dessous n'est atteignable QUE si on décide ici qu'il n'y a rien à
@@ -154,7 +153,6 @@ export async function createPlanChangeSession(
   const hasLiveStripeSubscription =
     !!currentSub?.stripe_subscription_id &&
     currentSub.stripe_subscription_id.startsWith("sub_") &&
-    currentSub.plan_type !== "lifetime" &&
     ["active", "trialing", "past_due"].includes(currentSub.status) &&
     !!process.env.STRIPE_SECRET_KEY;
 
@@ -178,13 +176,14 @@ export async function createPlanChangeSession(
       throw new Error(`Abonnement Stripe ${subscriptionId} introuvable, annulé ou sans item.`);
     }
 
-    // On préserve la "phase" tarifaire (early bird verrouillé vs. catalogue)
-    // déjà appliquée à ce marchand plutôt que de la recalculer sur le
-    // compteur global d'early birds au moment du changement — pour ne pas
-    // faire perdre son tarif early bird à un client qui change juste de
-    // durée/quota. HYPOTHÈSE PRODUIT NON CONFIRMÉE — à valider.
-    const earlyBirdCountForPricing = currentSub!.is_early_bird ? 0 : EARLY_BIRD_LIMIT;
-    const priceId = getPriceId(planType, earlyBirdCountForPricing, whatsappTier);
+    // Grille tarifaire unique (décision produit du 2026-08-22) : un
+    // changement de formule/palier requote toujours sur le tarif unique en
+    // vigueur, quel que soit l'historique du marchand (l'ancienne notion de
+    // "phase" early bird vs. catalogue n'existe plus). Un marchand encore
+    // sur l'ancien prix "catalogue" (is_early_bird = false) qui change de
+    // formule bascule donc ici sur le tarif unique, généralement plus
+    // avantageux — comportement voulu, à confirmer en recette.
+    const priceId = getPriceId(planType, whatsappTier);
     if (!priceId) {
       return { url: null, error: "Plan invalide ou prix Stripe non configuré" };
     }
