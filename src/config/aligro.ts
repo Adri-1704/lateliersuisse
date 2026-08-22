@@ -22,6 +22,15 @@
 export const ALIGRO_DISCOUNT_PERCENT: number | "X" | null = 40;
 
 /**
+ * Code promotionnel à saisir par le restaurateur sur la page de paiement
+ * Stripe. C'est LUI, et lui seul, qui déclenche la remise : le tarif remisé
+ * affiché sur /clients-aligro est une vitrine, aucun prix réduit n'est
+ * facturé sans ce code. Il doit correspondre exactement au code créé dans le
+ * Dashboard Stripe (Produits > Codes promotionnels).
+ */
+export const ALIGRO_PROMO_CODE = "ALIGRO40";
+
+/**
  * Libellé de l'offre à afficher sur la page, dérivé de `ALIGRO_DISCOUNT_PERCENT`.
  * - Si le pourcentage n'est pas encore décidé (`null`) : texte générique sans chiffre.
  * - Sinon : texte précis avec le pourcentage de remise.
@@ -31,4 +40,18 @@ export function getAligroOfferLabel(): string {
     return "Offre exclusive réservée aux clients ALIGRO";
   }
   return `-${ALIGRO_DISCOUNT_PERCENT}% sur tous vos abonnements`;
+}
+
+/**
+ * Applique la remise ALIGRO à un prix de base (voir `src/config/pricing.ts`
+ * pour la grille de base). Retourne `null` tant que le pourcentage n'est pas
+ * un nombre arrêté (`"X"` placeholder ou `null`) : dans ce cas, impossible
+ * d'afficher un prix remisé fiable — mieux vaut ne rien calculer que
+ * d'afficher un chiffre inventé.
+ */
+export function getAligroDiscountedPrice(basePrice: number): number | null {
+  if (typeof ALIGRO_DISCOUNT_PERCENT !== "number") {
+    return null;
+  }
+  return Math.round(basePrice * (1 - ALIGRO_DISCOUNT_PERCENT / 100) * 100) / 100;
 }

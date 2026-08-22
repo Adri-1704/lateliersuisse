@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getAligroOfferLabel } from "@/config/aligro";
+import { ALIGRO_PROMO_CODE, getAligroOfferLabel } from "@/config/aligro";
 
 /**
  * CTA final de la page /fr/clients-aligro. Le bouton pointe vers
@@ -44,6 +44,12 @@ export function AligroFinalCTA() {
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Link>
         </Button>
+
+        <p className="mt-5 text-sm text-gray-300">
+          Pensez à saisir le code{" "}
+          <span className="font-mono font-bold tracking-wider text-white">{ALIGRO_PROMO_CODE}</span>{" "}
+          sur la page de paiement pour obtenir votre remise.
+        </p>
 
         <p className="mt-6 text-sm text-gray-400">
           Une question ?{" "}

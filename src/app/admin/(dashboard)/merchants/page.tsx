@@ -10,14 +10,12 @@ const planLabels: Record<string, string> = {
   monthly: "Mensuel",
   semiannual: "Semestriel",
   annual: "Annuel",
-  lifetime: "À vie",
 };
 
 const planColors: Record<string, { bg: string; color: string }> = {
   monthly: { bg: "#f3f4f6", color: "#374151" },
   semiannual: { bg: "#eff6ff", color: "#2563eb" },
   annual: { bg: "#eef2ff", color: "#4f46e5" },
-  lifetime: { bg: "#fef3c7", color: "#92400e" },
 };
 
 export default async function MerchantsPage({

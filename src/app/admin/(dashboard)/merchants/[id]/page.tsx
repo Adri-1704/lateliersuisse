@@ -15,7 +15,6 @@ const planLabels: Record<string, string> = {
   monthly: "Mensuel",
   semiannual: "Semestriel",
   annual: "Annuel",
-  lifetime: "À vie",
 };
 
 export default async function MerchantDetailPage({

@@ -6,10 +6,13 @@ import { useTranslations } from "next-intl";
 import { Check, ShieldCheck, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// Grille unique et définitive depuis le 2026-08-22 (fin de l'offre de
+// lancement Early Bird : ces tarifs sont désormais les prix de base, pour
+// tout le monde et pour toujours).
 const PRICES = {
-  monthly:    { 50: [59.95,  89.95] as const, 100: [89.95,  149.95] as const, 200: [149.95, 249.95] as const },
-  semiannual: { 50: [52.95,  79.95] as const, 100: [79.95,  132.95] as const, 200: [132.95, 219.95] as const },
-  annual:     { 50: [49.95,  74.95] as const, 100: [74.95,  124.95] as const, 200: [124.95, 204.95] as const },
+  monthly:    { 50: 59.95,  100: 89.95,  200: 149.95 },
+  semiannual: { 50: 52.95,  100: 79.95,  200: 132.95 },
+  annual:     { 50: 49.95,  100: 74.95,  200: 124.95 },
 } as const;
 
 type Billing = keyof typeof PRICES;
@@ -33,8 +36,6 @@ export function B2BPricing() {
   const locale = params.locale as string;
   const router = useRouter();
   const [billing, setBilling] = useState<Billing>("monthly");
-
-  const phaseIdx = 0;
 
   const features = t.raw("features") as string[];
 
@@ -83,11 +84,6 @@ export function B2BPricing() {
               </button>
             ))}
           </div>
-
-          {/* Launch offer badge */}
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-200 px-4 py-1.5 text-sm font-medium text-amber-800">
-            🚀 {t("launchOfferBadge")}
-          </div>
         </div>
 
         {/* Section subtitle */}
@@ -103,7 +99,7 @@ export function B2BPricing() {
         {/* Cards */}
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {TIER_CONFIG.map(({ count, descKey, highlight }) => {
-            const price = PRICES[billing][count][phaseIdx];
+            const price = PRICES[billing][count];
             const showTotal = billing !== "monthly";
             const totalAmount = billing === "semiannual"
               ? (price * 6).toFixed(2)

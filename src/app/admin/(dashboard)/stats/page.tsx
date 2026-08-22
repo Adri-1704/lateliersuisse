@@ -1,5 +1,4 @@
 import { getSaaSMetrics } from "@/actions/admin/stats";
-import { EARLY_BIRD_LIMIT } from "@/lib/stripe";
 import {
   TrendingUp,
   DollarSign,
@@ -10,9 +9,7 @@ import {
   Target,
   UtensilsCrossed,
   ShieldCheck,
-  Zap,
   Clock,
-  Award,
   ArrowUpRight,
   ArrowDownRight,
   Minus,
@@ -120,14 +117,12 @@ export default async function StatsPage() {
     monthly: "Mensuel",
     semiannual: "Semestriel",
     annual: "Annuel",
-    lifetime: "Lifetime",
   };
 
   const totalByPlan =
     m.subscribersByPlan.monthly +
     m.subscribersByPlan.semiannual +
-    m.subscribersByPlan.annual +
-    m.subscribersByPlan.lifetime;
+    m.subscribersByPlan.annual;
 
   return (
     <div className="space-y-8">
@@ -140,7 +135,7 @@ export default async function StatsPage() {
       </div>
 
       {/* KPIs principaux */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard title="MRR" icon={<DollarSign className="h-4 w-4" />}>
           <p className="text-3xl font-bold text-gray-900">{formatCHF(m.mrr)}</p>
           <div className="mt-1 flex items-center gap-2">
@@ -173,34 +168,13 @@ export default async function StatsPage() {
           </p>
           <p className="mt-1 text-xs text-gray-400">ce mois</p>
         </KpiCard>
-
-        <KpiCard title="Places Early Bird" icon={<Zap className="h-4 w-4 text-amber-500" />}>
-          <p className="text-3xl font-bold text-gray-900">
-            {m.earlyBirdSpotsRemaining}
-            <span className="text-lg font-normal text-gray-400">/{EARLY_BIRD_LIMIT}</span>
-          </p>
-          <div className="mt-2">
-            <ProgressBar
-              value={EARLY_BIRD_LIMIT - m.earlyBirdSpotsRemaining}
-              max={EARLY_BIRD_LIMIT}
-              color="bg-amber-500"
-            />
-          </div>
-        </KpiCard>
       </div>
 
       {/* Croissance & Conversion */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <KpiCard title="Revenue total estimé" icon={<DollarSign className="h-4 w-4 text-emerald-600" />}>
           <p className="text-2xl font-bold text-gray-900">{formatCHF(m.revenueTotalEstime)}</p>
-          <p className="mt-1 text-xs text-gray-400">ARR + Lifetime</p>
-        </KpiCard>
-
-        <KpiCard title="Revenue Lifetime" icon={<Award className="h-4 w-4" />}>
-          <p className="text-2xl font-bold text-gray-900">{formatCHF(m.revenueLifetime)}</p>
-          <p className="mt-1 text-xs text-gray-400">
-            {m.subscribersByPlan.lifetime} abonné{m.subscribersByPlan.lifetime !== 1 ? "s" : ""} lifetime
-          </p>
+          <p className="mt-1 text-xs text-gray-400">ARR</p>
         </KpiCard>
 
         <KpiCard title="Nouveaux ce mois" icon={<UserPlus className="h-4 w-4" />}>
@@ -225,7 +199,7 @@ export default async function StatsPage() {
       </div>
 
       {/* Répartition */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard title="Répartition par plan" icon={<BarChart3 className="h-4 w-4 text-indigo-500" />}>
           <div className="space-y-3">
             {(Object.entries(m.subscribersByPlan) as [string, number][]).map(([plan, count]) => (
@@ -240,35 +214,6 @@ export default async function StatsPage() {
             {totalByPlan === 0 && (
               <p className="text-sm text-gray-400">Aucun abonné pour le moment</p>
             )}
-          </div>
-        </SectionCard>
-
-        <SectionCard title="Early Bird vs Standard" icon={<Zap className="h-4 w-4 text-amber-500" />}>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5 text-gray-700">
-                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />
-                  Early Bird
-                </span>
-                <span className="font-semibold text-gray-900">{m.earlyBirdCount}</span>
-              </div>
-              <ProgressBar
-                value={m.earlyBirdCount}
-                max={m.earlyBirdCount + m.standardCount || 1}
-                color="bg-amber-500"
-              />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1.5 text-gray-700">
-                  <span className="inline-block h-2.5 w-2.5 rounded-full bg-indigo-500" />
-                  Standard
-                </span>
-                <span className="font-semibold text-gray-900">{m.standardCount}</span>
-              </div>
-              <ProgressBar value={m.standardCount} max={m.earlyBirdCount + m.standardCount || 1} />
-            </div>
           </div>
         </SectionCard>
 

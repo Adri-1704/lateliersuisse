@@ -63,21 +63,16 @@ const FEATURES = [
   },
 ];
 
+// Grille unique et définitive depuis le 2026-08-22 (fin de l'offre de
+// lancement Early Bird : ces tarifs sont désormais les prix de base, pour
+// tout le monde et pour toujours).
 const PRICES = {
-  early: {
-    monthly:    { 50: 59.95,  100: 89.95,  200: 149.95 },
-    semiannual: { 50: 52.95,  100: 79.95,  200: 132.95 },
-    annual:     { 50: 49.95,  100: 74.95,  200: 124.95 },
-  },
-  standard: {
-    monthly:    { 50: 89.95,  100: 149.95, 200: 249.95 },
-    semiannual: { 50: 79.95,  100: 132.95, 200: 219.95 },
-    annual:     { 50: 74.95,  100: 124.95, 200: 204.95 },
-  },
+  monthly:    { 50: 59.95,  100: 89.95,  200: 149.95 },
+  semiannual: { 50: 52.95,  100: 79.95,  200: 132.95 },
+  annual:     { 50: 49.95,  100: 74.95,  200: 124.95 },
 } as const;
 
-type Phase  = keyof typeof PRICES;
-type Period = keyof (typeof PRICES)["early"];
+type Period = keyof typeof PRICES;
 type Tier   = 50 | 100 | 200;
 
 const TIERS: { contacts: Tier; msgs: number; desc: string; highlight: boolean; features: string[] }[] = [
@@ -131,14 +126,13 @@ function Pill<T extends string | number>({
 
 // ─── ROI Simulator ────────────────────────────────────────────────────────────
 function Simulator() {
-  const [phase, setPhase]       = useState<Phase>("early");
   const [period, setPeriod]     = useState<Period>("monthly");
   const [tier, setTier]         = useState<Tier>(100);
   const [convRate, setConvRate] = useState(12);
   const [basket, setBasket]     = useState(60);
 
   const r = useMemo(() => {
-    const price     = PRICES[phase][period][tier];
+    const price     = PRICES[period][tier];
     const msgs      = tier * 4;
     const visits    = tier * (convRate / 100);
     const revenue   = visits * basket;
@@ -146,7 +140,7 @@ function Simulator() {
     const roi       = (net / price) * 100;
     const breakeven = price / basket;
     return { price, msgs, contacts: tier, visits, revenue, net, roi, breakeven };
-  }, [phase, period, tier, convRate, basket]);
+  }, [period, tier, convRate, basket]);
 
   const fmt = (n: number) => n.toLocaleString("fr-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtInt = (n: number) => Math.round(n).toLocaleString("fr-CH");
@@ -163,17 +157,6 @@ function Simulator() {
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           {/* Controls */}
           <div className="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div>
-              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Tarif</p>
-              <Pill<Phase>
-                options={[
-                  { label: "🚀 Early Bird", value: "early" },
-                  { label: "Standard", value: "standard" },
-                ]}
-                value={phase}
-                onChange={setPhase}
-              />
-            </div>
             <div>
               <p className="mb-2 text-xs font-bold uppercase tracking-widest text-gray-400">Durée</p>
               <Pill<Period>
@@ -268,7 +251,6 @@ function Simulator() {
 
 // ─── Pricing ─────────────────────────────────────────────────────────────────
 function PricingSection() {
-  const [phase, setPhase]   = useState<Phase>("early");
   const [period, setPeriod] = useState<Period>("monthly");
 
   const fmt = (n: number) => n.toLocaleString("fr-CH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -283,19 +265,6 @@ function PricingSection() {
 
         {/* Controls */}
         <div className="mb-8 flex flex-col items-center gap-4">
-          {/* Phase */}
-          <div className="flex gap-1 rounded-full bg-gray-100 p-1">
-            {([["early", "🚀 Early Bird"], ["standard", "Standard"]] as [Phase, string][]).map(([val, label]) => (
-              <button
-                key={val}
-                onClick={() => setPhase(val)}
-                className="rounded-full px-5 py-2 text-sm font-medium transition-all"
-                style={phase === val ? { background: WA_GREEN, color: "#fff", fontWeight: 700 } : { color: "#6b7280" }}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
           {/* Period */}
           <div className="flex gap-1 rounded-full bg-gray-100 p-1">
             {([["monthly", "Mensuel"], ["semiannual", "Semestriel −11%"], ["annual", "Annuel −17%"]] as [Period, string][]).map(([val, label]) => (
@@ -309,17 +278,12 @@ function PricingSection() {
               </button>
             ))}
           </div>
-          {phase === "early" && (
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-sm font-medium text-amber-800">
-              🚀 Prix de lancement — offre limitée aux 100 premiers commerces
-            </div>
-          )}
         </div>
 
         {/* Cards */}
         <div className="grid gap-6 sm:grid-cols-3">
           {TIERS.map((t) => {
-            const price = PRICES[phase][period][t.contacts];
+            const price = PRICES[period][t.contacts];
             const showTotal = period !== "monthly";
             const totalAmount = period === "semiannual" ? fmt(price * 6) : fmt(price * 12);
             const totalPeriod = period === "semiannual" ? "/ 6 mois" : "/ an";

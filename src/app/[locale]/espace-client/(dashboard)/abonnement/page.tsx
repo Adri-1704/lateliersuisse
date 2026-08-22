@@ -13,7 +13,7 @@ import {
 import type { Subscription, Merchant } from "@/lib/supabase/types";
 
 const planLabels: Record<string, string> = {
-  monthly: "Mensuel", semiannual: "Semestriel", annual: "Annuel", lifetime: "À vie",
+  monthly: "Mensuel", semiannual: "Semestriel", annual: "Annuel",
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -33,10 +33,13 @@ const PERIODS: { key: Period; label: string; badge: string | null }[] = [
   { key: "annual",     label: "Annuel",     badge: "−17%" },
 ];
 
-const PRICES: Record<Period, Record<Tier, [number, number]>> = {
-  monthly:    { 50: [59.95,  89.95],  100: [89.95,  149.95],  200: [149.95, 249.95] },
-  semiannual: { 50: [52.95,  79.95],  100: [79.95,  132.95],  200: [132.95, 219.95] },
-  annual:     { 50: [49.95,  74.95],  100: [74.95,  124.95],  200: [124.95, 204.95] },
+// Grille unique et définitive depuis le 2026-08-22 (fin de l'offre de
+// lancement Early Bird : ces tarifs sont désormais les prix de base, pour
+// tout le monde et pour toujours).
+const PRICES: Record<Period, Record<Tier, number>> = {
+  monthly:    { 50: 59.95,  100: 89.95,  200: 149.95 },
+  semiannual: { 50: 52.95,  100: 79.95,  200: 132.95 },
+  annual:     { 50: 49.95,  100: 74.95,  200: 124.95 },
 };
 
 const TIERS: { value: Tier; label: string; desc: string; popular: boolean }[] = [
@@ -143,7 +146,6 @@ export default function SubscriptionPage() {
     );
   }
 
-  const isEarlyBird = subscription?.is_early_bird ?? false;
   const currentTier = (subscription?.whatsapp_tier ?? 100) as Tier;
 
   return (
@@ -292,8 +294,7 @@ export default function SubscriptionPage() {
               {/* Tier cards */}
               <div className="grid gap-4 sm:grid-cols-3">
                 {TIERS.map((tier) => {
-                  const [earlyPrice, standardPrice] = PRICES[selectedPeriod][tier.value];
-                  const price = isEarlyBird ? earlyPrice : standardPrice;
+                  const price = PRICES[selectedPeriod][tier.value];
                   const isCurrent = subscription.plan_type === selectedPeriod && currentTier === tier.value;
                   const key = `${selectedPeriod}-${tier.value}`;
                   const isChanging = changingPlan === key;
@@ -364,11 +365,6 @@ export default function SubscriptionPage() {
                 })}
               </div>
 
-              {isEarlyBird && (
-                <p className="text-[12px] font-semibold" style={{ color: "#e85d26" }}>
-                  ✦ Tarifs Early Bird — réservés aux 100 premiers restaurants inscrits
-                </p>
-              )}
               <p className="text-[12px] text-gray-500">
                 ✦ Jusqu&apos;à {(selectedTier ?? currentTier) * 4} messages WhatsApp par mois · Renouvellement le 1er de chaque mois
               </p>

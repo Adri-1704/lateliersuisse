@@ -365,7 +365,6 @@ const planLabels: Record<string, Record<Locale, string>> = {
   monthly: { fr: "Mensuel", de: "Monatlich", en: "Monthly", pt: "Mensal", es: "Mensual" },
   semiannual: { fr: "Semestriel", de: "Halbjährlich", en: "Semi-annual", pt: "Semestral", es: "Semestral" },
   annual: { fr: "Annuel", de: "Jährlich", en: "Annual", pt: "Anual", es: "Anual" },
-  lifetime: { fr: "À vie", de: "Lebenslang", en: "Lifetime", pt: "Vitalício", es: "De por vida" },
 };
 
 export function paymentConfirmation(
@@ -768,7 +767,6 @@ export interface SubscriptionPaymentAdminData {
   merchantEmail: string;
   restaurantName: string;
   planType: string;
-  isEarlyBird: boolean;
   amount?: string;
 }
 
@@ -786,7 +784,6 @@ export function subscriptionPaymentAdminNotification(data: SubscriptionPaymentAd
     label("Email", data.merchantEmail || "—"),
     label("Restaurant", data.restaurantName || "—"),
     label("Plan", data.planType || "—"),
-    label("Early Bird", data.isEarlyBird ? "Oui" : "Non"),
     ...(data.amount ? [label("Montant", data.amount)] : []),
     divider(),
     button("https://dashboard.stripe.com/payments", "Voir sur Stripe"),

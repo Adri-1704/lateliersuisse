@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { PLAN_DETAILS, type WhatsAppTier } from "@/lib/stripe";
 import { Users, TrendingUp, Link2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -25,9 +26,9 @@ async function getAffiliateStats(): Promise<{
 
   const { data: subs } = await supabase
     .from("subscriptions")
-    .select("affiliate_ref, plan_type, status, created_at, merchant_id, is_early_bird")
+    .select("affiliate_ref, plan_type, status, created_at, merchant_id, whatsapp_tier")
     .not("affiliate_ref", "is", null) as {
-      data: { affiliate_ref: string; plan_type: string; status: string; created_at: string; merchant_id: string; is_early_bird: boolean }[] | null;
+      data: { affiliate_ref: string; plan_type: string; status: string; created_at: string; merchant_id: string; whatsapp_tier: WhatsAppTier | null }[] | null;
     };
 
   if (!subs || subs.length === 0) {
@@ -52,11 +53,11 @@ async function getAffiliateStats(): Promise<{
     (parrains || []).map((p) => [p.ref_code, { name: p.name, email: p.email }])
   );
 
-  function getPrice(plan: string, isEarlyBird: boolean): number {
-    if (plan === "lifetime") return 1495;
-    if (plan === "annual") return isEarlyBird ? 299 : 499;
-    if (plan === "semiannual") return isEarlyBird ? 159 : 269;
-    return isEarlyBird ? 29.95 : 49.95;
+  // Grille unique et définitive depuis le 2026-08-22 (fin de l'offre de
+  // lancement Early Bird) : le prix ne dépend plus que du palier de messages
+  // WhatsApp et de la périodicité. Source : PLAN_DETAILS (src/lib/stripe.ts).
+  function getPrice(plan: "monthly" | "semiannual" | "annual", tier: WhatsAppTier | null): number {
+    return PLAN_DETAILS[tier ?? 100][plan];
   }
 
   const affiliateMap = new Map<string, AffiliateStats>();
@@ -77,7 +78,7 @@ async function getAffiliateStats(): Promise<{
       });
     }
     const aff = affiliateMap.get(ref)!;
-    const price = getPrice(sub.plan_type, sub.is_early_bird);
+    const price = getPrice(sub.plan_type as "monthly" | "semiannual" | "annual", sub.whatsapp_tier);
     const merchant = merchantMap.get(sub.merchant_id);
 
     aff.totalSubscriptions++;

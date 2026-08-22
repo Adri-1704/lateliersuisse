@@ -181,11 +181,9 @@
     "monthly": "Monatlich",
     "semiannual": "Halbjährlich",
     "annual": "Jährlich",
-    "lifetime": "Lebenslang",
     "perMonth": "/Monat",
     "perSemester": "/6 Monate",
     "perYear": "/Jahr",
-    "oneTime": "Einmalzahlung",
     "popular": "Am beliebtesten",
     "bestValue": "Bestes Preis-Leistungs-Verhältnis",
     "subscribe": "Abonnieren",
@@ -349,22 +347,14 @@
     "pricing": {
       "title": "Preise für jeden Bedarf",
       "subtitle": "Wählen Sie die passende Formel und beginnen Sie, neue Kunden zu gewinnen",
-      "earlyBirdTab": "Einführungsangebot",
-      "earlyBirdBadge": "-40%",
-      "earlyBirdNote": "Exklusive Preise für die ersten 100 registrierten Restaurants",
       "standardTab": "Standardpreise",
       "perMonthLabel": "/Monat",
       "totalLabel": "d.h. CHF {price} insgesamt",
       "toteBags": "+ {count} personalisierte Tote-Bags gratis",
       "bestValue": "Bestes Preis-Leistungs-Verhältnis",
-      "lifetimeTitle": "Lebenslang-Angebot",
-      "lifetimeExclusive": "Exklusiv",
-      "lifetimeDesc": "Eine einmalige Zahlung für unbegrenzten Zugang zu allen Funktionen, lebenslang.",
-      "oneTimePayment": "einmalige Zahlung",
       "cta": "Details ansehen und abonnieren",
       "note": "Keine Bindung beim Monatsplan. Jederzeit kündbar.",
       "guarantee": "14 Tage kostenlos testen — Zufriedenheitsgarantie",
-      "spotsLeft": "Noch {count} Plätze im Early-Bird-Angebot",
       "includedTitle": "In allen Abonnements enthalten",
       "included": {
         "presence": "Präsenz Ihres Betriebs",
@@ -405,7 +395,7 @@
       "title": "Häufig gestellte Fragen",
       "q1": {
         "question": "Was kostet die Registrierung bei Just-Tag?",
-        "answer": "Wir bieten 3 Formeln an (monatlich, halbjährlich, jährlich) mit einem Einführungspreis für die ersten 100 registrierten Restaurants. Danach gelten Standardpreise. Ein Lebenslang-Angebot für CHF 1 495 ist ebenfalls verfügbar. Alle Halbjahres- und Jahrespläne beinhalten kostenlose personalisierte Tote-Bags."
+        "answer": "Wir bieten 3 Formeln an (monatlich, halbjährlich, jährlich) mit einem einheitlichen Preis für alle Restaurants, ab der ersten Anmeldung. Alle Halbjahres- und Jahrespläne beinhalten kostenlose personalisierte Tote-Bags."
       },
       "q2": {
         "question": "Bin ich an eine Mindestlaufzeit gebunden?",
@@ -421,7 +411,7 @@
       },
       "q5": {
         "question": "Welchen Support bieten Sie an?",
-        "answer": "Alle Pläne beinhalten E-Mail-Support. Die Jahres- und Lebenslang-Pläne profitieren von einem dedizierten und prioritären Support mit einem persönlichen Berater."
+        "answer": "Alle Pläne beinhalten E-Mail-Support. Der Jahresplan profitiert von einem dedizierten und prioritären Support mit einem persönlichen Berater."
       },
       "q6": {
         "question": "Kann ich mein Profil jederzeit ändern?",
@@ -552,12 +542,8 @@
       "title": "Klare Preise, keine Überraschungen",
       "subtitle": "Alle Pläne beinhalten die gleichen Funktionen. Der einzige Unterschied: Laufzeit und Preis.",
       "guarantee": "14 Tage kostenlos testen — Zufriedenheitsgarantie",
-      "earlyBirdLabel": "Einführungsangebot",
-      "earlyBirdBannerActive": "Einführungsangebot: -40% für die ersten 100 Restaurants. Nur noch {count} Plätze verfügbar. Diese Preise kommen nicht wieder.",
-      "earlyBirdBannerExpiring": "Early-Bird-Angebot endet bald. Melden Sie sich an, bevor es zu spät ist.",
       "bestValue": "Bestes Preis-Leistungs-Verhältnis",
       "perMonth": "/Monat",
-      "afterHundred": "nach 100 Anmeldungen",
       "totalPrice": "d.h. CHF {price} insgesamt",
       "freeTrial": "14 Tage gratis",
       "toteBags": "+ {count} personalisierte Tote-Bags gratis",
@@ -571,10 +557,6 @@
         "offers": "Aktuelle Angebote"
       },
       "startTrial": "Kostenlos testen",
-      "lifetimeExclusive": "Exklusiv",
-      "lifetimeDesc": "Mit dem Lebenslang-Angebot zahlen Sie einmalig und sparen sich alle zukünftigen Abonnements. Und 500 personalisierte Tote-Bags (geschätzter Wert CHF 2 500) sind inklusive.",
-      "lifetimeToteBags": "+ 500 personalisierte Tote-Bags gratis",
-      "singlePayment": "Einmalzahlung",
       "contactNote": "Noch nicht bereit? Hinterlassen Sie Ihre Nummer, wir rufen Sie an:",
       "gridTitle": "Klare Preise, WhatsApp inklusive",
       "gridSubtitle": "Wählen Sie Ihren Plan nach der Größe Ihres Restaurants. Bis zu {count} WhatsApp-Nachrichten/Monat inklusive.",
@@ -584,7 +566,6 @@
         "semiannual": "Halbjährlich",
         "annual": "Jährlich"
       },
-      "launchOfferBadge": "Einführungspreis — Angebot begrenzt auf die ersten 100 Restaurants",
       "messagesIncludedTitle": "200, 400 oder 800 WhatsApp-Nachrichten pro Monat inklusive",
       "messagesIncludedSubtitle": "Wählen Sie Ihren Plan nach dem monatlichen Nachrichtenvolumen",
       "tierDescriptions": {
@@ -656,15 +637,10 @@
       }
     },
     "finalCta": {
-      "spotsLeft": "Nur noch {count} Plätze im Early-Bird-Angebot",
       "joinNow": "Jetzt Just-Tag beitreten",
       "subtitle": "14 Tage gratis. Keine Provision. Jederzeit kündbar.",
       "cta": "Kostenlose Testphase starten",
       "contactNote": "Haben Sie eine Frage? Schreiben Sie uns an"
-    },
-    "earlyBirdBanner": {
-      "active": "Early-Bird-Angebot: -40% für die ersten 100 Abonnenten.",
-      "expired": "Early-Bird-Angebot endet bald"
     },
     "findRestaurant": {
       "title": "Ihr Restaurant ist vielleicht schon auf Just-Tag",
@@ -674,7 +650,7 @@
       "foundSubtitle": "Beanspruchen Sie Ihr Profil, um es anzupassen und mehr Gäste zu gewinnen.",
       "claimCta": "Mein Profil beanspruchen",
       "notFoundTitle": "Ihr Restaurant ist noch nicht auf Just-Tag.",
-      "notFoundSubtitle": "Fügen Sie es hinzu und profitieren Sie vom Early-Bird-Angebot!",
+      "notFoundSubtitle": "Fügen Sie es hinzu und gewinnen Sie noch heute an Sichtbarkeit!",
       "addCta": "Mein Restaurant hinzufügen"
     },
     "meta": {
@@ -762,8 +738,6 @@
       "continue": "Weiter"
     },
     "plan": {
-      "earlyBirdTitle": "Early-Bird-Angebot",
-      "earlyBirdSeats": "Nur noch {count} Platz/Plätze zum Vorzugstarif!",
       "trialInfo": "14 Tage kostenlos testen. Ohne Bindung.",
       "monthly": "Monatlich",
       "semiannual": "Halbjährlich",
@@ -772,14 +746,8 @@
       "totalLabel": "D.h. CHF {price} {period}",
       "freeTrial": "14 Tage gratis",
       "bestValue": "Bestes Preis-Leistungs-Verhältnis",
-      "lifetimeTitle": "Lifetime",
-      "lifetimeExclusive": "Exklusiv",
-      "lifetimeDesc": "Einmalzahlung, lebenslanger Zugang. Kein wiederkehrendes Abonnement.",
-      "lifetimePrice": "CHF 1 495",
-      "lifetimeSingle": "Einmalzahlung",
       "back": "Zurück",
       "checkoutLoading": "Weiterleitung zur Zahlung...",
-      "checkoutLifetime": "CHF 1 495 bezahlen",
       "checkoutTrial": "Kostenlose Testphase starten (14 Tage)"
     },
     "redirecting": {

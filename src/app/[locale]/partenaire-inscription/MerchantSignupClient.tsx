@@ -23,7 +23,6 @@ import {
 } from "@/actions/merchant/register";
 import {
   createCheckoutSession,
-  getEarlyBirdSeatsAvailable,
 } from "@/actions/subscriptions";
 import { getMerchantSession } from "@/actions/merchant/auth";
 import { getAffiliateRef } from "@/components/analytics/AffiliateTracker";
@@ -50,33 +49,25 @@ interface SignupData {
 
 // Montants alignés sur les vrais Price Stripe (vérifiés en direct via l'API
 // le 2026-08-08 — cette page affichait des prix différents de ce qui est
-// réellement facturé au moment du paiement, ex. palier 100/mensuel early
-// montrait "59.95" alors que le vrai prix Stripe est 89.95).
+// réellement facturé au moment du paiement, ex. palier 100/mensuel montrait
+// "59.95" alors que le vrai prix Stripe est 89.95).
+// Grille unique et définitive depuis le 2026-08-22 (fin de l'offre de
+// lancement Early Bird : ces tarifs sont désormais les prix de base, pour
+// tout le monde et pour toujours).
 const TIER_DISPLAY_PRICES: Record<50 | 100 | 200, {
-  launch: { monthly: string; semi: string; semiTotal: string; annual: string; annualTotal: string };
-  catalogue: { monthly: string; semi: string; semiTotal: string; annual: string; annualTotal: string };
+  monthly: string; semi: string; semiTotal: string; annual: string; annualTotal: string;
 }> = {
-  50: {
-    launch:    { monthly: "59.95", semi: "52.95", semiTotal: "317.70", annual: "49.95", annualTotal: "599.40" },
-    catalogue: { monthly: "89.95", semi: "79.95", semiTotal: "479.70", annual: "74.95", annualTotal: "899.40" },
-  },
-  100: {
-    launch:    { monthly: "89.95", semi: "79.95", semiTotal: "479.70", annual: "74.95", annualTotal: "899.40" },
-    catalogue: { monthly: "149.95", semi: "132.95", semiTotal: "797.70", annual: "124.95", annualTotal: "1499.40" },
-  },
-  200: {
-    launch:    { monthly: "149.95", semi: "132.95", semiTotal: "797.70", annual: "124.95", annualTotal: "1499.40" },
-    catalogue: { monthly: "249.95", semi: "219.95", semiTotal: "1319.70", annual: "204.95", annualTotal: "2459.40" },
-  },
+  50:  { monthly: "59.95",  semi: "52.95",  semiTotal: "317.70",  annual: "49.95",  annualTotal: "599.40" },
+  100: { monthly: "89.95",  semi: "79.95",  semiTotal: "479.70",  annual: "74.95",  annualTotal: "899.40" },
+  200: { monthly: "149.95", semi: "132.95", semiTotal: "797.70",  annual: "124.95", annualTotal: "1499.40" },
 };
 
-function getPlans(tier: 50 | 100 | 200, isEarlyBird: boolean) {
-  const p = TIER_DISPLAY_PRICES[tier][isEarlyBird ? "launch" : "catalogue"];
-  const cat = TIER_DISPLAY_PRICES[tier]["catalogue"];
+function getPlans(tier: 50 | 100 | 200) {
+  const p = TIER_DISPLAY_PRICES[tier];
   return [
-    { id: "monthly" as const,    pricePerMonth: p.monthly, totalPrice: null,          cataloguePrice: isEarlyBird ? cat.monthly : null,  periodLabel: "/mois",     icon: Star,  highlighted: false, badgeText: null },
-    { id: "semiannual" as const, pricePerMonth: p.semi,    totalPrice: p.semiTotal,   cataloguePrice: isEarlyBird ? cat.semi : null,     periodLabel: "/semestre", icon: Star,  highlighted: false, badgeText: null },
-    { id: "annual" as const,     pricePerMonth: p.annual,  totalPrice: p.annualTotal, cataloguePrice: isEarlyBird ? cat.annual : null,   periodLabel: "/an",       icon: Crown, highlighted: true,  badgeText: "Meilleur rapport" },
+    { id: "monthly" as const,    pricePerMonth: p.monthly, totalPrice: null,          periodLabel: "/mois",     icon: Star,  highlighted: false, badgeText: null },
+    { id: "semiannual" as const, pricePerMonth: p.semi,    totalPrice: p.semiTotal,   periodLabel: "/semestre", icon: Star,  highlighted: false, badgeText: null },
+    { id: "annual" as const,     pricePerMonth: p.annual,  totalPrice: p.annualTotal, periodLabel: "/an",       icon: Crown, highlighted: true,  badgeText: "Meilleur rapport" },
   ];
 }
 
@@ -119,7 +110,6 @@ export default function MerchantSignupClient() {
   });
 
   // Plan state
-  const [earlyBirdSeats, setEarlyBirdSeats] = useState<number | null>(null);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(
     planParam || null
   );
@@ -132,10 +122,8 @@ export default function MerchantSignupClient() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // ── Load Early Bird count on mount + restore merchantId ──
+  // ── Restore merchantId on mount ──
   useEffect(() => {
-    getEarlyBirdSeatsAvailable().then(setEarlyBirdSeats);
-
     // 1. Try sessionStorage first (set during this signup flow)
     const savedMerchantId = sessionStorage.getItem("jt_merchant_id");
     if (savedMerchantId) {
@@ -252,8 +240,7 @@ export default function MerchantSignupClient() {
 
   const stepIndex = steps.findIndex((s) => s.key === currentStep);
 
-  const isEarlyBird = earlyBirdSeats !== null && earlyBirdSeats > 0;
-  const plans = getPlans(selectedWhatsAppTier, isEarlyBird);
+  const plans = getPlans(selectedWhatsAppTier);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
@@ -503,13 +490,6 @@ export default function MerchantSignupClient() {
       {/* ════════════════════════════════════════════════════════════════════ */}
       {currentStep === "plan" && (
         <div className="mt-8 space-y-6">
-          {isEarlyBird && (
-            <div className="flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5 text-sm text-amber-800">
-              <span className="text-base">🎁</span>
-              <span>Tarif de lancement — offre limitée aux 100 premiers restaurants.</span>
-            </div>
-          )}
-
           {/* WhatsApp subscriber tier selector */}
           <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <p className="mb-3 text-sm font-semibold text-gray-700">Messages WhatsApp par mois</p>
@@ -563,9 +543,6 @@ export default function MerchantSignupClient() {
                     <span className="text-2xl font-bold text-[var(--color-just-tag)]">CHF {plan.pricePerMonth}</span>
                     <span className="text-xs text-gray-500">/mois</span>
                   </div>
-                  {plan.cataloguePrice && (
-                    <p className="mt-0.5 text-xs text-gray-400 line-through">CHF {plan.cataloguePrice}/mois</p>
-                  )}
                   {plan.totalPrice && (
                     <p className="mt-0.5 text-xs text-gray-500">Soit CHF {plan.totalPrice} {plan.periodLabel}</p>
                   )}
