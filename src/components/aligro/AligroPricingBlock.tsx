@@ -48,11 +48,13 @@ import {
  * Contenu 100% en français en dur, comme le reste de la page
  * /fr/clients-aligro.
  */
-const TIER_INFO: Record<MessageTier, { desc: string; popular: boolean }> = {
-  50: { desc: "Petits établissements, tables d'hôtes", popular: false },
-  100: { desc: "Restaurants familiaux, bars de quartier", popular: true },
-  200: { desc: "Grands volumes, brasseries, traiteurs", popular: false },
-};
+/**
+ * Palier mis en avant. Les descriptions de profil d'établissement
+ * (« Petits établissements, tables d'hôtes », « Restaurants familiaux »…)
+ * ont été retirées : elles enfermaient le lecteur dans une catégorie alors
+ * que le seul critère qui compte ici est le volume de messages.
+ */
+const POPULAR_TIER: MessageTier = 100;
 
 const BILLING_TABS: { id: BillingPeriod; label: string; badge?: string }[] = [
   { id: "monthly", label: "Mensuel" },
@@ -190,7 +192,7 @@ export function AligroPricingBlock() {
             const base = BASE_PRICES[tier][billing];
             const discounted = getAligroDiscountedPrice(base);
             if (discounted === null) return null;
-            const { desc, popular } = TIER_INFO[tier];
+            const popular = tier === POPULAR_TIER;
 
             const showTotal = billing !== "monthly";
             const baseTotal = totalForPeriod(tier, billing);
@@ -214,34 +216,45 @@ export function AligroPricingBlock() {
                 <div className="mb-2 inline-flex w-fit items-center rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">
                   {messagesPerMonth(tier)} messages/mois
                 </div>
-                <p className="text-sm text-gray-500">{desc}</p>
 
                 <div className="mt-4">
-                  <p className="text-sm text-gray-400">
+                  {/* Le prix de base est volontairement affiché en grand :
+                      c'est la comparaison avec le tarif ALIGRO juste en
+                      dessous qui fait percevoir la remise. Barré, en gris
+                      moyen et légèrement plus petit que le prix remisé, il
+                      reste clairement l'ancien prix sans lui voler la
+                      vedette. */}
+                  <p className="whitespace-nowrap leading-none text-gray-400">
                     <span className="sr-only">Prix de base, avant remise ALIGRO : </span>
-                    <s className="decoration-2 decoration-gray-400">
-                      CHF {base.toFixed(2)}/mois
+                    {/* La taille de police doit être portée par le <s>
+                        lui-même : le navigateur calcule la position du trait
+                        d'après la taille de l'élément barré, pas celle d'un
+                        enfant. Avec la taille sur un <span> interne, la barre
+                        se plaçait beaucoup trop haut sur les chiffres. */}
+                    <s className="font-condensed text-3xl font-bold decoration-[3px] decoration-gray-400">
+                      CHF {base.toFixed(2)}
                     </s>
+                    <span className="ml-1 text-sm">/mois</span>
                   </p>
-                  <p className="mt-0.5 whitespace-nowrap leading-none">
+                  <p className="mt-1.5 whitespace-nowrap leading-none">
                     <span className="sr-only">
                       Prix ALIGRO, remise de {discountPercent}% déjà appliquée :{" "}
                     </span>
-                    <span className="font-condensed text-4xl font-black text-gray-900">
+                    <span className="font-condensed text-5xl font-black text-[var(--color-just-tag)]">
                       CHF {discounted.toFixed(2)}
                     </span>
                     <span className="ml-1 text-sm text-gray-500">/mois</span>
                   </p>
                   {showTotal && (
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-2 text-sm text-gray-400">
                       <span className="sr-only">
                         Total de base pour la période, avant remise ALIGRO :{" "}
                       </span>
-                      <s className="decoration-gray-400">CHF {baseTotal.toFixed(2)}</s>{" "}
+                      <s className="decoration-2 decoration-gray-400">CHF {baseTotal.toFixed(2)}</s>{" "}
                       <span className="sr-only">
                         Total ALIGRO pour la période, remise déjà appliquée :{" "}
                       </span>
-                      <span className="font-semibold text-gray-600">
+                      <span className="font-bold text-gray-700">
                         CHF {discountedTotal.toFixed(2)}
                       </span>{" "}
                       {periodTotalLabel(billing)}
