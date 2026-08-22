@@ -82,7 +82,7 @@ const slides = [
   },
 ];
 
-export default function PitchPage() {
+export default function ApplicationPage() {
   return (
     <main style={{ background: "#0a0a0a", minHeight: "100vh", fontFamily: "system-ui, sans-serif" }}>
       {/* Header */}

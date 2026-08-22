@@ -1,28 +1,41 @@
-"use client";
-
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 
 /**
  * 404 pour toute route non résolue à l'intérieur d'un préfixe de locale
  * valide (/fr/..., /de/..., etc.) — ex. /fr/blog/slug-inexistant ou
- * /fr/collections/slug-inexistant.
+ * /fr/collections/slug-inexistant (notFound() explicite), ou une URL
+ * totalement inconnue via [locale]/[...rest]/page.tsx.
  *
  * Rendu à l'intérieur de [locale]/layout.tsx, cette page hérite donc
- * automatiquement du <Header>/<Footer> (via PublicLayoutWrapper) et du
- * NextIntlClientProvider déjà configurés pour la locale courante — corrige
- * le 404 "nu" (sans navigation) et systématiquement en français quelle que
- * soit la locale (#40).
+ * automatiquement du <Header>/<Footer> (via PublicLayoutWrapper) — corrige
+ * le 404 "nu" (sans navigation) quelle que soit la locale (#40).
  *
- * `not-found.tsx` ne reçoit pas les `params` de route dans l'App Router :
- * on récupère donc la locale via `useParams()`, comme le fait déjà
- * `Header.tsx`.
+ * SERVER COMPONENT (et non "use client" + useParams()) : `not-found.tsx` ne
+ * reçoit pas les `params` de route dans l'App Router, mais côté serveur la
+ * locale reste résolvable de façon fiable via `getLocale()` de next-intl,
+ * qui lit le contexte de requête posé par `i18n/request.ts` (lui-même
+ * alimenté par l'en-tête que le middleware next-intl déduit du préfixe
+ * d'URL) — indépendamment de la résolution du segment dynamique [locale]
+ * par le routeur. C'est l'approche recommandée par next-intl pour ce cas
+ * précis (voir next-intl/docs — Error files : not-found.js).
+ *
+ * Point de vigilance (voir notes de recette) : dans l'App Router de
+ * Next.js, tant que ce projet n'utilise pas de Parallel Routes, un appel à
+ * `notFound()` n'est jamais intercepté par un error-boundary côté SERVEUR
+ * (ce mécanisme — HTTPAccessFallbackBoundary — n'est câblé par Next.js que
+ * pour un root layout avec des slots parallèles). Le corps de cette page
+ * n'apparaît donc dans le HTML qu'après l'hydratation React côté client
+ * (comme pour n'importe quelle appli Next.js App Router sans routes
+ * parallèles) ; en revanche le statut HTTP 404 et les métadonnées <head>
+ * (title/description, déjà localisées via generateMetadata du layout)
+ * restent corrects dès la réponse initiale. Googlebot/Bingbot exécutent le
+ * JS et voient donc le contenu traduit ; un outil qui ne l'exécute pas
+ * (curl, certains bots de prévisualisation) ne verra que le head localisé.
  */
-export default function LocaleNotFound() {
-  const params = useParams();
-  const locale = (params?.locale as string) || "fr";
-  const t = useTranslations("notFoundPage");
+export default async function LocaleNotFound() {
+  const locale = await getLocale();
+  const t = await getTranslations("notFoundPage");
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center bg-gray-50 px-6 py-16">

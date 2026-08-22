@@ -270,8 +270,22 @@ export async function fetchFilteredRestaurants(
     const { data, error, count } = await query;
 
     if (error) {
+      // Une page demandée au-delà du total réel (ex. ?page=520 pour 519
+      // pages réelles à 24/page) fait démarrer `.range()` après la dernière
+      // ligne filtrée : PostgREST rejette alors TOUTE la requête ("Range Not
+      // Satisfiable", HTTP 416) — y compris le `count`, pourtant censé être
+      // exact et indépendant du range demandé. Sans ce fallback, le total
+      // retombait à 0 et le clamp de page (src/app/[locale]/restaurants/page.tsx)
+      // redirigeait vers la page 1 au lieu de la dernière page valide (#40,
+      // cas 3). On ne teste pas un code d'erreur précis (ex. PGRST103) car
+      // ce n'est pas le seul cas où .range() peut échouer sans invalider le
+      // total : dans tous les cas, une requête count-only (sans .range(),
+      // donc jamais hors bornes) permet au clamp de fonctionner. La liste
+      // reste vide pour cette page invalide ; c'est l'appelant qui redirige
+      // ensuite vers la bonne page avec ce total correct.
       console.error("[fetchFilteredRestaurants] Supabase error:", error.message);
-      return { data: [], totalCount: 0 };
+      const fallbackCount = await fetchPublishedRestaurantCount(filters);
+      return { data: [], totalCount: fallbackCount };
     }
 
     return {
