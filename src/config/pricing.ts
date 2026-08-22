@@ -47,9 +47,27 @@ export function basePrice(tier: MessageTier, period: BillingPeriod): number {
   return BASE_PRICES[tier][period];
 }
 
+/** Nombre de mois couverts par une périodicité de facturation. */
+export function monthsInPeriod(period: BillingPeriod): number {
+  return period === "semiannual" ? 6 : period === "annual" ? 12 : 1;
+}
+
+function roundToCents(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
 /** Montant total facturé pour la période (le prix de base est toujours "par mois"). */
 export function totalForPeriod(tier: MessageTier, period: BillingPeriod): number {
-  const monthly = basePrice(tier, period);
-  const months = period === "semiannual" ? 6 : period === "annual" ? 12 : 1;
-  return Math.round(monthly * months * 100) / 100;
+  return totalForPeriodFromMonthly(basePrice(tier, period), period);
+}
+
+/**
+ * Montant total facturé pour la période, à partir d'un prix mensuel déjà
+ * connu (par ex. un prix remisé calculé ailleurs, voir
+ * `getAligroDiscountedPrice()` dans `src/config/aligro.ts`). Permet de
+ * calculer un total remisé fiable sans dupliquer la conversion mois ↔
+ * périodicité, ni les prix de base.
+ */
+export function totalForPeriodFromMonthly(monthlyPrice: number, period: BillingPeriod): number {
+  return roundToCents(monthlyPrice * monthsInPeriod(period));
 }
