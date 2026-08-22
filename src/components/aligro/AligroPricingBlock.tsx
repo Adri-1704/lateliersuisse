@@ -48,11 +48,13 @@ import {
  * Contenu 100% en français en dur, comme le reste de la page
  * /fr/clients-aligro.
  */
-const TIER_INFO: Record<MessageTier, { desc: string; popular: boolean }> = {
-  50: { desc: "Petits établissements, tables d'hôtes", popular: false },
-  100: { desc: "Restaurants familiaux, bars de quartier", popular: true },
-  200: { desc: "Grands volumes, brasseries, traiteurs", popular: false },
-};
+/**
+ * Palier mis en avant. Les descriptions de profil d'établissement
+ * (« Petits établissements, tables d'hôtes », « Restaurants familiaux »…)
+ * ont été retirées : elles enfermaient le lecteur dans une catégorie alors
+ * que le seul critère qui compte ici est le volume de messages.
+ */
+const POPULAR_TIER: MessageTier = 100;
 
 const BILLING_TABS: { id: BillingPeriod; label: string; badge?: string }[] = [
   { id: "monthly", label: "Mensuel" },
@@ -190,7 +192,7 @@ export function AligroPricingBlock() {
             const base = BASE_PRICES[tier][billing];
             const discounted = getAligroDiscountedPrice(base);
             if (discounted === null) return null;
-            const { desc, popular } = TIER_INFO[tier];
+            const popular = tier === POPULAR_TIER;
 
             const showTotal = billing !== "monthly";
             const baseTotal = totalForPeriod(tier, billing);
@@ -214,7 +216,6 @@ export function AligroPricingBlock() {
                 <div className="mb-2 inline-flex w-fit items-center rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">
                   {messagesPerMonth(tier)} messages/mois
                 </div>
-                <p className="text-sm text-gray-500">{desc}</p>
 
                 <div className="mt-4">
                   {/* Le prix de base est volontairement affiché en grand :
