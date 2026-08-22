@@ -120,6 +120,10 @@ export default function MerchantSignupClient() {
   // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // Code machine-lisible renvoyé par registerMerchant pour le cas "un compte
+  // existe déjà" — permet d'afficher des liens vers connexion / mot de passe
+  // oublié sans dépendre du texte exact du message d'erreur.
+  const [errorCode, setErrorCode] = useState<"account_exists" | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   // ── Restore merchantId on mount ──
@@ -143,6 +147,7 @@ export default function MerchantSignupClient() {
     (step: Step, extraParams?: Record<string, string>) => {
       setCurrentStep(step);
       setError("");
+      setErrorCode(null);
       const url = new URL(window.location.href);
       url.searchParams.set("step", step);
       // Écrit aussi le plan/l'offre WhatsApp choisis dans l'URL : sans ça,
@@ -173,6 +178,7 @@ export default function MerchantSignupClient() {
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setErrorCode(null);
     if (!selectedPlanId) {
       setError("Veuillez sélectionner un plan.");
       return;
@@ -197,6 +203,7 @@ export default function MerchantSignupClient() {
 
     if (!result.success) {
       setError(result.error || "Erreur inconnue");
+      setErrorCode(result.errorCode ?? null);
       setLoading(false);
       return;
     }
@@ -302,7 +309,17 @@ export default function MerchantSignupClient() {
       {/* Error banner */}
       {error && (
         <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
-          {error}
+          <p>{error}</p>
+          {errorCode === "account_exists" && (
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-medium">
+              <Link href={`/${locale}/espace-client/connexion`} className="underline hover:no-underline">
+                Se connecter
+              </Link>
+              <Link href={`/${locale}/espace-client/mot-de-passe-oublie`} className="underline hover:no-underline">
+                Mot de passe oublié ?
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
