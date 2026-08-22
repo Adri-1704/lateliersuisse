@@ -17,8 +17,117 @@ interface RegisterParams {
 interface RegisterResult {
   success: boolean;
   error: string | null;
+  /**
+   * Code machine-lisible pour le cas "un compte existe déjà" : permet à
+   * l'UI de proposer des liens (connexion / mot de passe oublié) sans
+   * dépendre du texte exact du message d'erreur.
+   */
+  errorCode?: "account_exists";
   claim_request_id?: string;
   claim_status?: "pending";
+}
+
+// Message renvoyé aussi bien quand un `merchants` existe déjà pour cet email
+// que quand le compte Supabase Auth existant est un "vrai" compte (rattaché
+// à un merchant) : dans les deux cas c'est un cul-de-sac pour l'utilisateur
+// s'il n'est pas orienté vers la connexion ou la réinitialisation de mot de
+// passe (voir /espace-client/connexion et /espace-client/mot-de-passe-oublie).
+const ACCOUNT_EXISTS_RESULT: RegisterResult = {
+  success: false,
+  error:
+    "Un compte existe déjà avec cet email. Connectez-vous à votre espace client, ou réinitialisez votre mot de passe si vous l'avez oublié.",
+  errorCode: "account_exists",
+};
+
+/**
+ * Recherche un utilisateur Supabase Auth par email.
+ *
+ * L'API admin GoTrue exposée par `supabase-js` (`auth.admin.listUsers`) ne
+ * permet de filtrer que par page/perPage, pas par email — on doit donc
+ * parcourir les pages nous-mêmes. N'est appelé que quand
+ * `auth.admin.createUser` vient d'échouer avec "already been registered",
+ * pour retrouver l'utilisateur concerné et évaluer s'il s'agit d'un compte
+ * orphelin récupérable (voir `isOrphanAuthUser`). Même approche que celle
+ * déjà utilisée dans `src/lib/subscriptions/webhook-handler.ts`.
+ */
+async function findAuthUserByEmail(
+  supabase: ReturnType<typeof createAdminClient>,
+  email: string
+): Promise<{ id: string } | null> {
+  const target = email.toLowerCase().trim();
+  const perPage = 200;
+  // Garde-fou : au-delà de 50 pages (10 000 utilisateurs), on abandonne
+  // plutôt que de boucler indéfiniment — hors de portée à l'échelle actuelle
+  // de la plateforme.
+  for (let page = 1; page <= 50; page++) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage });
+    if (error || !data?.users) break;
+    const found = data.users.find((u) => u.email?.toLowerCase() === target);
+    if (found) return { id: found.id };
+    if (data.users.length < perPage) break; // dernière page atteinte
+  }
+  return null;
+}
+
+/**
+ * Détermine si un utilisateur Supabase Auth est un "orphelin" récupérable :
+ * un compte Auth créé lors d'une inscription précédente restée incomplète
+ * (échec entre l'étape `auth.admin.createUser` et l'insertion du
+ * `merchants` correspondant, avant que la compensation ci-dessous
+ * n'existe), auquel plus aucune ressource métier n'est rattachée.
+ *
+ * ⚠️ RAISONNEMENT DE SÉCURITÉ (à relire attentivement) : cette fonction
+ * conditionne la possibilité, pour quiconque fournit seulement un email et
+ * un mot de passe — l'email n'est JAMAIS vérifié ici, `email_confirm: true`
+ * est forcé sans envoi de lien de confirmation — de "reprendre la main" sur
+ * un compte Auth existant en réinitialisant son mot de passe. Une erreur
+ * dans cette fonction serait une prise de contrôle de compte triviale. On
+ * est donc délibérément conservateur.
+ *
+ * Un compte Auth est considéré orphelin SI ET SEULEMENT SI :
+ *   1. aucune ligne `merchants` n'a cet email (vérifié par l'appelant AVANT
+ *      même de tenter `createUser`, cf. étape 1 de `registerMerchant`) ; ET
+ *   2. aucune ligne `merchants` n'a `auth_user_id` égal à cet utilisateur
+ *      Auth (vérifié ici).
+ *
+ * Ces deux conditions suffisent à garantir qu'aucune ressource métier n'est
+ * rattachée à ce compte, car dans le schéma (`supabase/migrations/0001_*.sql`
+ * et `0008_claim_requests_and_flow.sql`) `merchants` est le seul point
+ * d'entrée vers tout le reste :
+ *   - `restaurants.merchant_id` est une clé étrangère vers `merchants.id`
+ *     (`ON DELETE SET NULL`) ;
+ *   - `claim_requests.merchant_id` est une clé étrangère `NOT NULL` vers
+ *     `merchants.id` (`ON DELETE CASCADE`) ;
+ *   - `subscriptions.merchant_id` est une clé étrangère `NOT NULL` vers
+ *     `merchants.id` (`ON DELETE CASCADE`).
+ * Ces contraintes FK sont appliquées par Postgres : aucune ligne de ces
+ * tables ne peut exister sans référencer un `merchants.id` existant. Si
+ * aucun `merchants` ne pointe vers cet utilisateur Auth (ni par email, ni
+ * par `auth_user_id`), aucun restaurant, aucune demande de revendication et
+ * aucun abonnement ne peut lui être rattaché non plus — il n'y a donc
+ * structurellement rien d'autre à vérifier ni à protéger.
+ *
+ * En cas d'erreur de lecture (impossible de garantir l'absence de
+ * rattachement), on refuse par prudence : le compte n'est PAS considéré
+ * comme orphelin, quitte à renvoyer une erreur générique à l'utilisateur
+ * plutôt que de risquer une prise de contrôle de compte.
+ */
+async function isOrphanAuthUser(
+  supabase: ReturnType<typeof createAdminClient>,
+  authUserId: string
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("merchants")
+    .select("id")
+    .eq("auth_user_id", authUserId)
+    .limit(1) as { data: { id: string }[] | null; error: unknown };
+
+  if (error) {
+    console.error("isOrphanAuthUser: échec de la vérification, on refuse par prudence:", error);
+    return false;
+  }
+
+  return !data || data.length === 0;
 }
 
 export async function registerMerchant(params: RegisterParams): Promise<RegisterResult> {
@@ -44,10 +153,20 @@ export async function registerMerchant(params: RegisterParams): Promise<Register
     .single() as { data: { id: string } | null; error: unknown };
 
   if (existingMerchant) {
-    return { success: false, error: "Un compte existe déjà avec cet email" };
+    return { ...ACCOUNT_EXISTS_RESULT };
   }
 
   // 2. Create Supabase Auth user
+  //
+  // `authUserId` peut provenir soit d'une création réussie dans CET appel,
+  // soit de la récupération d'un compte orphelin préexistant (voir
+  // `isOrphanAuthUser`). `createdNewAuthUser` distingue les deux cas : on ne
+  // supprime JAMAIS (compensation ci-dessous) un utilisateur qui existait
+  // déjà avant cet appel, même récupéré comme orphelin — seule l'annulation
+  // d'une création que l'on vient tout juste de faire est sûre.
+  let authUserId: string | undefined;
+  let createdNewAuthUser = false;
+
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
     password,
@@ -55,13 +174,54 @@ export async function registerMerchant(params: RegisterParams): Promise<Register
   });
 
   if (authError) {
-    if (authError.message?.includes("already been registered")) {
-      return { success: false, error: "Un compte existe déjà avec cet email" };
+    if (!authError.message?.includes("already been registered")) {
+      return { success: false, error: "Erreur lors de la création du compte" };
     }
-    return { success: false, error: "Erreur lors de la création du compte" };
+
+    // Un compte Auth existe déjà pour cet email — mais on vient de vérifier
+    // ci-dessus qu'aucun `merchants.email` n'y correspond. Reste à
+    // déterminer si ce compte Auth est un orphelin récupérable (créé lors
+    // d'une inscription précédente restée incomplète) ou un vrai compte
+    // existant (l'email Auth peut en théorie différer de `merchants.email`
+    // si l'email a été changé côté Auth sans mise à jour de `merchants` —
+    // cas limite couvert par la vérification par `auth_user_id`).
+    const existingAuthUser = await findAuthUserByEmail(supabase, email);
+
+    if (!existingAuthUser) {
+      // Ne devrait normalement jamais arriver (Supabase vient de dire que
+      // l'email est pris) — message générique par prudence.
+      console.error(`registerMerchant: "already been registered" pour un email, mais utilisateur introuvable via listUsers.`);
+      return { success: false, error: "Erreur lors de la création du compte. Veuillez réessayer." };
+    }
+
+    const orphan = await isOrphanAuthUser(supabase, existingAuthUser.id);
+
+    if (!orphan) {
+      // Vrai compte existant, rattaché à un commerçant : cas légitime.
+      return { ...ACCOUNT_EXISTS_RESULT };
+    }
+
+    // Compte orphelin confirmé (cf. `isOrphanAuthUser`) : on réutilise ce
+    // compte Auth pour cette inscription, en lui appliquant le mot de passe
+    // fourni ici. Sûr car aucune ressource métier n'y est attachée — il n'y
+    // a donc rien qu'un mot de passe différent pourrait "voler".
+    const { error: updateError } = await supabase.auth.admin.updateUserById(existingAuthUser.id, {
+      password,
+      email_confirm: true,
+    });
+
+    if (updateError) {
+      console.error("registerMerchant: échec de la réinitialisation du compte orphelin:", updateError);
+      return { success: false, error: "Erreur lors de la création du compte. Veuillez réessayer." };
+    }
+
+    authUserId = existingAuthUser.id;
+    createdNewAuthUser = false;
+  } else {
+    authUserId = authData.user?.id;
+    createdNewAuthUser = true;
   }
 
-  const authUserId = authData.user?.id;
   if (!authUserId) {
     return { success: false, error: "Erreur lors de la création du compte" };
   }
@@ -79,6 +239,23 @@ export async function registerMerchant(params: RegisterParams): Promise<Register
     .single();
 
   if (merchantError || !merchant) {
+    // Compensation : si CET appel vient de créer l'utilisateur Auth, on le
+    // supprime pour ne pas laisser d'orphelin qui bloquerait
+    // définitivement cet email (l'email deviendrait rejeté par `createUser`
+    // au prochain essai sans qu'aucun compte exploitable n'existe). On ne
+    // supprime JAMAIS un compte récupéré/préexistant — cf. raisonnement de
+    // sécurité de `isOrphanAuthUser` ci-dessus.
+    if (createdNewAuthUser) {
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(authUserId);
+      if (deleteError) {
+        console.error(
+          "registerMerchant: échec du rollback de l'utilisateur Auth après échec de création du merchant:",
+          deleteError,
+          "authUserId:",
+          authUserId
+        );
+      }
+    }
     return { success: false, error: "Erreur lors de la création du profil" };
   }
 
