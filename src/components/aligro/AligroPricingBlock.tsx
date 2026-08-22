@@ -225,10 +225,13 @@ export function AligroPricingBlock() {
                       vedette. */}
                   <p className="whitespace-nowrap leading-none text-gray-400">
                     <span className="sr-only">Prix de base, avant remise ALIGRO : </span>
-                    <s className="decoration-[3px] decoration-gray-400">
-                      <span className="font-condensed text-3xl font-bold">
-                        CHF {base.toFixed(2)}
-                      </span>
+                    {/* La taille de police doit être portée par le <s>
+                        lui-même : le navigateur calcule la position du trait
+                        d'après la taille de l'élément barré, pas celle d'un
+                        enfant. Avec la taille sur un <span> interne, la barre
+                        se plaçait beaucoup trop haut sur les chiffres. */}
+                    <s className="font-condensed text-3xl font-bold decoration-[3px] decoration-gray-400">
+                      CHF {base.toFixed(2)}
                     </s>
                     <span className="ml-1 text-sm">/mois</span>
                   </p>
